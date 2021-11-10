@@ -10,6 +10,8 @@
 
 ### 项目引用
 
+注:也可以通过nuget安装
+
 1. 引用HiSql.dll文件
 2. 根据使用数据库的需要可以引用以下数据库实现的sdk
    1. HiSql.sqlserver.dll 
@@ -69,6 +71,7 @@ HiSqlClient sqlclient = new HiSqlClient(
 ```
 
 ### 初始安装 
+注：只需要执行一次即可
 ```c#
 sqlclient.CodeFirst.InstallHisql();
 
@@ -82,7 +85,7 @@ sqlclient.CodeFirst.InstallHisql();
 
         可以是一个物理表也可以是临时表
     临时表的写法如 "#Hi_DataElement" 用1个#号表示 本地临时表 两个#号表示是全局临时表
-    变更表写法如"@Hi_DataElement" 注：仅对sqlserver数据库支持
+    变更表写法如"@Hi_DataElement" 注：其它库的语也是这个语法
 
     参2：new { domain = "UTYPE" }
 
@@ -98,7 +101,14 @@ sqlclient.CodeFirst.InstallHisql();
     以上语句并不会立即执行插入如要执行插入如下所示
     ```c#
     sqlclient.Insert("Hi_DataElement", new { domain = "UTYPE" }).ExecCommand();
+    
     ```
+    查看生成的sql语句 通过以下方式也可以知道hisql底层对于当前类型的数据库生成的sql语句
+
+    ```c#
+    string _sql =sqlclient.Insert("Hi_DataElement", new { domain = "UTYPE" }).ToSql();
+    ```
+
     如果要监控该语句生成的目标数据库的sql语句可以在连接配置事件
     执行前或执行后都可以监控到
     ```c#
@@ -138,6 +148,19 @@ sqlclient.CodeFirst.InstallHisql();
     sqlclient.Insert("Hi_Domain", new { Domain = "UTYPE", DomainDesc = "用户类型" }).ExecCommand();
     ```
 ---
+
+3. 如果在表里存在就更新没有则更新 
+   其实我们经常在业务开发中有这种业务场景，如果有该记录存在则更新没有则插入数据，一般是用存储过程或单独写sql语句，这两种方式都比较麻烦,而hisql提供了更加方便的写法如下所示
+   注：如果当前表的主键是自增长的id 则无法使用该功能 HiSql检漏时会报异常
+   
+    ```c#
+    //当该记录存在时就会更新，不存在则会插入 支持批量操作
+     sqlClient.Modi("H_Test", new { Hid = 1, UserName = "tansar", UserAge = 100, ReName = "Tom" }).ExecCommand();
+
+
+
+    ```
+
 
 ### 表数据查询
 
@@ -430,3 +453,85 @@ sqlclient.CodeFirst.InstallHisql();
     ```
 
 
+
+
+# HiSql 实现case语法操作
+
+在SqlServer,Oralce,Hana,PostGreSql,MySql 这些数据都支持SQL case语法，平常在实现业务开发中也会常用到，那么HiSql对于case语法也提供了比较便捷的写法，HiSql将会自动适配不同的数据库，开发人员不用管具体哪一种的SQL语法。
+
+### 这是HiSql样例写法代码
+HiSql提供的语法只要开发人员本身对SQL有一定的基础，基本上上手都比较容易
+```c#
+    string _sql=sqlClient.Query("Hi_TabModel").Field("TabName as tabname").
+        Case("TabStatus")
+            .When("TabStatus>1").Then("'启用'")
+            .When("0").Then("'未激活'")
+            .Else("'未启用'")
+        .EndAs("Tabs", typeof(string))
+        .Field("IsSys")
+        .ToSql()
+        ;
+```
+#### When方法中的字条件语法 (HiSql支持的库都是以下同样的写法)
+1. When("TabStatus>1")  支持的操作符 >,<,>=,<=,!=,<> 如果操作符不在此列HiSql将会检测语法错误
+2. 当是字段是字符串时 值加下加单引号如 When("TabName='TabName'")
+3. 当然也可以这样写 .When("0")   这里的意思与 When("TabStatus=0")
+
+#### 注意事项
+1. 当出现语法错误时HiSql会自动检测并报出错误异常
+2. Case语法不支持嵌套Case语法（日常使用这样会有性能问题）
+
+
+
+
+### HiSql生成的原生SqlServer 代码
+```sql
+select [Hi_TabModel].[TabName] as [tabname],case
+        when [TabStatus] > 1 then '启用'
+        when [TabStatus] = 0 then '未激活'
+        else '未启用'
+    end as [Tabs]
+    ,[Hi_TabModel].[IsSys] from [Hi_TabModel] as [Hi_TabModel]
+```
+---
+### HiSql生成的原生MySql 代码
+```sql
+select `Hi_TabModel`.`TabName` as `tabname`,case
+    when `TabStatus` > 1 then '启用'
+    when `TabStatus` = 0 then '未激活'
+    else '未启用'
+    end as `Tabs`
+    ,`Hi_TabModel`.`IsSys` from `Hi_TabModel` as `Hi_TabModel`
+```
+---
+### HiSql生成的原生HANA 代码
+```sql
+SELECT "HI_TABMODEL"."TABNAME" AS "TABNAME",CASE
+   WHEN "TABSTATUS" > 1 THEN '启用'
+   WHEN "TABSTATUS" = 0 THEN '未激活'
+   ELSE '未启用'
+END AS "TABS"
+,"HI_TABMODEL"."ISSYS" FROM  "HONEBI"."HI_TABMODEL" AS "HI_TABMODEL" 
+
+```
+
+### HiSql生成的原生ORACLE 代码
+```sql
+SELECT HI_TABMODEL."TABNAME" AS "TABNAME",CASE
+   WHEN "TABSTATUS" > 1 THEN '启用'
+   WHEN "TABSTATUS" = 0 THEN '未激活'
+   ELSE '未启用'
+END AS "TABS"
+,HI_TABMODEL."ISSYS" FROM HI_TABMODEL   HI_TABMODEL
+```
+
+### HiSql生成的原生PostGreSql 代码
+```sql
+select "Hi_TabModel"."TabName" as "tabname",case
+   when "TabStatus" > 1 then '启用'
+   when "TabStatus" = 0 then '未激活'
+   else '未启用'
+end as "Tabs"
+,"Hi_TabModel"."IsSys" from "Hi_TabModel" as "Hi_TabModel"
+
+```
