@@ -12,10 +12,11 @@
 
 1. 引用HiSql.dll文件
 2. 根据使用数据库的需要可以引用以下数据库实现的sdk
-   1. HiSql.sqlserver.dll 暂进只实现了这个
+   1. HiSql.sqlserver.dll 
    2. HiSql.hana.dll
    3. HiSql.mysql.dll
    4. HiSql.oracle.dll
+   5. HiSql.postgresql.dll
 
 
 ### 配置数据库连接
