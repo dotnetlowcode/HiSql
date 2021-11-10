@@ -1,0 +1,17 @@
+D:\Project\NETCORE\HiSql.SqlServer\bin\Release\net5.0\HiSql.SqlServer.deps.json
+D:\Project\NETCORE\HiSql.SqlServer\bin\Release\net5.0\HiSql.SqlServer.dll
+D:\Project\NETCORE\HiSql.SqlServer\bin\Release\net5.0\ref\HiSql.SqlServer.dll
+D:\Project\NETCORE\HiSql.SqlServer\bin\Release\net5.0\HiSql.SqlServer.pdb
+D:\Project\NETCORE\HiSql.SqlServer\obj\Release\net5.0\HiSql.SqlServer.GeneratedMSBuildEditorConfig.editorconfig
+D:\Project\NETCORE\HiSql.SqlServer\obj\Release\net5.0\HiSql.SqlServer.AssemblyInfoInputs.cache
+D:\Project\NETCORE\HiSql.SqlServer\obj\Release\net5.0\HiSql.SqlServer.AssemblyInfo.cs
+D:\Project\NETCORE\HiSql.SqlServer\obj\Release\net5.0\HiSql.SqlServer.csproj.CoreCompileInputs.cache
+D:\Project\NETCORE\HiSql.SqlServer\obj\Release\net5.0\HiSql.SqlServer.dll
+D:\Project\NETCORE\HiSql.SqlServer\obj\Release\net5.0\ref\HiSql.SqlServer.dll
+D:\Project\NETCORE\HiSql.SqlServer\obj\Release\net5.0\HiSql.SqlServer.pdb
+D:\Project\NETCORE\HiSql.SqlServer\obj\Release\net5.0\HiSql.SqlServer.csprojAssemblyReference.cache
+D:\Project\NETCORE\HiSql.SqlServer\obj\Release\net5.0\HiSql.SqlServer.Properties.Resources.resources
+D:\Project\NETCORE\HiSql.SqlServer\obj\Release\net5.0\HiSql.SqlServer.csproj.GenerateResource.cache
+D:\Project\NETCORE\HiSql.SqlServer\bin\Release\net5.0\HiSql.dll
+D:\Project\NETCORE\HiSql.SqlServer\bin\Release\net5.0\HiSql.pdb
+D:\Project\NETCORE\HiSql.SqlServer\obj\Release\net5.0\HiSql.SqlServer.csproj.CopyComplete

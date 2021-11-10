@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <Copyright></Copyright>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Authors>tansar</Authors>
+    <Description>HiSql 核心包
+支持SqlServer,MySql,Oracle,Hana,PostGreSql 根据需要单独再引用支持的包
+解决部分bug问题
+支持动态类</Description>
+    <Company>Hone</Company>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.0.1.6</Version>
+    <PackageProjectUrl>http://www.hisql.net</PackageProjectUrl>
+    <SignAssembly>false</SignAssembly>
+    <AssemblyOriginatorKeyFile>hisql.pfx</AssemblyOriginatorKeyFile>
+    <DelaySign>false</DelaySign>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="SqlRealize\SqlServer\**" />
+    <EmbeddedResource Remove="SqlRealize\SqlServer\**" />
+    <None Remove="SqlRealize\SqlServer\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="5.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
+  </ItemGroup>
+
+  <!--<ItemGroup>
+    <Reference Include="HiSql.SqlServer">
+      <HintPath>..\HiSql.SqlServer\bin\Debug\net5.0\HiSql.SqlServer.dll</HintPath>
+    </Reference>
+  </ItemGroup>-->
+
+
+</Project>

@@ -1,0 +1,101 @@
+﻿using System;
+using System.Dynamic;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace HiSql.UnitTest
+{
+    class Program
+    {
+        public delegate string MethodCaller(string firstName, string lastName);
+        static void Main(string[] args)
+        {
+            /*
+            Console.WriteLine("1:" + Thread.CurrentThread.ManagedThreadId);
+            MethodCaller method = new MethodCaller(GetFullName);
+            //Task task = Task.Run(() => MethodCaller(GetFullName)) ;
+            //IAsyncResult result = method.BeginInvoke("m", "n",null,null);
+            var workTask = Task.Run(() => method.Invoke("m", "n" ));
+            bool flag = workTask.Wait(2000,new CancellationToken(true));
+            //bool flag = result.AsyncWaitHandle.WaitOne(2000, true);//请教WaitOne的第二个参数是什么作用？            
+            if (flag)
+            {
+                Console.WriteLine("time in");
+            }
+            else
+            {
+                Console.WriteLine("time out");
+            }
+
+            string fullName = workTask.Result;
+
+
+            Console.WriteLine(fullName);
+            Console.WriteLine("2:" + Thread.CurrentThread.ManagedThreadId);
+            */
+
+            /*
+            dynamic o1 = new { UserName = "tansar", Age = 33 };
+            ExpandoObject o2 = new ExpandoObject();
+            dynamic o3 = (dynamic)o2;
+            o3.UserName = "tansar";
+            o3.Age = 33;
+
+            TDynamic t1 = new TDynamic();
+            t1["UserName"] = "tansar";
+            t1["Age"] = 33;
+            dynamic o4 = (ExpandoObject)t1;
+            Console.WriteLine(t1["Age"]);
+
+            Console.WriteLine(o4.Age);
+
+            //DataConvert.ToDynamic(new TDynamic(new { UserName = "tansar", Age = 33 }).ToDynamic());
+            DataConvert.ToDynamic(t1.ToDynamic());
+            */
+
+
+            HiSqlClient sqlcient = Demo_Init.GetSqlClient();
+
+            Console.WriteLine(sqlcient.Context.ConnectedId);
+
+            Demo_Update.Init(sqlcient);
+            //Demo_Query.Init(sqlcient);
+
+            //Demo_Delete.Init(sqlcient);
+            //Demo_Insert.Init(sqlcient);
+            //DemoCodeFirst.Init(sqlcient);
+            //Demo_Snro.Init(sqlcient);
+            
+            Console.Read();
+        }
+
+         public static void ToAnonymous(dynamic o)
+        {
+
+            //var ostr = JsonConvert.SerializeObject(o);
+
+            //dynamic json = Newtonsoft.Json.Linq.JToken.Parse(ostr) as dynamic;
+
+
+            Type type = o.GetType();
+            dynamic x = new { UserName = "tansar", Age = 33 };
+            dynamic dyn = (dynamic)o;
+
+            Console.WriteLine($"UserName:{dyn.UserName},Age:{dyn.Age}");
+            //object o1=Activator.CreateInstance(type, true);
+
+            //if (o1 != null)
+            //{ 
+
+            //}
+
+        }
+        public static string GetFullName(string firstName, string lastName)
+        {
+            Console.WriteLine("3:" + Thread.CurrentThread.ManagedThreadId);
+            Thread.Sleep(6000);
+            Console.WriteLine("3:" + Thread.CurrentThread.ManagedThreadId);
+            return firstName + lastName;
+        }
+    }
+}

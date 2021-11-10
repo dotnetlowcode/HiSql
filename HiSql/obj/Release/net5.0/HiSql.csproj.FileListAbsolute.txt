@@ -1,0 +1,11 @@
+D:\Project\NETCORE\HiSql\obj\Release\net5.0\HiSql.GeneratedMSBuildEditorConfig.editorconfig
+D:\Project\NETCORE\HiSql\obj\Release\net5.0\HiSql.AssemblyInfoInputs.cache
+D:\Project\NETCORE\HiSql\obj\Release\net5.0\HiSql.AssemblyInfo.cs
+D:\Project\NETCORE\HiSql\obj\Release\net5.0\HiSql.csproj.CoreCompileInputs.cache
+D:\Project\NETCORE\HiSql\bin\Release\net5.0\HiSql.deps.json
+D:\Project\NETCORE\HiSql\bin\Release\net5.0\HiSql.dll
+D:\Project\NETCORE\HiSql\bin\Release\net5.0\ref\HiSql.dll
+D:\Project\NETCORE\HiSql\bin\Release\net5.0\HiSql.pdb
+D:\Project\NETCORE\HiSql\obj\Release\net5.0\HiSql.dll
+D:\Project\NETCORE\HiSql\obj\Release\net5.0\ref\HiSql.dll
+D:\Project\NETCORE\HiSql\obj\Release\net5.0\HiSql.pdb

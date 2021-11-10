@@ -1,0 +1,16 @@
+D:\Project\NETCORE\HiSql.Hana\bin\Release\net5.0\HiSql.Hana.deps.json
+D:\Project\NETCORE\HiSql.Hana\bin\Release\net5.0\HiSql.Hana.dll
+D:\Project\NETCORE\HiSql.Hana\bin\Release\net5.0\ref\HiSql.Hana.dll
+D:\Project\NETCORE\HiSql.Hana\bin\Release\net5.0\HiSql.Hana.pdb
+D:\Project\NETCORE\HiSql.Hana\obj\Release\net5.0\HiSql.Hana.GeneratedMSBuildEditorConfig.editorconfig
+D:\Project\NETCORE\HiSql.Hana\obj\Release\net5.0\HiSql.Hana.AssemblyInfoInputs.cache
+D:\Project\NETCORE\HiSql.Hana\obj\Release\net5.0\HiSql.Hana.AssemblyInfo.cs
+D:\Project\NETCORE\HiSql.Hana\obj\Release\net5.0\HiSql.Hana.csproj.CoreCompileInputs.cache
+D:\Project\NETCORE\HiSql.Hana\obj\Release\net5.0\HiSql.Hana.dll
+D:\Project\NETCORE\HiSql.Hana\obj\Release\net5.0\ref\HiSql.Hana.dll
+D:\Project\NETCORE\HiSql.Hana\obj\Release\net5.0\HiSql.Hana.pdb
+D:\Project\NETCORE\HiSql.Hana\obj\Release\net5.0\HiSql.Hana.csproj.CopyComplete
+D:\Project\NETCORE\HiSql.Hana\bin\Release\net5.0\Sap.Data.Hana.Core.v2.1.dll
+D:\Project\NETCORE\HiSql.Hana\obj\Release\net5.0\HiSql.Hana.Properties.Resources.resources
+D:\Project\NETCORE\HiSql.Hana\obj\Release\net5.0\HiSql.Hana.csproj.GenerateResource.cache
+D:\Project\NETCORE\HiSql.Hana\obj\Release\net5.0\HiSql.Hana.csprojAssemblyReference.cache
