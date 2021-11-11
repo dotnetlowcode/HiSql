@@ -13,8 +13,8 @@ namespace HiSql.HanaUnitTest
 
         public static HanaBulkCopy GetNativeClient()
         {
-            //HanaConnection hdbconn = new HanaConnection("DRIVER=HDBODBC;UID=HONEBI;PWD=Hone@2021;SERVERNODE =192.168.10.96:32015;DATABASENAME =HBI");
-            HanaConnection hdbconn = new HanaConnection("DRIVER=HDBODBC;UID=SAPHANADB;PWD=Hone@crd@2019;SERVERNODE =192.168.10.243:31015;DATABASENAME =QAS");
+            HanaConnection hdbconn = new HanaConnection("DRIVER=HDBODBC;UID=HONEBI;PWD=tt@2021;SERVERNODE =192.168.1.1:32015;DATABASENAME =HBI");
+          
             hdbconn.Open();
             HanaBulkCopy mybuild = new HanaBulkCopy(hdbconn);
             return mybuild;

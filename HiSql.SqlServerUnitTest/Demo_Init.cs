@@ -16,7 +16,6 @@ namespace HiSql.UnitTest
                      {
                          DbType = DBType.SqlServer,
                          DbServer = "local-HoneBI",
-                         //ConnectionString = "server=192.168.1.90,8433;uid=sa;pwd=Hone@123;database=HoneBI",
                          ConnectionString = "server=(local);uid=sa;pwd=Hone@123;database=HiSql;",//; MultipleActiveResultSets = true;
                          //User="tansar",//可以指定登陆用户的帐号
                         
