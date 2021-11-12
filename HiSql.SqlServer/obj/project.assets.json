@@ -208,7 +208,7 @@
           }
         }
       },
-      "HiSql/1.0.1.6": {
+      "HiSql/1.0.1.8": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
@@ -691,7 +691,7 @@
         "version.txt"
       ]
     },
-    "HiSql/1.0.1.6": {
+    "HiSql/1.0.1.8": {
       "type": "project",
       "path": "../HiSql/HiSql.csproj",
       "msbuildProject": "../HiSql/HiSql.csproj"
@@ -699,7 +699,7 @@
   },
   "projectFileDependencyGroups": {
     "net5.0": [
-      "HiSql >= 1.0.1.6"
+      "HiSql >= 1.0.1.8"
     ]
   },
   "packageFolders": {
@@ -707,7 +707,7 @@
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
-    "version": "1.0.1.5",
+    "version": "1.0.1.8",
     "restore": {
       "projectUniqueName": "D:\\Project\\OpenSource\\HiSql\\HiSql.SqlServer\\HiSql.SqlServer.csproj",
       "projectName": "HiSql.SqlServer",

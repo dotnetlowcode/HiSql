@@ -435,7 +435,7 @@
           }
         }
       },
-      "HiSql/1.0.1.6": {
+      "HiSql/1.0.1.8": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
@@ -451,11 +451,11 @@
           "bin/placeholder/HiSql.dll": {}
         }
       },
-      "HiSql.MySql/1.0.1.3": {
+      "HiSql.MySql/1.0.1.8": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
-          "HiSql": "1.0.1.3",
+          "HiSql": "1.0.1.8",
           "MySql.Data": "8.0.26"
         },
         "compile": {
@@ -1368,12 +1368,12 @@
         "version.txt"
       ]
     },
-    "HiSql/1.0.1.6": {
+    "HiSql/1.0.1.8": {
       "type": "project",
       "path": "../HiSql/HiSql.csproj",
       "msbuildProject": "../HiSql/HiSql.csproj"
     },
-    "HiSql.MySql/1.0.1.3": {
+    "HiSql.MySql/1.0.1.8": {
       "type": "project",
       "path": "../HiSql.MySql/HiSql.MySql.csproj",
       "msbuildProject": "../HiSql.MySql/HiSql.MySql.csproj"
@@ -1381,8 +1381,8 @@
   },
   "projectFileDependencyGroups": {
     "net5.0": [
-      "HiSql >= 1.0.1.6",
-      "HiSql.MySql >= 1.0.1.3"
+      "HiSql >= 1.0.1.8",
+      "HiSql.MySql >= 1.0.1.8"
     ]
   },
   "packageFolders": {

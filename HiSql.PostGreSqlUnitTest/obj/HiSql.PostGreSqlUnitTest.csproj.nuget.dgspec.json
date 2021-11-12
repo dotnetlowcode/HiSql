@@ -70,7 +70,7 @@
       }
     },
     "D:\\Project\\OpenSource\\HiSql\\HiSql.PostGreSql\\HiSql.PostGreSql.csproj": {
-      "version": "1.0.1.3",
+      "version": "1.0.1.8",
       "restore": {
         "projectUniqueName": "D:\\Project\\OpenSource\\HiSql\\HiSql.PostGreSql\\HiSql.PostGreSql.csproj",
         "projectName": "HiSql.PostGreSql",
@@ -96,7 +96,11 @@
         "frameworks": {
           "net5.0": {
             "targetAlias": "net5.0",
-            "projectReferences": {}
+            "projectReferences": {
+              "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj": {
+                "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj"
+              }
+            }
           }
         },
         "warningProperties": {
@@ -109,10 +113,6 @@
         "net5.0": {
           "targetAlias": "net5.0",
           "dependencies": {
-            "HiSql": {
-              "target": "Package",
-              "version": "[1.0.1.3, )"
-            },
             "Npgsql": {
               "target": "Package",
               "version": "[5.0.7, )"
@@ -138,7 +138,7 @@
       }
     },
     "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj": {
-      "version": "1.0.1.6",
+      "version": "1.0.1.8",
       "restore": {
         "projectUniqueName": "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj",
         "projectName": "HiSql",

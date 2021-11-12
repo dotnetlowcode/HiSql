@@ -9,7 +9,7 @@
 解决部分bug问题</description>
     <dependencies>
       <group targetFramework="net5.0">
-        <dependency id="HiSql" version="1.0.1.6" exclude="Build,Analyzers" />
+        <dependency id="HiSql" version="1.0.1.7" exclude="Build,Analyzers" />
       </group>
     </dependencies>
   </metadata>

@@ -105,6 +105,17 @@ namespace HiSql
         string BuildDeleteSql(TableDefinition table, Dictionary<string, string> dic_value, string _where, bool istruncate = false);
         string BuildUpdateSql(TableDefinition table, Dictionary<string, string> dic_value, Dictionary<string, string> dic_primary, string _where);
 
+        /// <summary>
+        /// 生成更新语句,实现数据 以字段更新字段带表达式的内容
+        /// </summary>
+        /// <param name="tabinfo"></param>
+        /// <param name="table"></param>
+        /// <param name="dic_value"></param>
+        /// <param name="dic_primary"></param>
+        /// <param name="_where"></param>
+        /// <returns></returns>
+        string BuildUpdateSql(TabInfo tabinfo, TableDefinition table, Dictionary<string, string> dic_value, Dictionary<string, string> dic_primary, string _where);
+
         string BuilderWhereSql(List<TableDefinition> TableList, Dictionary<string, TabInfo> dictabinfo, List<FieldDefinition> Fields, List<FilterDefinition> Wheres, bool issubquery);
     }
 }

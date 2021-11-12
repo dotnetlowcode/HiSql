@@ -24,3 +24,7 @@ D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\net5.0\HiSql.PostGreSql.c
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\net5.0\HiSql.PostGreSql.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\net5.0\ref\HiSql.PostGreSql.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\net5.0\HiSql.PostGreSql.pdb
+D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\net5.0\HiSql.dll
+D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\net5.0\HiSql.pdb
+D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\net5.0\HiSql.PostGreSql.csprojAssemblyReference.cache
+D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\net5.0\HiSql.PostGreSql.csproj.CopyComplete

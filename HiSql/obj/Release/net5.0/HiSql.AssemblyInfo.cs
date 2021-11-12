@@ -14,11 +14,11 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Hone")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("HiSql 核心包\r\n支持SqlServer,MySql,Oracle,Hana,PostGreSql 根据需要单独再引用支持的包\r\n解决部分bug问题\r\n")]
-[assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.1.5")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.1.5")]
+[assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.1.7")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.1.7")]
 [assembly: System.Reflection.AssemblyProductAttribute("HiSql")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HiSql")]
-[assembly: System.Reflection.AssemblyVersionAttribute("1.0.1.5")]
+[assembly: System.Reflection.AssemblyVersionAttribute("1.0.1.7")]
 
 // 由 MSBuild WriteCodeFragment 类生成。
 

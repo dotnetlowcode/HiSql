@@ -34,6 +34,33 @@ namespace HiSql
         }
 
         /// <summary>
+        /// 获取多个组合匹配
+        /// </summary>
+        /// <param name="_regex"></param>
+        /// <param name="_text"></param>
+        /// <returns></returns>
+        public static List<Dictionary<string, string>> RegexGrps(string _regex, string _text)
+        {
+            List<Dictionary<string, string>> _lstresult = new List<Dictionary<string, string>>();
+
+            Regex regex = new Regex(_regex.Trim(), RegexOptions.IgnoreCase | RegexOptions.Multiline);
+            Match _match = regex.Match(_text);
+            while (_match.Success)
+            {
+                Dictionary<string, string> _dic = new Dictionary<string, string>();
+                foreach (string name in regex.GetGroupNames())
+                {
+                    _dic.Add(name, _match.Groups[regex.GroupNumberFromName(name)].Value);
+                }
+                _lstresult.Add(_dic);
+
+                _match = _match.NextMatch();
+            }
+            return _lstresult;
+        }
+
+
+        /// <summary>
         /// (?<name>[\w]+[.]{1}[\[]{1}[\w]+[\]]{1})
         /// </summary>
         /// <param name="regex"></param>

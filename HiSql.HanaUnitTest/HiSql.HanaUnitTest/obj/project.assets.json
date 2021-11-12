@@ -70,7 +70,7 @@
           "lib/netcoreapp3.0/Microsoft.Extensions.Primitives.dll": {}
         }
       },
-      "Microsoft.NETCore.Platforms/3.1.0": {
+      "Microsoft.NETCore.Platforms/5.0.0": {
         "type": "package",
         "compile": {
           "lib/netstandard1.0/_._": {}
@@ -146,6 +146,36 @@
           }
         }
       },
+      "System.Data.Odbc/5.0.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.NETCore.Platforms": "5.0.0"
+        },
+        "compile": {
+          "ref/netstandard2.0/System.Data.Odbc.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/System.Data.Odbc.dll": {}
+        },
+        "runtimeTargets": {
+          "runtimes/freebsd/lib/netcoreapp2.0/System.Data.Odbc.dll": {
+            "assetType": "runtime",
+            "rid": "freebsd"
+          },
+          "runtimes/linux/lib/netcoreapp2.0/System.Data.Odbc.dll": {
+            "assetType": "runtime",
+            "rid": "linux"
+          },
+          "runtimes/osx/lib/netcoreapp2.0/System.Data.Odbc.dll": {
+            "assetType": "runtime",
+            "rid": "osx"
+          },
+          "runtimes/win/lib/netcoreapp2.0/System.Data.Odbc.dll": {
+            "assetType": "runtime",
+            "rid": "win"
+          }
+        }
+      },
       "System.Data.SqlClient/4.8.2": {
         "type": "package",
         "dependencies": {
@@ -208,7 +238,7 @@
           }
         }
       },
-      "HiSql/1.0.1.6": {
+      "HiSql/1.0.1.8": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
@@ -222,6 +252,20 @@
         },
         "runtime": {
           "bin/placeholder/HiSql.dll": {}
+        }
+      },
+      "HiSql.Hana/1.0.1.8": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v5.0",
+        "dependencies": {
+          "HiSql": "1.0.1.8",
+          "System.Data.Odbc": "5.0.0"
+        },
+        "compile": {
+          "bin/placeholder/HiSql.Hana.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/HiSql.Hana.dll": {}
         }
       }
     }
@@ -351,17 +395,18 @@
         "version.txt"
       ]
     },
-    "Microsoft.NETCore.Platforms/3.1.0": {
-      "sha512": "z7aeg8oHln2CuNulfhiLYxCVMPEwBl3rzicjvIX+4sUuCwvXw5oXQEtbiU2c0z4qYL5L3Kmx0mMA/+t/SbY67w==",
+    "Microsoft.NETCore.Platforms/5.0.0": {
+      "sha512": "VyPlqzH2wavqquTcYpkIIAQ6WdenuKoFN0BdYBbCWsclXacSOHNQn66Gt4z5NBqEYW0FAPm5rlvki9ZiCij5xQ==",
       "type": "package",
-      "path": "microsoft.netcore.platforms/3.1.0",
+      "path": "microsoft.netcore.platforms/5.0.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
+        "Icon.png",
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
         "lib/netstandard1.0/_._",
-        "microsoft.netcore.platforms.3.1.0.nupkg.sha512",
+        "microsoft.netcore.platforms.5.0.0.nupkg.sha512",
         "microsoft.netcore.platforms.nuspec",
         "runtime.json",
         "useSharedDesignerContext.txt",
@@ -501,6 +546,40 @@
         "runtime.win-x86.runtime.native.system.data.sqlclient.sni.4.4.0.nupkg.sha512",
         "runtime.win-x86.runtime.native.system.data.sqlclient.sni.nuspec",
         "runtimes/win-x86/native/sni.dll",
+        "useSharedDesignerContext.txt",
+        "version.txt"
+      ]
+    },
+    "System.Data.Odbc/5.0.0": {
+      "sha512": "j4WsYGmcD7m1D0Tc3N7HqWqcdUHNn9+kdXh9ODTWEsOGrAvALf+BgRStd7L0/O/zDS0R4Uu9vNM8UY6EnK+WYw==",
+      "type": "package",
+      "path": "system.data.odbc/5.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/net461/System.Data.Odbc.dll",
+        "lib/net461/System.Data.Odbc.xml",
+        "lib/netstandard2.0/System.Data.Odbc.dll",
+        "lib/netstandard2.0/System.Data.Odbc.xml",
+        "ref/net461/System.Data.Odbc.dll",
+        "ref/net461/System.Data.Odbc.xml",
+        "ref/netstandard2.0/System.Data.Odbc.dll",
+        "ref/netstandard2.0/System.Data.Odbc.xml",
+        "runtimes/freebsd/lib/netcoreapp2.0/System.Data.Odbc.dll",
+        "runtimes/freebsd/lib/netcoreapp2.0/System.Data.Odbc.xml",
+        "runtimes/linux/lib/netcoreapp2.0/System.Data.Odbc.dll",
+        "runtimes/linux/lib/netcoreapp2.0/System.Data.Odbc.xml",
+        "runtimes/osx/lib/netcoreapp2.0/System.Data.Odbc.dll",
+        "runtimes/osx/lib/netcoreapp2.0/System.Data.Odbc.xml",
+        "runtimes/win/lib/net461/System.Data.Odbc.dll",
+        "runtimes/win/lib/net461/System.Data.Odbc.xml",
+        "runtimes/win/lib/netcoreapp2.0/System.Data.Odbc.dll",
+        "runtimes/win/lib/netcoreapp2.0/System.Data.Odbc.xml",
+        "system.data.odbc.5.0.0.nupkg.sha512",
+        "system.data.odbc.nuspec",
         "useSharedDesignerContext.txt",
         "version.txt"
       ]
@@ -691,15 +770,21 @@
         "version.txt"
       ]
     },
-    "HiSql/1.0.1.6": {
+    "HiSql/1.0.1.8": {
       "type": "project",
       "path": "../../HiSql/HiSql.csproj",
       "msbuildProject": "../../HiSql/HiSql.csproj"
+    },
+    "HiSql.Hana/1.0.1.8": {
+      "type": "project",
+      "path": "../../HiSql.Hana/HiSql.Hana.csproj",
+      "msbuildProject": "../../HiSql.Hana/HiSql.Hana.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net5.0": [
-      "HiSql >= 1.0.1.6"
+      "HiSql >= 1.0.1.8",
+      "HiSql.Hana >= 1.0.1.8"
     ]
   },
   "packageFolders": {
@@ -734,6 +819,9 @@
         "net5.0": {
           "targetAlias": "net5.0",
           "projectReferences": {
+            "D:\\Project\\OpenSource\\HiSql\\HiSql.Hana\\HiSql.Hana.csproj": {
+              "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.Hana\\HiSql.Hana.csproj"
+            },
             "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj": {
               "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj"
             }

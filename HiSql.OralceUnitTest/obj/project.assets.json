@@ -375,7 +375,7 @@
           "ref/netstandard1.3/System.Threading.Tasks.dll": {}
         }
       },
-      "HiSql/1.0.1.6": {
+      "HiSql/1.0.1.8": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
@@ -391,11 +391,11 @@
           "bin/placeholder/HiSql.dll": {}
         }
       },
-      "HiSql.Oracle/1.0.1.3": {
+      "HiSql.Oracle/1.0.1.8": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
-          "HiSql": "1.0.1.3",
+          "HiSql": "1.0.1.8",
           "System.Data.OracleClient": "1.0.8"
         },
         "compile": {
@@ -1755,12 +1755,12 @@
         "ref/xamarinwatchos10/_._"
       ]
     },
-    "HiSql/1.0.1.6": {
+    "HiSql/1.0.1.8": {
       "type": "project",
       "path": "../HiSql/HiSql.csproj",
       "msbuildProject": "../HiSql/HiSql.csproj"
     },
-    "HiSql.Oracle/1.0.1.3": {
+    "HiSql.Oracle/1.0.1.8": {
       "type": "project",
       "path": "../HiSql.Oracle/HiSql.Oracle.csproj",
       "msbuildProject": "../HiSql.Oracle/HiSql.Oracle.csproj"
@@ -1768,8 +1768,8 @@
   },
   "projectFileDependencyGroups": {
     "net5.0": [
-      "HiSql >= 1.0.1.6",
-      "HiSql.Oracle >= 1.0.1.3"
+      "HiSql >= 1.0.1.8",
+      "HiSql.Oracle >= 1.0.1.8"
     ]
   },
   "packageFolders": {
