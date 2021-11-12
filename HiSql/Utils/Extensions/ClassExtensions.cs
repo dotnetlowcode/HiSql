@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -7,6 +8,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace HiSql
@@ -46,11 +48,16 @@ namespace HiSql
 
                 //已经过时的处理方式
 
-                BinaryFormatter formatter = new BinaryFormatter();
-                
-                formatter.Serialize(objectStream, RealObject);
-                objectStream.Seek(0, SeekOrigin.Begin);
-                return (T)formatter.Deserialize(objectStream);
+                //BinaryFormatter formatter = new BinaryFormatter();
+
+                //formatter.Serialize(objectStream, RealObject);
+                //objectStream.Seek(0, SeekOrigin.Begin);
+                //return (T)formatter.Deserialize(objectStream);
+
+
+                //string json = System.Text.Json.JsonSerializer.Serialize(RealObject);
+                string json = JsonConvert.SerializeObject(RealObject);
+                return JsonConvert.DeserializeObject<T>(json); 
             }
         }   
 
