@@ -84,7 +84,7 @@ namespace HiSql
                     Tuple<Dictionary<string, string>, Dictionary<string, string>> result =this. CheckData(_isdic,this.Table, obj, (IDMInitalize)Context.DMInitalize, tabinfo, _field, _isonly);
                     if (result.Item1.Count > 0)
                     {
-                        sb.AppendLine(Context.DMTab.BuildUpdateSql(this.Table, result.Item1, result.Item2, sql_where));
+                        sb.AppendLine(Context.DMTab.BuildUpdateSql(tabinfo, this.Table, result.Item1, result.Item2, sql_where));
                     }
                 }
             }

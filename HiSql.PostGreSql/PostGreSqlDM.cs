@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace HiSql
@@ -748,6 +749,81 @@ namespace HiSql
             return _temp_sql;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tabinfo"></param>
+        /// <param name="table"></param>
+        /// <param name="dic_value"></param>
+        /// <param name="dic_primary"></param>
+        /// <param name="_where"></param>
+        /// <returns></returns>
+        public string BuildUpdateSql(TabInfo tabinfo, TableDefinition table, Dictionary<string, string> dic_value, Dictionary<string, string> dic_primary, string _where)
+        {
+            string _temp_sql = string.Empty;
+            int i = 0;
+            StringBuilder sb = new StringBuilder();
+            StringBuilder sb_field = new StringBuilder();
+            StringBuilder sb_primary = new StringBuilder();
+
+            string _schema = string.IsNullOrEmpty(Context.CurrentConnectionConfig.Schema) ? "dbo" : Context.CurrentConnectionConfig.Schema;
+
+            if (dic_primary.Count() > 0 || !string.IsNullOrEmpty(_where))
+            {
+                _temp_sql = dbConfig.Update_Statement_Where;
+            }
+            else
+                _temp_sql = dbConfig.Update_Statement;
+
+
+            foreach (string n in dic_value.Keys)
+            {
+                var columninfo = tabinfo.Columns.Where(c => c.ColumnName.ToLower() == n.ToLower()).FirstOrDefault();
+                //只有是字段类型为数字的才支撑
+                if (columninfo != null && columninfo.FieldType.IsIn<HiType>(HiType.INT, HiType.BIGINT, HiType.DECIMAL, HiType.SMALLINT))
+                {
+                    ///检测是否有以字段更新字段的语法
+                    List<Dictionary<string, string>> _lstdic = Tool.RegexGrps(Constants.REG_UPDATE, dic_value[n]);
+                    if (_lstdic.Count() > 0)
+                    {
+                        //说明是基于
+                        Regex regex = new Regex(Constants.REG_UPDATE);
+                        string _str = dic_value[n];
+                        foreach (Dictionary<string, string> dic in _lstdic)
+                        {
+                            _str = regex.Replace(_str, $"{dbConfig.Field_Pre}{dic["field"].ToString()}{dbConfig.Field_After}", 1);
+                        }
+                        dic_value[n] = _str;
+                    }
+                }
+
+                sb_field.Append($"{dbConfig.Field_Pre}{n}{dbConfig.Field_After}={dic_value[n].ToString()}");
+                if (i != dic_value.Count() - 1)
+                    sb_field.Append($"{dbConfig.Field_Split}");
+                i++;
+            }
+            i = 0;
+            foreach (string n in dic_primary.Keys)
+            {
+                sb_primary.Append($"{dbConfig.Field_Pre}{n}{dbConfig.Field_After}={dic_primary[n].ToString()}");
+                if (i != dic_primary.Count() - 1)
+                    sb_primary.Append($" and ");
+                i++;
+            }
+
+            if (!string.IsNullOrEmpty(sb_primary.ToString()) && !string.IsNullOrEmpty(_where))
+                sb_primary.Append($" and {_where}");
+            else
+                sb_primary.Append($"{_where}");
+
+            _temp_sql = _temp_sql
+                .Replace("[$Schema$]", _schema)
+                .Replace("[$TabName$]", table.TabName)
+                .Replace("[$Fields$]", sb_field.ToString())
+                .Replace("[$Where$]", sb_primary.ToString())
+                ;
+            return _temp_sql;
+        }
 
         //生成Key字段
         public string BuildKey(List<HiColumn> hiColumn)

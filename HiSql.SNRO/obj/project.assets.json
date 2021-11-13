@@ -208,7 +208,7 @@
           }
         }
       },
-      "HiSql/1.0.1.6": {
+      "HiSql/1.0.1.8": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
@@ -691,7 +691,7 @@
         "version.txt"
       ]
     },
-    "HiSql/1.0.1.6": {
+    "HiSql/1.0.1.8": {
       "type": "project",
       "path": "../HiSql/HiSql.csproj",
       "msbuildProject": "../HiSql/HiSql.csproj"
@@ -699,7 +699,7 @@
   },
   "projectFileDependencyGroups": {
     "net5.0": [
-      "HiSql >= 1.0.1.6",
+      "HiSql >= 1.0.1.8",
       "Microsoft.Extensions.Caching.Memory >= 5.0.0"
     ]
   },
@@ -710,11 +710,11 @@
   "project": {
     "version": "1.0.0.1",
     "restore": {
-      "projectUniqueName": "D:\\Project\\OpenSource\\HiSql\\HiSql.SNRO\\HiSql.SNRO.csproj",
+      "projectUniqueName": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.SNRO\\HiSql.SNRO.csproj",
       "projectName": "HiSql.SNRO",
-      "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.SNRO\\HiSql.SNRO.csproj",
+      "projectPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.SNRO\\HiSql.SNRO.csproj",
       "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-      "outputPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.SNRO\\obj\\",
+      "outputPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.SNRO\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -735,8 +735,8 @@
         "net5.0": {
           "targetAlias": "net5.0",
           "projectReferences": {
-            "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj": {
-              "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj"
+            "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\HiSql.csproj": {
+              "projectPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\HiSql.csproj"
             }
           }
         }

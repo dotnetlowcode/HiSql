@@ -64,3 +64,10 @@ D:\Project\OpenSource\HiSql\HiSql.HanaUnitTest\HiSql.HanaUnitTest\obj\Debug\net5
 D:\Project\OpenSource\HiSql\HiSql.HanaUnitTest\HiSql.HanaUnitTest\obj\Debug\net5.0\ref\HiSql.HanaUnitTest.dll
 D:\Project\OpenSource\HiSql\HiSql.HanaUnitTest\HiSql.HanaUnitTest\obj\Debug\net5.0\HiSql.HanaUnitTest.pdb
 D:\Project\OpenSource\HiSql\HiSql.HanaUnitTest\HiSql.HanaUnitTest\obj\Debug\net5.0\HiSql.HanaUnitTest.genruntimeconfig.cache
+D:\Project\OpenSource\HiSql\HiSql.HanaUnitTest\HiSql.HanaUnitTest\bin\Debug\net5.0\System.Data.Odbc.dll
+D:\Project\OpenSource\HiSql\HiSql.HanaUnitTest\HiSql.HanaUnitTest\bin\Debug\net5.0\runtimes\freebsd\lib\netcoreapp2.0\System.Data.Odbc.dll
+D:\Project\OpenSource\HiSql\HiSql.HanaUnitTest\HiSql.HanaUnitTest\bin\Debug\net5.0\runtimes\linux\lib\netcoreapp2.0\System.Data.Odbc.dll
+D:\Project\OpenSource\HiSql\HiSql.HanaUnitTest\HiSql.HanaUnitTest\bin\Debug\net5.0\runtimes\osx\lib\netcoreapp2.0\System.Data.Odbc.dll
+D:\Project\OpenSource\HiSql\HiSql.HanaUnitTest\HiSql.HanaUnitTest\bin\Debug\net5.0\runtimes\win\lib\netcoreapp2.0\System.Data.Odbc.dll
+D:\Project\OpenSource\HiSql\HiSql.HanaUnitTest\HiSql.HanaUnitTest\bin\Debug\net5.0\HiSql.Hana.dll
+D:\Project\OpenSource\HiSql\HiSql.HanaUnitTest\HiSql.HanaUnitTest\bin\Debug\net5.0\HiSql.Hana.pdb

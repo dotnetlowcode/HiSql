@@ -2,21 +2,6 @@
   "version": 3,
   "targets": {
     "net5.0": {
-      "HiSql/1.0.1.3": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.Extensions.Caching.Abstractions": "5.0.0",
-          "Microsoft.Extensions.Caching.Memory": "5.0.0",
-          "Newtonsoft.Json": "13.0.1",
-          "System.Data.SqlClient": "4.8.2"
-        },
-        "compile": {
-          "lib/net5.0/HiSql.dll": {}
-        },
-        "runtime": {
-          "lib/net5.0/HiSql.dll": {}
-        }
-      },
       "Microsoft.Extensions.Caching.Abstractions/5.0.0": {
         "type": "package",
         "dependencies": {
@@ -243,22 +228,26 @@
             "rid": "win"
           }
         }
+      },
+      "HiSql/1.0.1.8": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v5.0",
+        "dependencies": {
+          "Microsoft.Extensions.Caching.Abstractions": "5.0.0",
+          "Microsoft.Extensions.Caching.Memory": "5.0.0",
+          "Newtonsoft.Json": "13.0.1",
+          "System.Data.SqlClient": "4.8.2"
+        },
+        "compile": {
+          "bin/placeholder/HiSql.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/HiSql.dll": {}
+        }
       }
     }
   },
   "libraries": {
-    "HiSql/1.0.1.3": {
-      "sha512": "45FJFGU0vfmdemg2NLHb6PAwq0386Ygto1M3z6PpiG5UvUDY0VkOaeV20LOMcXcBHZfUEc1VkZLzb9MNVo40MQ==",
-      "type": "package",
-      "path": "hisql/1.0.1.3",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "hisql.1.0.1.3.nupkg.sha512",
-        "hisql.nuspec",
-        "lib/net5.0/HiSql.dll"
-      ]
-    },
     "Microsoft.Extensions.Caching.Abstractions/5.0.0": {
       "sha512": "bu8As90/SBAouMZ6fJ+qRNo1X+KgHGrVueFhhYi+E5WqEhcnp2HoWRFnMzXQ6g4RdZbvPowFerSbKNH4Dtg5yg==",
       "type": "package",
@@ -767,11 +756,16 @@
         "useSharedDesignerContext.txt",
         "version.txt"
       ]
+    },
+    "HiSql/1.0.1.8": {
+      "type": "project",
+      "path": "../HiSql/HiSql.csproj",
+      "msbuildProject": "../HiSql/HiSql.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net5.0": [
-      "HiSql >= 1.0.1.3",
+      "HiSql >= 1.0.1.8",
       "Npgsql >= 5.0.7"
     ]
   },
@@ -780,13 +774,13 @@
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
-    "version": "1.0.1.3",
+    "version": "1.0.1.8",
     "restore": {
-      "projectUniqueName": "D:\\Project\\OpenSource\\HiSql\\HiSql.PostGreSql\\HiSql.PostGreSql.csproj",
+      "projectUniqueName": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.PostGreSql\\HiSql.PostGreSql.csproj",
       "projectName": "HiSql.PostGreSql",
-      "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.PostGreSql\\HiSql.PostGreSql.csproj",
+      "projectPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.PostGreSql\\HiSql.PostGreSql.csproj",
       "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-      "outputPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.PostGreSql\\obj\\",
+      "outputPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.PostGreSql\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -806,7 +800,11 @@
       "frameworks": {
         "net5.0": {
           "targetAlias": "net5.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\HiSql.csproj": {
+              "projectPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\HiSql.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
@@ -819,10 +817,6 @@
       "net5.0": {
         "targetAlias": "net5.0",
         "dependencies": {
-          "HiSql": {
-            "target": "Package",
-            "version": "[1.0.1.3, )"
-          },
           "Npgsql": {
             "target": "Package",
             "version": "[5.0.7, )"

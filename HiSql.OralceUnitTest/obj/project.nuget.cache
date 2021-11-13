@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "t5H4Lo+PXS6hVvU+xqA0LqVJgYxOgAN2ZFlMYZyGxEY1F4SYtsq76SGoXK7Ydt2c63Z2aO74vlNxugJ+ymvQ9Q==",
+  "dgSpecHash": "awVHFiRPw6h1uDuaMyflJEnKyEGUoacTFMEcnMtod/o2b1vx14aMwxJtTpaK2GJJGiUHRwyfUGb0RqkgLmOUwg==",
   "success": true,
-  "projectFilePath": "D:\\Project\\OpenSource\\HiSql\\HiSql.OralceUnitTest\\HiSql.OralceUnitTest.csproj",
+  "projectFilePath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.OralceUnitTest\\HiSql.OralceUnitTest.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\admin\\.nuget\\packages\\microsoft.extensions.caching.abstractions\\5.0.0\\microsoft.extensions.caching.abstractions.5.0.0.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\microsoft.extensions.caching.memory\\5.0.0\\microsoft.extensions.caching.memory.5.0.0.nupkg.sha512",

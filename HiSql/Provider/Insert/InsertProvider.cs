@@ -705,6 +705,10 @@ namespace HiSql
                         {
 
                             _value = objprop.GetValue(objdata).ToString();
+                            if (!Tool.IsDecimal(_value))
+                            {
+                                throw new Exception($"字段[{hiColumn.ColumnName}]的值[{_value}]非数字,不符合规范");
+                            }
                             //_value = "1";
 
                      

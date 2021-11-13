@@ -1,17 +1,85 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Project\\OpenSource\\HiSql\\HiSql.MySql\\HiSql.MySql.csproj": {}
+    "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.MySql\\HiSql.MySql.csproj": {}
   },
   "projects": {
-    "D:\\Project\\OpenSource\\HiSql\\HiSql.MySql\\HiSql.MySql.csproj": {
-      "version": "1.0.1.3",
+    "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.MySql\\HiSql.MySql.csproj": {
+      "version": "1.0.1.8",
       "restore": {
-        "projectUniqueName": "D:\\Project\\OpenSource\\HiSql\\HiSql.MySql\\HiSql.MySql.csproj",
+        "projectUniqueName": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.MySql\\HiSql.MySql.csproj",
         "projectName": "HiSql.MySql",
-        "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.MySql\\HiSql.MySql.csproj",
+        "projectPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.MySql\\HiSql.MySql.csproj",
         "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-        "outputPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.MySql\\obj\\",
+        "outputPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.MySql\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net5.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "http://www.hone.cn:1080/nuget": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net5.0": {
+            "targetAlias": "net5.0",
+            "projectReferences": {
+              "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\HiSql.csproj": {
+                "projectPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\HiSql.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net5.0": {
+          "targetAlias": "net5.0",
+          "dependencies": {
+            "MySql.Data": {
+              "target": "Package",
+              "version": "[8.0.26, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.100\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\HiSql.csproj": {
+      "version": "1.0.1.8",
+      "restore": {
+        "projectUniqueName": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\HiSql.csproj",
+        "projectName": "HiSql",
+        "projectPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\HiSql.csproj",
+        "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
+        "outputPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -44,13 +112,21 @@
         "net5.0": {
           "targetAlias": "net5.0",
           "dependencies": {
-            "HiSql": {
+            "Microsoft.Extensions.Caching.Abstractions": {
               "target": "Package",
-              "version": "[1.0.1.3, )"
+              "version": "[5.0.0, )"
             },
-            "MySql.Data": {
+            "Microsoft.Extensions.Caching.Memory": {
               "target": "Package",
-              "version": "[8.0.26, )"
+              "version": "[5.0.0, )"
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.1, )"
+            },
+            "System.Data.SqlClient": {
+              "target": "Package",
+              "version": "[4.8.2, )"
             }
           },
           "imports": [

@@ -28,3 +28,6 @@ D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Debug\net5.0\ref\HiSql.Hana.dll
 D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Debug\net5.0\HiSql.Hana.pdb
 D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Debug\net5.0\Sap.Data.Hana.Core.v2.1.dll
 D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\net5.0\HiSql.Hana.csproj.CopyComplete
+D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Debug\net5.0\HiSql.dll
+D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Debug\net5.0\HiSql.pdb
+D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\net5.0\HiSql.Hana.csprojAssemblyReference.cache

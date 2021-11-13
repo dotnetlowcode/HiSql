@@ -8,8 +8,8 @@
     ".NETCoreApp,Version=v5.0": {
       "HiSql.MySqlUnitTest/1.0.0": {
         "dependencies": {
-          "HiSql": "1.0.1.6",
-          "HiSql.MySql": "1.0.1.3"
+          "HiSql": "1.0.1.8",
+          "HiSql.MySql": "1.0.1.8"
         },
         "runtime": {
           "HiSql.MySqlUnitTest.dll": {}
@@ -352,7 +352,7 @@
           }
         }
       },
-      "HiSql/1.0.1.6": {
+      "HiSql/1.0.1.8": {
         "dependencies": {
           "Microsoft.Extensions.Caching.Abstractions": "5.0.0",
           "Microsoft.Extensions.Caching.Memory": "5.0.0",
@@ -363,9 +363,9 @@
           "HiSql.dll": {}
         }
       },
-      "HiSql.MySql/1.0.1.3": {
+      "HiSql.MySql/1.0.1.8": {
         "dependencies": {
-          "HiSql": "1.0.1.6",
+          "HiSql": "1.0.1.8",
           "MySql.Data": "8.0.26"
         },
         "runtime": {
@@ -604,12 +604,12 @@
       "path": "system.windows.extensions/4.7.0",
       "hashPath": "system.windows.extensions.4.7.0.nupkg.sha512"
     },
-    "HiSql/1.0.1.6": {
+    "HiSql/1.0.1.8": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "HiSql.MySql/1.0.1.3": {
+    "HiSql.MySql/1.0.1.8": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

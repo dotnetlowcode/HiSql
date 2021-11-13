@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Project\\OpenSource\\HiSql\\HiSql.MySqlUnitTest\\HiSql.MySqlUnitTest.csproj": {}
+    "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.MySqlUnitTest\\HiSql.MySqlUnitTest.csproj": {}
   },
   "projects": {
-    "D:\\Project\\OpenSource\\HiSql\\HiSql.MySqlUnitTest\\HiSql.MySqlUnitTest.csproj": {
+    "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.MySqlUnitTest\\HiSql.MySqlUnitTest.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Project\\OpenSource\\HiSql\\HiSql.MySqlUnitTest\\HiSql.MySqlUnitTest.csproj",
+        "projectUniqueName": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.MySqlUnitTest\\HiSql.MySqlUnitTest.csproj",
         "projectName": "HiSql.MySqlUnitTest",
-        "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.MySqlUnitTest\\HiSql.MySqlUnitTest.csproj",
+        "projectPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.MySqlUnitTest\\HiSql.MySqlUnitTest.csproj",
         "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-        "outputPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.MySqlUnitTest\\obj\\",
+        "outputPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.MySqlUnitTest\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -32,11 +32,11 @@
           "net5.0": {
             "targetAlias": "net5.0",
             "projectReferences": {
-              "D:\\Project\\OpenSource\\HiSql\\HiSql.MySql\\HiSql.MySql.csproj": {
-                "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.MySql\\HiSql.MySql.csproj"
+              "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.MySql\\HiSql.MySql.csproj": {
+                "projectPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.MySql\\HiSql.MySql.csproj"
               },
-              "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj": {
-                "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj"
+              "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\HiSql.csproj": {
+                "projectPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\HiSql.csproj"
               }
             }
           }
@@ -69,14 +69,14 @@
         }
       }
     },
-    "D:\\Project\\OpenSource\\HiSql\\HiSql.MySql\\HiSql.MySql.csproj": {
-      "version": "1.0.1.3",
+    "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.MySql\\HiSql.MySql.csproj": {
+      "version": "1.0.1.8",
       "restore": {
-        "projectUniqueName": "D:\\Project\\OpenSource\\HiSql\\HiSql.MySql\\HiSql.MySql.csproj",
+        "projectUniqueName": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.MySql\\HiSql.MySql.csproj",
         "projectName": "HiSql.MySql",
-        "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.MySql\\HiSql.MySql.csproj",
+        "projectPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.MySql\\HiSql.MySql.csproj",
         "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-        "outputPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.MySql\\obj\\",
+        "outputPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.MySql\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -96,7 +96,11 @@
         "frameworks": {
           "net5.0": {
             "targetAlias": "net5.0",
-            "projectReferences": {}
+            "projectReferences": {
+              "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\HiSql.csproj": {
+                "projectPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\HiSql.csproj"
+              }
+            }
           }
         },
         "warningProperties": {
@@ -109,10 +113,6 @@
         "net5.0": {
           "targetAlias": "net5.0",
           "dependencies": {
-            "HiSql": {
-              "target": "Package",
-              "version": "[1.0.1.3, )"
-            },
             "MySql.Data": {
               "target": "Package",
               "version": "[8.0.26, )"
@@ -137,14 +137,14 @@
         }
       }
     },
-    "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj": {
-      "version": "1.0.1.6",
+    "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\HiSql.csproj": {
+      "version": "1.0.1.8",
       "restore": {
-        "projectUniqueName": "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj",
+        "projectUniqueName": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\HiSql.csproj",
         "projectName": "HiSql",
-        "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj",
+        "projectPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\HiSql.csproj",
         "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-        "outputPath": "D:\\Project\\OpenSource\\HiSql\\HiSql\\obj\\",
+        "outputPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

@@ -25,3 +25,6 @@ D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Debug\net5.0\HiSql.Oracle.dll
 D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Debug\net5.0\ref\HiSql.Oracle.dll
 D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Debug\net5.0\HiSql.Oracle.pdb
 D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Debug\net5.0\HiSql.Oracle.csprojAssemblyReference.cache
+D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net5.0\HiSql.dll
+D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net5.0\HiSql.pdb
+D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Debug\net5.0\HiSql.Oracle.csproj.CopyComplete

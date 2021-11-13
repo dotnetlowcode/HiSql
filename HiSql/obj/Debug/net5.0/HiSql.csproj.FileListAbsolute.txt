@@ -20,3 +20,15 @@ D:\Project\OpenSource\HiSql\HiSql\obj\Debug\net5.0\HiSql.csproj.CoreCompileInput
 D:\Project\OpenSource\HiSql\HiSql\obj\Debug\net5.0\HiSql.dll
 D:\Project\OpenSource\HiSql\HiSql\obj\Debug\net5.0\ref\HiSql.dll
 D:\Project\OpenSource\HiSql\HiSql\obj\Debug\net5.0\HiSql.pdb
+D:\Project\OpenSource\giteeHiSql\hisql\HiSql\bin\Debug\net5.0\HiSql.deps.json
+D:\Project\OpenSource\giteeHiSql\hisql\HiSql\bin\Debug\net5.0\HiSql.dll
+D:\Project\OpenSource\giteeHiSql\hisql\HiSql\bin\Debug\net5.0\ref\HiSql.dll
+D:\Project\OpenSource\giteeHiSql\hisql\HiSql\bin\Debug\net5.0\HiSql.pdb
+D:\Project\OpenSource\giteeHiSql\hisql\HiSql\obj\Debug\net5.0\HiSql.csprojAssemblyReference.cache
+D:\Project\OpenSource\giteeHiSql\hisql\HiSql\obj\Debug\net5.0\HiSql.GeneratedMSBuildEditorConfig.editorconfig
+D:\Project\OpenSource\giteeHiSql\hisql\HiSql\obj\Debug\net5.0\HiSql.AssemblyInfoInputs.cache
+D:\Project\OpenSource\giteeHiSql\hisql\HiSql\obj\Debug\net5.0\HiSql.AssemblyInfo.cs
+D:\Project\OpenSource\giteeHiSql\hisql\HiSql\obj\Debug\net5.0\HiSql.csproj.CoreCompileInputs.cache
+D:\Project\OpenSource\giteeHiSql\hisql\HiSql\obj\Debug\net5.0\HiSql.dll
+D:\Project\OpenSource\giteeHiSql\hisql\HiSql\obj\Debug\net5.0\ref\HiSql.dll
+D:\Project\OpenSource\giteeHiSql\hisql\HiSql\obj\Debug\net5.0\HiSql.pdb

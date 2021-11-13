@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Project\\OpenSource\\HiSql\\HiSql.PostGreSqlUnitTest\\HiSql.PostGreSqlUnitTest.csproj": {}
+    "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.PostGreSqlUnitTest\\HiSql.PostGreSqlUnitTest.csproj": {}
   },
   "projects": {
-    "D:\\Project\\OpenSource\\HiSql\\HiSql.PostGreSqlUnitTest\\HiSql.PostGreSqlUnitTest.csproj": {
+    "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.PostGreSqlUnitTest\\HiSql.PostGreSqlUnitTest.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Project\\OpenSource\\HiSql\\HiSql.PostGreSqlUnitTest\\HiSql.PostGreSqlUnitTest.csproj",
+        "projectUniqueName": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.PostGreSqlUnitTest\\HiSql.PostGreSqlUnitTest.csproj",
         "projectName": "HiSql.PostGreSqlUnitTest",
-        "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.PostGreSqlUnitTest\\HiSql.PostGreSqlUnitTest.csproj",
+        "projectPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.PostGreSqlUnitTest\\HiSql.PostGreSqlUnitTest.csproj",
         "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-        "outputPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.PostGreSqlUnitTest\\obj\\",
+        "outputPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.PostGreSqlUnitTest\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -32,11 +32,11 @@
           "net5.0": {
             "targetAlias": "net5.0",
             "projectReferences": {
-              "D:\\Project\\OpenSource\\HiSql\\HiSql.PostGreSql\\HiSql.PostGreSql.csproj": {
-                "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.PostGreSql\\HiSql.PostGreSql.csproj"
+              "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.PostGreSql\\HiSql.PostGreSql.csproj": {
+                "projectPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.PostGreSql\\HiSql.PostGreSql.csproj"
               },
-              "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj": {
-                "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj"
+              "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\HiSql.csproj": {
+                "projectPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\HiSql.csproj"
               }
             }
           }
@@ -69,14 +69,14 @@
         }
       }
     },
-    "D:\\Project\\OpenSource\\HiSql\\HiSql.PostGreSql\\HiSql.PostGreSql.csproj": {
-      "version": "1.0.1.3",
+    "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.PostGreSql\\HiSql.PostGreSql.csproj": {
+      "version": "1.0.1.8",
       "restore": {
-        "projectUniqueName": "D:\\Project\\OpenSource\\HiSql\\HiSql.PostGreSql\\HiSql.PostGreSql.csproj",
+        "projectUniqueName": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.PostGreSql\\HiSql.PostGreSql.csproj",
         "projectName": "HiSql.PostGreSql",
-        "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.PostGreSql\\HiSql.PostGreSql.csproj",
+        "projectPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.PostGreSql\\HiSql.PostGreSql.csproj",
         "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-        "outputPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.PostGreSql\\obj\\",
+        "outputPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.PostGreSql\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -96,7 +96,11 @@
         "frameworks": {
           "net5.0": {
             "targetAlias": "net5.0",
-            "projectReferences": {}
+            "projectReferences": {
+              "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\HiSql.csproj": {
+                "projectPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\HiSql.csproj"
+              }
+            }
           }
         },
         "warningProperties": {
@@ -109,10 +113,6 @@
         "net5.0": {
           "targetAlias": "net5.0",
           "dependencies": {
-            "HiSql": {
-              "target": "Package",
-              "version": "[1.0.1.3, )"
-            },
             "Npgsql": {
               "target": "Package",
               "version": "[5.0.7, )"
@@ -137,14 +137,14 @@
         }
       }
     },
-    "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj": {
-      "version": "1.0.1.6",
+    "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\HiSql.csproj": {
+      "version": "1.0.1.8",
       "restore": {
-        "projectUniqueName": "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj",
+        "projectUniqueName": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\HiSql.csproj",
         "projectName": "HiSql",
-        "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj",
+        "projectPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\HiSql.csproj",
         "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-        "outputPath": "D:\\Project\\OpenSource\\HiSql\\HiSql\\obj\\",
+        "outputPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

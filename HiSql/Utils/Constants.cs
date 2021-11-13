@@ -237,6 +237,13 @@ namespace HiSql
 
         public static string REG_SORT = @"^(?:[\s]*)(?<field>(?:(?:[\#]{1,2}|[\@]{1})?(?:[\w]+)(?:[\.]{1}))?(?:[\w]+))?\s*(?<sort>asc|desc)?\s*$";
 
+
+
+        /// <summary>
+        /// 表过式字段更新
+        /// </summary>
+        public static string REG_UPDATE = @"[`](?:[\s]*)(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w]+)(?:[\.]{1}))?(?<field>[\w]+)[`]";
+
         /// <summary>
         /// 解析表字段关联关系
         /// #a.dddd     =    #add.ad

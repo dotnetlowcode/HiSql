@@ -1,12 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "8JBqF0lCiRDoSqAM5hX3YMEDge9AFRLVoTUa9myXFxUM2PF3TTnPjJZTPchdcs2d3xdb//eTygwHaGKzI5rrVg==",
+  "dgSpecHash": "Dc49uWfjXQFkX01fBAzvNKsvJIkM/nKaqyUiqiygQvVaLbGgzqOvVafAc15AS+etXwxdFJb9iFLzl20YwO17Ew==",
   "success": true,
-  "projectFilePath": "D:\\Project\\OpenSource\\HiSql\\HiSql.MySql\\HiSql.MySql.csproj",
+  "projectFilePath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.MySql\\HiSql.MySql.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\admin\\.nuget\\packages\\bouncycastle.netcore\\1.8.5\\bouncycastle.netcore.1.8.5.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\google.protobuf\\3.14.0\\google.protobuf.3.14.0.nupkg.sha512",
-    "C:\\Users\\admin\\.nuget\\packages\\hisql\\1.0.1.3\\hisql.1.0.1.3.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\k4os.compression.lz4\\1.1.11\\k4os.compression.lz4.1.1.11.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\k4os.compression.lz4.streams\\1.1.11\\k4os.compression.lz4.streams.1.1.11.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\k4os.hash.xxhash\\1.0.6\\k4os.hash.xxhash.1.0.6.nupkg.sha512",

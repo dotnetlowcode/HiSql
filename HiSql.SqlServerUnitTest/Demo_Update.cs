@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace HiSql.UnitTest
@@ -28,9 +29,32 @@ namespace HiSql.UnitTest
 
         public static void Init(HiSqlClient sqlClient)
         {
-            Update_Demo(sqlClient);
+            //Update_Demo(sqlClient);
+            Update_Demo2(sqlClient);
         }
 
+
+        static void Update_Demo2(HiSqlClient sqlClient)
+        {
+            //string _txt = @"`UserAge`= `UserAge` + 1";
+            string _txt = @"abc";
+            string _reg = @"[`](?:[\s]*)(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w]+)(?:[\.]{1}))?(?<field>[\w]+)[`]";
+            List<Dictionary<string, string>> lst_dic = Tool.RegexGrps(_reg, _txt);
+
+            if (lst_dic.Count() > 0)
+            {
+                Regex regex = new Regex(_reg);
+                foreach (Dictionary<string, string> dic in lst_dic)
+                {
+                    _txt = regex.Replace(_txt, dic["field"].ToString(), 1);
+                }
+            }
+
+            string _sql = sqlClient.Update("H_TEST", new { Hid = 1, UNAME = "UTYPE", UserAge= "`UserAge`+1", UNAME2 = "user123" }).Exclude("UNAME").ToSql();
+
+
+
+        }
 
         static void Update_Demo(HiSqlClient sqlClient)
         {
@@ -75,7 +99,7 @@ namespace HiSql.UnitTest
             string _sql2 = update2.ToSql();
             Console.WriteLine(_sql2);
 
-
+             
             IUpdate update3 = sqlClient.Update("H_TEST", new List<object> { new { DID = 1,   UNAME2 = "user123" }, new { DID = 2,   UNAME2 = "user124" } }).Only("UNAME2");
             int _effect3 = sqlClient.Update("H_TEST", new List<object> { new { DID = 1, UNAME2 = "user123" }, new { DID = 2, UNAME2 = "user124" } }).Only("UNAME2").ExecCommand();
             string _sql3 = update3.ToSql();

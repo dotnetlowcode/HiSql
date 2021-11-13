@@ -9,11 +9,11 @@
 解决部分bug问题</description>
     <dependencies>
       <group targetFramework="net5.0">
-        <dependency id="HiSql" version="1.0.1.5" exclude="Build,Analyzers" />
+        <dependency id="HiSql" version="1.0.1.7" exclude="Build,Analyzers" />
       </group>
     </dependencies>
   </metadata>
   <files>
-    <file src="D:\Project\NETCORE\HiSql.SqlServer\bin\Release\net5.0\HiSql.SqlServer.dll" target="lib\net5.0\HiSql.SqlServer.dll" />
+    <file src="D:\Project\OpenSource\HiSql\HiSql.SqlServer\bin\Release\net5.0\HiSql.SqlServer.dll" target="lib\net5.0\HiSql.SqlServer.dll" />
   </files>
 </package>

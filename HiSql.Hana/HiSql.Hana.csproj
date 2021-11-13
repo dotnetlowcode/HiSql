@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <Authors>tansar</Authors>
-    <Version>1.0.1.3</Version>
+    <Version>1.0.1.8</Version>
     <Company>Hone</Company>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <SignAssembly>false</SignAssembly>
@@ -13,8 +13,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HiSql" Version="1.0.1.3" />
     <PackageReference Include="System.Data.Odbc" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\HiSql\HiSql.csproj" />
   </ItemGroup>
 
   <ItemGroup>
