@@ -65,8 +65,10 @@ namespace HiSql
         {
             get
             {
-
-                return _dicO[keyname];
+                if (_dicO.ContainsKey(keyname))
+                    return _dicO[keyname];
+                else
+                    return null;
 
             }
             set

@@ -4,7 +4,6 @@
     <id>HiSql.SqlServer</id>
     <version>1.0.1.8</version>
     <authors>tansar</authors>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>该包支持SqlServer数据库 依赖于HiSql.dll包运行
 解决部分bug问题</description>
     <dependencies>

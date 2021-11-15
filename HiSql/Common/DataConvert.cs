@@ -58,7 +58,29 @@ namespace HiSql
                             PropertyInfo pinfo = listInfo.Where(p => p.Name.ToLower() == n.ToLower()).FirstOrDefault();
                             if (pinfo != null)
                             {
-                                pinfo.SetValue(t1, dataReader[n]);
+                                
+
+                                if (dataReader[n] is not DBNull)
+                                {
+                                    pinfo.SetValue(t1, dataReader[n]);
+                                }
+                                else
+                                {
+                                    //暂不启用默认值
+                                    //if (pinfo.PropertyType.IsIn<Type>(Constants.LongType, Constants.IntType, Constants.DecType, Constants.FloatType, Constants.ShortType,Constants.DobType))
+                                    //{
+                                    //    pinfo.SetValue(t1, 0);
+                                    //}
+                                    //else if (pinfo.PropertyType.IsIn<Type>(Constants.StringType))
+                                    //{
+                                    //    pinfo.SetValue(t1, "");
+                                    //}
+                                    //else if (pinfo.PropertyType.IsIn<Type>(Constants.BoolType))
+                                    //{
+                                    //    pinfo.SetValue(t1, false);
+                                    //}
+
+                                }
                             }
                         }
                         lst.Add(t1);
@@ -71,7 +93,30 @@ namespace HiSql
                             string n = fieldNameList.Where(fn => fn.ToLower() == pinfo.Name.ToLower()).FirstOrDefault();
                             if(!string.IsNullOrEmpty(n))
                             {
-                                pinfo.SetValue(t1, dataReader[n]);
+
+                                //当不为Null值时才赋值
+                                if (dataReader[n] is not DBNull)
+                                {
+                                    pinfo.SetValue(t1, dataReader[n]);
+                                }
+                                else
+                                {
+                                    //暂不启用默认值
+                                    //if (pinfo.PropertyType.IsIn<Type>(Constants.LongType, Constants.IntType, Constants.DecType, Constants.FloatType, Constants.ShortType, Constants.DobType))
+                                    //{
+                                    //    pinfo.SetValue(t1, 0);
+                                    //}
+                                    //else if (pinfo.PropertyType.IsIn<Type>(Constants.StringType))
+                                    //{
+                                    //    pinfo.SetValue(t1, "");
+                                    //}
+                                    //else if (pinfo.PropertyType.IsIn<Type>(Constants.BoolType))
+                                    //{
+                                    //    pinfo.SetValue(t1, false);
+                                    //}
+
+                                }
+
 
                             }
                         }
@@ -105,7 +150,10 @@ namespace HiSql
                         _dyn[n] = Convert.ToDecimal(dataReader[n].ToString());
                     }
                     else
-                        _dyn[n] = dataReader[n];
+                    {
+                        if (dataReader[n] is not DBNull)
+                            _dyn[n] = dataReader[n];
+                    }
                 }
                 result.Add((ExpandoObject)_dyn);
             }
@@ -130,7 +178,8 @@ namespace HiSql
                 TDynamic _dyn = new TDynamic();
                 foreach (string n in fieldNameList)
                 {
-                    _dyn[n] = dataReader[n];
+                    if(dataReader[n] is not DBNull)
+                        _dyn[n] = dataReader[n];
                 }
                 result.Add(_dyn);
             }

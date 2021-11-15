@@ -7,11 +7,12 @@
     <Authors>tansar</Authors>
     <Description>HiSql 核心包
 支持SqlServer,MySql,Oracle,Hana,PostGreSql 根据需要单独再引用支持的包
-解决部分bug问题
+解决部分bug问题 
+1.映射实体，动态类等已知Bug
 </Description>
     <Company>Hone</Company>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.1.8</Version>
+    <Version>1.0.1.9</Version>
     <PackageProjectUrl>http://www.hisql.net</PackageProjectUrl>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>hisql.pfx</AssemblyOriginatorKeyFile>

@@ -229,7 +229,7 @@
           }
         }
       },
-      "HiSql/1.0.1.8": {
+      "HiSql/1.0.1.9": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
@@ -249,7 +249,7 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
-          "HiSql": "1.0.1.8",
+          "HiSql": "1.0.1.9",
           "Npgsql": "5.0.7"
         },
         "compile": {
@@ -771,7 +771,7 @@
         "version.txt"
       ]
     },
-    "HiSql/1.0.1.8": {
+    "HiSql/1.0.1.9": {
       "type": "project",
       "path": "../HiSql/HiSql.csproj",
       "msbuildProject": "../HiSql/HiSql.csproj"
@@ -784,12 +784,13 @@
   },
   "projectFileDependencyGroups": {
     "net5.0": [
-      "HiSql >= 1.0.1.8",
+      "HiSql >= 1.0.1.9",
       "HiSql.PostGreSql >= 1.0.1.8"
     ]
   },
   "packageFolders": {
     "C:\\Users\\admin\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
@@ -802,10 +803,12 @@
       "outputPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.PostGreSqlUnitTest\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
         "C:\\Users\\admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
