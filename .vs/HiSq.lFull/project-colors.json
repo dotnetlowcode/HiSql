@@ -1,0 +1,36 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "254d72c4-559a-400b-8595-586441617dfd": {
+      "ProjectGuid": "254d72c4-559a-400b-8595-586441617dfd",
+      "DisplayName": "HiSql.SqlServerUnitTest",
+      "ColorIndex": 0
+    },
+    "ca8150b8-c051-4da4-a2e3-d0cf550321e5": {
+      "ProjectGuid": "ca8150b8-c051-4da4-a2e3-d0cf550321e5",
+      "DisplayName": "HiSql",
+      "ColorIndex": 1
+    },
+    "32f96eb8-c919-4eb0-94f1-253fe425fa7d": {
+      "ProjectGuid": "32f96eb8-c919-4eb0-94f1-253fe425fa7d",
+      "DisplayName": "HiSql.PostGreSqlUnitTest",
+      "ColorIndex": 2
+    },
+    "ffa2559d-be27-40b2-b6cd-bf82a4e27ab1": {
+      "ProjectGuid": "ffa2559d-be27-40b2-b6cd-bf82a4e27ab1",
+      "DisplayName": "HiSql.OralceUnitTest",
+      "ColorIndex": 3
+    },
+    "988a8244-67ab-49cd-9700-d0aba79f2ead": {
+      "ProjectGuid": "988a8244-67ab-49cd-9700-d0aba79f2ead",
+      "DisplayName": "HiSql.MySqlUnitTest",
+      "ColorIndex": 4
+    },
+    "3b0ff451-11f4-4ba6-8922-6d7ed6460279": {
+      "ProjectGuid": "3b0ff451-11f4-4ba6-8922-6d7ed6460279",
+      "DisplayName": "HiSql.HanaUnitTest",
+      "ColorIndex": 5
+    }
+  },
+  "NextColorIndex": 6
+}

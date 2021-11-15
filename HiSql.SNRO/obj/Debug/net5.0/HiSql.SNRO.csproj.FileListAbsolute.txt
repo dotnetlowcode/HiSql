@@ -19,7 +19,6 @@ D:\Project\OpenSource\HiSql\HiSql.SNRO\bin\Debug\net5.0\ref\HiSql.SNRO.dll
 D:\Project\OpenSource\HiSql\HiSql.SNRO\bin\Debug\net5.0\HiSql.SNRO.pdb
 D:\Project\OpenSource\HiSql\HiSql.SNRO\bin\Debug\net5.0\HiSql.dll
 D:\Project\OpenSource\HiSql\HiSql.SNRO\bin\Debug\net5.0\HiSql.pdb
-D:\Project\OpenSource\HiSql\HiSql.SNRO\obj\Debug\net5.0\HiSql.SNRO.csprojAssemblyReference.cache
 D:\Project\OpenSource\HiSql\HiSql.SNRO\obj\Debug\net5.0\HiSql.SNRO.GeneratedMSBuildEditorConfig.editorconfig
 D:\Project\OpenSource\HiSql\HiSql.SNRO\obj\Debug\net5.0\HiSql.SNRO.AssemblyInfoInputs.cache
 D:\Project\OpenSource\HiSql\HiSql.SNRO\obj\Debug\net5.0\HiSql.SNRO.AssemblyInfo.cs
@@ -28,3 +27,4 @@ D:\Project\OpenSource\HiSql\HiSql.SNRO\obj\Debug\net5.0\HiSql.SNRO.csproj.CopyCo
 D:\Project\OpenSource\HiSql\HiSql.SNRO\obj\Debug\net5.0\HiSql.SNRO.dll
 D:\Project\OpenSource\HiSql\HiSql.SNRO\obj\Debug\net5.0\ref\HiSql.SNRO.dll
 D:\Project\OpenSource\HiSql\HiSql.SNRO\obj\Debug\net5.0\HiSql.SNRO.pdb
+D:\Project\OpenSource\HiSql\HiSql.SNRO\obj\Debug\net5.0\HiSql.SNRO.csproj.AssemblyReference.cache

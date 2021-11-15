@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "udIcE0S05h0peclNeg7+mlnNyjJZ/6Bawy7mf2yIFM0NtjsB9YdmzbQqePdxNqalvBxVm11Q/UF662i7jBOM9Q==",
+  "dgSpecHash": "zf84NjtT8YV1XqHp1gXWbw6ZCNMpPzpRvXUO8pPmVKrFE5V7s2cAdjnnZcFYRvaKdAFbwog/LO2GRIKRiTliPg==",
   "success": true,
-  "projectFilePath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.MySqlUnitTest\\HiSql.MySqlUnitTest.csproj",
+  "projectFilePath": "D:\\Project\\OpenSource\\HiSql\\HiSql.MySqlUnitTest\\HiSql.MySqlUnitTest.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\admin\\.nuget\\packages\\bouncycastle.netcore\\1.8.5\\bouncycastle.netcore.1.8.5.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\google.protobuf\\3.14.0\\google.protobuf.3.14.0.nupkg.sha512",

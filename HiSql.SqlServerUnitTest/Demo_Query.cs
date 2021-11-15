@@ -10,6 +10,12 @@ namespace HiSql.UnitTest
     public class Demo_Query
     {
 
+        public class H_Test2
+        {
+            public int Uid { get; set; }
+            public string UserName { get; set; }
+            public DateTime createdate { get; set; }
+        }
         public class Rang
         {
             public double Low { get; set; }
@@ -20,15 +26,26 @@ namespace HiSql.UnitTest
         public static void Init(HiSqlClient sqlClient)
         {
             //Query_Demo(sqlClient);
-            QuerySlave(sqlClient);
-           //Query_Demo3(sqlClient);
+            //QuerySlave(sqlClient);
+            //Query_Demo3(sqlClient);
             //Query_Case(sqlClient);
             //Query_Demo2(sqlClient);
             //Query_Demo4(sqlClient);
+            Query_Demo5(sqlClient);
 
             var s = Console.ReadLine();
         }
 
+        static void Query_Demo5(HiSqlClient sqlClient)
+        {
+            //测试表中的值为null是赋值实体  H_test2请自己建表测试
+            List<H_Test2> lst_test = sqlClient.Query("H_Test2").Field("*").ToList<H_Test2>();
+
+            string _json=sqlClient.Query("H_Test2").Field("*").ToJson();
+
+            List<TDynamic> lstd = sqlClient.Query("H_Test2").Field("*").ToDynamic();
+
+        }
 
 
         static void Query_Demo4(HiSqlClient sqlClient)

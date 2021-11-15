@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "1O/Sk2MwfgrPaczvM9kYKEXwgOoQm5eF1TeycL8P92CwncYFzRajO63Eo3cOdZCI9MGJarmlAGKb71xJCchfrw==",
+  "dgSpecHash": "R4B1wWtQUvih1dVE8PT9xUdwUHNWRdLahAwOBvEsrhlfTzyAEvKa58poXJY3VKLm2WAY9yBmTU/vHhpiQHKUIA==",
   "success": true,
-  "projectFilePath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.PostGreSql\\HiSql.PostGreSql.csproj",
+  "projectFilePath": "D:\\Project\\OpenSource\\HiSql\\HiSql.PostGreSql\\HiSql.PostGreSql.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\admin\\.nuget\\packages\\microsoft.extensions.caching.abstractions\\5.0.0\\microsoft.extensions.caching.abstractions.5.0.0.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\microsoft.extensions.caching.memory\\5.0.0\\microsoft.extensions.caching.memory.5.0.0.nupkg.sha512",

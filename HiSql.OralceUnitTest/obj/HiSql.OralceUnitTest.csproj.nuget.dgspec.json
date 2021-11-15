@@ -1,23 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.OralceUnitTest\\HiSql.OralceUnitTest.csproj": {}
+    "D:\\Project\\OpenSource\\HiSql\\HiSql.OralceUnitTest\\HiSql.OralceUnitTest.csproj": {}
   },
   "projects": {
-    "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.Oracle\\HiSql.Oracle.csproj": {
+    "D:\\Project\\OpenSource\\HiSql\\HiSql.Oracle\\HiSql.Oracle.csproj": {
       "version": "1.0.1.8",
       "restore": {
-        "projectUniqueName": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.Oracle\\HiSql.Oracle.csproj",
+        "projectUniqueName": "D:\\Project\\OpenSource\\HiSql\\HiSql.Oracle\\HiSql.Oracle.csproj",
         "projectName": "HiSql.Oracle",
-        "projectPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.Oracle\\HiSql.Oracle.csproj",
+        "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.Oracle\\HiSql.Oracle.csproj",
         "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-        "outputPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.Oracle\\obj\\",
+        "outputPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.Oracle\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
           "C:\\Users\\admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -32,8 +34,8 @@
           "net5.0": {
             "targetAlias": "net5.0",
             "projectReferences": {
-              "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\HiSql.csproj": {
-                "projectPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\HiSql.csproj"
+              "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj": {
+                "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj"
               }
             }
           }
@@ -72,20 +74,22 @@
         }
       }
     },
-    "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.OralceUnitTest\\HiSql.OralceUnitTest.csproj": {
+    "D:\\Project\\OpenSource\\HiSql\\HiSql.OralceUnitTest\\HiSql.OralceUnitTest.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.OralceUnitTest\\HiSql.OralceUnitTest.csproj",
+        "projectUniqueName": "D:\\Project\\OpenSource\\HiSql\\HiSql.OralceUnitTest\\HiSql.OralceUnitTest.csproj",
         "projectName": "HiSql.OralceUnitTest",
-        "projectPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.OralceUnitTest\\HiSql.OralceUnitTest.csproj",
+        "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.OralceUnitTest\\HiSql.OralceUnitTest.csproj",
         "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-        "outputPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.OralceUnitTest\\obj\\",
+        "outputPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.OralceUnitTest\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
           "C:\\Users\\admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -100,11 +104,11 @@
           "net5.0": {
             "targetAlias": "net5.0",
             "projectReferences": {
-              "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.Oracle\\HiSql.Oracle.csproj": {
-                "projectPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.Oracle\\HiSql.Oracle.csproj"
+              "D:\\Project\\OpenSource\\HiSql\\HiSql.Oracle\\HiSql.Oracle.csproj": {
+                "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.Oracle\\HiSql.Oracle.csproj"
               },
-              "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\HiSql.csproj": {
-                "projectPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\HiSql.csproj"
+              "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj": {
+                "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj"
               }
             }
           }
@@ -137,20 +141,22 @@
         }
       }
     },
-    "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\HiSql.csproj": {
-      "version": "1.0.1.8",
+    "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj": {
+      "version": "1.0.1.9",
       "restore": {
-        "projectUniqueName": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\HiSql.csproj",
+        "projectUniqueName": "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj",
         "projectName": "HiSql",
-        "projectPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\HiSql.csproj",
+        "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj",
         "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-        "outputPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\obj\\",
+        "outputPath": "D:\\Project\\OpenSource\\HiSql\\HiSql\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
           "C:\\Users\\admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "9oGA1kQ3sE9U6LZ8vt33WITz6GPKLSAQmeOOa0sotfwHTfXB2jvuVJryKRsu16r/2qGUR4LkGFReDqs+6O01oA==",
+  "dgSpecHash": "/RH/DKlu4XHGfntgeVF6uBuvJ5lVv4hif4aMeO/oAvwDqYebVHhvByYas61NzvOzltzw5RY6JPSp+JCjpw8ibQ==",
   "success": true,
-  "projectFilePath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\HiSql.csproj",
+  "projectFilePath": "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\admin\\.nuget\\packages\\microsoft.extensions.caching.abstractions\\5.0.0\\microsoft.extensions.caching.abstractions.5.0.0.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\microsoft.extensions.caching.memory\\5.0.0\\microsoft.extensions.caching.memory.5.0.0.nupkg.sha512",

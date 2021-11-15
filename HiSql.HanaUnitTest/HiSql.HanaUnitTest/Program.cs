@@ -9,8 +9,8 @@ namespace HiSql.HanaUnitTest
             Console.WriteLine("Hello World!");
 
             HiSqlClient sqlClient = Demo_Init.GetSqlClient();
-
-            Demo_Insert.Init(sqlClient);
+            Console.WriteLine($"数据库连接id" + sqlClient.Context.ConnectedId);
+            //Demo_Insert.Init(sqlClient);
             //DemoCodeFirst.Init(sqlClient);
             //Demo_Query.Init(sqlClient);
 

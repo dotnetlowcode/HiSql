@@ -238,7 +238,7 @@
           }
         }
       },
-      "HiSql/1.0.1.8": {
+      "HiSql/1.0.1.9": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
@@ -258,7 +258,7 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
-          "HiSql": "1.0.1.8",
+          "HiSql": "1.0.1.9",
           "System.Data.Odbc": "5.0.0"
         },
         "compile": {
@@ -770,7 +770,7 @@
         "version.txt"
       ]
     },
-    "HiSql/1.0.1.8": {
+    "HiSql/1.0.1.9": {
       "type": "project",
       "path": "../../HiSql/HiSql.csproj",
       "msbuildProject": "../../HiSql/HiSql.csproj"
@@ -783,28 +783,31 @@
   },
   "projectFileDependencyGroups": {
     "net5.0": [
-      "HiSql >= 1.0.1.8",
+      "HiSql >= 1.0.1.9",
       "HiSql.Hana >= 1.0.1.8"
     ]
   },
   "packageFolders": {
     "C:\\Users\\admin\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.HanaUnitTest\\HiSql.HanaUnitTest\\HiSql.HanaUnitTest.csproj",
+      "projectUniqueName": "D:\\Project\\OpenSource\\HiSql\\HiSql.HanaUnitTest\\HiSql.HanaUnitTest\\HiSql.HanaUnitTest.csproj",
       "projectName": "HiSql.HanaUnitTest",
-      "projectPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.HanaUnitTest\\HiSql.HanaUnitTest\\HiSql.HanaUnitTest.csproj",
+      "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.HanaUnitTest\\HiSql.HanaUnitTest\\HiSql.HanaUnitTest.csproj",
       "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-      "outputPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.HanaUnitTest\\HiSql.HanaUnitTest\\obj\\",
+      "outputPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.HanaUnitTest\\HiSql.HanaUnitTest\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
         "C:\\Users\\admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -819,11 +822,11 @@
         "net5.0": {
           "targetAlias": "net5.0",
           "projectReferences": {
-            "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.Hana\\HiSql.Hana.csproj": {
-              "projectPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql.Hana\\HiSql.Hana.csproj"
+            "D:\\Project\\OpenSource\\HiSql\\HiSql.Hana\\HiSql.Hana.csproj": {
+              "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.Hana\\HiSql.Hana.csproj"
             },
-            "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\HiSql.csproj": {
-              "projectPath": "D:\\Project\\OpenSource\\giteeHiSql\\hisql\\HiSql\\HiSql.csproj"
+            "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj": {
+              "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj"
             }
           }
         }

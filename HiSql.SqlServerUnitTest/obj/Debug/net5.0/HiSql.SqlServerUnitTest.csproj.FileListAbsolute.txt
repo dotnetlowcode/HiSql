@@ -60,7 +60,6 @@ D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\HiSql.SqlSe
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\HiSql.SNRO.pdb
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\HiSql.SqlServer.pdb
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\HiSql.pdb
-D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Debug\net5.0\HiSql.SqlServerUnitTest.csprojAssemblyReference.cache
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Debug\net5.0\HiSql.SqlServerUnitTest.GeneratedMSBuildEditorConfig.editorconfig
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Debug\net5.0\HiSql.SqlServerUnitTest.AssemblyInfoInputs.cache
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Debug\net5.0\HiSql.SqlServerUnitTest.AssemblyInfo.cs
@@ -70,3 +69,4 @@ D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Debug\net5.0\HiSql.SqlSe
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Debug\net5.0\ref\HiSql.SqlServerUnitTest.dll
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Debug\net5.0\HiSql.SqlServerUnitTest.pdb
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Debug\net5.0\HiSql.SqlServerUnitTest.genruntimeconfig.cache
+D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Debug\net5.0\HiSql.SqlServerUnitTest.csproj.AssemblyReference.cache

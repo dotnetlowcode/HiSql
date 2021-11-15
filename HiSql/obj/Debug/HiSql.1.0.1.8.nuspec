@@ -4,7 +4,6 @@
     <id>HiSql</id>
     <version>1.0.1.8</version>
     <authors>tansar</authors>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <projectUrl>http://www.hisql.net/</projectUrl>
     <description>HiSql 核心包
 支持SqlServer,MySql,Oracle,Hana,PostGreSql 根据需要单独再引用支持的包
@@ -19,6 +18,6 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="D:\Project\OpenSource\giteeHiSql\hisql\HiSql\bin\Debug\net5.0\HiSql.dll" target="lib\net5.0\HiSql.dll" />
+    <file src="D:\Project\OpenSource\HiSql\HiSql\bin\Debug\net5.0\HiSql.dll" target="lib\net5.0\HiSql.dll" />
   </files>
 </package>
