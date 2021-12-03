@@ -238,7 +238,7 @@
           }
         }
       },
-      "HiSql/1.0.1.9": {
+      "HiSql/1.0.2": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
@@ -254,11 +254,11 @@
           "bin/placeholder/HiSql.dll": {}
         }
       },
-      "HiSql.Hana/1.0.1.8": {
+      "HiSql.Hana/1.0.2": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
-          "HiSql": "1.0.1.9",
+          "HiSql": "1.0.2",
           "System.Data.Odbc": "5.0.0"
         },
         "compile": {
@@ -770,12 +770,12 @@
         "version.txt"
       ]
     },
-    "HiSql/1.0.1.9": {
+    "HiSql/1.0.2": {
       "type": "project",
       "path": "../../HiSql/HiSql.csproj",
       "msbuildProject": "../../HiSql/HiSql.csproj"
     },
-    "HiSql.Hana/1.0.1.8": {
+    "HiSql.Hana/1.0.2": {
       "type": "project",
       "path": "../../HiSql.Hana/HiSql.Hana.csproj",
       "msbuildProject": "../../HiSql.Hana/HiSql.Hana.csproj"
@@ -783,8 +783,8 @@
   },
   "projectFileDependencyGroups": {
     "net5.0": [
-      "HiSql >= 1.0.1.9",
-      "HiSql.Hana >= 1.0.1.8"
+      "HiSql >= 1.0.2",
+      "HiSql.Hana >= 1.0.2"
     ]
   },
   "packageFolders": {

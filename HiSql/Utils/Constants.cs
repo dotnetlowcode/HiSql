@@ -263,5 +263,24 @@ namespace HiSql
         public static string REG_FUNCTION = @"^(?:[\s]*)(?<fun>max|min|avg|sum|count)\s*[\(]\s*(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w]+)(?:[\.]{1}))?(?<field>[\w]+|[\*]{1})\s*[\)]\s*(?:as)\s*(?<refield>[\w]+)\s*$";
 
         public static string REG_SERVER = "";
+
+
+        /// <summary>
+        /// 是否是模糊查询值
+        /// </summary>
+        public static string REG_ISLIKEQUERY = @"[\%]+";
+
+
+
+        /// <summary>
+        /// 匹配一个左括号
+        /// </summary>
+        public static string REG_BRACKET_LEFT = @"^\s*\(\s*$";
+
+
+        /// <summary>
+        /// 匹配一个右括号
+        /// </summary>
+        public static string REG_BRACKET_RIGHT = @"^\s*\)\s*$";
     }
 }

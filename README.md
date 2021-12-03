@@ -21,6 +21,43 @@
    5. HiSql.postgresql.dll
 
 
+### 2021.12.2 更新
+1. 修复当以Dictionary 对象作为数据插入来源，且该字典的字段无与表中匹配的问题
+2. 新增 查询条件语法如下 可以实现无限级分组条件
+
+2.1 结构化写法如下所示
+```c#
+string sql = sqlClient.Query("Hi_FieldModel", "A").Field("A.FieldName as Fname")
+    .Join("Hi_TabModel").As("B").On(new JoinOn { { "A.TabName", "B.TabName" } })
+    .Where(new Filter {
+        { "("},
+        {"A.TabName", OperType.EQ, "Hi_FieldModel"},
+        {"A.FieldName", OperType.EQ, "CreateName"},
+        { ")"},
+        { LogiType.OR},
+        { "("},
+        {"A.FieldType",OperType.BETWEEN,new RangDefinition(){ Low=10,High=99} },
+        { ")"}
+    })
+    .Group(new GroupBy { { "A.FieldName" } }).ToSql();
+
+2.2 字符串写法如下所示
+支持 字符串写法解决通过应用前端可以自定义传条件过来 `a.tabname = 'Hi_FieldModel' and ((a.FieldType = 11)) `
+看这个语法类似于sqlserver的写法，与sqlserver无关， 这是Hisql自定义的中间语法 通过hisql编译后在hisql支持的库中运行
+
+注：暂时不支持in,not in写法 下一版本将会加上
+
+
+```c#
+string jsondata = sqlClient.Query("Hi_FieldModel", "A").Field("A.FieldName as Fname")
+    .Join("Hi_TabModel").As("B").On(new JoinOn { { "A.TabName", "B.TabName" } })
+    .Where("a.tabname = 'Hi_FieldModel' and ((a.FieldType = 11)) ")
+    .Group(new GroupBy { { "A.FieldName" } }).ToJson();
+```
+
+```
+
+
 ### 配置数据库连接
 
 ```c#

@@ -315,9 +315,16 @@ namespace HiSql
             //检测JOIN关联条件字段
             sb_join.Append(sqlServerDM.BuildJoinSql(this.TableList, dictabinfo, this.Fields, this.Joins));
 
-            
+
             // 检测where条件字段
-            sb_where.Append(sqlServerDM.BuilderWhereSql(this.TableList, dictabinfo, this.Fields, this.Wheres, this.IsMultiSubQuery));
+
+            if (this.Filters.IsHiSqlWhere && !string.IsNullOrEmpty(this.Filters.HiSqlWhere.Trim()))
+            {
+                //this.Filters.WhereParse.Result
+                sb_where.Append(sqlServerDM.BuilderWhereSql(this.TableList, dictabinfo, this.Fields, this.Filters.WhereParse.Result, this.IsMultiSubQuery));
+            }
+            else
+                sb_where.Append(sqlServerDM.BuilderWhereSql(this.TableList, dictabinfo, this.Fields, this.Wheres, this.IsMultiSubQuery));
 
 
 

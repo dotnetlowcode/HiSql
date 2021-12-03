@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HiSql.AST;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -1028,8 +1029,62 @@ namespace HiSql
             return sb_sql.ToString();
         }
 
+        /// <summary>
+        /// 解析hisql中间语言语法
+        /// </summary>
+        /// <param name="TableList"></param>
+        /// <param name="dictabinfo"></param>
+        /// <param name="Fields"></param>
+        /// <param name="lstresult"></param>
+        /// <param name="issubquery"></param>
+        /// <returns></returns>
+        public string BuilderWhereSql(List<TableDefinition> TableList, Dictionary<string, TabInfo> dictabinfo, List<FieldDefinition> Fields, List<WhereResult> lstresult, bool issubquery)
+        {
+            StringBuilder sb_sql = new StringBuilder();
+            if (lstresult != null && lstresult.Count() > 0)
+            {
+                foreach (WhereResult whereResult in lstresult)
+                {
+                    //字段值
+                    if (whereResult.SType == StatementType.FieldValue)
+                    {
+                        if (whereResult.Result.ContainsKey("fields"))
+                        {
+                            FieldDefinition field = new FieldDefinition(whereResult.Result["fields"].ToString());
+                            sb_sql.Append($"{dbConfig.Table_Pre}{field.AsTabName}{dbConfig.Table_After}.{dbConfig.Table_Pre}{field.AsFieldName}{dbConfig.Table_After}");
+                            HiColumn hiColumn = CheckField(TableList, dictabinfo, Fields, field);
+                            string _value = whereResult.Result["value"].ToString();
+                            if (hiColumn != null)
+                            {
+                                sb_sql.Append($" {whereResult.Result["op"].ToString()} ");
+                                sb_sql.Append(getSingleValue(issubquery, hiColumn, _value));
+                            }
+                        }
+                        else
+                        {
+                            throw new Exception($"未能识别的解析结果");
+                        }
+                    }
+                    else if (whereResult.SType == StatementType.SubCondition)
+                    {
+                        //子条件中可能会嵌套多个深度子条件
+                        if (whereResult.Result != null)
+                        {
+                            WhereParse whereParse = new WhereParse(whereResult.Result["content"].ToString());
+                            sb_sql.Append($" ({BuilderWhereSql(TableList, dictabinfo, Fields, whereParse.Result, issubquery)})");
+                        }
+                    }
+                    else if (whereResult.SType == StatementType.Symbol)
+                    {
+                        sb_sql.Append($" {whereResult.Result["mode"].ToString()} ");
+                    }
+                    else
+                        throw new Exception("暂时不支持该语法");
+                }
+            }
 
-
+            return sb_sql.ToString();
+        }
         /// <summary>
         /// 生成WHERE语句
         /// </summary>
@@ -1040,50 +1095,92 @@ namespace HiSql
             int _idx = 0;
             foreach (FilterDefinition filterDefinition in Wheres)
             {
-                HiColumn hiColumn = CheckField(TableList, dictabinfo, Fields, filterDefinition.Field);
-                sb_where.Append($"{dbConfig.Table_Pre}{filterDefinition.Field.AsTabName}{dbConfig.Table_After}.{dbConfig.Table_Pre}{filterDefinition.Field.AsFieldName}{dbConfig.Table_After}");
-                switch (filterDefinition.OpFilter)
+                if (filterDefinition.FilterType == FilterType.BRACKET_LEFT)
                 {
-                    case OperType.EQ:
-                        sb_where.Append(" = ");
-                        sb_where.Append(getSingleValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value));
-                        break;
-                    case OperType.GT:
-                        sb_where.Append(" > ");
-                        sb_where.Append(getSingleValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value));
-                        break;
-                    case OperType.LT:
-                        sb_where.Append(" < ");
-                        sb_where.Append(getSingleValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value));
-                        break;
-                    case OperType.GE:
-                        sb_where.Append(" >= ");
-                        sb_where.Append(getSingleValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value));
-                        break;
-                    case OperType.LE:
-                        sb_where.Append(" <= ");
-                        sb_where.Append(getSingleValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value));
-                        break;
-                    case OperType.IN:
-                        sb_where.Append(" in ");
-                        sb_where.Append($"({getInValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value)})");
-                        break;
-                    case OperType.NOIN:
-                        sb_where.Append(" not in ");
-                        sb_where.Append($"({getInValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value)})");
-                        break;
-                    case OperType.BETWEEN:
-                        sb_where.Append(" BETWEEN ");
-                        sb_where.Append(getBetweenValue(hiColumn, filterDefinition, filterDefinition.Value));
-                        break;
+                    sb_where.Append("(");
                 }
-                if (_idx < Wheres.Count - 1)
+                else if (filterDefinition.FilterType == FilterType.BRACKET_RIGHT)
                 {
-                    if (filterDefinition.LogiType == LogiType.AND)
-                        sb_where.Append(" and ");
-                    else
-                        sb_where.Append(" or ");
+                    sb_where.Append(")");
+                    if (_idx < Wheres.Count - 1)
+                    {
+                        if (Wheres[_idx + 1].FilterType == FilterType.LOGI)
+                        {
+                            sb_where.Append($" {Wheres[_idx + 1].LogiType} ");
+                        }
+                        else
+                        {
+                            throw new Exception($"在括号[)]后如果还有其它的条件则必需要有逻辑操作符[and|or]");
+                        }
+                    }
                 }
+                else if (filterDefinition.FilterType == FilterType.CONDITION)
+                {
+                    HiColumn hiColumn = CheckField(TableList, dictabinfo, Fields, filterDefinition.Field);
+                    sb_where.Append($"{dbConfig.Table_Pre}{filterDefinition.Field.AsTabName}{dbConfig.Table_After}.{dbConfig.Table_Pre}{filterDefinition.Field.AsFieldName}{dbConfig.Table_After}");
+                    switch (filterDefinition.OpFilter)
+                    {
+                        case OperType.EQ:
+                            sb_where.Append(" = ");
+                            sb_where.Append(getSingleValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value));
+                            break;
+                        case OperType.GT:
+                            sb_where.Append(" > ");
+                            sb_where.Append(getSingleValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value));
+                            break;
+                        case OperType.LT:
+                            sb_where.Append(" < ");
+                            sb_where.Append(getSingleValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value));
+                            break;
+                        case OperType.GE:
+                            sb_where.Append(" >= ");
+                            sb_where.Append(getSingleValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value));
+                            break;
+                        case OperType.LE:
+                            sb_where.Append(" <= ");
+                            sb_where.Append(getSingleValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value));
+                            break;
+                        case OperType.IN:
+                            sb_where.Append(" in ");
+                            sb_where.Append($"({getInValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value)})");
+                            break;
+                        case OperType.NOIN:
+                            sb_where.Append(" not in ");
+                            sb_where.Append($"({getInValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value)})");
+                            break;
+                        case OperType.BETWEEN:
+                            sb_where.Append(" BETWEEN ");
+                            sb_where.Append(getBetweenValue(hiColumn, filterDefinition, filterDefinition.Value));
+                            break;
+
+                        case OperType.LIKE:
+                            //模糊查询
+                            sb_where.Append(" like ");
+                            sb_where.Append(getLikeValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value));
+                            break;
+                        case OperType.NOLIKE:
+                            //模糊查询
+                            sb_where.Append(" not like ");
+                            sb_where.Append(getLikeValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value));
+                            break;
+                    }
+                    if (_idx < Wheres.Count - 1)
+                    {
+
+                        if (Wheres[_idx + 1].FilterType == FilterType.CONDITION)
+                        {
+                            if (filterDefinition.LogiType == LogiType.AND)
+                                sb_where.Append(" and ");
+                            else
+                                sb_where.Append(" or ");
+                        }
+                        else if (Wheres[_idx + 1].FilterType == FilterType.LOGI)
+                        {
+                            sb_where.Append($" {Wheres[_idx + 1].LogiType} ");
+                        }
+                    }
+                }
+
                 _idx++;
             }
 
@@ -1766,6 +1863,52 @@ namespace HiSql
 
             return _sb_value.ToString();
         }
+        string getSingleValue(bool issubquery, HiColumn hiColumn, object value)
+        {
+            string _value = string.Empty;
+            if (!issubquery)
+            {
+                if (hiColumn.FieldType.IsIn<HiType>(HiType.NCHAR, HiType.NVARCHAR, HiType.GUID))
+                {
+                    _value = value.ToString();
+                    if (_value.Length <= hiColumn.FieldLen)
+                        _value = $"'{_value.ToSqlInject()}'";
+                    else
+                        throw new Exception($"过滤条件字段[{hiColumn.ColumnName}]指定的值超过了限定长度[{hiColumn.FieldLen}]");
+                }
+                else if (hiColumn.FieldType.IsIn<HiType>(HiType.VARCHAR, HiType.CHAR))
+                {
+                    _value = value.ToString();
+                    if (_value.LengthZH() <= hiColumn.FieldLen)
+                        _value = $"'{_value.ToSqlInject()}'";
+                    else
+                        throw new Exception($"过滤条件字段[{hiColumn.ColumnName}]指定的值超过了限定长度[{hiColumn.FieldLen}]");
+                }
+                else if (hiColumn.FieldType.IsIn<HiType>(HiType.INT, HiType.DECIMAL, HiType.SMALLINT, HiType.BIGINT))
+                {
+                    _value = value.ToString();
+                }
+                else if (hiColumn.FieldType.IsIn<HiType>(HiType.DATETIME))
+                {
+                    DateTime _time = Convert.ToDateTime(value.ToString());
+                    _value = $"'{_time.ToString("yyyy-MM-dd HH:mm:ss.fff")}'";
+                }
+                else if (hiColumn.FieldType.IsIn<HiType>(HiType.DATE))
+                {
+                    DateTime _time = Convert.ToDateTime(value.ToString());
+                    _value = $"'{_time.ToString("yyyy-MM-dd")}'";
+                }
+                else
+                {
+                    _value = $"'{value.ToString().ToSqlInject()}'";
+                }
+            }
+            else
+            {
+                _value = $"'{value.ToString().ToSqlInject()}'";
+            }
+            return _value;
+        }
         string getSingleValue(bool issubquery, HiColumn hiColumn, FilterDefinition filterDefinition, object value)
         {
             string _value = string.Empty;
@@ -1810,6 +1953,53 @@ namespace HiSql
             {
                 _value = $"'{value.ToString().ToSqlInject()}'";
             }
+            return _value;
+        }
+
+        /// <summary>
+        /// 获取模糊查询值
+        /// </summary>
+        /// <param name="issubquery"></param>
+        /// <param name="hiColumn"></param>
+        /// <param name="filterDefinition"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        string getLikeValue(bool issubquery, HiColumn hiColumn, FilterDefinition filterDefinition, object value)
+        {
+            string _value = string.Empty;
+            //没有子查询
+            if (!issubquery)
+            {
+                if (hiColumn.FieldType.IsIn<HiType>(HiType.NCHAR, HiType.NVARCHAR))
+                {
+                    _value = value.ToString();
+                    if (!Tool.RegexMatch(Constants.REG_ISLIKEQUERY, _value))
+                        throw new Exception($"当前使用了模糊查询但值[{_value}]未指定[%]符号 ");
+                    if (_value.Length <= hiColumn.FieldLen)
+                        _value = $"'{_value.ToSqlInject()}'";
+                    else
+                        throw new Exception($"过滤条件字段[{filterDefinition.Field.AsFieldName}]指定的值超过了限定长度[{hiColumn.FieldLen}]");
+                }
+                else if (hiColumn.FieldType.IsIn<HiType>(HiType.VARCHAR, HiType.CHAR))
+                {
+                    _value = value.ToString();
+                    if (!Tool.RegexMatch(Constants.REG_ISLIKEQUERY, _value))
+                        throw new Exception($"当前使用了模糊查询但值[{_value}]未指定[%]符号 ");
+                    if (_value.LengthZH() <= hiColumn.FieldLen)
+                        _value = $"'{_value.ToSqlInject()}'";
+                    else
+                        throw new Exception($"过滤条件字段[{filterDefinition.Field.AsFieldName}]指定的值超过了限定长度[{hiColumn.FieldLen}]");
+                }
+                else if (hiColumn.FieldType.IsIn<HiType>(HiType.TEXT))
+                {
+                    throw new Exception($"超大文本不支持用模糊查询");
+                }
+                else
+                {
+                    throw new Exception($"当前字段类型{hiColumn.FieldType.ToString()} 不支持模糊查询");
+                }
+            }
+
             return _value;
         }
         #endregion

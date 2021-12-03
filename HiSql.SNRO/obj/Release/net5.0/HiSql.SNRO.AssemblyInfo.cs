@@ -13,6 +13,7 @@ using System.Reflection;
 
 [assembly: System.Reflection.AssemblyCompanyAttribute("Hone")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
+[assembly: System.Reflection.AssemblyDescriptionAttribute("编号服务工具包\r\n根据此包可以自定义开发编号服务")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.1")]
 [assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0.1")]
 [assembly: System.Reflection.AssemblyProductAttribute("HiSql.SNRO")]

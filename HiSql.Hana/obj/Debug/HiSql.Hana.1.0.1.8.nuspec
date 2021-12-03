@@ -8,7 +8,7 @@
     <description>该包支持Hana 内存数据库 依赖于HiSql.dll包运行</description>
     <dependencies>
       <group targetFramework="net5.0">
-        <dependency id="HiSql" version="1.0.1.8" exclude="Build,Analyzers" />
+        <dependency id="HiSql" version="1.0.1.9" exclude="Build,Analyzers" />
         <dependency id="System.Data.Odbc" version="5.0.0" exclude="Build,Analyzers" />
       </group>
     </dependencies>

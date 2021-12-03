@@ -5,10 +5,12 @@
     <version>1.0.0.1</version>
     <authors>tansar</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Package Description</description>
+    <projectUrl>http://www.hisql.net/</projectUrl>
+    <description>编号服务工具包
+根据此包可以自定义开发编号服务</description>
     <dependencies>
       <group targetFramework="net5.0">
-        <dependency id="HiSql" version="1.0.1.8" exclude="Build,Analyzers" />
+        <dependency id="HiSql" version="1.0.1.9" exclude="Build,Analyzers" />
         <dependency id="Microsoft.Extensions.Caching.Memory" version="5.0.0" exclude="Build,Analyzers" />
       </group>
     </dependencies>

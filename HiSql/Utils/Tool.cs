@@ -32,7 +32,32 @@ namespace HiSql
             }
             return _dic;
         }
+        /// <summary>
+        /// 匹配值且进行替换
+        /// </summary>
+        /// <param name="regex"></param>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static Tuple<bool, Dictionary<string, string>, string> RegexGrpOrReplace(string regex, string text)
+        {
+            Tuple<bool, Dictionary<string, string>, string> tuple = new Tuple<bool, Dictionary<string, string>, string>(false, null, "");
+            Regex _regex = new Regex(regex, RegexOptions.IgnoreCase | RegexOptions.Multiline);
+            Dictionary<string, string> _dic = new Dictionary<string, string>();
 
+            //bool _ismach = _regex.IsMatch(text);
+            Match _match = _regex.Match(text);
+
+            if (_match.Success)
+            {
+                foreach (string name in _regex.GetGroupNames())
+                {
+                    _dic.Add(name, _match.Groups[_regex.GroupNumberFromName(name)].Value);
+                }
+                text = _regex.Replace(text, "");
+                //_match = _match.NextMatch();
+            }
+            return new Tuple<bool, Dictionary<string, string>, string>(_match.Success, _dic, text);
+        }
         /// <summary>
         /// 获取多个组合匹配
         /// </summary>

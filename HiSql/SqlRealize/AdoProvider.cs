@@ -238,6 +238,8 @@ namespace HiSql
         private int execCommand(string sql, params HiParameter[] parameters)
         {
             int count = 0;
+            bool hassError = false;
+            Exception _e = null;
             try
             {
 
@@ -286,7 +288,9 @@ namespace HiSql
             catch (Exception E)
             {
                 CmdTyp = CommandType.Text;
+                hassError = true;
                 ExecuteError(sql, parameters, E);
+                _e = E; 
                 //throw E;
             }
             finally
@@ -297,6 +301,8 @@ namespace HiSql
                 }
                 //ChooseConnectionEnd(sql);
             }
+            if (hassError)
+                throw _e;
             return count;
         }
         /// <summary>
@@ -329,6 +335,8 @@ namespace HiSql
         private object execScalar(string sql)
         {
             object _effect = null;
+            bool hassError = false;
+            Exception _e = null;
             try
             {
 
@@ -378,6 +386,8 @@ namespace HiSql
             catch (Exception E)
             {
                 CmdTyp = CommandType.Text;
+                hassError = true;
+                _e = E;
                 ExecuteError(sql, null, E);
                 //throw E;
             }
@@ -389,6 +399,8 @@ namespace HiSql
                 }
                 //ChooseConnectionEnd(sql);
             }
+            if (hassError)
+                throw _e;
             return _effect;
         }
         public virtual object ExecScalar(string sql)

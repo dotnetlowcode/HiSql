@@ -21,7 +21,14 @@ namespace HiSql
 
         IQuery As(string retabname);
         IQuery Where(Filter where);
-        
+
+
+        /// <summary>
+        /// 支持Hisql 中间语言的sql条件
+        /// </summary>
+        /// <param name="sqlwhere"></param>
+        /// <returns></returns>
+        IQuery Where(string sqlwhere);
 
         /// <summary>
         /// 指定一个或多个查询字段

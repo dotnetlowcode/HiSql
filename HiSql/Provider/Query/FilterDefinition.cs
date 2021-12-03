@@ -17,7 +17,10 @@ namespace HiSql
 
         private FieldDefinition _field = new FieldDefinition();
         private object _value;
-
+        /// <summary>
+        /// 过滤条件的节点类型
+        /// </summary>
+        private FilterType _filtertype;
         //private readonly List<FiledDefinition> _elements = new List<FiledDefinition>();
         public string Name
         {
@@ -48,6 +51,11 @@ namespace HiSql
             get { return _opfilter; }
             set { _opfilter = value; }
         }
+
+        public FilterType FilterType
+        {
+            get { return _filtertype; }
+        }
         public FieldDefinition Field
         {
             get { return _field; }
@@ -62,7 +70,10 @@ namespace HiSql
             get { return _logitype; }
             set { _logitype = value; }
         }
+        public FilterDefinition(FilterType filterType)
+        {
+            this._filtertype = filterType;
+        }
 
-       
     }
 }

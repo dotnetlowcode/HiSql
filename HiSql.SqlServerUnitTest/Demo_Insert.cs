@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace HiSql
 {
 
-    public   class Demo_Insert
+    public class Demo_Insert
     {
         class H_Test
         {
@@ -36,7 +36,8 @@ namespace HiSql
             //Demo1_Insert(sqlClient);
             //Demo1_Insert2(sqlClient);
             //Demo1_Insert3(sqlClient);
-            Demo_dynamic(sqlClient);
+            Demo1_Insert4(sqlClient);
+            //Demo_dynamic(sqlClient);
         }
 
         static void Demo_dynamic(HiSqlClient sqlClient)
@@ -45,7 +46,7 @@ namespace HiSql
             for (int i = 0; i < 10; i++)
             {
                 TDynamic dyn1 = new TDynamic();
-                dyn1["Hid"] = 150+i;
+                dyn1["Hid"] = 150 + i;
                 dyn1["UserName"] = $"tgm{i}";
                 dyn1["UserAge"] = 34;
                 dyn1["Birth"] = DateTime.Now;
@@ -55,23 +56,23 @@ namespace HiSql
             dyn["Hid"] = 123;
             dyn["UserName"] = "tgm";
             dyn["UserAge"] = 34;
-            dyn["Birth"] =DateTime.Now;
+            dyn["Birth"] = DateTime.Now;
 
             dynamic ddyn = dyn.ToDynamic();
 
             ddyn.Userid = "";
 
             var type = ddyn.GetType();
-            var prop=type.GetProperties();
+            var prop = type.GetProperties();
 
 
-            string hid =  ddyn.Birth.ToString("yyyy-MM-dd HH:mm:ss.fff");
+            string hid = ddyn.Birth.ToString("yyyy-MM-dd HH:mm:ss.fff");
 
             ddyn.Hid = 99;
 
 
 
-            Dictionary<string,object> exo=(Dictionary<string, object>)dyn;
+            Dictionary<string, object> exo = (Dictionary<string, object>)dyn;
             for (int i = 0; i < 10; i++)
             {
                 lstdyn.Add(new Dictionary<string, string>
@@ -83,14 +84,24 @@ namespace HiSql
             }
 
 
-            
+
             lstdyn.Add(dyn);
 
             DateTime dnow = DateTime.Now;
             Console.WriteLine(dnow.ToString());
 
+
+
+
             string _sql = sqlClient.Modi("H_Test", lstdyn).ToSql(); ;
         }
+
+        static void Demo1_Insert4(HiSqlClient sqlClient)
+        {
+            ///测试 非自增长且不允许为空且没有设置默认值且没有传值 
+            string _sql2 = sqlClient.Insert("H_Test", new Dictionary<string, object> { { "UserAge",34 },{ "Hid",5798 } }).ToSql();
+        }
+
 
         static void Demo1_Insert3(HiSqlClient sqlClient)
         {

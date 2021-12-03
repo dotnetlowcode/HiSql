@@ -14,11 +14,11 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Hone")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("该包支持SqlServer数据库 依赖于HiSql.dll包运行\r\n解决部分bug问题")]
-[assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.1.8")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.1.8")]
+[assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.2.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.2.0")]
 [assembly: System.Reflection.AssemblyProductAttribute("HiSql.SqlServer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HiSql.SqlServer")]
-[assembly: System.Reflection.AssemblyVersionAttribute("1.0.1.8")]
+[assembly: System.Reflection.AssemblyVersionAttribute("1.0.2.0")]
 
 // 由 MSBuild WriteCodeFragment 类生成。
 

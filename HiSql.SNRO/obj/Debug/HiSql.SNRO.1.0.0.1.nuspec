@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>HiSql.SNRO</id>
+    <version>1.0.0.1</version>
+    <authors>tansar</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <projectUrl>http://www.hisql.net/</projectUrl>
+    <description>编号服务工具包
+根据此包可以自定义开发编号服务</description>
+    <dependencies>
+      <group targetFramework="net5.0">
+        <dependency id="HiSql" version="1.0.2" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Caching.Memory" version="5.0.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="D:\Project\OpenSource\HiSql\HiSql.SNRO\bin\Debug\net5.0\HiSql.SNRO.dll" target="lib\net5.0\HiSql.SNRO.dll" />
+  </files>
+</package>

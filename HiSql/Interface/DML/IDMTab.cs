@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HiSql.AST;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -90,6 +91,8 @@ namespace HiSql
         /// <returns></returns>
         HiColumn CheckField(List<TableDefinition> TableList, Dictionary<string, TabInfo> dictabinfo, List<FieldDefinition> Fields, FieldDefinition fieldDefinition, bool allowstart = false);
 
+
+
         /// <summary>
         /// 检测更新数据
         /// </summary>
@@ -117,5 +120,9 @@ namespace HiSql
         string BuildUpdateSql(TabInfo tabinfo, TableDefinition table, Dictionary<string, string> dic_value, Dictionary<string, string> dic_primary, string _where);
 
         string BuilderWhereSql(List<TableDefinition> TableList, Dictionary<string, TabInfo> dictabinfo, List<FieldDefinition> Fields, List<FilterDefinition> Wheres, bool issubquery);
+
+        string BuilderWhereSql(List<TableDefinition> TableList, Dictionary<string, TabInfo> dictabinfo, List<FieldDefinition> Fields, List<WhereResult> lstresult, bool issubquery);
+
+
     }
 }

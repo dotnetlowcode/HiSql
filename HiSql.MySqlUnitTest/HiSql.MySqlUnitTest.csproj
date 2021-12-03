@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\HiSql.MySql\HiSql.MySql.csproj" />
+    <ProjectReference Include="..\HiSql.Oracle\HiSql.Oracle.csproj" />
     <ProjectReference Include="..\HiSql\HiSql.csproj" />
   </ItemGroup>
 

@@ -12,7 +12,7 @@
 </Description>
     <Company>Hone</Company>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.1.9</Version>
+    <Version>1.0.2.0</Version>
     <PackageProjectUrl>http://www.hisql.net</PackageProjectUrl>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>hisql.pfx</AssemblyOriginatorKeyFile>
