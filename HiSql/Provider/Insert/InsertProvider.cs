@@ -731,7 +731,7 @@ namespace HiSql
                         {
                             if ((bool)objprop.GetValue(objdata) == true)
                             {
-                                if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.PostGreSql, DBType.Hana))
+                                if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.PostGreSql, DBType.Hana,DBType.MySql))
                                 {
                                     _value = "True";
                                     _values.Add(hiColumn.ColumnName, $"{_value}");
@@ -744,7 +744,7 @@ namespace HiSql
                             }
                             else
                             {
-                                if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.PostGreSql, DBType.Hana))
+                                if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.PostGreSql, DBType.Hana, DBType.MySql))
                                 {
                                     _value = "False";
                                     _values.Add(hiColumn.ColumnName, $"{_value}");

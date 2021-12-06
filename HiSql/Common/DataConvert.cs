@@ -41,6 +41,7 @@ namespace HiSql
             List<T> lst = new List<T>();
             Type type = typeof(T);
             List<string> fieldNameList = new List<string>();
+            string _value = "";
             List< PropertyInfo> listInfo = type.GetProperties().Where(p => p.CanWrite && p.CanRead && p.MemberType == MemberTypes.Property).ToList();//
             for (int i = 0; i < dataReader.FieldCount; i++)
             {
@@ -62,7 +63,17 @@ namespace HiSql
 
                                 if (dataReader[n] is not DBNull)
                                 {
-                                    pinfo.SetValue(t1, dataReader[n]);
+                                    if (pinfo.PropertyType.FullName.IndexOf("bool") >= 0)
+                                    {
+                                        _value = dataReader[n].ToString().ToLower().Trim();
+                                        if(_value=="1" || _value=="true")
+                                            pinfo.SetValue(t1, true);
+                                        else
+                                            pinfo.SetValue(t1, false);
+                                    }
+                                    else
+                                        pinfo.SetValue(t1, dataReader[n]);
+
                                 }
                                 else
                                 {
@@ -97,7 +108,16 @@ namespace HiSql
                                 //当不为Null值时才赋值
                                 if (dataReader[n] is not DBNull)
                                 {
-                                    pinfo.SetValue(t1, dataReader[n]);
+                                    if (pinfo.PropertyType.FullName.ToLower().IndexOf("bool") >= 0)
+                                    {
+                                        _value = dataReader[n].ToString().ToLower().Trim();
+                                        if (_value == "1" || _value == "true")
+                                            pinfo.SetValue(t1, true);
+                                        else
+                                            pinfo.SetValue(t1, false);
+                                    }
+                                    else
+                                        pinfo.SetValue(t1, dataReader[n]);
                                 }
                                 else
                                 {

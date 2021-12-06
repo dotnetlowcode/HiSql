@@ -23,14 +23,16 @@ namespace HiSql.MySqlUnitTest
             {
                 get; set;
             }
-
+            public bool ISSYS { get; set; }
         }
+        
         public static void Init(HiSqlClient sqlClient)
         {
-            Demo1_Insert(sqlClient);
+            //Demo1_Insert(sqlClient);
             //Demo1_Modi(sqlClient);
             //Demo2_Insert(sqlClient);
             //Demo1_Modi2(sqlClient);
+            Demo3_Insert(sqlClient);
             string s = Console.ReadLine();
         }
 
@@ -69,6 +71,11 @@ namespace HiSql.MySqlUnitTest
             Console.WriteLine($"[{_times}]条数据,耗时：{watch.Elapsed.ToString()}");
             Console.WriteLine(_effect);
         }
+        static void Demo3_Insert(HiSqlClient sqlClient)
+        {
+            int v=sqlClient.Insert("H_TEST", new H_TEST { UNAME="tgm",UNAME2="tang",ISSYS=true }).ExecCommand();
+        }
+
 
         static void Demo2_Insert(HiSqlClient sqlClient)
         {

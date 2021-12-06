@@ -9,6 +9,22 @@ namespace HiSql.MySqlUnitTest
 {
     class Demo_Query
     {
+        class H_TEST
+        {
+            public int DID
+            {
+                get; set;
+            }
+            public string UNAME
+            {
+                get; set;
+            }
+            public string UNAME2
+            {
+                get; set;
+            }
+            public bool ISSYS { get; set; }
+        }
         public static void Init(HiSqlClient sqlClient)
         {
             //Query_Demo(sqlClient);
@@ -17,6 +33,14 @@ namespace HiSql.MySqlUnitTest
             //Query_Demo4(sqlClient);
             //Query_Case(sqlClient);
             Query_Demo6(sqlClient);
+            //Query_Demo7(sqlClient);
+        }
+
+
+        static void Query_Demo7(HiSqlClient sqlClient)
+        {
+            List<H_TEST> lst = sqlClient.Query("h_test").Field("*").ToList<H_TEST>();
+
         }
 
         /// <summary>

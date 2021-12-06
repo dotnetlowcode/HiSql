@@ -326,7 +326,7 @@ namespace HiSql
 
 
             // 检测where条件字段
-            if (this.Filters.IsHiSqlWhere && !string.IsNullOrEmpty(this.Filters.HiSqlWhere.Trim()))
+            if (this.Filters != null && this.Filters.IsHiSqlWhere && !string.IsNullOrEmpty(this.Filters.HiSqlWhere.Trim()))
             {
                 //this.Filters.WhereParse.Result
                 sb_where.Append(postgresqlDM.BuilderWhereSql(this.TableList, dictabinfo, this.Fields, this.Filters.WhereParse.Result, this.IsMultiSubQuery));
