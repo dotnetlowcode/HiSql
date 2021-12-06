@@ -5,6 +5,10 @@
     <Version>1.0.0.1</Version>
     <Authors>tansar</Authors>
     <Company>Hone</Company>
+    <Description>编号服务工具包
+根据此包可以自定义开发编号服务</Description>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageProjectUrl>http://www.hisql.net</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>

@@ -9,13 +9,66 @@ namespace HiSql.MySqlUnitTest
 {
     class Demo_Query
     {
+        class H_TEST
+        {
+            public int DID
+            {
+                get; set;
+            }
+            public string UNAME
+            {
+                get; set;
+            }
+            public string UNAME2
+            {
+                get; set;
+            }
+            public bool ISSYS { get; set; }
+        }
         public static void Init(HiSqlClient sqlClient)
         {
             //Query_Demo(sqlClient);
             //Query_Demo2(sqlClient);
             //Query_Demo3(sqlClient);
             //Query_Demo4(sqlClient);
-            Query_Case(sqlClient);
+            //Query_Case(sqlClient);
+            Query_Demo6(sqlClient);
+            //Query_Demo7(sqlClient);
+        }
+
+
+        static void Query_Demo7(HiSqlClient sqlClient)
+        {
+            List<H_TEST> lst = sqlClient.Query("h_test").Field("*").ToList<H_TEST>();
+
+        }
+
+        /// <summary>
+        /// 测试where的新语法
+        /// </summary>
+        /// <param name="sqlClient"></param>
+        static void Query_Demo6(HiSqlClient sqlClient)
+        {
+            string sql = sqlClient.Query("Hi_FieldModel", "A").Field("A.FieldName as Fname")
+                .Join("Hi_TabModel").As("B").On(new JoinOn { { "A.TabName", "B.TabName" } })
+                .Where(new Filter {
+                    { "("},
+                    {"A.TabName", OperType.EQ, "Hi_FieldModel"},
+                    {"A.FieldName", OperType.EQ, "CreateName"},
+                    { ")"},
+                    { LogiType.OR},
+                    { "("},
+                    {"A.FieldType",OperType.BETWEEN,new RangDefinition(){ Low=10,High=99} },
+                    { ")"}
+                })
+                .Group(new GroupBy { { "A.FieldName" } }).ToSql();
+
+
+            string jsondata = sqlClient.Query("Hi_FieldModel", "A").Field("A.FieldName as Fname")
+                .Join("Hi_TabModel").As("B").On(new JoinOn { { "A.TabName", "B.TabName" } })
+                .Where("a.tabname = 'Hi_FieldModel' and ((a.FieldType = 11)) ")
+                .Group(new GroupBy { { "A.FieldName" } }).ToJson();
+
         }
         static void Query_Demo2(HiSqlClient sqlClient)
         {

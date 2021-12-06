@@ -69,4 +69,4 @@ D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Debug\net5.0\HiSql.SqlSe
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Debug\net5.0\ref\HiSql.SqlServerUnitTest.dll
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Debug\net5.0\HiSql.SqlServerUnitTest.pdb
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Debug\net5.0\HiSql.SqlServerUnitTest.genruntimeconfig.cache
-D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Debug\net5.0\HiSql.SqlServerUnitTest.csproj.AssemblyReference.cache
+D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Debug\net5.0\HiSql.SqlServerUnitTest.csprojAssemblyReference.cache

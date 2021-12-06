@@ -264,10 +264,10 @@ namespace HiSql
             int _idx = 0;
             int _idx2 = 0;
             bool _flag = false;
-            OracleDM sqlServerDM = null;
-            sqlServerDM = (OracleDM)Instance.CreateInstance<OracleDM>($"{Constants.NameSpace}.{this.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
+            OracleDM oracleDM = null;
+            oracleDM = (OracleDM)Instance.CreateInstance<OracleDM>($"{Constants.NameSpace}.{this.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
             //IDMInitalize dMInitalize = new SqlServerDM();
-            sqlServerDM.Context = this.Context;
+            oracleDM.Context = this.Context;
             //多表子查询的情况下 无当前查询表
             if (!this.IsMultiSubQuery)
             {
@@ -288,7 +288,7 @@ namespace HiSql
                         else
                         {
                             //全局缓存
-                            tabinfo = sqlServerDM.GetTabStruct(table.TabName);
+                            tabinfo = oracleDM.GetTabStruct(table.TabName);
                         }
                         //TabInfo tabinfo = dMInitalize.GetTabStruct(table.TabName);
                         dictabinfo.Add(table.TabName, tabinfo);
@@ -309,7 +309,7 @@ namespace HiSql
 
             //检测返回结果字段
 
-            Tuple<string, string, List<HiColumn>> queryresult = sqlServerDM.BuildQueryFieldSql(dictabinfo, (QueryProvider)this);
+            Tuple<string, string, List<HiColumn>> queryresult = oracleDM.BuildQueryFieldSql(dictabinfo, (QueryProvider)this);
             sb_field.Append(queryresult.Item1);
             sb_field_result.Append(queryresult.Item2);
             this.ResultColumn = queryresult.Item3;
@@ -332,21 +332,27 @@ namespace HiSql
             }
 
             //检测JOIN关联条件字段
-            sb_join.Append(sqlServerDM.BuildJoinSql(this.TableList, dictabinfo, this.Fields, this.Joins));
+            sb_join.Append(oracleDM.BuildJoinSql(this.TableList, dictabinfo, this.Fields, this.Joins));
 
 
             // 检测where条件字段
-            sb_where.Append(sqlServerDM.BuilderWhereSql(this.TableList, dictabinfo, this.Fields, this.Wheres, this.IsMultiSubQuery));
+            if (this.Filters != null && this.Filters.IsHiSqlWhere && !string.IsNullOrEmpty(this.Filters.HiSqlWhere.Trim()))
+            {
+                //this.Filters.WhereParse.Result
+                sb_where.Append(oracleDM.BuilderWhereSql(this.TableList, dictabinfo, this.Fields, this.Filters.WhereParse.Result, this.IsMultiSubQuery));
+            }
+            else
+                sb_where.Append(oracleDM.BuilderWhereSql(this.TableList, dictabinfo, this.Fields, this.Wheres, this.IsMultiSubQuery));
 
 
 
             //分组
 
-            sb_group.Append(sqlServerDM.BuildGroupSql(this.TableList, dictabinfo, this.Fields, this.Groups, this.IsMultiSubQuery));
+            sb_group.Append(oracleDM.BuildGroupSql(this.TableList, dictabinfo, this.Fields, this.Groups, this.IsMultiSubQuery));
 
 
             //排序字段
-            sb_sort.Append(sqlServerDM.BuildOrderBySql(ref sb_group, dictabinfo, (QueryProvider)this));
+            sb_sort.Append(oracleDM.BuildOrderBySql(ref sb_group, dictabinfo, (QueryProvider)this));
 
 
 

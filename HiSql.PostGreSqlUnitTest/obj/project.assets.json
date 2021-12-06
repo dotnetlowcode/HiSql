@@ -229,7 +229,7 @@
           }
         }
       },
-      "HiSql/1.0.1.9": {
+      "HiSql/1.0.2.1": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
@@ -245,11 +245,11 @@
           "bin/placeholder/HiSql.dll": {}
         }
       },
-      "HiSql.PostGreSql/1.0.1.8": {
+      "HiSql.PostGreSql/1.0.2.1": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
-          "HiSql": "1.0.1.9",
+          "HiSql": "1.0.2.1",
           "Npgsql": "5.0.7"
         },
         "compile": {
@@ -771,12 +771,12 @@
         "version.txt"
       ]
     },
-    "HiSql/1.0.1.9": {
+    "HiSql/1.0.2.1": {
       "type": "project",
       "path": "../HiSql/HiSql.csproj",
       "msbuildProject": "../HiSql/HiSql.csproj"
     },
-    "HiSql.PostGreSql/1.0.1.8": {
+    "HiSql.PostGreSql/1.0.2.1": {
       "type": "project",
       "path": "../HiSql.PostGreSql/HiSql.PostGreSql.csproj",
       "msbuildProject": "../HiSql.PostGreSql/HiSql.PostGreSql.csproj"
@@ -784,8 +784,8 @@
   },
   "projectFileDependencyGroups": {
     "net5.0": [
-      "HiSql >= 1.0.1.9",
-      "HiSql.PostGreSql >= 1.0.1.8"
+      "HiSql >= 1.0.2.1",
+      "HiSql.PostGreSql >= 1.0.2.1"
     ]
   },
   "packageFolders": {

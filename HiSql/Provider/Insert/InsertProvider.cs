@@ -221,7 +221,8 @@ namespace HiSql
                         else
                         {
                             Dictionary<string, string> _values = CheckInsertData(_isdic, attrs, tabinfo.GetColumns, this.Data[i]);
-                                //sqldm.CheckInsertData(attrs, tabinfo.GetColumns, this.Data[i]);
+                            if (_values.Count == 0)
+                                throw new Exception($"向表[{_insertTabName}]插入数据值中无任何配置的字段");
                             string _sql = sqldm.BuildInsertSql(_values, i > p * DbConfig.BlukSize).Replace("[$TabName$]", _insertTabName);//i > p * _bluksize
                             sb_sql.Append(_sql);
                         }
@@ -668,7 +669,7 @@ namespace HiSql
                         {
                             //中文按1个字符计算
                             //_value = "test";
-                         
+
                             _value = (string)objprop.GetValue(objdata);
                             if (_value.Length >= hiColumn.FieldLen)
                             {
@@ -679,13 +680,13 @@ namespace HiSql
                                 if (string.IsNullOrEmpty(_value.Trim()))
                                     throw new Exception($"字段[{objprop.Name}] 为必填 无法数据提交");
                             }
-                          
+
                             _values.Add(hiColumn.ColumnName, $"'{_value.ToSqlInject()}'");
 
                         }
                         else if (hiColumn.FieldType.IsIn<HiType>(HiType.VARCHAR, HiType.CHAR, HiType.TEXT))
                         {
-                         
+
                             //中文按两个字符计算
                             _value = (string)objprop.GetValue(objdata);
                             //_value = "test";
@@ -698,7 +699,7 @@ namespace HiSql
                                 if (string.IsNullOrEmpty(_value.Trim()))
                                     throw new Exception($"字段[{objprop.Name}] 为必填 无法数据提交");
                             }
-                         
+
                             _values.Add(hiColumn.ColumnName, $"'{_value.ToSqlInject()}'");
                         }
                         else if (hiColumn.FieldType.IsIn<HiType>(HiType.INT, HiType.BIGINT, HiType.DECIMAL, HiType.SMALLINT))
@@ -711,7 +712,7 @@ namespace HiSql
                             }
                             //_value = "1";
 
-                     
+
                             _values.Add(hiColumn.ColumnName, $"{_value}");
                         }
                         else if (hiColumn.FieldType.IsIn<HiType>(HiType.DATE, HiType.DATETIME))
@@ -719,18 +720,18 @@ namespace HiSql
 
                             DateTime dtime = (DateTime)objprop.GetValue(objdata);
                             //DateTime dtime = DateTime.Now;
-                            if (dtime != null && dtime!=DateTime.MinValue)
+                            if (dtime != null && dtime != DateTime.MinValue)
                             {
                                 _values.Add(hiColumn.ColumnName, $"'{dtime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
                             }
-                            
-                            
+
+
                         }
                         else if (hiColumn.FieldType.IsIn<HiType>(HiType.BOOL)) //add by tgm date:2021.10.27
                         {
                             if ((bool)objprop.GetValue(objdata) == true)
                             {
-                                if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.PostGreSql, DBType.Hana))
+                                if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.PostGreSql, DBType.Hana,DBType.MySql))
                                 {
                                     _value = "True";
                                     _values.Add(hiColumn.ColumnName, $"{_value}");
@@ -743,7 +744,7 @@ namespace HiSql
                             }
                             else
                             {
-                                if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.PostGreSql, DBType.Hana))
+                                if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.PostGreSql, DBType.Hana, DBType.MySql))
                                 {
                                     _value = "False";
                                     _values.Add(hiColumn.ColumnName, $"{_value}");
@@ -755,12 +756,20 @@ namespace HiSql
                                 }
                             }
 
-                            
+
                         }
                         else
                         {
                             _value = (string)objprop.GetValue(objdata);
                             _values.Add(hiColumn.ColumnName, $"'{_value}'");
+                        }
+                    }
+                    else
+                    {
+                        //非自增长且不允许为空且没有设置默认值且没有传值的情况下应该抛出异常 不然底层库会报错
+                        if (!hiColumn.IsNull && hiColumn.DBDefault == HiTypeDBDefault.NONE && !hiColumn.IsIdentity)
+                        {
+                            throw new Exception($"字段[{hiColumn.ColumnName}]不允许为空数据库中未设置默认值 且插入数据值中未指定值");
                         }
                     }
 
@@ -849,6 +858,14 @@ namespace HiSql
                             _values.Add(hiColumn.ColumnName, $"'{_value}'");
                         }
                     }
+                    else
+                    {
+                        //非自增长且不允许为空且没有设置默认值且没有传值的情况下应该抛出异常 不然底层库会报错
+                        if (!hiColumn.IsNull && hiColumn.DBDefault == HiTypeDBDefault.NONE && !hiColumn.IsIdentity)
+                        {
+                            throw new Exception($"字段[{hiColumn.ColumnName}]不允许为空数据库中未设置默认值 且插入数据值中未指定值");
+                        }
+                    }
                     if (hiColumn.ColumnName.ToLower() == "CreateTime".ToLower() || hiColumn.ColumnName.ToLower() == "ModiTime".ToLower())
                     {
 
@@ -862,6 +879,10 @@ namespace HiSql
                     #endregion
                 }
             }
+
+            
+
+
             return _values;
         }
 

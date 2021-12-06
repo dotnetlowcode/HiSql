@@ -31,10 +31,39 @@ namespace HiSql.UnitTest
             //Query_Case(sqlClient);
             //Query_Demo2(sqlClient);
             //Query_Demo4(sqlClient);
-            Query_Demo5(sqlClient);
-
+            //Query_Demo5(sqlClient);
+            Query_Demo6(sqlClient);
             var s = Console.ReadLine();
         }
+
+        /// <summary>
+        /// 测试where的新语法
+        /// </summary>
+        /// <param name="sqlClient"></param>
+        static void Query_Demo6(HiSqlClient sqlClient)
+        {
+            string sql = sqlClient.Query("Hi_FieldModel", "A").Field("A.FieldName as Fname")
+                .Join("Hi_TabModel").As("B").On(new JoinOn { { "A.TabName", "B.TabName" } })
+                .Where(new Filter {
+                    { "("},
+                    {"A.TabName", OperType.EQ, "Hi_FieldModel"},
+                    {"A.FieldName", OperType.EQ, "CreateName"},
+                    { ")"},
+                    { LogiType.OR},
+                    { "("},
+                    {"A.FieldType",OperType.BETWEEN,new RangDefinition(){ Low=10,High=99} },
+                    { ")"}
+                })
+                .Group(new GroupBy { { "A.FieldName" } }).ToSql();
+
+
+            string jsondata = sqlClient.Query("Hi_FieldModel", "A").Field("A.FieldName as Fname")
+                .Join("Hi_TabModel").As("B").On(new JoinOn { { "A.TabName", "B.TabName" } })
+                .Where("a.tabname = 'Hi_FieldModel' and ((a.FieldType = 11)) ")
+                .Group(new GroupBy { { "A.FieldName" } }).ToJson();
+            
+        }
+
 
         static void Query_Demo5(HiSqlClient sqlClient)
         {

@@ -31,4 +31,4 @@ D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\net5.0\HiSql.SqlServer.csp
 D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\net5.0\HiSql.SqlServer.dll
 D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\net5.0\ref\HiSql.SqlServer.dll
 D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\net5.0\HiSql.SqlServer.pdb
-D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\net5.0\HiSql.SqlServer.csproj.AssemblyReference.cache
+D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\net5.0\HiSql.SqlServer.csprojAssemblyReference.cache

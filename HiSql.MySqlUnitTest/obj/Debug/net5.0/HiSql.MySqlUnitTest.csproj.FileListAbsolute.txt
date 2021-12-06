@@ -104,3 +104,6 @@ D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\obj\Debug\net5.0\HiSql.MySqlUnit
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\obj\Debug\net5.0\ref\HiSql.MySqlUnitTest.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\obj\Debug\net5.0\HiSql.MySqlUnitTest.pdb
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\obj\Debug\net5.0\HiSql.MySqlUnitTest.genruntimeconfig.cache
+D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\System.Data.OracleClient.dll
+D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\HiSql.Oracle.dll
+D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\HiSql.Oracle.pdb

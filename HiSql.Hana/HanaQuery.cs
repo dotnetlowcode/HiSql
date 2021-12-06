@@ -332,7 +332,13 @@ namespace HiSql
 
 
             // 检测where条件字段
-            sb_where.Append(hanaDM.BuilderWhereSql(this.TableList, dictabinfo, this.Fields, this.Wheres, this.IsMultiSubQuery));
+            if (this.Filters != null && this.Filters.IsHiSqlWhere && !string.IsNullOrEmpty(this.Filters.HiSqlWhere.Trim()))
+            {
+                //this.Filters.WhereParse.Result
+                sb_where.Append(hanaDM.BuilderWhereSql(this.TableList, dictabinfo, this.Fields, this.Filters.WhereParse.Result, this.IsMultiSubQuery));
+            }
+            else
+                sb_where.Append(hanaDM.BuilderWhereSql(this.TableList, dictabinfo, this.Fields, this.Wheres, this.IsMultiSubQuery));
 
 
 

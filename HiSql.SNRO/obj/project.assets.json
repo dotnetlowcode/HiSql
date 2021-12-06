@@ -208,7 +208,7 @@
           }
         }
       },
-      "HiSql/1.0.1.9": {
+      "HiSql/1.0.2.1": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
@@ -691,7 +691,7 @@
         "version.txt"
       ]
     },
-    "HiSql/1.0.1.9": {
+    "HiSql/1.0.2.1": {
       "type": "project",
       "path": "../HiSql/HiSql.csproj",
       "msbuildProject": "../HiSql/HiSql.csproj"
@@ -699,7 +699,7 @@
   },
   "projectFileDependencyGroups": {
     "net5.0": [
-      "HiSql >= 1.0.1.9",
+      "HiSql >= 1.0.2.1",
       "Microsoft.Extensions.Caching.Memory >= 5.0.0"
     ]
   },

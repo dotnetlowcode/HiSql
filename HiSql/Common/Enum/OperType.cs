@@ -33,16 +33,33 @@ namespace HiSql
         /// </summary>
         LE=4,//小于等于
 
-
-        NE=5,//不等于
+        /// <summary>
+        /// 不等于
+        /// </summary>
+        NE = 5,//
 
         /// <summary>
         /// 模糊查询
         /// </summary>
-        LIKE=5,//模糊查询 还未实现
+        LIKE=6,//模糊查询 
 
+        /// <summary>
+        /// 不匹配模糊查询
+        /// </summary>
+        NOLIKE=7,//否定模糊查询
+
+
+        /// <summary>
+        /// 范围值
+        /// </summary>
         BETWEEN=20,//范围
+        /// <summary>
+        /// 包含
+        /// </summary>
         IN=30,//包含
+        /// <summary>
+        /// 不包含
+        /// </summary>
         NOIN=31,//不包含
 
         //JOIN=40,//关于

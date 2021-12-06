@@ -16,6 +16,9 @@ namespace HiSql
     {
         TableDefinition _table;
         FieldDefinition _field;
+
+        Filter _where;
+
         List<FilterDefinition> _list_filter=new List<FilterDefinition> ();
 
         List<FieldDefinition> _list_field=new List<FieldDefinition> ();
@@ -148,6 +151,15 @@ namespace HiSql
         {
             get { return _list_filter; }
         }
+
+        /// <summary>
+        /// 返回
+        /// </summary>
+        public Filter Filters
+        {
+            get { return _where; }
+        }
+
 
         /// <summary>
         /// 返回结果字段结构信息
@@ -781,6 +793,9 @@ namespace HiSql
         {
             if (where != null && where.Elements.Count > 0)
             {
+                if (!where.IsBracketOk)
+                    throw new Exception("指定了括号[(,)] 但没有成对出现");
+
                 _list_filter = where.Elements;
                 foreach (FilterDefinition filterDefinition in _list_filter)
                 {
@@ -796,7 +811,26 @@ namespace HiSql
                 else
                     throw new Exception($"不允许多次指定where条件");
             }
+            _where = where;
+            return this;
+        }
 
+        /// <summary>
+        /// 支持Hisql 中间语言的sql条件
+        /// </summary>
+        /// <param name="sqlwhere"></param>
+        /// <returns></returns>
+        public IQuery Where(string sqlwhere)
+        {
+            //需要检测语法
+            if (string.IsNullOrEmpty(sqlwhere.Trim()))
+            {
+                throw new Exception($"指定的hisql where语句[{sqlwhere}]为空");
+            }
+            
+            Filter where = new Filter() { sqlwhere };
+            
+            _where = where;
 
             return this;
         }
