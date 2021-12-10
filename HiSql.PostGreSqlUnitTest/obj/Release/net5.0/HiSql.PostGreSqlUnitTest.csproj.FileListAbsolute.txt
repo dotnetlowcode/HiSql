@@ -48,17 +48,10 @@ D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Release\net5.0\Microsof
 D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Release\net5.0\Microsoft.Extensions.Primitives.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Release\net5.0\Newtonsoft.Json.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Release\net5.0\Npgsql.dll
-D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Release\net5.0\System.Data.SqlClient.dll
-D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Release\net5.0\runtimes\win-arm64\native\sni.dll
-D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Release\net5.0\runtimes\win-x64\native\sni.dll
-D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Release\net5.0\runtimes\win-x86\native\sni.dll
-D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Release\net5.0\runtimes\unix\lib\netcoreapp2.1\System.Data.SqlClient.dll
-D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Release\net5.0\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Release\net5.0\HiSql.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Release\net5.0\HiSql.PostGreSql.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Release\net5.0\HiSql.PostGreSql.pdb
 D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Release\net5.0\HiSql.pdb
-D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\obj\Release\net5.0\HiSql.PostGreSqlUnitTest.csprojAssemblyReference.cache
 D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\obj\Release\net5.0\HiSql.PostGreSqlUnitTest.GeneratedMSBuildEditorConfig.editorconfig
 D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\obj\Release\net5.0\HiSql.PostGreSqlUnitTest.AssemblyInfoInputs.cache
 D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\obj\Release\net5.0\HiSql.PostGreSqlUnitTest.AssemblyInfo.cs
@@ -68,3 +61,5 @@ D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\obj\Release\net5.0\HiSql.Po
 D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\obj\Release\net5.0\ref\HiSql.PostGreSqlUnitTest.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\obj\Release\net5.0\HiSql.PostGreSqlUnitTest.pdb
 D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\obj\Release\net5.0\HiSql.PostGreSqlUnitTest.genruntimeconfig.cache
+D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Release\net5.0\System.Runtime.CompilerServices.Unsafe.dll
+D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\obj\Release\net5.0\HiSql.PostGreSqlUnitTest.csproj.AssemblyReference.cache

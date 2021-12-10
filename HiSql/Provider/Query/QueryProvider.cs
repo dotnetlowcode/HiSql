@@ -846,13 +846,13 @@ namespace HiSql
             switch (rank)
             {
                 case DbRank.DENSERANK:
-                    _list_rank.Add($"dense_rank() over( order by {string.Join(',', _lstorderby) }) as {asname}");
+                    _list_rank.Add($"dense_rank() over( order by {string.Join(",", _lstorderby.ToArray()) }) as {asname}");
                     break;
                 case DbRank.RANK:
-                    _list_rank.Add($"rank() over( order by {string.Join(',', _lstorderby)}) as {asname}");
+                    _list_rank.Add($"rank() over( order by {string.Join(",", _lstorderby.ToArray())}) as {asname}");
                     break;
                 case DbRank.ROWNUMBER:
-                    _list_rank.Add($"row_number() over( order by {string.Join(',', _lstorderby)}) as {asname}");
+                    _list_rank.Add($"row_number() over( order by {string.Join(",", _lstorderby.ToArray())}) as {asname}");
                     break;
                 default:
                     break;

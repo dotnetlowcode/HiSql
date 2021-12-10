@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+	  <TargetFrameworks>net461;net5.0;netcoreapp3.1;net6.0</TargetFrameworks>
     <Authors>tansar</Authors>
-    <Version>1.0.2.2</Version>
+    <Version>1.0.2.3</Version>
     <Company>Hone</Company>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>hisql.sqlserver.pfx</AssemblyOriginatorKeyFile>
@@ -14,6 +14,10 @@
 
   <ItemGroup>
     <None Remove="SqlServerInsert.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
   </ItemGroup>
 
   <ItemGroup>
