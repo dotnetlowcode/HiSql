@@ -1081,15 +1081,22 @@ namespace HiSql
                     {
                         if (whereResult.Result.ContainsKey("fields"))
                         {
+
                             FieldDefinition field = new FieldDefinition(whereResult.Result["fields"].ToString());
-                            sb_sql.Append($"{dbConfig.Table_Pre}{field.AsTabName}{dbConfig.Table_After}.{dbConfig.Table_Pre}{field.AsFieldName}{dbConfig.Table_After}");
                             HiColumn hiColumn = CheckField(TableList, dictabinfo, Fields, field);
-                            string _value = whereResult.Result["value"].ToString();
+                            sb_sql.Append($"{dbConfig.Table_Pre}{field.AsTabName}{dbConfig.Table_After}.{dbConfig.Table_Pre}{field.AsFieldName}{dbConfig.Table_After}");
+
                             if (hiColumn != null)
                             {
-                                sb_sql.Append($" {whereResult.Result["op"].ToString()} ");
-                                sb_sql.Append(getSingleValue(issubquery, hiColumn, _value));
+                                string _value = whereResult.Result["value"].ToString();
+                                if (hiColumn != null)
+                                {
+                                    sb_sql.Append($" {whereResult.Result["op"].ToString()} ");
+                                    sb_sql.Append(getSingleValue(issubquery, hiColumn, _value));
+                                }
                             }
+                            else
+                                throw new Exception($"字段[{whereResult.Result["fields"].ToString()}]出现错误");
                         }
                         else
                         {
@@ -1109,6 +1116,77 @@ namespace HiSql
                     {
                         sb_sql.Append($" {whereResult.Result["mode"].ToString()} ");
                     }
+                    else if (whereResult.SType == StatementType.In)
+                    {
+                        //解析in条件
+                        // in 一般有三种写法
+                        // 1  a.user in ('tgm','tansar')
+                        // 2  a.user in (select User from UserAadmin)
+                        // 3  a.utype in (1,2,3)
+                        if (whereResult.Result.ContainsKey("fields") && whereResult.Result.ContainsKey("fields"))
+                        {
+                            FieldDefinition field = new FieldDefinition(whereResult.Result["fields"].ToString());
+                            HiColumn hiColumn = CheckField(TableList, dictabinfo, Fields, field);
+                            sb_sql.Append($"{dbConfig.Table_Pre}{field.AsTabName}{dbConfig.Table_After}.{dbConfig.Table_Pre}{field.AsFieldName}{dbConfig.Table_After}");
+
+                            if (hiColumn == null)
+                                throw new Exception($"字段[{whereResult.Result["fields"].ToString()}]出现错误");
+
+                            string _content = whereResult.Result["content"].ToString();
+                            if (Tool.RegexMatch(AST.SelectParse.Constants.REG_SELECT, _content))
+                            {
+
+
+                                //检测出是select 语句
+                                SelectParse selectParse = new SelectParse(_content, Context, true);
+                                string _sql = selectParse.Query.ToSql();
+
+
+                                sb_sql.Append($" {whereResult.Result["symbol"].ToString()} ");
+                                sb_sql.Append($"({_sql})");
+                            }
+                            else if (Tool.RegexMatch(AST.SelectParse.Constants.REG_INCHARVALUE, _content))
+                            {
+                                //a.user in ('tgm','tansar')
+
+                                var diclst = Tool.RegexGrps(AST.SelectParse.Constants.REG_INCHARVALUE, _content, "content");
+                                if (diclst.Count > 0)
+                                {
+                                    string _value = diclst.ToArray().ToSqlIn();
+                                    sb_sql.Append($" {whereResult.Result["symbol"].ToString()} ");
+                                    sb_sql.Append($"({_value})");
+                                }
+                                else
+                                    throw new Exception($"语句[{whereResult.Result["fields"].ToString()}] 附近有语法错误,无匹配的in范围值");
+
+
+
+                            }
+                            else if (Tool.RegexMatch(AST.SelectParse.Constants.REG_INVALUE, _content))
+                            {
+                                //a.utype in (1,2,3)
+                                var diclst = Tool.RegexGrps(AST.SelectParse.Constants.REG_INVALUE, _content, "content");
+                                if (diclst.Count > 0)
+                                {
+                                    string _value = diclst.ToArray().ToSqlIn(false);
+                                    sb_sql.Append($" {whereResult.Result["symbol"].ToString()} ");
+                                    sb_sql.Append($"({_value})");
+                                }
+                                else
+                                    throw new Exception($"语句[{whereResult.Result["fields"].ToString()}] 附近有语法错误,无匹配的in范围值");
+
+                            }
+                            else
+                                throw new Exception($"语句[{_content}]附近有语法错误");
+
+
+
+                        }
+                        else
+                            throw new Exception("未能识别的解析结果");
+
+                    }
+
                     else
                         throw new Exception("暂时不支持该语法");
                 }
@@ -1143,7 +1221,8 @@ namespace HiSql
                         }
                         else
                         {
-                            throw new Exception($"在括号[)]后如果还有其它的条件则必需要有逻辑操作符[and|or]");
+                            if (Wheres[_idx + 1].FilterType != FilterType.BRACKET_RIGHT)
+                                throw new Exception($"在括号[)]后如果还有其它的条件则必需要有逻辑操作符[and|or]");
                         }
                     }
                 }
@@ -1238,11 +1317,11 @@ namespace HiSql
                 if (joinDefinition.Right != null && joinDefinition.JoinOn.Count > 0)
                 {
                     if (joinDefinition.JoinType == JoinType.Inner)
-                        sb_join.Append($"inner join");
+                        sb_join.Append($" inner join");
                     else if (joinDefinition.JoinType == JoinType.Left)
-                        sb_join.Append($"left inner join");
+                        sb_join.Append($" left inner join");
                     else if (joinDefinition.JoinType == JoinType.Right)
-                        sb_join.Append($"outer join");
+                        sb_join.Append($" outer join");
                     sb_join.Append($" {dbConfig.Field_Pre}{joinDefinition.Right.TabName}{dbConfig.Field_After} as {dbConfig.Field_Pre}{joinDefinition.Right.AsTabName}{dbConfig.Field_After}");
                     sb_join.Append(" on ");
                     foreach (JoinOnFilterDefinition joinOnFilterDefinition in joinDefinition.JoinOn)
@@ -1385,7 +1464,7 @@ namespace HiSql
                     {
                         sb_sort.Append($"{dbConfig.Field_Pre}{groupDefinition.Field.AsTabName}{dbConfig.Field_After}.{dbConfig.Field_Pre}{groupDefinition.Field.AsFieldName}{dbConfig.Field_After}");
                         sb_sort.Append(" ASC");
-                        if (_idx < queryProvider.Sorts.Count - 1)
+                        if (_idx < queryProvider.Groups.Count - 1)
                         {
                             sb_sort.Append(",");
                         }
@@ -1668,6 +1747,18 @@ namespace HiSql
         public HiColumn CheckField(List<TableDefinition> TableList, Dictionary<string, TabInfo> dictabinfo, List<FieldDefinition> Fields, FieldDefinition fieldDefinition, bool allowstart = false)
         {
             HiColumn hiColumn = null;
+            //2021.12.8 add by tgm
+            if (string.IsNullOrEmpty(fieldDefinition.AsTabName))
+            {
+                if (TableList.Count == 1)
+                {
+                    fieldDefinition.AsTabName = TableList[0].AsTabName;
+                }
+                else
+                {
+                    throw new Exception($"查询多张表时 字段[{fieldDefinition.FieldName}]需要指定表");
+                }
+            }
             TableDefinition tabinfo = TableList.Where(t => t.AsTabName.ToLower() == fieldDefinition.AsTabName.ToLower()).FirstOrDefault();//&& t.Columns.Any(c=>c.ColumnName==fieldDefinition.FieldName)
             if (tabinfo != null)
             {

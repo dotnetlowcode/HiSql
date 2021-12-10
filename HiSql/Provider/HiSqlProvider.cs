@@ -231,6 +231,34 @@ namespace HiSql
             result.Query(tabname);
             return result;
         }
+
+
+
+        /// <summary>
+        /// 执行Hisql语句
+        /// 详细请参照Hisql语法
+        /// 注意hisql并不是原生数据sql Hisql是一个单独的语法可以编译成不同数据库的原生sql
+        /// </summary>
+        /// <param name="hisql"></param>
+        /// <param name="dbMasterSlave"></param>
+        /// <returns></returns>
+        public IQuery HiSql(string hisql, DbMasterSlave dbMasterSlave = DbMasterSlave.Default)
+        {
+            IQuery result = null;
+            //默认主从规则
+
+            //bool _isslave = ConnManager.ChooseSlaveForTable(this.Context.SlaveConnectionConfig, tabname, dbMasterSlave);
+            //if (dbMasterSlave)
+            //    result = Instance.GetQuery(this.Context.SlaveConnectionConfig);
+            //else
+            result = Instance.GetQuery(this.Context.CurrentConnectionConfig);
+
+
+
+            result.Context = this.Context;
+            result.HiSql(hisql,result);
+            return result;
+        }
         #endregion
 
 

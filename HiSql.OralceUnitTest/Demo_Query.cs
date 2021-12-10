@@ -16,8 +16,27 @@ namespace HiSql.OralceUnitTest
             //Query_Demo2(sqlClient);
             //Query_Demo3(sqlClient);
             //Query_Demo4(sqlClient);
+            Query_Demo8(sqlClient);
 
             Query_Case(sqlClient);
+        }
+        static void Query_Demo8(HiSqlClient sqlClient)
+        {
+            //string sql = sqlClient.HiSql($"select * from Hi_FieldModel  where (tabname = 'h_test') and  FieldType in (11,21,31) and tabname in (select tabname from Hi_TabModel)").ToSql();
+
+            //string sql = sqlClient.HiSql($"select fieldlen,isprimary from  Hi_FieldModel  group by fieldlen,isprimary   order by fieldlen ")
+            //    .Take(3).Skip(2)
+            //    .ToSql();
+
+            int total = 0;
+            var table = sqlClient.HiSql($"select fieldlen,isprimary from  Hi_FieldModel     order by fieldlen ")
+                .Take(3).Skip(2)
+                .ToTable(ref total);
+            if (table != null)
+            {
+
+            }
+            //string sql = sqlClient.Query("Hi_TabModel").Field("*").Sort(new SortBy { { "CreateTime" } }).Take(2).Skip(2).ToSql();
         }
         static void Query_Demo4(HiSqlClient sqlClient)
         {

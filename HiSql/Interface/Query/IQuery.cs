@@ -16,7 +16,7 @@ namespace HiSql
 
         IQuery Query(string tabname, string rename);
         IQuery Query(string tabname);
-
+        IQuery HiSql(string hisql,IQuery query);
         IQuery Query(params IQuery[] query);
 
         IQuery As(string retabname);
@@ -47,9 +47,9 @@ namespace HiSql
 
         IQuery Join(JoinDefinition join);
 
-        IQuery Join(string tabname, string retabname);
+        IQuery Join(string tabname, string retabname,JoinType joinType= JoinType.Inner);
 
-        IQuery Join(string tabname);
+        IQuery Join(string tabname, JoinType joinType = JoinType.Inner);
 
         /// <summary>
         /// ON
@@ -62,6 +62,9 @@ namespace HiSql
         IQuery On(string condition);
 
         IQuery Sort(SortBy sort);
+
+        //IQuery Sort(string sort);
+
         IQuery Sort(SortByDefinition sort);
 
         IQuery Sort(params string[] sort);
@@ -86,13 +89,13 @@ namespace HiSql
         IQuery WithLock(LockMode lockMode =LockMode.NONE);
 
         /// <summary>
-        /// 从多少页开始
+        /// 显示第几页的数据
         /// </summary>
         /// <param name="currpage"></param>
         /// <returns></returns>
         IQuery Skip(int currpage);
         /// <summary>
-        /// 显示多少数据
+        /// 页大小(显示最大记录数)
         /// </summary>
         /// <param name="pagesize"></param>
         /// <returns></returns>
@@ -166,16 +169,64 @@ namespace HiSql
         string GetDbName(string tabname);
 
 
+        /// <summary>
+        /// 将前的操作生成目库的sql语句
+        /// </summary>
+        /// <returns></returns>
         string ToSql();
+
+        /// <summary>
+        /// 将结果集返回指定的实体类结果集
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         List<T> ToList<T>() ;
+        /// <summary>
+        /// 当有分页时返回实体数据，并返回当前查询条件的总记录数
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="total">总记录数</param>
+        /// <returns></returns>
+        List<T> ToList<T>(ref int total);
+        /// <summary>
+        /// 将查询结果返回一个DataTable结果集
+        /// </summary>
+        /// <returns></returns>
         DataTable ToTable();
+        /// <summary>
+        /// 当有分页时返回DataTable，并返回当前查询条件的总记录数
+        /// </summary>
+        /// <param name="total"></param>
+        /// <returns></returns>
+        DataTable ToTable(ref int total);
 
 
+        /// <summary>
+        /// 返回动态类型结果集
+        /// </summary>
+        /// <returns></returns>
         List<TDynamic> ToDynamic();
+        /// <summary>
+        /// 当有分页时返回动态类型结果集，并返回当前查询条件的总记录数
+        /// </summary>
+        /// <param name="total"></param>
+        /// <returns></returns>
+        List<TDynamic> ToDynamic(ref int total);
+
+        /// <summary>
+        /// 将数据转成json字符串
+        /// </summary>
+        /// <returns></returns>
         string ToJson();
+        /// <summary>
+        /// 当有分页时将数据转成json字符串，并返回当前查询条件的总记录数
+        /// </summary>
+        /// <param name="total"></param>
+        /// <returns></returns>
+        string ToJson(ref int total);
 
 
-        
+
     }
     //查询对象
     

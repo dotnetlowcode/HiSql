@@ -20,6 +20,8 @@ namespace HiSql.AST
 
         public static class  Constants
         {
+
+
             public static  List<WhereGrp> REG_WHERE = new List<WhereGrp> {
                 new WhereGrp(){
                     //识别字段
@@ -62,7 +64,11 @@ namespace HiSql.AST
 
         private string _sqlwhere;
         private string _currwhere;
-        string _reg_symbol = @"^[\s]*(?<mode>and|or)";
+        string _reg_symbol = @"^[\s]*(?<mode>\band\b|\bor\b)";
+
+        string _wherestr;
+
+        bool _isallmatch = true;
 
         List<WhereResult> lstresult = new List<WhereResult>();
 
@@ -71,10 +77,15 @@ namespace HiSql.AST
         /// </summary>
         public List<WhereResult> Result { get { return lstresult; } }
 
-        public WhereParse(string _hisqlwhere)
+        public string ResultSql { get { return _wherestr; } }
+
+        public WhereParse(string _hisqlwhere, bool allmatch = true)
         {
             _sqlwhere = _hisqlwhere;
             _currwhere = _hisqlwhere;
+
+            //当为false时 表示是不会完全匹配，如果没有匹配上的，将会返回
+            _isallmatch = allmatch;
 
             #region  解析工具
             
@@ -99,8 +110,8 @@ namespace HiSql.AST
             bool _isexpsymbol = false;
             bool _checkok = true;
             List<WhereResult> listresult = new List<WhereResult>();
-
-            while (!string.IsNullOrEmpty(wherestr.Trim()))
+            //_wherestr = wherestr;
+            while (!string.IsNullOrEmpty(wherestr.Trim())  && _checkok)
             {
                 if (!_isexpsymbol)
                 {
@@ -113,7 +124,7 @@ namespace HiSql.AST
                         if (result.Item1)
                         {
                             //暂时不支持in语句 下一版本会支持
-                            if (!_expr.SType .IsIn<StatementType>( StatementType.In,StatementType.FieldBetweenValue))
+                            if (!_expr.SType .IsIn<StatementType>(StatementType.FieldBetweenValue))
                             {
                                 _ismatch = result.Item1;
                                 WhereResult whereResult = new WhereResult();
@@ -122,7 +133,7 @@ namespace HiSql.AST
                                 if (result.Item2.ContainsKey("0"))
                                     whereResult.Statement = result.Item2["0"].ToString();
                                 else
-                                    throw new Exception($"解析错误无法识别的解析结果 {wherestr}");
+                                    throw new Exception($"{HiSql.Constants.HiSqlSyntaxError}解析错误无法识别的解析结果 {wherestr}");
                                 listresult.Add(whereResult);
                                
                                 wherestr = result.Item3;
@@ -131,7 +142,7 @@ namespace HiSql.AST
                             else
                             {
                                 _checkok = false;
-                                throw new Exception($"语句{wherestr} 暂时不支持 in 或not in 及between and语法");
+                                throw new Exception($"{HiSql.Constants.HiSqlSyntaxError}语句{wherestr} 暂时不支持 in 或not in 及between and语法");
                                 //Console.WriteLine($"语句{wherestr} 暂时不支持 in 语法");
                             }
                         }
@@ -141,7 +152,8 @@ namespace HiSql.AST
                     {
                         _checkok = false;
                         //Console.WriteLine($"语句{wherestr} 附近出现语法错误!");
-                        throw new Exception($"语句 {wherestr} 附近出现语法错误!");
+                        if(_isallmatch)
+                            throw new Exception($"{HiSql.Constants.HiSqlSyntaxError}语句 {wherestr} 附近出现语法错误!");
                         
                         
                     }
@@ -157,21 +169,25 @@ namespace HiSql.AST
                         if (result.Item2.ContainsKey("0"))
                             whereResult.Statement = result.Item2["0"].ToString();
                         else
-                            throw new Exception($"解析错误无法识别的解析结果 {wherestr}");
+                            throw new Exception($"{HiSql.Constants.HiSqlSyntaxError}解析错误无法识别的解析结果 {wherestr}");
                         listresult.Add(whereResult);
                         wherestr = result.Item3;
                         
                     }
                     else
                     {
-                        Console.WriteLine($"语句 {wherestr} 附近缺少 and 或or 运算符");
+                        if (_isallmatch)
+                        {
+                            throw new Exception($"{HiSql.Constants.HiSqlSyntaxError}语句 {wherestr} 附近缺少 and 或or 运算符");
+                        }
+
                         _checkok = false;
                         break;
                     }
                 }
                 _isexpsymbol = !_isexpsymbol;
             }
-
+            _wherestr = wherestr;
             return listresult;
         }
 

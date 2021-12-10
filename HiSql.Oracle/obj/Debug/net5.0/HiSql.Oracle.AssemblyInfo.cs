@@ -14,11 +14,11 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Hone")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("该包支持Oracle数据库 依赖于HiSql.dll包运行")]
-[assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.2.1")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.2.1")]
+[assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.2.2")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.2.2")]
 [assembly: System.Reflection.AssemblyProductAttribute("HiSql.Oracle")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HiSql.Oracle")]
-[assembly: System.Reflection.AssemblyVersionAttribute("1.0.2.1")]
+[assembly: System.Reflection.AssemblyVersionAttribute("1.0.2.2")]
 
 // 由 MSBuild WriteCodeFragment 类生成。
 

@@ -86,6 +86,29 @@ namespace HiSql
 
 
         /// <summary>
+        /// 批量匹配结果并返回指定的值
+        /// </summary>
+        /// <param name="_regex"></param>
+        /// <param name="_text"></param>
+        /// <param name="grpname"></param>
+        /// <returns></returns>
+        public static List<string> RegexGrps(string _regex, string _text,string grpname)
+        {
+            List<string> lst = new List<string>();
+
+            Regex regex = new Regex(_regex.Trim(), RegexOptions.IgnoreCase | RegexOptions.Multiline);
+
+            MatchCollection matches = regex.Matches(_text);
+            for (int i = 0; i < matches.Count; i++)
+            {
+                lst.Add(matches[i].Groups[grpname].Value);
+            }
+
+
+            return lst;
+        }
+
+        /// <summary>
         /// (?<name>[\w]+[.]{1}[\[]{1}[\w]+[\]]{1})
         /// </summary>
         /// <param name="regex"></param>

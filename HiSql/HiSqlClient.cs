@@ -327,6 +327,19 @@ namespace HiSql
         {
             return _context.Query(tabname, dbMasterSlave);
         }
+        /// <summary>
+        /// 执行Hisql语句
+        /// 详细请参照Hisql语法
+        /// 注意hisql并不是原生数据sql Hisql是一个单独的语法可以编译成不同数据库的原生sql
+        /// </summary>
+        /// <param name="hisql"></param>
+        /// <param name="dbMasterSlave"></param>
+        /// <returns></returns>
+        public IQuery HiSql(string hisql, DbMasterSlave dbMasterSlave = DbMasterSlave.Default)
+        {
+            return _context.HiSql(hisql, dbMasterSlave);
+        }
+
         #endregion
 
         #region 数据插入操作

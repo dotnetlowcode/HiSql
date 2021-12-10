@@ -29,6 +29,17 @@ namespace HiSql
         IQuery Query(string tabname, DbMasterSlave dbMasterSlave = DbMasterSlave.Default);
 
         /// <summary>
+        /// 执行Hisql语句
+        /// 详细请参照Hisql语法
+        /// 注意hisql并不是原生数据sql Hisql是一个单独的语法可以编译成不同数据库的原生sql
+        /// </summary>
+        /// <param name="hisql"></param>
+        /// <param name="dbMasterSlave"></param>
+        /// <returns></returns>
+        IQuery HiSql(string hisql, DbMasterSlave dbMasterSlave = DbMasterSlave.Default);
+
+
+        /// <summary>
         /// 表数据插入
         /// </summary>
         /// <param name="tabname">表名</param>

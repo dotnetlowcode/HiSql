@@ -21,7 +21,7 @@ namespace HiSql
         6.having
          */
 
-        Dictionary<string, TabInfo> dictabinfo = new Dictionary<string, TabInfo>();
+        Dictionary<string, TabInfo> dictabinfo = new Dictionary<string, TabInfo>(StringComparer.OrdinalIgnoreCase);
         StringBuilder sb_table = new StringBuilder();
         StringBuilder sb_field = new StringBuilder();
         StringBuilder sb_field_result = new StringBuilder();
@@ -60,11 +60,26 @@ namespace HiSql
             }
             checkData();
             StringBuilder sb = new StringBuilder();
-
+            StringBuilder sb_total = new StringBuilder();
             if (!this.IsMultiSubQuery)
             {
                 if (this.IsPage)
                 {
+                    sb_total.AppendLine($"select  COUNT(*)   from {sb_table.ToString()}");
+                    if (!string.IsNullOrEmpty(sb_join.ToString()))
+                    {
+                        sb_total.AppendLine($" {sb_join.ToString()}");
+                    }
+                    if (!string.IsNullOrEmpty(sb_where.ToString()))
+                    {
+                        sb_total.AppendLine($" where {sb_where.ToString()}");
+                    }
+                    if (!string.IsNullOrEmpty(sb_group.ToString()))
+                    {
+                        sb_total.AppendLine($" group by {sb_group.ToString()}");
+
+                    }
+                    this.PageTotalSql = sb_total.ToString();
                     if (this.CurrentPage == 1)
                     {
                         //表示第一页
@@ -291,7 +306,8 @@ namespace HiSql
                             tabinfo = oracleDM.GetTabStruct(table.TabName);
                         }
                         //TabInfo tabinfo = dMInitalize.GetTabStruct(table.TabName);
-                        dictabinfo.Add(table.TabName, tabinfo);
+                        if (!dictabinfo.ContainsKey(table.TabName))
+                            dictabinfo.Add(table.TabName, tabinfo);
 
                     }
                 }

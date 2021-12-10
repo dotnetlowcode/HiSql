@@ -6,9 +6,9 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v5.0": {
-      "HiSql.SqlServer/1.0.2.1": {
+      "HiSql.SqlServer/1.0.2.2": {
         "dependencies": {
-          "HiSql": "1.0.2.1"
+          "HiSql": "1.0.2.2"
         },
         "runtime": {
           "HiSql.SqlServer.dll": {}
@@ -159,7 +159,7 @@
         }
       },
       "System.Security.Principal.Windows/4.7.0": {},
-      "HiSql/1.0.2.1": {
+      "HiSql/1.0.2.2": {
         "dependencies": {
           "Microsoft.Extensions.Caching.Abstractions": "5.0.0",
           "Microsoft.Extensions.Caching.Memory": "5.0.0",
@@ -173,7 +173,7 @@
     }
   },
   "libraries": {
-    "HiSql.SqlServer/1.0.2.1": {
+    "HiSql.SqlServer/1.0.2.2": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
@@ -290,7 +290,7 @@
       "path": "system.security.principal.windows/4.7.0",
       "hashPath": "system.security.principal.windows.4.7.0.nupkg.sha512"
     },
-    "HiSql/1.0.2.1": {
+    "HiSql/1.0.2.2": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

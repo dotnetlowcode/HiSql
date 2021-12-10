@@ -47,6 +47,8 @@ namespace HiSql
         public static string KEY_SEPRATE = ":";//key分隔符
         public static string KEY_ENTITY_NAME = $"{KEY_PRE}{KEY_SEPRATE}Entities{KEY_SEPRATE}[$NAME$]";//实体对象缓存KEY
 
+        public static string HiSqlSyntaxError = $"HiSql语法检测错误:";
+
         /// <summary>
         /// 程序集名称
         /// </summary>
