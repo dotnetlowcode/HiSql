@@ -75,6 +75,7 @@ D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\Ubiety.Dns.Core
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\Zstandard.Net.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\Newtonsoft.Json.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\System.Configuration.ConfigurationManager.dll
+D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\System.Data.OracleClient.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\System.Data.SqlClient.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\System.Drawing.Common.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\System.Security.Cryptography.ProtectedData.dll
@@ -92,7 +93,9 @@ D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\runtimes\win\li
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\runtimes\win\lib\netcoreapp3.0\System.Windows.Extensions.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\HiSql.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\HiSql.MySql.dll
+D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\HiSql.Oracle.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\HiSql.MySql.pdb
+D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\HiSql.Oracle.pdb
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\HiSql.pdb
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\obj\Debug\net5.0\HiSql.MySqlUnitTest.csprojAssemblyReference.cache
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\obj\Debug\net5.0\HiSql.MySqlUnitTest.GeneratedMSBuildEditorConfig.editorconfig
@@ -104,6 +107,3 @@ D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\obj\Debug\net5.0\HiSql.MySqlUnit
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\obj\Debug\net5.0\ref\HiSql.MySqlUnitTest.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\obj\Debug\net5.0\HiSql.MySqlUnitTest.pdb
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\obj\Debug\net5.0\HiSql.MySqlUnitTest.genruntimeconfig.cache
-D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\System.Data.OracleClient.dll
-D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\HiSql.Oracle.dll
-D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\HiSql.Oracle.pdb

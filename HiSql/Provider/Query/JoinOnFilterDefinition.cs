@@ -59,7 +59,7 @@ namespace HiSql
             if (result.Item1)
             {
                 _left = result.Item2.MoveCross<FieldDefinition>(_left);
-                _right = result.Item2.MoveCross<FieldDefinition>(_right);
+                _right = result.Item3.MoveCross<FieldDefinition>(_right);
             }
             else
                 throw new Exception($"关联条件[{joinonstr}]不符合语法规则");

@@ -17,7 +17,7 @@ namespace HiSql
         /// <typeparam name="T"></typeparam>
         /// <param name="array"></param>
         /// <returns></returns>
-        public static string ToSqlIn<T>(this T[] array)
+        public static string ToSqlIn<T>(this T[] array, bool ischar = true)
         {
             if (array == null || array.Length == 0)
             {
@@ -25,14 +25,17 @@ namespace HiSql
             }
             else
             {
-                return string.Join(",", array.Where(c => c != null).Select(it => (it + "").ToSqlValue()));
+                return string.Join(",", array.Where(c => c != null).Select(it => (it + "").ToSqlValue(ischar)));
             }
         }
 
-        public static string ToSqlValue(this string value)
+        public static string ToSqlValue(this string value,bool ischar=true)
         {
             //按理需要对值的长度进行检测 ，或默认大小写
-            return string.Format("'{0}'", value.ToSqlInject());
+            if(ischar)
+                return string.Format("'{0}'", value.ToSqlInject());
+            else
+                return string.Format("{0}", value.ToSqlInject());
         }
 
         /// <summary>

@@ -21,6 +21,10 @@ namespace HiSql
             _elements.Add(new GroupDefinition(fieldname));
         }
 
+        public virtual void Add(GroupDefinition groupDefinition)
+        {
+            _elements.Add(groupDefinition);
+        }
         IEnumerator IEnumerable.GetEnumerator()
         {
             return _elements.GetEnumerator();

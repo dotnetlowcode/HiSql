@@ -32,9 +32,35 @@ namespace HiSql.UnitTest
             //Query_Demo2(sqlClient);
             //Query_Demo4(sqlClient);
             //Query_Demo5(sqlClient);
-            Query_Demo6(sqlClient);
+            //Query_Demo6(sqlClient);
+            Query_Demo7(sqlClient);
             var s = Console.ReadLine();
         }
+
+        static void Query_Demo7(HiSqlClient sqlClient)
+        {
+            //string sql = sqlClient.HiSql($"select * from Hi_FieldModel  where (tabname = 'Hi_FieldModel') and  FieldType in (11,21,31) and tabname in (select tabname from Hi_TabModel) order by tabname asc")
+            //    .Take(2).Skip(2)
+            //    .ToSql();
+
+            string sql = sqlClient.HiSql($"select FieldName,FieldType from Hi_FieldModel  group by FieldName,FieldType ")
+                .Take(2).Skip(2)
+                .ToSql();
+
+            //string sql = sqlClient.HiSql($"select fieldlen,isprimary from  Hi_FieldModel     order by fieldlen ")
+            //    .Take(3).Skip(2)
+            //    .ToSql();
+
+            //string sql = sqlClient.HiSql($"select b.tabname, a.fieldname,a.IsPrimary from  Hi_FieldModel as a  inner join   Hi_TabModel as  b on a.tabname = b.tabname" +
+            //    $" inner join Hi_TabModel as c on a.tabname = c.tabname ").ToSql();
+
+            //int total = 0;
+            //var table = sqlClient.HiSql($"select fieldlen,isprimary from  Hi_FieldModel     order by fieldlen ")
+            //    .Take(3).Skip(2)
+            //    .ToTable(ref total);
+
+        }
+
 
         /// <summary>
         /// 测试where的新语法
@@ -44,10 +70,13 @@ namespace HiSql.UnitTest
         {
             string sql = sqlClient.Query("Hi_FieldModel", "A").Field("A.FieldName as Fname")
                 .Join("Hi_TabModel").As("B").On(new JoinOn { { "A.TabName", "B.TabName" } })
+                .Join("Hi_TabModel").As("c").On(new JoinOn { { "A.TabName", "C.TabName" } })
                 .Where(new Filter {
+                    { "("},
                     { "("},
                     {"A.TabName", OperType.EQ, "Hi_FieldModel"},
                     {"A.FieldName", OperType.EQ, "CreateName"},
+                    { ")"},
                     { ")"},
                     { LogiType.OR},
                     { "("},
@@ -59,7 +88,8 @@ namespace HiSql.UnitTest
 
             string jsondata = sqlClient.Query("Hi_FieldModel", "A").Field("A.FieldName as Fname")
                 .Join("Hi_TabModel").As("B").On(new JoinOn { { "A.TabName", "B.TabName" } })
-                .Where("a.tabname = 'Hi_FieldModel' and ((a.FieldType = 11)) ")
+                .Where("a.tabname = 'Hi_FieldModel' and ((a.FieldType = 11)) and a.tabname in ('h_test','hi_fieldmodel')  and a.tabname in (select a.tabname from hi_fieldmodel as a inner join Hi_TabModel as  b on a.tabname =b.tabname " +
+                " inner join Hi_TabModel as c on a.tabname=c.tabname where a.tabname='h_test' ) and a.FieldType in (11,41,21)  ")
                 .Group(new GroupBy { { "A.FieldName" } }).ToJson();
             
         }

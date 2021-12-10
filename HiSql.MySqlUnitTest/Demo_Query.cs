@@ -32,10 +32,40 @@ namespace HiSql.MySqlUnitTest
             //Query_Demo3(sqlClient);
             //Query_Demo4(sqlClient);
             //Query_Case(sqlClient);
-            Query_Demo6(sqlClient);
+            //Query_Demo6(sqlClient);
             //Query_Demo7(sqlClient);
+            Query_Demo8(sqlClient);
         }
+        static void Query_Demo8(HiSqlClient sqlClient)
+        {
+            //string sql = sqlClient.HiSql($"select * from Hi_FieldModel  where (tabname = 'h_test') and  FieldType in (11,21,31) and tabname in (select tabname from Hi_TabModel)").ToSql();
 
+            //string sql = sqlClient.HiSql($"select fieldlen,isprimary from  Hi_FieldModel  group by fieldlen,isprimary   order by fieldlen ")
+            //    .Take(3).Skip(2)
+            //    .ToSql();
+
+            string sql = sqlClient.HiSql($"select FieldName,FieldType from Hi_FieldModel  group by FieldName,FieldType ")
+             .Take(2).Skip(2)
+             .ToSql();
+
+
+            //string sql = sqlClient.HiSql($"select b.tabname, a.fieldname,a.IsPrimary from  Hi_FieldModel as a  inner join   Hi_TabModel as  b on a.tabname = b.tabname" +
+            //    $" inner join Hi_TabModel as c on a.tabname = c.tabname ").ToSql();
+
+            //if (sql.Trim() != "")
+            //{ 
+
+            //}
+
+            //int total = 0;
+            //var table = sqlClient.HiSql($"select fieldlen,isprimary from  Hi_FieldModel     order by fieldlen ")
+            //    .Take(3).Skip(2)
+            //    .ToTable(ref total);
+            //if (table != null)
+            //{
+
+            //}
+        }
 
         static void Query_Demo7(HiSqlClient sqlClient)
         {

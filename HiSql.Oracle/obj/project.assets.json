@@ -375,7 +375,7 @@
           "ref/netstandard1.3/System.Threading.Tasks.dll": {}
         }
       },
-      "HiSql/1.0.2.1": {
+      "HiSql/1.0.2.2": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
@@ -1741,7 +1741,7 @@
         "ref/xamarinwatchos10/_._"
       ]
     },
-    "HiSql/1.0.2.1": {
+    "HiSql/1.0.2.2": {
       "type": "project",
       "path": "../HiSql/HiSql.csproj",
       "msbuildProject": "../HiSql/HiSql.csproj"
@@ -1749,7 +1749,7 @@
   },
   "projectFileDependencyGroups": {
     "net5.0": [
-      "HiSql >= 1.0.2.1",
+      "HiSql >= 1.0.2.2",
       "System.Data.OracleClient >= 1.0.8"
     ]
   },
@@ -1759,7 +1759,7 @@
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
-    "version": "1.0.2.1",
+    "version": "1.0.2.2",
     "restore": {
       "projectUniqueName": "D:\\Project\\OpenSource\\HiSql\\HiSql.Oracle\\HiSql.Oracle.csproj",
       "projectName": "HiSql.Oracle",

@@ -20,6 +20,87 @@
    4. HiSql.oracle.dll
    5. HiSql.postgresql.dll
 
+### 2021.12.10 更新
+
+ 目前流行的ORM框架如果需要动态的拼接查询语句，只能用原生的sql进行拼接，无法跨不同数据库执行。hisql推出新的语法一套语句可以在不同的数据库执行
+
+传统ORM框架最大的弊端就是完全要依赖于实体用lambda表达式写查询语句，但最大的问题就是如果业务场景需要动态拼接条件时只能又切换到原生数据库的sql语句进行完成，如果自行拼接开发人员还要解决防注入的问题,hisql 刚才完美的解决这些问题,Hisql底层已经对sql注入进行了处理，开发人员只要关注于业务开发
+
+
+ `HiSql`不仅仅是一个ORM框架而且是一个`HiSql` SQL语句 如下所示
+
+
+```c#
+    string sql = sqlClient.HiSql($"select * from Hi_FieldModel  where (tabname = 'h_test') and  FieldType in (11,21,31) and tabname in (select tabname from Hi_TabModel)").ToSql();
+```
+
+以上语法是不是与sqlserver 和sql语句有点类似？是的 但他可不是原生的sql,现在统一命名为`hisql` ，这个语法可以在hisql 支持的任意库中运行
+
+`hisql` 支持 常规sql基本`join`操作
+`inner join` 或`join`
+`left inner join`或 `left join`
+`outer join`
+也支持 子查询 `in (select ....)`
+
+#### hisql inner join 示例
+
+```c#
+    string sql = sqlClient.HiSql($"select b.tabname, a.fieldname,a.IsPrimary from  Hi_FieldModel as a  inner join   Hi_TabModel as  b on a.tabname = b.tabname" ).ToSql();
+
+```
+以上示例的hisql代码编译后成的sqlserver的原生sql如下
+```sql
+select [b].[tabname],[a].[fieldname],[a].[IsPrimary] from [Hi_FieldModel] as [a]
+ inner join [Hi_TabModel] as [b] on [a].[tabname]=[a].[tabname]
+```
+
+在生成的mysql 原生sql如下
+```sql
+select `b`.`tabname`,`a`.`fieldname`,`a`.`IsPrimary` from `Hi_FieldModel` as `a`
+ inner join `Hi_TabModel` as `b` on `a`.`tabname`=`a`.`tabname`
+```
+
+
+也可以多表Join
+```c#
+string sql = sqlClient.HiSql($"select b.tabname, a.fieldname,a.IsPrimary from  Hi_FieldModel as a  inner join   Hi_TabModel as  b on a.tabname = b.tabname" +
+                $" inner join Hi_TabModel as c on a.tabname = c.tabname ").ToSql();
+
+```
+
+注意如果出现语法错误将会抛出异常并提示`HiSql语法检测错误:xxxxx` 根据这个错误提示可自行定位问题
+
+#### hisql 语句实现分页
+示例代码如下
+```c#
+int total = 0;
+    var table = sqlClient.HiSql($"select fieldlen,isprimary from  Hi_FieldModel     order by fieldlen ")
+        .Take(3).Skip(2)
+        .ToTable(ref total);
+```
+注意：分页查询时一定有一个order by 语句，并可以返回当前条件的数据总记录数`total`
+
+#### hisql 语句实现 in查询 及select in 查询
+
+```c#
+    string sql = sqlClient.HiSql($"select * from Hi_FieldModel  where (tabname = 'Hi_FieldModel') and  FieldType in (11,21,31) and tabname in (select tabname from Hi_TabModel) order by tabname asc")
+        .Take(2).Skip(2)
+        .ToSql();
+```
+
+#### hisql 语句实现 group by 查询
+```c#
+string sql = sqlClient.HiSql($"select FieldName,FieldType from Hi_FieldModel  group by FieldName,FieldType ")
+             .Take(2).Skip(2)
+             .ToSql();
+
+```
+
+
+
+
+
+
 
 ### 2021.12.2 更新
 1. 修复当以Dictionary 对象作为数据插入来源，且该字典的字段无与表中匹配的问题
@@ -40,7 +121,7 @@ string sql = sqlClient.Query("Hi_FieldModel", "A").Field("A.FieldName as Fname")
         { ")"}
     })
     .Group(new GroupBy { { "A.FieldName" } }).ToSql();
-
+```
 2.2 字符串写法如下所示
 支持 字符串写法解决通过应用前端可以自定义传条件过来 `a.tabname = 'Hi_FieldModel' and ((a.FieldType = 11)) `
 看这个语法类似于sqlserver的写法，与sqlserver无关， 这是Hisql自定义的中间语法 通过hisql编译后在hisql支持的库中运行

@@ -18,10 +18,33 @@ namespace HiSql.HanaUnitTest
             //Query_Demo3(sqlClient);
             //Query_Demo4(sqlClient);
             //Query_Demo5(sqlClient);
-            Query_Case(sqlClient);
+            //Query_Case(sqlClient);
+            Query_Demo8(sqlClient);
 
         }
 
+        /// <summary>
+        /// 测试分页返回总数
+        /// </summary>
+        /// <param name="sqlClient"></param>
+        static void Query_Demo8(HiSqlClient sqlClient)
+        {
+            //string sql = sqlClient.HiSql($"select * from Hi_FieldModel  where (tabname = 'h_test') and  FieldType in (11,21,31) and tabname in (select tabname from Hi_TabModel)").ToSql();
+
+            //string sql = sqlClient.HiSql($"select fieldlen,isprimary from  Hi_FieldModel  group by fieldlen,isprimary   order by fieldlen ")
+            //    .Take(3).Skip(2)
+            //    .ToSql();
+
+            int total = 0;
+            var table = sqlClient.HiSql($"select fieldlen,isprimary from  Hi_FieldModel     order by fieldlen ")
+                .Take(3).Skip(2)
+                .ToTable(ref total);
+            if (table != null)
+            {
+
+            }
+            //string sql = sqlClient.Query("Hi_TabModel").Field("*").Sort(new SortBy { { "CreateTime" } }).Take(2).Skip(2).ToSql();
+        }
         static void Query_Demo5(HiSqlClient sqlClient)
         {
             string _sql = sqlClient.Query("MGS_OD_ORDERINFO", "A").Field("A.ORDERID").Sort(new SortBy { { "A.ORDERID", SortType.ASC } })

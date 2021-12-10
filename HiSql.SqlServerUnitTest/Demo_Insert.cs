@@ -36,10 +36,18 @@ namespace HiSql
             //Demo1_Insert(sqlClient);
             //Demo1_Insert2(sqlClient);
             //Demo1_Insert3(sqlClient);
-            Demo1_Insert4(sqlClient);
+            //Demo1_Insert4(sqlClient);
+            Demo1_Insert5(sqlClient);
             //Demo_dynamic(sqlClient);
         }
-
+        static void Demo1_Insert5(HiSqlClient sqlClient)
+        {
+            int v = sqlClient.Insert("H_Test3", new { descript = "hello world" }).ExecCommand();
+            if (v > 0)
+            { 
+            
+            }
+        }
         static void Demo_dynamic(HiSqlClient sqlClient)
         {
             List<object> lstdyn = new List<object>();

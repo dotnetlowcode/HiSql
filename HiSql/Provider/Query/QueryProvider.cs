@@ -12,6 +12,11 @@ using System.Threading.Tasks;
 namespace HiSql
 {
 
+    /// <summary>
+    /// 查询语句解析核心类
+    /// author tgm email:tansar@126.com
+    /// 
+    /// </summary>
     public partial class QueryProvider : IQuery
     {
         TableDefinition _table;
@@ -19,11 +24,11 @@ namespace HiSql
 
         Filter _where;
 
-        List<FilterDefinition> _list_filter=new List<FilterDefinition> ();
+        List<FilterDefinition> _list_filter = new List<FilterDefinition>();
 
-        List<FieldDefinition> _list_field=new List<FieldDefinition> ();
+        List<FieldDefinition> _list_field = new List<FieldDefinition>();
 
-        List<JoinDefinition> _list_join=new List<JoinDefinition> ();
+        List<JoinDefinition> _list_join = new List<JoinDefinition>();
 
         List<SortByDefinition> _list_sort = new List<SortByDefinition>();
         List<GroupDefinition> _list_group = new List<GroupDefinition>();
@@ -41,7 +46,7 @@ namespace HiSql
         /// 是否忽略表锁
         /// </summary>
         bool _withnolock = false;
-        
+
 
         /// <summary>
         /// 查询结果插入的表
@@ -70,6 +75,9 @@ namespace HiSql
         /// 当触发了Take方法时就会为true
         /// </summary>
         bool _ispage = false;//是否分页
+        //分页是要获取当前查询的总数的sql语句
+        string _pagetotalsql = string.Empty;
+
         SynTaxQueue _queue = new SynTaxQueue();
 
         int _currpage = 0;
@@ -103,7 +111,7 @@ namespace HiSql
         public List<IQuery> SubQuery
         {
             get { return _querylist; }
-           
+
         }
 
         public List<string> Ranks
@@ -174,6 +182,13 @@ namespace HiSql
             get { return _ispage; }
         }
 
+
+        public string PageTotalSql
+        {
+            get { return _pagetotalsql; }
+            set { _pagetotalsql = value; }
+        }
+
         public int CurrentPage
         {
             get { return _currpage; }
@@ -196,7 +211,7 @@ namespace HiSql
         /// </summary>
         public LockMode WithLockMode
         {
-            get {return _withCurLock; }
+            get { return _withCurLock; }
         }
 
         /// <summary>
@@ -214,17 +229,17 @@ namespace HiSql
                     }
                 }
                 return _list;
-            
-            
+
+
             }
         }
 
 
         public HiSqlProvider Context { get; set; }
 
-        public QueryProvider( )
+        public QueryProvider()
         {
-             
+
         }
 
         public IQuery Query(params IQuery[] query)
@@ -241,23 +256,41 @@ namespace HiSql
                     }
 
                     _isMultiSubQuery = true;//表示当前查询是多表子查询
-                }else
+                } else
                     throw new Exception($"使用子查询时未指定对应的子查询");
             }
             else
                 throw new Exception($"指定查询表必须在初始就指定");
             return this;
         }
+
+        /// <summary>
+        /// 执行hisql
+        /// </summary>
+        /// <param name="hisql"></param>
+        /// <returns></returns>
+        public IQuery HiSql(string hisql,IQuery query)
+        {
+            //编译hisql
+            AST.SelectParse selectParse = new AST.SelectParse(hisql, query);
+            return selectParse.Query;
+        }
+
+        /// <summary>
+        /// 查询表
+        /// </summary>
+        /// <param name="tabname">表名</param>
+        /// <returns></returns>
         public IQuery Query(string tabname)
         {
             if (string.IsNullOrEmpty(_queue.LastQueue()))
             {
-                if (  Tool.CheckTabName(tabname).Item1==true)
+                if (Tool.CheckTabName(tabname).Item1 == true)
                 {
                     Dictionary<string, string> _dic = Tool.RegexGrp(Constants.REG_TABNAME, tabname);
 
                     _table = new TableDefinition();
-                    _table.Schema = Context.CurrentConnectionConfig.Schema==null?"" : Context.CurrentConnectionConfig.Schema;
+                    _table.Schema = Context.CurrentConnectionConfig.Schema == null ? "" : Context.CurrentConnectionConfig.Schema;
                     _table.TabName = tabname;
                     _table.DbServer = Context.CurrentConnectionConfig.DbServer;
 
@@ -277,7 +310,7 @@ namespace HiSql
                             break;
 
                     }
-                    
+
                     mergeTable(_table);
                     _queue.Add("table");
                 }
@@ -289,6 +322,12 @@ namespace HiSql
             return this;
         }
 
+        /// <summary>
+        /// 指定查询表
+        /// </summary>
+        /// <param name="tabname">表名</param>
+        /// <param name="rename">指定表的别名</param>
+        /// <returns></returns>
         public IQuery Query(string tabname, string rename)
         {
             if (string.IsNullOrEmpty(_queue.LastQueue()))
@@ -325,7 +364,7 @@ namespace HiSql
                 foreach (string f in fields)
                 {
                     FieldDefinition _fieldd = new FieldDefinition(f);
-                    _fieldd.Schema =  Context.CurrentConnectionConfig.Schema;
+                    _fieldd.Schema = Context.CurrentConnectionConfig.Schema;
                     _fieldd.DbServer = Context.CurrentConnectionConfig.DbServer;
                     _fieldd.IsVirtualFeild = this.IsMultiSubQuery;//是否多表子查询
 
@@ -348,7 +387,12 @@ namespace HiSql
 
             return this;
         }
-
+        
+        /// <summary>
+        /// 重命名表
+        /// </summary>
+        /// <param name="retabname"></param>
+        /// <returns></returns>
         public IQuery As(string retabname)
         {
             if (Tool.CheckFieldName(retabname).Item1)
@@ -372,6 +416,11 @@ namespace HiSql
             return this;
         }
 
+        /// <summary>
+        /// 单个分组指定
+        /// </summary>
+        /// <param name="grp"></param>
+        /// <returns></returns>
         public IQuery Group(GroupDefinition grp)
         {
             if (_queue.HasQueue("field"))
@@ -384,7 +433,7 @@ namespace HiSql
                     {
                         grp.Field.TabName = _table.TabName;
                         grp.Field.AsTabName = _table.AsTabName;
-                        
+
                     }
                     grp.Field.IsVirtualFeild = this.IsMultiSubQuery;
 
@@ -403,6 +452,11 @@ namespace HiSql
             return this;
         }
 
+        /// <summary>
+        /// 分组 多个参数分组 param参数
+        /// </summary>
+        /// <param name="group"></param>
+        /// <returns></returns>
         public IQuery Group(params string[] group)
         {
             GroupBy groups = new GroupBy();
@@ -413,6 +467,11 @@ namespace HiSql
             return Group(groups);
         }
 
+        /// <summary>
+        /// 分组 多个结构化分组
+        /// </summary>
+        /// <param name="grp"></param>
+        /// <returns></returns>
         public IQuery Group(GroupBy grp)
         {
             if (grp != null && grp.Elements.Count > 0)
@@ -430,7 +489,7 @@ namespace HiSql
                             {
                                 groupDefinition.Field.TabName = _table.TabName;
                                 groupDefinition.Field.AsTabName = _table.AsTabName;
-                                
+
                             }
                         }
                     }
@@ -438,8 +497,8 @@ namespace HiSql
                     {
                         throw new Exception($"[GroupBy]方法只能在Sort之前");
                     }
-                
-                
+
+
                 }
                 else throw new Exception($"[GroupBy]方法不能在Field之前");
             }
@@ -448,13 +507,18 @@ namespace HiSql
             return this;
         }
 
-        
+
+        /// <summary>
+        /// 指定表关联
+        /// </summary>
+        /// <param name="join"></param>
+        /// <returns></returns>
         public IQuery Join(JoinDefinition join)
         {
             if (join != null)
             {
                 _currjoin = join;
-                
+
                 _queue.Add("join");
             }
             else
@@ -462,23 +526,37 @@ namespace HiSql
 
             return this;
         }
-        public IQuery Join(string tabname, string retabname)
+        /// <summary>
+        /// 指定关联表
+        /// </summary>
+        /// <param name="tabname">关联的表名</param>
+        /// <param name="retabname">重命名表</param>
+        /// <param name="joinType">关联类型 默认inner</param>
+        /// <returns></returns>
+        public IQuery Join(string tabname, string retabname,JoinType joinType= JoinType.Inner)
         {
             _currjoin = new JoinDefinition(tabname, retabname);
-            
+            _currjoin.JoinType = joinType;
             _queue.Add("join|rename");
             return this;
         }
-        public IQuery Join(string tabname)
+        /// <summary>
+        /// 指定关联表
+        /// </summary>
+        /// <param name="tabname">关联的表名</param>
+        /// <param name="joinType">关联的类型 默认inner</param>
+        /// <returns></returns>
+        public IQuery Join(string tabname,JoinType joinType=JoinType.Inner)
         {
             _currjoin = new JoinDefinition(tabname);
+            _currjoin.JoinType = joinType;
             _queue.Add("join");
             return this;
         }
 
         public IQuery On(JoinOn joinon)
         {
-            if (joinon != null && joinon.Elements.Count>0)
+            if (joinon != null && joinon.Elements.Count > 0)
             {
                 if (_queue.LastQueue().IndexOf("join") >= 0)
                 {
@@ -494,7 +572,7 @@ namespace HiSql
                 }
                 else if (_queue.LastQueue() == "as")
                 {
-                    if (_queue.LastQueue(-1).IndexOf ("join")>=0)
+                    if (_queue.LastQueue(-1).IndexOf("join") >= 0)
                     {
                         _queue.Add("on");
                         _currjoin.JoinOn = joinon.Elements;
@@ -551,9 +629,9 @@ namespace HiSql
                 throw new Exception($"On 的连接条件[{leftCondition}] 和[{rightCcondition}]不能为空");
             return this;
         }
-        public IQuery On(string condition )
+        public IQuery On(string condition)
         {
-            if (!string.IsNullOrEmpty(condition)  )
+            if (!string.IsNullOrEmpty(condition))
             {
                 if (_queue.LastQueue().IndexOf("join") >= 0)
                 {
@@ -592,6 +670,11 @@ namespace HiSql
             return this;
         }
 
+        /// <summary>
+        /// 用结构化的方式定义多个排序
+        /// </summary>
+        /// <param name="sort"></param>
+        /// <returns></returns>
         public IQuery Sort(SortBy sort)
         {
             if (sort != null)
@@ -622,6 +705,12 @@ namespace HiSql
 
             return this;
         }
+
+        /// <summary>
+        /// 指定单个排序
+        /// </summary>
+        /// <param name="sort"></param>
+        /// <returns></returns>
         public IQuery Sort(SortByDefinition sort)
         {
             if (sort != null)
@@ -647,6 +736,11 @@ namespace HiSql
 
             return this;
         }
+        /// <summary>
+        /// 排序 可以多个参数 params 参数
+        /// </summary>
+        /// <param name="sort"></param>
+        /// <returns></returns>
         public IQuery Sort(params string[] sort)
         {
             SortBy sortby = new SortBy();
@@ -659,7 +753,7 @@ namespace HiSql
                         sortby.Add(_dic_sort["field"].ToString(), SortType.ASC);
                     else
                     {
-                        sortby.Add(_dic_sort["field"].ToString(), _dic_sort["field"].ToString().ToLower()=="asc"? SortType.ASC:SortType.DESC);
+                        sortby.Add(_dic_sort["field"].ToString(), _dic_sort["field"].ToString().ToLower() == "asc" ? SortType.ASC : SortType.DESC);
                     }
                 }
                 else
@@ -694,10 +788,10 @@ namespace HiSql
                 this.Context.DBO.ExecCommand(_sql, null);
 
             }
-            
-                
+
+
         }
-        public virtual IQuery WithRank(DbRank rank,DbFunction dbFunction,string field, string asname,SortType sortType)
+        public virtual IQuery WithRank(DbRank rank, DbFunction dbFunction, string field, string asname, SortType sortType)
         {
             asname = asname.ToSqlInject();
             if (field.Trim() != "*" && !string.IsNullOrEmpty(field))
@@ -740,15 +834,15 @@ namespace HiSql
             asname = asname.ToSqlInject();
             List<string> _lstorderby = new List<string>();
             foreach (RankDefinition rankDefinition in ranks.Elements)
-            { 
+            {
                 rankDefinition.Field = rankDefinition.Field.ToSqlInject();
-                if(rankDefinition.Field.Trim()!="*")
+                if (rankDefinition.Field.Trim() != "*")
                     _lstorderby.Add($"{rankDefinition.DbFunction.ToString()}({dbConfig.Field_Pre}{rankDefinition.Field}{dbConfig.Field_After}) {rankDefinition.SortType.ToString()}");
                 else
                     _lstorderby.Add($"{rankDefinition.DbFunction.ToString()}({rankDefinition.Field}) {rankDefinition.SortType.ToString()}");
             }
 
-            
+
             switch (rank)
             {
                 case DbRank.DENSERANK:
@@ -767,7 +861,7 @@ namespace HiSql
         }
 
         /// <summary>
-        /// 显示第几页数据
+        /// 显示第几页的数据
         /// </summary>
         /// <param name="currpage"></param>
         /// <returns></returns>
@@ -778,7 +872,7 @@ namespace HiSql
         }
 
         /// <summary>
-        /// 显示多少条数据
+        /// 页大小(显示最大记录数)
         /// </summary>
         /// <param name="pagesize"></param>
         /// <returns></returns>
@@ -827,9 +921,9 @@ namespace HiSql
             {
                 throw new Exception($"指定的hisql where语句[{sqlwhere}]为空");
             }
-            
+
             Filter where = new Filter() { sqlwhere };
-            
+
             _where = where;
 
             return this;
@@ -837,10 +931,19 @@ namespace HiSql
 
         public virtual string ToSql()
         {
-            
+
             return "";
         }
         public List<T> ToList<T>()
+        {
+            string _sql = this.ToSql();
+            IDataReader dr = this.Context.DBO.GetDataReader(_sql, null);
+            List<T> _result = DataConvert.ToList<T>(dr);
+            dr.Close();
+            return _result;
+        }
+
+        public List<T> ToList<T>(ref int total)
         {
             string _sql = this.ToSql();
             IDataReader dr = this.Context.DBO.GetDataReader(_sql, null);
@@ -853,7 +956,33 @@ namespace HiSql
             string _sql = this.ToSql();
             return this.Context.DBO.GetDataTable(_sql, null);
         }
+        public DataTable ToTable(ref int total)
+        {
+            string _sql = this.ToSql();
+            total = 0;
+            if (this.IsPage && !string.IsNullOrEmpty(this.PageTotalSql.ToString().Trim()))
+            {
+                if (Context.CurrentConnectionConfig.DbType == DBType.Oracle)
+                {
+                    total = Convert.ToInt32((decimal)this.Context.DBO.ExecScalar(this.PageTotalSql.ToString()));
+                }else
+                    total = Convert.ToInt32((Int64)this.Context.DBO.ExecScalar(this.PageTotalSql.ToString()));
+
+            }
+                
+
+            return this.Context.DBO.GetDataTable(_sql, null);
+        }
         public List<TDynamic> ToDynamic()
+        {
+            string _sql = this.ToSql();
+
+            IDataReader dr = this.Context.DBO.GetDataReader(_sql, null);
+            List<TDynamic> result = DataConvert.ToDynamic(dr);
+            dr.Close();
+            return result;
+        }
+        public List<TDynamic> ToDynamic(ref int total)
         {
             string _sql = this.ToSql();
 
@@ -865,21 +994,29 @@ namespace HiSql
         }
         public string ToJson()
         {
-
             string _sql = this.ToSql();
-
             IDataReader dr = this.Context.DBO.GetDataReader(_sql, null);
-
-
-            List<ExpandoObject> lstobj= DataConvert.ToEObject(dr);
-            //dr.Close();
+            List<ExpandoObject> lstobj = DataConvert.ToEObject(dr);
             return JsonConvert.SerializeObject(lstobj);
-            
+        }
+        public string ToJson(ref int total)
+        {
+            string _sql = this.ToSql();
+            IDataReader dr = this.Context.DBO.GetDataReader(_sql, null);
+            List<ExpandoObject> lstobj = DataConvert.ToEObject(dr);
+            return JsonConvert.SerializeObject(lstobj);
         }
 
+        /// <summary>
+        /// 添加新表到当前连接查询中
+        /// 主要用于动态hisql解析执行时发现有新的表将其添加进来
+        /// </summary>
+        /// <param name="table"></param>
+        //public void MergeTable(TableDefinition table)
+        //{
+        //    mergeTable(table);
+        //}
 
-
-        
 
         void mergeTable(TableDefinition table)
         {

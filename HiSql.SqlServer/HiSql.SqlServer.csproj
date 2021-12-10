@@ -3,13 +3,13 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <Authors>tansar</Authors>
-    <Version>1.0.2.1</Version>
+    <Version>1.0.2.2</Version>
     <Company>Hone</Company>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>hisql.sqlserver.pfx</AssemblyOriginatorKeyFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>该包支持SqlServer数据库 依赖于HiSql.dll包运行
-解决部分bug问题</Description>
+</Description>
   </PropertyGroup>
 
   <ItemGroup>

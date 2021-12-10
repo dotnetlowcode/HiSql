@@ -673,7 +673,9 @@ namespace HiSql
                             _value = (string)objprop.GetValue(objdata);
                             if (_value.Length >= hiColumn.FieldLen)
                             {
-                                throw new Exception($"字段[{objprop.Name}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
+                                //sqlserver 的类型定义为varchar(max)
+                                if (hiColumn.FieldLen>=0)
+                                    throw new Exception($"字段[{objprop.Name}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
                             }
                             if (hiColumn.IsRequire)
                             {
