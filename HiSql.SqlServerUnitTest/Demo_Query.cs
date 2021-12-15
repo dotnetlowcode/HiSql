@@ -34,18 +34,42 @@ namespace HiSql.UnitTest
             //Query_Demo5(sqlClient);
             //Query_Demo6(sqlClient);
             Query_Demo7(sqlClient);
+            //Query_Demo8(sqlClient);
             var s = Console.ReadLine();
+        }
+
+        static void Query_Demo8(HiSqlClient sqlClient)
+        {
+            //string sql = sqlClient.HiSql($"select FieldName,FieldType from Hi_FieldModel  group by FieldName,FieldType ")
+            //   .Having("count(FieldType) > 1 and FieldName ='CreateTime'  ")
+            //    .ToSql();
+
+            string sql = sqlClient.HiSql($"select FieldName,count(*) as scount  from Hi_FieldModel group by FieldName,  Having count(*) > 0   order by fieldname")
+               .ToSql();
+
+            int _total = 0;
+
+            DataTable dt = sqlClient.HiSql($"select FieldName,count(*) as scount  from Hi_FieldModel group by FieldName,  Having count(*) > 0   order by fieldname")
+                .Take(2).Skip(2).ToTable(ref _total);
         }
 
         static void Query_Demo7(HiSqlClient sqlClient)
         {
-            //string sql = sqlClient.HiSql($"select * from Hi_FieldModel  where (tabname = 'Hi_FieldModel') and  FieldType in (11,21,31) and tabname in (select tabname from Hi_TabModel) order by tabname asc")
+            string sql = sqlClient.HiSql($"select * from Hi_FieldModel  where (tabname = 'Hi_FieldModel') and  FieldType in (11,21,31) and tabname in (select tabname from Hi_TabModel) order by tabname asc")
+                .Take(2).Skip(2)
+                .ToSql();
+            int _total = 0;
+            DataTable dt = sqlClient.HiSql($"select * from Hi_FieldModel  where (tabname = 'Hi_FieldModel') and  FieldType in (11,21,31) and tabname in (select tabname from Hi_TabModel) order by tabname asc")
+                .Take(2).Skip(2).ToTable(ref _total);
+
+
+            //string sql = sqlClient.HiSql($"select FieldName,FieldType from Hi_FieldModel  group by FieldName,FieldType ")
             //    .Take(2).Skip(2)
             //    .ToSql();
 
-            string sql = sqlClient.HiSql($"select FieldName,FieldType from Hi_FieldModel  group by FieldName,FieldType ")
-                .Take(2).Skip(2)
-                .ToSql();
+            //string sql2=sqlClient.Query("Hi_FieldModel").Field("*").Group("TabName").Having(new Having { { "FieldName", OperType.EQ, "CreateTime" } }).Sort("TabName").ToSql() ;
+            //string sql2 = sqlClient.Query("Hi_FieldModel").Field("FieldName","count(*) as scount").Group("FieldName").Having("count(*)>0 and FieldName='CreateTime'").Sort("FieldName").ToSql();
+
 
             //string sql = sqlClient.HiSql($"select fieldlen,isprimary from  Hi_FieldModel     order by fieldlen ")
             //    .Take(3).Skip(2)

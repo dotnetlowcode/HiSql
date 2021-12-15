@@ -29,7 +29,7 @@ namespace HiSql
         StringBuilder sb_where = new StringBuilder();
         StringBuilder sb_sort = new StringBuilder();
         StringBuilder sb_group = new StringBuilder();
-
+        StringBuilder sb_having = new StringBuilder();
         StringBuilder sb_subquery = new StringBuilder();
         IDbConfig dbConfig = new OracleConfig();
         public override IDbConfig DbConfig
@@ -65,7 +65,14 @@ namespace HiSql
             {
                 if (this.IsPage)
                 {
-                    sb_total.AppendLine($"select  COUNT(*)   from {sb_table.ToString()}");
+                    if (!string.IsNullOrEmpty(sb_group.ToString().Trim()))
+                    {
+                        sb_total.AppendLine($"select  COUNT(*)   from ( select {sb_field.ToString()} from {sb_table.ToString()}");
+                    }
+                    else
+                    {
+                        sb_total.AppendLine($"select  COUNT(*)   from {sb_table.ToString()}");
+                    }
                     if (!string.IsNullOrEmpty(sb_join.ToString()))
                     {
                         sb_total.AppendLine($" {sb_join.ToString()}");
@@ -79,6 +86,14 @@ namespace HiSql
                         sb_total.AppendLine($" group by {sb_group.ToString()}");
 
                     }
+                    if (!string.IsNullOrEmpty(sb_having.ToString()))
+                    {
+                        sb_total.AppendLine($" having {sb_having.ToString()}");
+                    }
+                    if (!string.IsNullOrEmpty(sb_group.ToString().Trim()))
+                        sb_total.AppendLine($") ");
+
+
                     this.PageTotalSql = sb_total.ToString();
                     if (this.CurrentPage == 1)
                     {
@@ -93,6 +108,11 @@ namespace HiSql
 
                         if (!string.IsNullOrEmpty(sb_group.ToString()))
                             sb.AppendLine($" group by {sb_group.ToString()}");
+
+                        if (!string.IsNullOrEmpty(sb_having.ToString()))
+                        {
+                            sb_total.AppendLine($" having {sb_having.ToString()}");
+                        }
 
                         if (!string.IsNullOrEmpty(sb_sort.ToString()))
                             sb.AppendLine($" order by  {sb_sort.ToString()}");
@@ -110,6 +130,11 @@ namespace HiSql
 
                         if (!string.IsNullOrEmpty(sb_group.ToString()))
                             sb.AppendLine($" group by {sb_group.ToString()}");
+
+                        if (!string.IsNullOrEmpty(sb_having.ToString()))
+                        {
+                            sb_total.AppendLine($" having {sb_having.ToString()}");
+                        }
 
                         sb.AppendLine(")   hi_sql ");//as
                         sb.Append($"where hi_sql.{dbConfig.Field_Pre}_hi_rownum_{dbConfig.Field_After} BETWEEN ({this.CurrentPage }-1)*{this.PageSize}+1 and {this.CurrentPage}*{this.PageSize}");
@@ -129,6 +154,11 @@ namespace HiSql
                     if (!string.IsNullOrEmpty(sb_group.ToString()))
                         sb.AppendLine($" group by {sb_group.ToString()}");
 
+                    if (!string.IsNullOrEmpty(sb_having.ToString()))
+                    {
+                        sb_total.AppendLine($" having {sb_having.ToString()}");
+                    }
+
                     if (!string.IsNullOrEmpty(sb_sort.ToString()))
                         sb.AppendLine($" order by  {sb_sort.ToString()}");
                 }
@@ -144,6 +174,11 @@ namespace HiSql
 
                 if (!string.IsNullOrEmpty(sb_group.ToString()))
                     sb.AppendLine($" group by {sb_group.ToString()}");
+
+                if (!string.IsNullOrEmpty(sb_having.ToString()))
+                {
+                    sb_total.AppendLine($" having {sb_having.ToString()}");
+                }
 
                 if (!string.IsNullOrEmpty(sb_sort.ToString()))
                     sb.AppendLine($" order by  {sb_sort.ToString()}");
@@ -366,6 +401,9 @@ namespace HiSql
 
             sb_group.Append(oracleDM.BuildGroupSql(this.TableList, dictabinfo, this.Fields, this.Groups, this.IsMultiSubQuery));
 
+            //having
+            if (this.Havings != null)
+                sb_having.Append(oracleDM.BuildHavingSql(this.TableList, dictabinfo, this.Fields, this.Havings.HavingParse.Result, this.IsMultiSubQuery));
 
             //排序字段
             sb_sort.Append(oracleDM.BuildOrderBySql(ref sb_group, dictabinfo, (QueryProvider)this));

@@ -77,4 +77,5 @@ D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Release\net5.0\HiSql.Sql
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Release\net5.0\ref\HiSql.SqlServerUnitTest.dll
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Release\net5.0\HiSql.SqlServerUnitTest.pdb
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Release\net5.0\HiSql.SqlServerUnitTest.genruntimeconfig.cache
-D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Release\net5.0\HiSql.SqlServerUnitTest.csprojAssemblyReference.cache
+D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Release\net5.0\HiSql.SqlServerUnitTest.csproj.AssemblyReference.cache
+D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Release\net5.0\System.Runtime.CompilerServices.Unsafe.dll

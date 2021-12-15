@@ -17,7 +17,6 @@ D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Debug\net5.0\ref\HiSql.MySql.dll
 D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Debug\net5.0\HiSql.MySql.pdb
 D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Debug\net5.0\HiSql.dll
 D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Debug\net5.0\HiSql.pdb
-D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Debug\net5.0\HiSql.MySql.csprojAssemblyReference.cache
 D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Debug\net5.0\HiSql.MySql.Properties.Resources.resources
 D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Debug\net5.0\HiSql.MySql.csproj.GenerateResource.cache
 D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Debug\net5.0\HiSql.MySql.GeneratedMSBuildEditorConfig.editorconfig
@@ -28,3 +27,4 @@ D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Debug\net5.0\HiSql.MySql.csproj.Copy
 D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Debug\net5.0\HiSql.MySql.dll
 D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Debug\net5.0\ref\HiSql.MySql.dll
 D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Debug\net5.0\HiSql.MySql.pdb
+D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Debug\net5.0\HiSql.MySql.csproj.AssemblyReference.cache

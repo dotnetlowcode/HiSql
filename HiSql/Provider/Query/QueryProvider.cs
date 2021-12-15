@@ -23,6 +23,9 @@ namespace HiSql
         FieldDefinition _field;
 
         Filter _where;
+        Having _having;
+
+
 
         List<FilterDefinition> _list_filter = new List<FilterDefinition>();
 
@@ -33,6 +36,7 @@ namespace HiSql
         List<SortByDefinition> _list_sort = new List<SortByDefinition>();
         List<GroupDefinition> _list_group = new List<GroupDefinition>();
 
+        List<HavingDefinition> _list_having = new List<HavingDefinition>();
 
         List<HiColumn> _list_column = new List<HiColumn>();
 
@@ -167,7 +171,13 @@ namespace HiSql
         {
             get { return _where; }
         }
-
+        /// <summary>
+        /// having
+        /// </summary>
+        public Having  Havings
+        {
+            get { return _having; }
+        }
 
         /// <summary>
         /// 返回结果字段结构信息
@@ -508,6 +518,51 @@ namespace HiSql
         }
 
 
+        public IQuery Having(string having)
+        {
+            if (_queue.LastQueue() == "group")
+            {
+                _having = new Having(having);
+            }
+            else
+                throw new Exception("[Having]必须在Group之后");
+
+            
+
+
+            return this;
+        }
+        public IQuery Having(Having havings)
+        {
+            if (_queue.LastQueue() == "group")
+            {
+
+                
+                if (havings==null || havings.Elements.Count == 0)
+                {
+                    throw new Exception($"[Having]未指定过滤条件");
+                }
+                else
+                {
+                 
+                    _list_having=havings.Elements;
+                    foreach (HavingDefinition havingDefinition in _list_having)
+                    {
+                        if (string.IsNullOrEmpty(havingDefinition.Field.TabName) && !this.IsMultiSubQuery)
+                        {
+                            havingDefinition.Field.TabName = _table.TabName;
+                            havingDefinition.Field.AsTabName = _table.AsTabName;
+                        }
+                    }
+                }
+
+                
+            }else
+                throw new Exception("[Having]必须在Group之后");
+
+            return this;
+        }
+
         /// <summary>
         /// 指定表关联
         /// </summary>
@@ -846,13 +901,13 @@ namespace HiSql
             switch (rank)
             {
                 case DbRank.DENSERANK:
-                    _list_rank.Add($"dense_rank() over( order by {string.Join(',', _lstorderby) }) as {asname}");
+                    _list_rank.Add($"dense_rank() over( order by {string.Join(",", _lstorderby.ToArray()) }) as {asname}");
                     break;
                 case DbRank.RANK:
-                    _list_rank.Add($"rank() over( order by {string.Join(',', _lstorderby)}) as {asname}");
+                    _list_rank.Add($"rank() over( order by {string.Join(",", _lstorderby.ToArray())}) as {asname}");
                     break;
                 case DbRank.ROWNUMBER:
-                    _list_rank.Add($"row_number() over( order by {string.Join(',', _lstorderby)}) as {asname}");
+                    _list_rank.Add($"row_number() over( order by {string.Join(",", _lstorderby.ToArray())}) as {asname}");
                     break;
                 default:
                     break;
@@ -962,11 +1017,9 @@ namespace HiSql
             total = 0;
             if (this.IsPage && !string.IsNullOrEmpty(this.PageTotalSql.ToString().Trim()))
             {
-                if (Context.CurrentConnectionConfig.DbType == DBType.Oracle)
-                {
-                    total = Convert.ToInt32((decimal)this.Context.DBO.ExecScalar(this.PageTotalSql.ToString()));
-                }else
-                    total = Convert.ToInt32((Int64)this.Context.DBO.ExecScalar(this.PageTotalSql.ToString()));
+                var obj = this.Context.DBO.ExecScalar(this.PageTotalSql.ToString());
+
+                total = Convert.ToInt32(obj.ToString());
 
             }
                 

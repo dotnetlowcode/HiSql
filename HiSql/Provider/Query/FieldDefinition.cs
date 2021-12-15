@@ -99,16 +99,20 @@ namespace HiSql
             else
                 throw new Exception($"字段[{fieldname}]或别名[{rename}]不符合语法规则");
         }
-        public FieldDefinition(string fieldname)
+        public FieldDefinition(string fieldname,bool isnoas=false)
         {
-
-            Tuple<bool, FieldDefinition> result = Tool.CheckQueryField(fieldname);
+            //CheckQueryNoAsField
+            Tuple<bool, FieldDefinition> result = new Tuple<bool, FieldDefinition>(false, null);
+            if(!isnoas)
+                result = Tool.CheckQueryField(fieldname);
+            else
+                result = Tool.CheckQueryNoAsField(fieldname);
             if (result.Item1)
             {
                 AsTabName = result.Item2.AsTabName;
                 TabName = result.Item2.TabName;
-                
-                
+
+
                 FieldName = result.Item2.FieldName;
                 SqlName = result.Item2.SqlName;
                 AsFieldName = result.Item2.AsFieldName;
@@ -117,7 +121,12 @@ namespace HiSql
 
             }
             else
-                throw new Exception($"字段[{fieldname}]不符合语法规则");
+            {
+                if (!isnoas)
+                    throw new Exception($"字段[{fieldname}]不符合语法规则 如果是聚合字段一定要用 as 重命名");
+                else
+                    throw new Exception($"字段[{fieldname}]不符合语法规则");
+            }
         }
         public FieldDefinition()
         { 

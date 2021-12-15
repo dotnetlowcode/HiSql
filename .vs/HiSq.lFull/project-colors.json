@@ -30,7 +30,22 @@
       "ProjectGuid": "3b0ff451-11f4-4ba6-8922-6d7ed6460279",
       "DisplayName": "HiSql.HanaUnitTest",
       "ColorIndex": 5
+    },
+    "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3": {
+      "ProjectGuid": "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3",
+      "DisplayName": "杂项文件",
+      "ColorIndex": -1
+    },
+    "6f634250-f215-4407-9f5e-4713d2e37d88": {
+      "ProjectGuid": "6f634250-f215-4407-9f5e-4713d2e37d88",
+      "DisplayName": "HiSql.SqlServer",
+      "ColorIndex": 6
+    },
+    "33758dde-1a27-4159-9fe4-fad7159d500f": {
+      "ProjectGuid": "33758dde-1a27-4159-9fe4-fad7159d500f",
+      "DisplayName": "HiSql.SNRO",
+      "ColorIndex": 7
     }
   },
-  "NextColorIndex": 6
+  "NextColorIndex": 8
 }

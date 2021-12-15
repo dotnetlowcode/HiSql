@@ -20,7 +20,12 @@
    4. HiSql.oracle.dll
    5. HiSql.postgresql.dll
 
-### 2021.12.10 更新
+
+
+
+
+
+
 
  目前流行的ORM框架如果需要动态的拼接查询语句，只能用原生的sql进行拼接，无法跨不同数据库执行。hisql推出新的语法一套语句可以在不同的数据库执行
 
@@ -29,6 +34,24 @@
 
  `HiSql`不仅仅是一个ORM框架而且是一个`HiSql` SQL语句 如下所示
 
+
+
+### 2021.12.15 更新
+
+通过这个更新hisql 全面支持select 常用语法
+
+
+#### hisql 语句实现 group by having
+```c#
+string sql = sqlClient.HiSql($"select FieldName,count(*) as scount  from Hi_FieldModel group by FieldName,  Having count(*) > 0   order by fieldname").ToSql();
+
+int _total = 0;
+
+DataTable dt = sqlClient.HiSql($"select FieldName,count(*) as scount  from Hi_FieldModel group by FieldName,  Having count(*) > 0   order by fieldname")
+    .Take(2).Skip(2).ToTable(ref _total);
+```
+
+### 2021.12.10 更新
 
 ```c#
     string sql = sqlClient.HiSql($"select * from Hi_FieldModel  where (tabname = 'h_test') and  FieldType in (11,21,31) and tabname in (select tabname from Hi_TabModel)").ToSql();
@@ -96,6 +119,15 @@ string sql = sqlClient.HiSql($"select FieldName,FieldType from Hi_FieldModel  gr
 
 ```
 
+#### hisql 语句实现 group by having
+```c#
+string sql = sqlClient.HiSql($"select FieldName,count(*) as scount  from Hi_FieldModel group by FieldName,  Having count(*) > 0   order by fieldname").ToSql();
+
+int _total = 0;
+
+DataTable dt = sqlClient.HiSql($"select FieldName,count(*) as scount  from Hi_FieldModel group by FieldName,  Having count(*) > 0   order by fieldname")
+    .Take(2).Skip(2).ToTable(ref _total);
+```
 
 
 

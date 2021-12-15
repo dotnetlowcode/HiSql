@@ -58,7 +58,6 @@ D:\Project\OpenSource\HiSql\HiSql.Test\bin\Debug\net5.0\HiSql.dll
 D:\Project\OpenSource\HiSql\HiSql.Test\bin\Debug\net5.0\HiSql.SqlServer.dll
 D:\Project\OpenSource\HiSql\HiSql.Test\bin\Debug\net5.0\HiSql.SqlServer.pdb
 D:\Project\OpenSource\HiSql\HiSql.Test\bin\Debug\net5.0\HiSql.pdb
-D:\Project\OpenSource\HiSql\HiSql.Test\obj\Debug\net5.0\HiSql.Test.csprojAssemblyReference.cache
 D:\Project\OpenSource\HiSql\HiSql.Test\obj\Debug\net5.0\HiSql.Test.GeneratedMSBuildEditorConfig.editorconfig
 D:\Project\OpenSource\HiSql\HiSql.Test\obj\Debug\net5.0\HiSql.Test.AssemblyInfoInputs.cache
 D:\Project\OpenSource\HiSql\HiSql.Test\obj\Debug\net5.0\HiSql.Test.AssemblyInfo.cs
@@ -68,3 +67,5 @@ D:\Project\OpenSource\HiSql\HiSql.Test\obj\Debug\net5.0\HiSql.Test.dll
 D:\Project\OpenSource\HiSql\HiSql.Test\obj\Debug\net5.0\ref\HiSql.Test.dll
 D:\Project\OpenSource\HiSql\HiSql.Test\obj\Debug\net5.0\HiSql.Test.pdb
 D:\Project\OpenSource\HiSql\HiSql.Test\obj\Debug\net5.0\HiSql.Test.genruntimeconfig.cache
+D:\Project\OpenSource\HiSql\HiSql.Test\bin\Debug\net5.0\System.Runtime.CompilerServices.Unsafe.dll
+D:\Project\OpenSource\HiSql\HiSql.Test\obj\Debug\net5.0\HiSql.Test.csproj.AssemblyReference.cache

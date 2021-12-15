@@ -203,6 +203,11 @@ namespace HiSql
         public static string REG_FIELDANDRENAME = @"^(?:[\s]*)(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w]+)(?:[\.]{1}))?(?<field>[\w]+)\s*(?:(?i)as\s*(?<refield>[\w]+))?\s*$|(?:[\s]*)(?:(?<tab>[\#]?[\w]+)(?:[\.]{1}))(?<field>[\*]{1})\s*$|^(?:[\s]*)(?<field>[\*]{1})\s*$";
 
 
+        /// <summary>
+        /// 字段名 不带 as 重命名
+        /// </summary>
+        public static string REG_FIELDNOASNAME = @"^(?:[\s]*)(?<left>(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w]+)(?:[\.]{1}))?(?<field>[\w]+))\s*";
+
         
         /// <summary>
         /// 解析表或字段的名称
@@ -263,6 +268,12 @@ namespace HiSql
         /// </summary>
         //public static string REG_FUNCTION = @"^(?:[\s]*)(?<fun>max|min|avg|sum|count)\s*[\(]\s*(?:(?<tab>[\#]?[\w]+)(?:[\.]{1}))?(?<field>[\w]+|[\*]{1})\s*[\)]\s*(?:as)\s*(?<refield>[\w]+)\s*$";
         public static string REG_FUNCTION = @"^(?:[\s]*)(?<fun>max|min|avg|sum|count)\s*[\(]\s*(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w]+)(?:[\.]{1}))?(?<field>[\w]+|[\*]{1})\s*[\)]\s*(?:as)\s*(?<refield>[\w]+)\s*$";
+
+        /// <summary>
+        /// 解析聚合函数 且无重命名 在having中专用
+        /// </summary>
+        public static string REG_FUNCTIONNORENAME = @"^(?:[\s]*)(?<left>(?<fun>max|min|avg|sum|count)\s*[\(]\s*(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w]+)(?:[\.]{1}))?(?<field>[\w]+|[\*]{1})\s*[\)])\s*";
+
 
         public static string REG_SERVER = "";
 

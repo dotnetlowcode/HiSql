@@ -107,6 +107,13 @@ namespace HiSql
 
         IQuery Group(params string[] group);
 
+        IQuery Having(string having);
+
+        IQuery Having(Having havings);
+
+
+
+
         void Insert(string tabname);
 
 
