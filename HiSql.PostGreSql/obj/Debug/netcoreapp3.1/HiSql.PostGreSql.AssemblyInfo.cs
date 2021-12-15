@@ -11,13 +11,14 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute("HiSql.PostGreSql")]
+[assembly: System.Reflection.AssemblyCompanyAttribute("Hone")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
-[assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyDescriptionAttribute("该包支持PostGreSql数据库 依赖于HiSql.dll包运行")]
+[assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.2.3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.2.3")]
 [assembly: System.Reflection.AssemblyProductAttribute("HiSql.PostGreSql")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HiSql.PostGreSql")]
-[assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
+[assembly: System.Reflection.AssemblyVersionAttribute("1.0.2.3")]
 
 // 由 MSBuild WriteCodeFragment 类生成。
 

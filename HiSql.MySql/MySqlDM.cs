@@ -1427,7 +1427,117 @@ namespace HiSql
             return sb_sort.ToString();
         }
 
+        /// <summary>
+        /// 解析having
+        /// </summary>
+        /// <param name="TableList"></param>
+        /// <param name="dictabinfo"></param>
+        /// <param name="Fields"></param>
+        /// <param name="lstresult"></param>
+        /// <param name="issubquery"></param>
+        /// <returns></returns>
+        public string BuildHavingSql(List<TableDefinition> TableList, Dictionary<string, TabInfo> dictabinfo, List<FieldDefinition> Fields, List<HavingResult> lstresult, bool issubquery)
+        {
+            StringBuilder sb_sql = new StringBuilder();
+            if (lstresult != null && lstresult.Count() > 0)
+            {
+                foreach (HavingResult whereResult in lstresult)
+                {
+                    //字段值
+                    if (whereResult.SType == StatementType.FieldValue)
+                    {
+                        FieldDefinition field = new FieldDefinition(whereResult.Result["left"].ToString(), true);
 
+                        HiColumn hiColumn = CheckField(TableList, dictabinfo, Fields, field, true);
+
+
+                        if (field.IsFun)
+                        {
+                            //表示函数
+                            switch (field.DbFun)
+                            {
+                                case DbFunction.AVG:
+                                    sb_sql.Append($"avg({dbConfig.Field_Pre}{field.FieldName}{dbConfig.Field_After}) {whereResult.Result["op"].ToString()} '{whereResult.Result["value"].ToString()}'");
+
+
+                                    break;
+                                case DbFunction.COUNT:
+                                    sb_sql.Append($"count(*) {whereResult.Result["op"].ToString()} '{whereResult.Result["value"].ToString()}'");
+
+                                    break;
+                                case DbFunction.MAX:
+                                    sb_sql.Append($"max({dbConfig.Field_Pre}{field.FieldName}{dbConfig.Field_After}) {whereResult.Result["op"].ToString()} '{whereResult.Result["value"].ToString()}'");
+
+
+
+                                    break;
+                                case DbFunction.MIN:
+                                    sb_sql.Append($"min({dbConfig.Field_Pre}{field.FieldName}{dbConfig.Field_After}) {whereResult.Result["op"].ToString()} '{whereResult.Result["value"].ToString()}'");
+
+                                    break;
+                                case DbFunction.SUM:
+                                    sb_sql.Append($"sum({dbConfig.Field_Pre}{field.FieldName}{dbConfig.Field_After}) {whereResult.Result["op"].ToString()} '{whereResult.Result["value"].ToString()}'");
+
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            if (hiColumn != null)
+                                sb_sql.Append($"{dbConfig.Table_Pre}{field.AsTabName}{dbConfig.Table_After}.{dbConfig.Table_Pre}{field.AsFieldName}{dbConfig.Table_After} {whereResult.Result["op"].ToString()} '{whereResult.Result["value"].ToString()}'");
+                            else
+                                throw new Exception($"Having字段[{whereResult.Result["left"]}]在表中不存在");
+
+                        }
+
+                        //if (whereResult.Result.ContainsKey("fields"))
+                        //{
+
+                        //FieldDefinition field = new FieldDefinition(whereResult.Result["fields"].ToString());
+                        //HiColumn hiColumn = CheckField(TableList, dictabinfo, Fields, field);
+                        //sb_sql.Append($"{dbConfig.Table_Pre}{field.AsTabName}{dbConfig.Table_After}.{dbConfig.Table_Pre}{field.AsFieldName}{dbConfig.Table_After}");
+
+                        //if (hiColumn != null)
+                        //{
+                        //    string _value = whereResult.Result["value"].ToString();
+                        //    if (hiColumn != null)
+                        //    {
+                        //        sb_sql.Append($" {whereResult.Result["op"].ToString()} ");
+                        //        sb_sql.Append(getSingleValue(issubquery, hiColumn, _value));
+                        //    }
+                        //}
+                        //else
+                        //    throw new Exception($"字段[{whereResult.Result["fields"].ToString()}]出现错误");
+                        //}
+                        //else
+                        //{
+                        //    throw new Exception($"未能识别的解析结果");
+                        //}
+                    }
+                    else if (whereResult.SType == StatementType.SubCondition)
+                    {
+                        //子条件中可能会嵌套多个深度子条件
+                        throw new Exception($"暂时不支持该写法[{whereResult.Result["0"].ToString()}]");
+                    }
+                    else if (whereResult.SType == StatementType.Symbol)
+                    {
+                        sb_sql.Append($" {whereResult.Result["mode"].ToString()} ");
+                    }
+                    else if (whereResult.SType == StatementType.In)
+                    {
+                        throw new Exception($"暂不支持in写法");
+
+                    }
+
+                    else
+                        throw new Exception("暂时不支持该语法");
+                }
+            }
+
+            return sb_sql.ToString();
+        }
         /// <summary>
         /// 生成查询字段清单
         /// </summary>
@@ -1725,7 +1835,10 @@ namespace HiSql
                             }
                         }
                         else
-                            throw new Exception($"字段[{fieldDefinition.FieldName}]在表[{fieldDefinition.AsTabName}]中不存在");
+                        {
+                            if (fieldDefinition.FieldName.Trim() != "*" && allowstart == true)
+                                throw new Exception($"字段[{fieldDefinition.FieldName}]在表[{fieldDefinition.AsTabName}]中不存在");
+                        }
                     }
 
 

@@ -1,0 +1,15 @@
+D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\netcoreapp3.1\HiSql.PostGreSql.deps.json
+D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\netcoreapp3.1\HiSql.PostGreSql.dll
+D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\netcoreapp3.1\HiSql.PostGreSql.pdb
+D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\netcoreapp3.1\HiSql.dll
+D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\netcoreapp3.1\HiSql.pdb
+D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\netcoreapp3.1\HiSql.PostGreSql.csproj.AssemblyReference.cache
+D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\netcoreapp3.1\HiSql.PostGreSql.Properties.Resources.resources
+D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\netcoreapp3.1\HiSql.PostGreSql.csproj.GenerateResource.cache
+D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\netcoreapp3.1\HiSql.PostGreSql.GeneratedMSBuildEditorConfig.editorconfig
+D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\netcoreapp3.1\HiSql.PostGreSql.AssemblyInfoInputs.cache
+D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\netcoreapp3.1\HiSql.PostGreSql.AssemblyInfo.cs
+D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\netcoreapp3.1\HiSql.PostGreSql.csproj.CoreCompileInputs.cache
+D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\netcoreapp3.1\HiSql.PostGreSql.csproj.CopyComplete
+D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\netcoreapp3.1\HiSql.PostGreSql.dll
+D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\netcoreapp3.1\HiSql.PostGreSql.pdb

@@ -35,14 +35,24 @@ namespace HiSql.HanaUnitTest
             //    .Take(3).Skip(2)
             //    .ToSql();
 
-            int total = 0;
-            var table = sqlClient.HiSql($"select fieldlen,isprimary from  Hi_FieldModel     order by fieldlen ")
-                .Take(3).Skip(2)
-                .ToTable(ref total);
-            if (table != null)
-            {
+            //int total = 0;
+            //var table = sqlClient.HiSql($"select fieldlen,isprimary from  Hi_FieldModel     order by fieldlen ")
+            //    .Take(3).Skip(2)
+            //    .ToTable(ref total);
+            //if (table != null)
+            //{
 
-            }
+            //}
+
+            string sql = sqlClient.HiSql($"select FieldName,count(*) as scount  from Hi_FieldModel group by FieldName,  Having count(*) > 0   order by fieldname")
+               .ToSql();
+
+            int _total = 0;
+
+            DataTable dt = sqlClient.HiSql($"select FieldName,count(*) as scount  from Hi_FieldModel group by FieldName,  Having count(*) > 0   order by fieldname")
+                .Take(2).Skip(2).ToTable(ref _total);
+
+
             //string sql = sqlClient.Query("Hi_TabModel").Field("*").Sort(new SortBy { { "CreateTime" } }).Take(2).Skip(2).ToSql();
         }
         static void Query_Demo5(HiSqlClient sqlClient)

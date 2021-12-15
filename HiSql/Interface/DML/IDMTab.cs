@@ -123,6 +123,26 @@ namespace HiSql
 
         string BuilderWhereSql(List<TableDefinition> TableList, Dictionary<string, TabInfo> dictabinfo, List<FieldDefinition> Fields, List<WhereResult> lstresult, bool issubquery);
 
+        /// <summary>
+        /// 构建Group sql
+        /// </summary>
+        /// <param name="TableList"></param>
+        /// <param name="dictabinfo"></param>
+        /// <param name="Fields"></param>
+        /// <param name="Groups"></param>
+        /// <param name="issubquery"></param>
+        /// <returns></returns>
+        string BuildGroupSql(List<TableDefinition> TableList, Dictionary<string, TabInfo> dictabinfo, List<FieldDefinition> Fields, List<GroupDefinition> Groups, bool issubquery);
 
+        /// <summary>
+        /// 构建having sql
+        /// </summary>
+        /// <param name="TableList"></param>
+        /// <param name="dictabinfo"></param>
+        /// <param name="Fields"></param>
+        /// <param name="lstresult"></param>
+        /// <param name="issubquery"></param>
+        /// <returns></returns>
+        string BuildHavingSql(List<TableDefinition> TableList, Dictionary<string, TabInfo> dictabinfo, List<FieldDefinition> Fields, List<HavingResult> lstresult, bool issubquery);
     }
 }

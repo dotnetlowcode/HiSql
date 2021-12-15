@@ -177,6 +177,70 @@ namespace HiSql
                 return new Regex(@"^\d+$", RegexOptions.IgnoreCase | RegexOptions.Multiline).Match(text).Success;
 
         }
+
+
+        /// <summary>
+        /// 检测Having的条件字段
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static Tuple<bool, FieldDefinition> CheckHavingField(string text)
+        {
+            Tuple<bool, FieldDefinition> result = new Tuple<bool, FieldDefinition>(false, null);
+            if (text is null || string.IsNullOrEmpty(text)) return result;
+            Dictionary<string, string> _reg = RegexGrp(Constants.REG_FUNCTIONNORENAME, text);
+
+            if (_reg.Count > 0)
+            {
+                FieldDefinition myfield = new FieldDefinition();
+                myfield.SqlName = text;
+                myfield.TabName = _reg["tab"].ToString();
+                myfield.FieldName = _reg["field"].ToString();
+                result = new Tuple<bool, FieldDefinition>(true, myfield);
+            }
+            else
+            {
+                Dictionary<string, string> _reg_fun = RegexGrp(Constants.REG_FUNCTION, text);
+                if (_reg_fun.Count > 0)
+                {
+                    FieldDefinition myfield = new FieldDefinition();
+                    myfield.IsFun = true;
+                    switch (_reg_fun["fun"].ToLower())
+                    {
+                        case "count":
+                            myfield.DbFun = DbFunction.COUNT;
+                            break;
+                        case "avg":
+                            myfield.DbFun = DbFunction.AVG;
+                            break;
+                        case "max":
+                            myfield.DbFun = DbFunction.MAX;
+                            break;
+                        case "min":
+                            myfield.DbFun = DbFunction.MIN;
+                            break;
+                        case "sum":
+                            myfield.DbFun = DbFunction.SUM;
+                            break;
+                        default:
+                            break;
+
+                    }
+
+                    myfield.SqlName = text;
+                    myfield.TabName = _reg_fun["tab"].ToString();
+                    myfield.FieldName = _reg_fun["field"].ToString();
+
+                    
+                    if (!string.IsNullOrEmpty(myfield.AsFieldName))
+                        result = new Tuple<bool, FieldDefinition>(true, myfield);
+                    else
+                        result = new Tuple<bool, FieldDefinition>(false, null);
+                }
+            }
+            return result;
+        }
+
         /// <summary>
         /// 检测是不是指定查询字段信息,并返回字段结构
         /// </summary>
@@ -185,7 +249,7 @@ namespace HiSql
         public static Tuple<bool, FieldDefinition> CheckQueryField(string text)
         {
             Tuple<bool, FieldDefinition> result =new Tuple<bool, FieldDefinition>(false,null) ;
-            if (text is null) return result;
+            if (text is null || string.IsNullOrEmpty(text)) return result;
             Dictionary<string, string> _reg = RegexGrp(Constants.REG_FIELDANDRENAME, text);
             if (_reg.Count > 0)
             {
@@ -233,6 +297,72 @@ namespace HiSql
 
                     myfield.AsFieldName = _reg_fun["refield"].ToString();
                     if(!string.IsNullOrEmpty(myfield.AsFieldName))
+                        result = new Tuple<bool, FieldDefinition>(true, myfield);
+                    else
+                        result = new Tuple<bool, FieldDefinition>(false, null);
+                }
+                else
+                    result = new Tuple<bool, FieldDefinition>(false, null);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 检测是不是指定查询字段信息,并返回字段结构 检测不带as的
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static Tuple<bool, FieldDefinition> CheckQueryNoAsField(string text)
+        {
+            Tuple<bool, FieldDefinition> result = new Tuple<bool, FieldDefinition>(false, null);
+            if (text is null || string.IsNullOrEmpty(text)) return result;
+            Dictionary<string, string> _reg = RegexGrp($"{Constants.REG_FIELDNOASNAME}$", text);
+            if (_reg.Count > 0)
+            {
+                FieldDefinition myfield = new FieldDefinition();
+                myfield.SqlName = text;
+                myfield.TabName = _reg["tab"].ToString();
+                myfield.FieldName = _reg["field"].ToString();
+                myfield.AsFieldName = myfield.FieldName;
+                result = new Tuple<bool, FieldDefinition>(true, myfield);
+            }
+
+            else
+            {
+                Dictionary<string, string> _reg_fun = RegexGrp($"{Constants.REG_FUNCTIONNORENAME}$", text);
+                if (_reg_fun.Count > 0)
+                {
+                    FieldDefinition myfield = new FieldDefinition();
+                    myfield.IsFun = true;
+
+                    switch (_reg_fun["fun"].ToLower())
+                    {
+                        case "count":
+                            myfield.DbFun = DbFunction.COUNT;
+                            break;
+                        case "avg":
+                            myfield.DbFun = DbFunction.AVG;
+                            break;
+                        case "max":
+                            myfield.DbFun = DbFunction.MAX;
+                            break;
+                        case "min":
+                            myfield.DbFun = DbFunction.MIN;
+                            break;
+                        case "sum":
+                            myfield.DbFun = DbFunction.SUM;
+                            break;
+                        default:
+                            break;
+
+                    }
+
+                    myfield.SqlName = text;
+                    myfield.TabName = _reg_fun["tab"].ToString();
+                    myfield.FieldName = _reg_fun["field"].ToString();
+
+                    myfield.AsFieldName = myfield.FieldName;
+                    if (!string.IsNullOrEmpty(myfield.AsFieldName))
                         result = new Tuple<bool, FieldDefinition>(true, myfield);
                     else
                         result = new Tuple<bool, FieldDefinition>(false, null);

@@ -34,7 +34,16 @@ namespace HiSql.PostGreSqlUnitTest
             //{
 
             //}
-            string sql = sqlClient.Query("Hi_TabModel").Field("*").Sort(new SortBy { { "CreateTime" } }).Take(2).Skip(2).ToSql();
+            //string sql = sqlClient.Query("Hi_TabModel").Field("*").Sort(new SortBy { { "CreateTime" } }).Take(2).Skip(2).ToSql();
+
+            string sql = sqlClient.HiSql($"select FieldName,count(*) as scount  from Hi_FieldModel group by FieldName  Having count(*) > 0   order by FieldName")
+               .ToSql();
+
+            int _total = 0;
+
+            DataTable dt = sqlClient.HiSql($"select FieldName,count(*) as scount  from Hi_FieldModel group by FieldName,  Having count(*) > 0   order by FieldName")
+                .Take(2).Skip(2).ToTable(ref _total);
+
         }
 
         static void Query_Demo2(HiSqlClient sqlClient)

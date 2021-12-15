@@ -44,9 +44,17 @@ namespace HiSql.MySqlUnitTest
             //    .Take(3).Skip(2)
             //    .ToSql();
 
-            string sql = sqlClient.HiSql($"select FieldName,FieldType from Hi_FieldModel  group by FieldName,FieldType ")
-             .Take(2).Skip(2)
-             .ToSql();
+            //string sql = sqlClient.HiSql($"select FieldName,FieldType from Hi_FieldModel  group by FieldName,FieldType ")
+            // .Take(2).Skip(2)
+            // .ToSql();
+
+            string sql = sqlClient.HiSql($"select FieldName,count(*) as scount  from Hi_FieldModel group by FieldName,  Having count(*) > 0   order by fieldname")
+               .ToSql();
+
+            int _total = 0;
+
+            DataTable dt = sqlClient.HiSql($"select FieldName,count(*) as scount  from Hi_FieldModel group by FieldName,  Having count(*) > 0   order by fieldname")
+                .Take(2).Skip(2).ToTable(ref _total);
 
 
             //string sql = sqlClient.HiSql($"select b.tabname, a.fieldname,a.IsPrimary from  Hi_FieldModel as a  inner join   Hi_TabModel as  b on a.tabname = b.tabname" +

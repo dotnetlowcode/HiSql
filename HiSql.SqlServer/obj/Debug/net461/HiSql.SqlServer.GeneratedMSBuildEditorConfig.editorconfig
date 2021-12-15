@@ -1,0 +1,3 @@
+is_global = true
+build_property.RootNamespace = HiSql.SqlServer
+build_property.ProjectDir = D:\Project\OpenSource\HiSql\HiSql.SqlServer\

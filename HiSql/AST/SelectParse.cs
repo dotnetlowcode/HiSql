@@ -47,7 +47,7 @@ namespace HiSql.AST
 
             public static string REG_SELECT_WHERE = @"^\s*\b(?<cmd>where)\b";
 
-            public static string REG_SELECT_WHERE1 = @"^\s*\b(?<cmd>where)(?<where>[\s\S.\w]*?)(?=\border\s+\bby\b|\bgroup\s+\bby\b|\bunion\b)";
+            public static string REG_SELECT_WHERE1 = @"^\s*\b(?<cmd>where)(?<where>[\s\S.\w]*?)(?=\border\s+\bby\b|\bgroup\s+\bby\b|\bhaving\b|\bunion\b)";
 
             public static string REG_SELECT_WHERE2 = @"^\s*\b(?<cmd>where)(?<where>[\s\S.\w]*)";
 
@@ -266,6 +266,15 @@ namespace HiSql.AST
 
                 #region having
                 //如果having 必出现 group by
+                if (!string.IsNullOrEmpty(sql.Trim()))
+                {
+                    var rtndic = Tool.RegexGrpOrReplace(HavingParse.Constants.REG_HAVING, sql);
+                    if (rtndic.Item1)
+                    {
+                        parseHaving(rtndic.Item2["having"]);
+                        sql = rtndic.Item3;
+                    }
+                }
                 #endregion
 
 
@@ -376,6 +385,16 @@ namespace HiSql.AST
             }
             return sql;
         }
+
+        string parseHaving(string sql)
+        {
+            if (!string.IsNullOrEmpty(sql.Trim()))
+                _query.Having(sql);
+            else
+                throw new Exception($"{HiSql.Constants.HiSqlSyntaxError} 指定的Having条件为空");
+            return sql;
+        }
+
 
         /// <summary>
         /// 多个Order 排序用逗号,分开
