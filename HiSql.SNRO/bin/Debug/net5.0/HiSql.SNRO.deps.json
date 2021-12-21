@@ -8,7 +8,7 @@
     ".NETCoreApp,Version=v5.0": {
       "HiSql.SNRO/1.0.0.1": {
         "dependencies": {
-          "HiSql": "1.0.2.3",
+          "HiSql": "1.0.2.4",
           "Microsoft.Extensions.Caching.Memory": "6.0.0"
         },
         "runtime": {
@@ -102,7 +102,7 @@
           }
         }
       },
-      "HiSql/1.0.2.3": {
+      "HiSql/1.0.2.4": {
         "dependencies": {
           "Microsoft.Extensions.Caching.Memory": "6.0.0",
           "Newtonsoft.Json": "13.0.1"
@@ -189,7 +189,7 @@
       "path": "system.runtime.compilerservices.unsafe/6.0.0",
       "hashPath": "system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512"
     },
-    "HiSql/1.0.2.3": {
+    "HiSql/1.0.2.4": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

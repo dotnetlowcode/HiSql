@@ -11,23 +11,39 @@ namespace HiSql
 
     public class Demo_Insert
     {
-        class H_Test
+        class H_Test:StandField
         {
-            public int DID
+           public int Hid
+            {
+                get;set;
+            }
+            public string UserName
             {
                 get; set;
             }
-            public int Hid
+            public int UserAge
             {
                 get; set;
             }
-            public string UNAME
+            public string ReName
             {
                 get; set;
             }
-            public string UNAME2
+            public DateTime CreateTime
             {
-                get; set;
+                get;set;
+            }
+            public string CreateName
+            {
+                get;set;
+            }
+            public DateTime ModiTime
+            {
+                get;set;
+            }
+            public string ModiName
+            {
+                get;set;
             }
 
         }
@@ -37,9 +53,15 @@ namespace HiSql
             //Demo1_Insert2(sqlClient);
             //Demo1_Insert3(sqlClient);
             //Demo1_Insert4(sqlClient);
-            Demo1_Insert5(sqlClient);
+            //Demo1_Insert5(sqlClient);
+            Demo1_Insert6(sqlClient);
             //Demo_dynamic(sqlClient);
         }
+        static void Demo1_Insert6(HiSqlClient sqlClient)
+        {
+            int v = sqlClient.Insert("H_Test", new H_Test() { Hid=1, UserName="tansar", UserAge=33, ReName="tgm", CreateTime=DateTime.Now, CreateName="tansar" , ModiTime=DateTime.Now, ModiName ="tansar"}).ExecCommand();
+        }
+
         static void Demo1_Insert5(HiSqlClient sqlClient)
         {
             int v = sqlClient.Insert("H_Test3", new { descript = "hello world" }).ExecCommand();
@@ -78,30 +100,43 @@ namespace HiSql
 
             ddyn.Hid = 99;
 
-
-
+            int scount = 1000;
+            Random random = new Random();
             Dictionary<string, object> exo = (Dictionary<string, object>)dyn;
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < scount; i++)
             {
-                lstdyn.Add(new Dictionary<string, string>
+                lstdyn.Add(new Dictionary<string, object>
                 {
-                    { "Hid",$"20{i}"},
-                    { "UserName","tgm"},
-                    { "UserAge","36"}
+                    //{ "Hid",$"12{i}"},
+                    //{ "UserName",$"tgm1{i}"},
+                    //{ "UserAge","32"}
+                    { "SID",(i + 1)},
+                    { "UName",$"hisql{i}"},
+                    { "Age",20 + (i % 50)},
+                    { "Salary",5000 + (i % 2000) + random.Next(10)},
+                    { "Descript",$"hisql"}
                 });
             }
 
 
 
-            lstdyn.Add(dyn);
+            //lstdyn.Add(dyn);
 
             DateTime dnow = DateTime.Now;
             Console.WriteLine(dnow.ToString());
 
 
 
+            sqlClient.Insert("HTest01", new { SID = "0", UName = " hisql" , Age = 36, Salary =11, Descript ="hisql"}).ExecCommand();
+            //string _sql = sqlClient.Modi("H_Test", lstdyn).ToSql(); 
+            //string _sql = sqlClient.Insert("H_Test", lstdyn).ToSql(); 
 
-            string _sql = sqlClient.Modi("H_Test", lstdyn).ToSql(); ;
+            Stopwatch SW = new Stopwatch();
+            SW.Start();
+            int v = sqlClient.Insert("HTest01", lstdyn).ExecCommand();
+            SW.Stop();
+            Console.WriteLine($" hisql插入{scount} 耗时{SW.Elapsed}秒");
+
         }
 
         static void Demo1_Insert4(HiSqlClient sqlClient)
@@ -140,7 +175,7 @@ namespace HiSql
             //    .Insert("H_TEST", new { UNAME = "UTYPE9", UNAME2 = "用户类型9" })
             //    .Insert("Hone_Test", new { Username = "TOM4", Scount = 99 }).ExecCommand();
 
-            string _sql2 = sqlClient.Insert<H_Test>(new H_Test { DID = 123, UNAME="UTYPEHA" ,UNAME2="TEST'" }).ToSql();
+            //string _sql2 = sqlClient.Insert<H_Test>(new H_Test { DID = 123, UNAME="UTYPEHA" ,UNAME2="TEST'" }).ToSql();
 
             string _sql3= sqlClient.Modi("Hi_Domain", new List<object> { new { Domain = "10097", DomainDesc = "用户类型10097" }, new { Domain = "10098", DomainDesc = "用户类型10098" } }).ToSql();
             int _effect3 = sqlClient.Modi("Hi_Domain", new List<object> { new { Domain = "10097", DomainDesc = "用户类型10097" }, new { Domain = "10098", DomainDesc = "用户类型10098" } }).ExecCommand();

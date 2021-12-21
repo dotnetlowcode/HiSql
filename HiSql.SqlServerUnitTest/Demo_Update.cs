@@ -30,9 +30,16 @@ namespace HiSql.UnitTest
         public static void Init(HiSqlClient sqlClient)
         {
             //Update_Demo(sqlClient);
-            Update_Demo2(sqlClient);
+            //Update_Demo2(sqlClient);
+            Update_Demo3(sqlClient);
         }
 
+        static void Update_Demo3(HiSqlClient sqlClient)
+        {
+            string _sql = sqlClient.Update("Hi_FieldModel", new { TabName = "HTest01", FieldName = "UName",Regex= @"^[\w]+[^']$" }).Only("Regex").ToSql();
+            sqlClient.Update("Hi_FieldModel", new { TabName = "HTest01", FieldName = "UName", Regex = @"^[\w]+[^']$" }).Only("Regex").ExecCommand();
+
+        }
 
         static void Update_Demo2(HiSqlClient sqlClient)
         {

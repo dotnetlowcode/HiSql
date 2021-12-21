@@ -641,16 +641,24 @@ namespace HiSql
 
                     //if (hiColumn.DBDefault != HiTypeDBDefault.FUNDATE)
                     //    _values.Add(hiColumn.ColumnName, $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                    if (_values.ContainsKey(hiColumn.ColumnName))
+                        _values.Remove(hiColumn.ColumnName);
                 }
                 else if (hiColumn.ColumnName.ToLower() == "ModiName".ToLower())
                 {
-                    _values.Add(hiColumn.ColumnName, $"'{Context.CurrentConnectionConfig.User}'");
+                    if(!_values.ContainsKey(hiColumn.ColumnName))
+                        _values.Add(hiColumn.ColumnName, $"'{Context.CurrentConnectionConfig.User}'");
+                    else
+                        _values[hiColumn.ColumnName]= $"'{Context.CurrentConnectionConfig.User}'";
 
-                    
+
                 }
                 else if (hiColumn.ColumnName.ToLower() == "ModiTime".ToLower())
                 {
-                    _values.Add(hiColumn.ColumnName, $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                    if (!_values.ContainsKey(hiColumn.ColumnName))
+                        _values.Add(hiColumn.ColumnName, $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                    else
+                        _values[hiColumn.ColumnName] = $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'";
                 }
             }
 
