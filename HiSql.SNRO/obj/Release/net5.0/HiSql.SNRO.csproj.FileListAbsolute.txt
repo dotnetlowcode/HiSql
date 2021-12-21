@@ -27,3 +27,4 @@ D:\Project\OpenSource\HiSql\HiSql.SNRO\obj\Release\net5.0\HiSql.SNRO.csproj.Copy
 D:\Project\OpenSource\HiSql\HiSql.SNRO\obj\Release\net5.0\HiSql.SNRO.dll
 D:\Project\OpenSource\HiSql\HiSql.SNRO\obj\Release\net5.0\ref\HiSql.SNRO.dll
 D:\Project\OpenSource\HiSql\HiSql.SNRO\obj\Release\net5.0\HiSql.SNRO.pdb
+D:\Project\OpenSource\HiSql\HiSql.SNRO\obj\Release\net5.0\HiSql.SNRO.csproj.AssemblyReference.cache

@@ -1001,6 +1001,14 @@ namespace HiSql
         public List<T> ToList<T>(ref int total)
         {
             string _sql = this.ToSql();
+            total = 0;
+            if (this.IsPage && !string.IsNullOrEmpty(this.PageTotalSql.ToString().Trim()))
+            {
+                var obj = this.Context.DBO.ExecScalar(this.PageTotalSql.ToString());
+
+                total = Convert.ToInt32(obj.ToString());
+
+            }
             IDataReader dr = this.Context.DBO.GetDataReader(_sql, null);
             List<T> _result = DataConvert.ToList<T>(dr);
             dr.Close();
@@ -1029,6 +1037,7 @@ namespace HiSql
         public List<TDynamic> ToDynamic()
         {
             string _sql = this.ToSql();
+            
 
             IDataReader dr = this.Context.DBO.GetDataReader(_sql, null);
             List<TDynamic> result = DataConvert.ToDynamic(dr);
@@ -1038,7 +1047,14 @@ namespace HiSql
         public List<TDynamic> ToDynamic(ref int total)
         {
             string _sql = this.ToSql();
+            total = 0;
+            if (this.IsPage && !string.IsNullOrEmpty(this.PageTotalSql.ToString().Trim()))
+            {
+                var obj = this.Context.DBO.ExecScalar(this.PageTotalSql.ToString());
 
+                total = Convert.ToInt32(obj.ToString());
+
+            }
             IDataReader dr = this.Context.DBO.GetDataReader(_sql, null);
             List<TDynamic> result = DataConvert.ToDynamic(dr);
             dr.Close();
@@ -1055,6 +1071,14 @@ namespace HiSql
         public string ToJson(ref int total)
         {
             string _sql = this.ToSql();
+            total = 0;
+            if (this.IsPage && !string.IsNullOrEmpty(this.PageTotalSql.ToString().Trim()))
+            {
+                var obj = this.Context.DBO.ExecScalar(this.PageTotalSql.ToString());
+
+                total = Convert.ToInt32(obj.ToString());
+
+            }
             IDataReader dr = this.Context.DBO.GetDataReader(_sql, null);
             List<ExpandoObject> lstobj = DataConvert.ToEObject(dr);
             return JsonConvert.SerializeObject(lstobj);

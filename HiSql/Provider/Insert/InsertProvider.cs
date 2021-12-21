@@ -5,6 +5,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -204,12 +205,23 @@ namespace HiSql
             StringBuilder sb_sql = new StringBuilder();
             if (this.Data != null && this.Data.Count > 0)
             {
+
+                
+
                 Type type = this.Data[0].GetType();
                 bool _isdic = type == typeof(Dictionary<string, string>)  || type== typeof(Dictionary<string, object>);
                 List<PropertyInfo> attrs = type.GetProperties().Where(p => p.MemberType == MemberTypes.Property && p.CanRead == true).ToList();
                 int page = this.Data.Count <= DbConfig.BlukSize ? 1 : this.Data.Count % DbConfig.BlukSize == 0 ? this.Data.Count / DbConfig.BlukSize : this.Data.Count / DbConfig.BlukSize + 1;
                 //分数据包 包的大小决定了数据插入的性能问题
                 //insert values 的方式 包大小最高不能超过1000
+
+                //List<Dictionary<string, string>> rtnlst=new List<Dictionary<string, string>> ();//=CheckAllData(tabinfo.GetColumns, this.Data);
+                //List<Dictionary<string, string>> rtnlst=CheckAllData(tabinfo.GetColumns, this.Data);
+                //foreach (var obj in this.Data)
+                //{
+                //    rtnlst.Add(CheckInsertData(_isdic, attrs, tabinfo.GetColumns, obj));
+                //}
+
                 for (int p = 0; p < page; p++)
                 {
                     for (int i = p * DbConfig.BlukSize; i < (p + 1) * DbConfig.BlukSize; i++)
@@ -221,6 +233,7 @@ namespace HiSql
                         else
                         {
                             Dictionary<string, string> _values = CheckInsertData(_isdic, attrs, tabinfo.GetColumns, this.Data[i]);
+                            //Dictionary<string, string> _values = rtnlst[i];
                             if (_values.Count == 0)
                                 throw new Exception($"向表[{_insertTabName}]插入数据值中无任何配置的字段");
                             string _sql = sqldm.BuildInsertSql(_values, i > p * DbConfig.BlukSize).Replace("[$TabName$]", _insertTabName);//i > p * _bluksize
@@ -332,22 +345,30 @@ namespace HiSql
             //{
             //    _list_data.Add(obj);
             //}
-            foreach (var obj in lstdata)
+
+            var _typname = "";
+            if (lstdata.Count > 0)
+                _typname = lstdata[0].GetType().FullName;
+
+            if (_typname.IndexOf("TDynamic") >= 0 || _typname.IndexOf("ExpandoObject") >= 0)
             {
-                var _typname = obj.GetType().FullName;
-                if (_typname.IndexOf("TDynamic") >= 0)
+                foreach (var obj in lstdata)
                 {
-                    TDynamic dyn = (dynamic)obj;
-                    _list_data.Add((Dictionary<string, object>)dyn);
+                    if (_typname.IndexOf("TDynamic") >= 0)
+                    {
+                        TDynamic dyn = (dynamic)obj;
+                        _list_data.Add((Dictionary<string, object>)dyn);
+                    }
+                    else if (_typname.IndexOf("ExpandoObject") >= 0)
+                    {
+                        TDynamic dyn = new TDynamic(obj);
+                        _list_data.Add((Dictionary<string, object>)dyn);
+                    }
                 }
-                else if (_typname.IndexOf("ExpandoObject") >= 0)
-                {
-                    TDynamic dyn = new TDynamic(obj);
-                    _list_data.Add((Dictionary<string, object>)dyn);
-                }
-                else
-                    _list_data.Add((object)obj);
+                
             }
+            else
+                _list_data = lstdata;
 
             checkData();
             _queue.Add("insert");
@@ -612,6 +633,423 @@ namespace HiSql
 
 
         #region 私有方法 add by tgm date:20211016
+
+
+        /// <summary>
+        /// 检测数据
+        /// 包括表引用,正则检测,类型,长度
+        /// </summary>
+        /// <param name="hiColumns"></param>
+        /// <param name="lstdata"></param>
+        /// <returns></returns>
+        List<Dictionary<string, string>> CheckAllData( List<HiColumn> hiColumns, List<object> lstdata)
+        {
+            List<Dictionary<string, string>> rtnlst = new List<Dictionary<string, string>>();
+            if (this.Data != null && this.Data.Count > 0)
+            {
+                Type type = this.Data[0].GetType();
+
+                Type _typ_dic = typeof(Dictionary<string, string>);
+                Type _typ_dic_obj = typeof(Dictionary<string, object>);
+
+                bool _isdic = type == _typ_dic || type == _typ_dic_obj;
+                List<PropertyInfo> attrs = type.GetProperties().Where(p => p.MemberType == MemberTypes.Property && p.CanRead == true).ToList();
+
+                //将有配正则校验的列去重统计
+                Dictionary<string, HashSet<string>> dic_hash_reg = new Dictionary<string, HashSet<string>>();
+
+
+                var arrcol_reg = hiColumns.Where(h => !string.IsNullOrEmpty(h.Regex)).ToList();
+                var arrcol_tab = hiColumns.Where(h => h.IsRefTab).ToList();
+
+                var arrcol = hiColumns.Where(h => !string.IsNullOrEmpty(h.Regex) ||  h.IsRefTab).ToList();
+                foreach (HiColumn hi in arrcol)
+                {
+                    dic_hash_reg.Add(hi.ColumnName, new HashSet<string>());
+                }
+                int _rowidx = 0;
+                if (_isdic)
+                {
+                    //表示是字典 Dictionary<string, object>
+                    string _value = "";
+                    if (type == _typ_dic_obj)
+                    {
+                        #region Dictionary<string, object>
+                        foreach (Dictionary<string, object> _o in lstdata)
+                        {
+                            _rowidx++;
+                            Dictionary<string, string> _dic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                            Dictionary<string, string> _rowdic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                            foreach (HiColumn hiColumn in hiColumns)
+                            {
+
+                                if (hiColumn.IsRequire && !hiColumn.IsIdentity && !_o.ContainsKey(hiColumn.ColumnName))
+                                {
+                                    throw new Exception($"行[{_rowidx}] 缺少字段[{hiColumn.ColumnName}] 为必填字段");
+                                }
+                                if (hiColumn.IsIdentity && _o.ContainsKey(hiColumn.ColumnName))
+                                {
+                                    _value = _o[hiColumn.ColumnName].ToString();
+                                    if (_value == "0" || string.IsNullOrEmpty(_value))
+                                        continue;
+                                    else
+                                        throw new Exception($"行[{_rowidx}] 字段[{hiColumn.ColumnName}] 为自增长字段 不需要外部赋值");
+                                }
+
+
+                                if (_o.ContainsKey(hiColumn.ColumnName))
+                                {
+                                    //if (_o[hiColumn.ColumnName].GetType() != typeof(DateTime))
+                                    //    _dic.Add(hiColumn.ColumnName, _o[hiColumn.ColumnName].ToString());
+                                    //else
+                                    //{
+                                    //    DateTime _dtime = (DateTime)_o[hiColumn.ColumnName];
+                                    //    _dic.Add(hiColumn.ColumnName, _dtime.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+                                    //}
+                                    if (hiColumn.FieldType.IsIn<HiType>(HiType.DATE, HiType.DATETIME))
+                                    {
+                                        DateTime dtime = (DateTime)_o[hiColumn.ColumnName];
+                                        if (dtime != null && dtime != DateTime.MinValue)
+                                        {
+                                            _dic.Add(hiColumn.ColumnName, dtime.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+                                        }
+                                    }
+                                    else if (hiColumn.FieldType.IsIn<HiType>(HiType.BOOL))
+                                    {
+                                        if ((bool)_o[hiColumn.ColumnName] == true)
+                                        {
+                                            _dic.Add(hiColumn.ColumnName, "1");
+                                        }
+                                        else
+                                            _dic.Add(hiColumn.ColumnName, "0");
+                                    }
+                                    else
+                                    {
+                                        _dic.Add(hiColumn.ColumnName, _o[hiColumn.ColumnName].ToString());
+                                    }
+
+
+                                }
+                                else {
+                                    if (!hiColumn.IsNull && hiColumn.DBDefault == HiTypeDBDefault.NONE && !hiColumn.IsIdentity)
+                                    {
+                                        throw new Exception($"行[{_rowidx}] 字段[{hiColumn.ColumnName}]不允许为空数据库中未设置默认值 且插入数据值中未指定值");
+                                    }
+                                }
+
+                                if (_dic.ContainsKey(hiColumn.ColumnName) || _dic.ContainsKey(hiColumn.ColumnName.ToLower()))
+                                {
+                                    if (arrcol.Any(h => h.ColumnName == hiColumn.ColumnName))
+                                    {
+                                        dic_hash_reg[hiColumn.ColumnName].Add(_dic[hiColumn.ColumnName]);
+                                    }
+
+                                }
+
+
+
+                                if (hiColumn.ColumnName.ToLower() == "CreateTime".ToLower() || hiColumn.ColumnName.ToLower() == "ModiTime".ToLower())
+                                {
+
+                                    if (hiColumn.DBDefault != HiTypeDBDefault.FUNDATE)
+                                        _rowdic.Add(hiColumn.ColumnName, $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+
+                                }
+                                else if (hiColumn.ColumnName.ToLower() == "CreateName".ToLower() || hiColumn.ColumnName.ToLower() == "ModiName".ToLower())
+                                {
+                                    _rowdic.Add(hiColumn.ColumnName, $"'{Context.CurrentConnectionConfig.User}'");
+                                }
+                                else
+                                {
+                                    if (_dic.ContainsKey(hiColumn.ColumnName))
+                                    {
+                                        var result = checkFieldValue(hiColumn, _rowidx, _dic[hiColumn.ColumnName]);
+                                        if (result.Item1)
+                                        {
+                                            _rowdic.Add(hiColumn.ColumnName, result.Item2);
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (_rowdic.Count > 0)
+                            {
+                                rtnlst.Add(_rowdic);
+                            }
+                        }
+                        #endregion
+                    }
+                    else
+                    {
+                        #region Dictionary<string, string> 
+                        foreach (Dictionary<string, string> _o in lstdata)
+                        {
+                            _rowidx++;
+                            
+                            Dictionary<string, string> _rowdic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                            foreach (HiColumn hiColumn in hiColumns)
+                            {
+                                if (_o.ContainsKey(hiColumn.ColumnName) || _o.ContainsKey(hiColumn.ColumnName.ToLower()))
+                                {
+                                    if (arrcol.Any(h => h.ColumnName == hiColumn.ColumnName))
+                                    {
+                                        dic_hash_reg[hiColumn.ColumnName].Add(_o[hiColumn.ColumnName]);
+                                    }
+                                }
+                                var result = checkFieldValue(hiColumn, _rowidx, _o[hiColumn.ColumnName]);
+                                if (result.Item1)
+                                {
+                                    _rowdic.Add(hiColumn.ColumnName, result.Item2);
+                                }
+                            }
+                            if (_rowdic.Count > 0)
+                            {
+                                rtnlst.Add(_rowdic);
+                            }
+                        }
+                        #endregion
+                    }
+                }
+                else
+                {
+                    //非字典
+
+                    #region  非字典
+                    string _value = "";
+                    foreach (object objdata in lstdata)
+                    {
+                        _rowidx++;
+                        Dictionary<string, string> _dic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                        Dictionary<string, string> _rowdic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                        foreach (HiColumn hiColumn in hiColumns)
+                        {
+                            var objprop = attrs.Where(p => p.Name.ToLower() == hiColumn.ColumnName.ToLower()).FirstOrDefault();
+                            if (hiColumn.IsRequire && !hiColumn.IsIdentity && objprop == null)
+                            {
+                                throw new Exception($"行[{_rowidx}] 缺少字段[{hiColumn.ColumnName}] 为必填字段");
+                            }
+                            if (hiColumn.IsIdentity && _dic.ContainsKey(hiColumn.ColumnName))
+                            {
+                                _value = _dic[hiColumn.ColumnName].ToString();
+                                if (_value == "0" || string.IsNullOrEmpty(_value))
+                                    continue;
+                                else
+                                    throw new Exception($"行[{_rowidx}] 字段[{hiColumn.ColumnName}] 为自增长字段 不需要外部赋值");
+                            }
+
+
+                            if (objprop != null && objprop.GetValue(objdata) != null)
+                            {
+                                if (hiColumn.FieldType.IsIn<HiType>(HiType.DATE, HiType.DATETIME))
+                                {
+                                    DateTime dtime = (DateTime)objprop.GetValue(objdata);
+                                    if (dtime != null && dtime != DateTime.MinValue)
+                                    {
+                                        _dic.Add(hiColumn.ColumnName, dtime.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+                                    }
+                                }
+                                else if (hiColumn.FieldType.IsIn<HiType>(HiType.BOOL))
+                                {
+                                    if ((bool)objprop.GetValue(objdata) == true)
+                                    {
+                                        _dic.Add(hiColumn.ColumnName, "1");
+                                    }
+                                    else
+                                        _dic.Add(hiColumn.ColumnName, "0");
+                                }
+                                else
+                                {
+                                    _dic.Add(hiColumn.ColumnName, objprop.GetValue(objdata).ToString());
+                                }
+                            }
+                            else
+                            {
+                                if (!hiColumn.IsNull && hiColumn.DBDefault == HiTypeDBDefault.NONE && !hiColumn.IsIdentity)
+                                {
+                                    throw new Exception($"行[{_rowidx}] 字段[{hiColumn.ColumnName}]不允许为空数据库中未设置默认值 且插入数据值中未指定值");
+                                }
+                            }
+
+
+                            if (_dic.ContainsKey(hiColumn.ColumnName) || _dic.ContainsKey(hiColumn.ColumnName.ToLower()))
+                            {
+                                if (arrcol.Any(h => h.ColumnName == hiColumn.ColumnName))
+                                {
+                                    dic_hash_reg[hiColumn.ColumnName].Add(_dic[hiColumn.ColumnName]);
+                                }
+
+                            }
+
+
+
+                            if (hiColumn.ColumnName.ToLower() == "CreateTime".ToLower() || hiColumn.ColumnName.ToLower() == "ModiTime".ToLower())
+                            {
+
+                                if (hiColumn.DBDefault != HiTypeDBDefault.FUNDATE)
+                                    _rowdic.Add(hiColumn.ColumnName, $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+
+                            }
+                            else if (hiColumn.ColumnName.ToLower() == "CreateName".ToLower() || hiColumn.ColumnName.ToLower() == "ModiName".ToLower())
+                            {
+                                _rowdic.Add(hiColumn.ColumnName, $"'{Context.CurrentConnectionConfig.User}'");
+                            }
+                            else
+                            {
+                                if (_dic.ContainsKey(hiColumn.ColumnName))
+                                {
+                                    var result = checkFieldValue(hiColumn, _rowidx, _dic[hiColumn.ColumnName]);
+                                    if (result.Item1)
+                                    {
+                                        _rowdic.Add(hiColumn.ColumnName, result.Item2);
+                                    }
+                                }
+                            }
+                        }
+                        
+
+                        if (_rowdic.Count > 0)
+                        {
+                            rtnlst.Add(_rowdic);
+                        }
+
+
+                    }
+
+                    #endregion
+                }
+
+
+                foreach (HiColumn hiColumn in arrcol_reg)
+                {
+                    Regex _regex = new Regex(hiColumn.Regex, RegexOptions.IgnoreCase | RegexOptions.Multiline);
+                    if (dic_hash_reg.ContainsKey(hiColumn.ColumnName))
+                    {
+                        foreach (string n in dic_hash_reg[hiColumn.ColumnName])
+                        {
+                            if (!_regex.Match(n).Success)
+                            {
+                                throw new Exception($"列[{hiColumn.ColumnName}]值[{n}] 不符合业务配置要求");
+                            }
+                        }
+
+                    }
+                }
+
+
+
+            }
+            else
+                return rtnlst;
+            return rtnlst;
+        }
+
+        Tuple<bool,string> checkFieldValue( HiColumn hiColumn,int rowidx, string value)
+        {
+
+            string _value = "";
+            Tuple<bool, string> rtn = new Tuple<bool, string>(false, "");
+
+
+            #region 字典数据
+
+            _value = value;
+            if (hiColumn.FieldType.IsIn<HiType>(HiType.NVARCHAR, HiType.NCHAR, HiType.GUID))
+            {
+                //中文按1个字符计算
+                //_value = "test";
+                
+                if (_value.Length >= hiColumn.FieldLen)
+                {
+                    throw new Exception($"字段[{hiColumn.ColumnName}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
+                }
+                if (hiColumn.IsRequire)
+                {
+                    if (string.IsNullOrEmpty(_value.Trim()))
+                        throw new Exception($"字段[{hiColumn.ColumnName}] 为必填 无法数据提交");
+                }
+
+                _value = $"'{_value.ToSqlInject()}'";
+                rtn = new Tuple<bool, string>(true, _value);
+
+            }
+            else if (hiColumn.FieldType.IsIn<HiType>(HiType.VARCHAR, HiType.CHAR, HiType.TEXT))
+            {
+                //中文按两个字符计算
+                
+                //_value = "test";
+                if (_value.LengthZH() > hiColumn.FieldLen)
+                {
+                    throw new Exception($"字段[{hiColumn.ColumnName}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
+                }
+                if (hiColumn.IsRequire)
+                {
+                    if (string.IsNullOrEmpty(_value.Trim()))
+                        throw new Exception($"字段[{hiColumn.ColumnName}] 为必填 无法数据提交");
+                }
+                _value = $"'{_value.ToSqlInject()}'";
+                rtn = new Tuple<bool, string>(true, _value);
+            }
+            else if (hiColumn.FieldType.IsIn<HiType>(HiType.INT, HiType.BIGINT, HiType.DECIMAL, HiType.SMALLINT))
+            {
+                
+                //_value = "1";
+                rtn = new Tuple<bool, string>(true, $"{_value}");
+            }
+            else if (hiColumn.FieldType.IsIn<HiType>(HiType.BOOL))
+            {
+               
+                if (_value=="true" || _value=="1")
+                {
+                    if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.PostGreSql, DBType.Hana, DBType.MySql))
+                    {
+                        _value = "True";
+                        rtn = new Tuple<bool, string>(true, _value);
+                    }
+                    else
+                    {
+                        _value = "1";
+                        rtn = new Tuple<bool, string>(true, $"'{_value}'");
+                            
+                    }
+                }
+                else
+                {
+                    if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.PostGreSql, DBType.Hana, DBType.MySql))
+                    {
+                        _value = "False";
+                        rtn = new Tuple<bool, string>(true, _value);
+                    }
+                    else
+                    {
+                        _value = "0";
+                        rtn = new Tuple<bool, string>(true, $"'{_value}'");
+                    }
+                }
+            }
+            else if (hiColumn.FieldType.IsIn<HiType>(HiType.DATE, HiType.DATETIME))
+            {
+                if (!string.IsNullOrEmpty(_value))
+                {
+                    DateTime dtime = DateTime.Parse(_value);
+                    //DateTime dtime = DateTime.Now;
+                    if (dtime != null)
+                    {
+                        rtn = new Tuple<bool, string>(true, $"'{dtime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                    }
+                }
+            }
+            else
+            {
+                rtn = new Tuple<bool, string>(true, $"'{_value}'");
+            }
+            
+            
+            
+            #endregion
+            
+            return rtn;
+        }
+
         Dictionary<string, string> CheckInsertData(bool isDic, List<PropertyInfo> attrs, List<HiColumn> hiColumns, object objdata)
         {
             Dictionary<string, string> _values = new Dictionary<string, string>();
@@ -778,12 +1216,22 @@ namespace HiSql
                     if (hiColumn.ColumnName == "CreateTime" || hiColumn.ColumnName == "ModiTime")
                     {
 
+
                         if (hiColumn.DBDefault != HiTypeDBDefault.FUNDATE)
-                            _values.Add(hiColumn.ColumnName, $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                        {
+                            if(!_values.ContainsKey(hiColumn.ColumnName))
+                                _values.Add(hiColumn.ColumnName, $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                            else
+                                _values[hiColumn.ColumnName]= $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'";
+                        }
+                            
                     }
                     else if (hiColumn.ColumnName == "CreateName" || hiColumn.ColumnName == "ModiName")
                     {
-                        _values.Add(hiColumn.ColumnName, $"'{Context.CurrentConnectionConfig.User}'");
+                        if (!_values.ContainsKey(hiColumn.ColumnName))
+                            _values.Add(hiColumn.ColumnName, $"'{Context.CurrentConnectionConfig.User}'");
+                        else
+                            _values[hiColumn.ColumnName]= $"'{Context.CurrentConnectionConfig.User}'";
                     }
                     #endregion
                 }
@@ -872,11 +1320,24 @@ namespace HiSql
                     {
 
                         if (hiColumn.DBDefault != HiTypeDBDefault.FUNDATE)
-                            _values.Add(hiColumn.ColumnName, $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                        {
+                            if(!_values.ContainsKey(hiColumn.ColumnName))
+                                _values.Add(hiColumn.ColumnName, $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                            else
+                                _values[hiColumn.ColumnName]= $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'";
+                        }
+                            
                     }
                     else if (hiColumn.ColumnName.ToLower() == "CreateName".ToLower() || hiColumn.ColumnName.ToLower() == "ModiName".ToLower())
                     {
-                        _values.Add(hiColumn.ColumnName, $"'{Context.CurrentConnectionConfig.User}'");
+                        if (!_values.ContainsKey(hiColumn.ColumnName))
+                        {
+                            _values.Add(hiColumn.ColumnName, $"'{Context.CurrentConnectionConfig.User}'");
+                        }
+                        else
+                            _values[hiColumn.ColumnName] = $"'{Context.CurrentConnectionConfig.User}'";
+
+
                     }
                     #endregion
                 }

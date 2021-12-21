@@ -13,3 +13,4 @@ D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Release\netcoreapp3.1\HiSql.Hana.cspr
 D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Release\netcoreapp3.1\HiSql.Hana.csproj.CopyComplete
 D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Release\netcoreapp3.1\HiSql.Hana.dll
 D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Release\netcoreapp3.1\HiSql.Hana.pdb
+D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Release\netcoreapp3.1\HiSql.Hana.csproj.AssemblyReference.cache

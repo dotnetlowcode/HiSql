@@ -8,7 +8,7 @@
     ".NETCoreApp,Version=v5.0": {
       "HiSql.SqlServerUnitTest/1.0.0": {
         "dependencies": {
-          "HiSql": "1.0.2.3",
+          "HiSql": "1.0.2.5",
           "HiSql.SNRO": "1.0.0.1",
           "HiSql.SqlServer": "1.0.2.3",
           "Newtonsoft.Json": "13.0.1"
@@ -179,7 +179,7 @@
         }
       },
       "System.Security.Principal.Windows/4.7.0": {},
-      "HiSql/1.0.2.3": {
+      "HiSql/1.0.2.5": {
         "dependencies": {
           "Microsoft.Extensions.Caching.Memory": "6.0.0",
           "Newtonsoft.Json": "13.0.1"
@@ -190,7 +190,7 @@
       },
       "HiSql.SNRO/1.0.0.1": {
         "dependencies": {
-          "HiSql": "1.0.2.3",
+          "HiSql": "1.0.2.5",
           "Microsoft.Extensions.Caching.Memory": "6.0.0"
         },
         "runtime": {
@@ -199,7 +199,7 @@
       },
       "HiSql.SqlServer/1.0.2.3": {
         "dependencies": {
-          "HiSql": "1.0.2.3",
+          "HiSql": "1.0.2.5",
           "System.Data.SqlClient": "4.8.2"
         },
         "runtime": {
@@ -347,7 +347,7 @@
       "path": "system.security.principal.windows/4.7.0",
       "hashPath": "system.security.principal.windows.4.7.0.nupkg.sha512"
     },
-    "HiSql/1.0.2.3": {
+    "HiSql/1.0.2.5": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

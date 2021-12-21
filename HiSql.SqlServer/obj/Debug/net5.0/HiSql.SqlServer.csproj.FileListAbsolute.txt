@@ -21,6 +21,7 @@ D:\Project\OpenSource\HiSql\HiSql.SqlServer\bin\Debug\net5.0\ref\HiSql.SqlServer
 D:\Project\OpenSource\HiSql\HiSql.SqlServer\bin\Debug\net5.0\HiSql.SqlServer.pdb
 D:\Project\OpenSource\HiSql\HiSql.SqlServer\bin\Debug\net5.0\HiSql.dll
 D:\Project\OpenSource\HiSql\HiSql.SqlServer\bin\Debug\net5.0\HiSql.pdb
+D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\net5.0\HiSql.SqlServer.csproj.AssemblyReference.cache
 D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\net5.0\HiSql.SqlServer.Properties.Resources.resources
 D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\net5.0\HiSql.SqlServer.csproj.GenerateResource.cache
 D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\net5.0\HiSql.SqlServer.GeneratedMSBuildEditorConfig.editorconfig

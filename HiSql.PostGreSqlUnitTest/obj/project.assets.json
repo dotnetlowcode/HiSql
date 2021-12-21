@@ -137,7 +137,7 @@
           "buildTransitive/netcoreapp3.1/_._": {}
         }
       },
-      "HiSql/1.0.2.3": {
+      "HiSql/1.0.2.5": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
@@ -155,7 +155,7 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
-          "HiSql": "1.0.2.3",
+          "HiSql": "1.0.2.5",
           "Npgsql": "5.0.7"
         },
         "compile": {
@@ -455,7 +455,7 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "HiSql/1.0.2.3": {
+    "HiSql/1.0.2.5": {
       "type": "project",
       "path": "../HiSql/HiSql.csproj",
       "msbuildProject": "../HiSql/HiSql.csproj"
@@ -468,7 +468,7 @@
   },
   "projectFileDependencyGroups": {
     "net5.0": [
-      "HiSql >= 1.0.2.3",
+      "HiSql >= 1.0.2.5",
       "HiSql.PostGreSql >= 1.0.2.3"
     ]
   },
