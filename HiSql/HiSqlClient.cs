@@ -51,6 +51,9 @@ namespace HiSql
             codeFirst.SqlClient = this;
         }
 
+        
+
+
         //public ICache MCache
         //{
         //    get { return _mcache; }

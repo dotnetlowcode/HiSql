@@ -31,9 +31,12 @@ namespace HiSql
         static void Delete_Demo(HiSqlClient sqlClient)
         {
 
-            Dictionary<string, string> _dic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "DID", "1" }  };
+            Dictionary<string, string> _dic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "HID", "1" }  };
 
-            IDelete dic_delete = sqlClient.Delete("H_Test", _dic);
+            IDelete where_delete = sqlClient.Delete("H_Test", new { Hid = 1 }).Where("HID=1");
+            string _where_sql = where_delete.ToSql();
+
+            IDelete dic_delete = sqlClient.Delete("H_Test", new { Hid=1});
             string _dicsql = dic_delete.ToSql();
 
 

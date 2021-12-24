@@ -940,27 +940,32 @@ namespace HiSql
 
         public IQuery Where(Filter where)
         {
-            if (where != null && where.Elements.Count > 0)
-            {
-                if (!where.IsBracketOk)
-                    throw new Exception("指定了括号[(,)] 但没有成对出现");
-
-                _list_filter = where.Elements;
-                foreach (FilterDefinition filterDefinition in _list_filter)
+            if (!_queue.HasQueue("where"))
+            { 
+                if (where != null && where.Elements.Count > 0)
                 {
-                    if (string.IsNullOrEmpty(filterDefinition.Field.TabName) && !this.IsMultiSubQuery)
-                    {
-                        filterDefinition.Field.TabName = _table.TabName;
-                        filterDefinition.Field.AsTabName = _table.AsTabName;
-                    }
-                }
+                    if (!where.IsBracketOk)
+                        throw new Exception("指定了括号[(,)] 但没有成对出现");
 
-                if (_queue.Queue.Where(q => q == "where").Count() == 0)
-                    _queue.Add("where");
-                else
-                    throw new Exception($"不允许多次指定where条件");
-            }
-            _where = where;
+                    _list_filter = where.Elements;
+                    foreach (FilterDefinition filterDefinition in _list_filter)
+                    {
+                        if (string.IsNullOrEmpty(filterDefinition.Field.TabName) && !this.IsMultiSubQuery)
+                        {
+                            filterDefinition.Field.TabName = _table.TabName;
+                            filterDefinition.Field.AsTabName = _table.AsTabName;
+                        }
+                    }
+
+                    if (_queue.Queue.Where(q => q == "where").Count() == 0)
+                        _queue.Add("where");
+                    else
+                        throw new Exception($"不允许多次指定where条件");
+                }
+                _where = where;
+
+            }else
+                throw new Exception($"已经指定了一个Where 不允许重复指定");
             return this;
         }
 
@@ -972,15 +977,20 @@ namespace HiSql
         public IQuery Where(string sqlwhere)
         {
             //需要检测语法
-            if (string.IsNullOrEmpty(sqlwhere.Trim()))
+            if (!_queue.HasQueue("where"))
             {
-                throw new Exception($"指定的hisql where语句[{sqlwhere}]为空");
+                if (string.IsNullOrEmpty(sqlwhere.Trim()))
+                {
+                    throw new Exception($"指定的hisql where语句[{sqlwhere}]为空");
+                }
+
+                Filter where = new Filter() { sqlwhere };
+
+                _where = where;
+                _queue.Add("where");
             }
-
-            Filter where = new Filter() { sqlwhere };
-
-            _where = where;
-
+            else
+                throw new Exception($"已经指定了一个Where 不允许重复指定");
             return this;
         }
 

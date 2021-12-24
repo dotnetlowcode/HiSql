@@ -36,9 +36,10 @@ namespace HiSql.UnitTest
 
         static void Update_Demo3(HiSqlClient sqlClient)
         {
-            string _sql = sqlClient.Update("Hi_FieldModel", new { TabName = "HTest01", FieldName = "UName",Regex= @"^[\w]+[^']$" }).Only("Regex").ToSql();
-            sqlClient.Update("Hi_FieldModel", new { TabName = "HTest01", FieldName = "UName", Regex = @"^[\w]+[^']$" }).Only("Regex").ExecCommand();
+            //string _sql = sqlClient.Update("Hi_FieldModel", new { TabName = "HTest01", FieldName = "UName",Regex= @"^[\w]+[^']$" }).Only("Regex").ToSql();
+            //sqlClient.Update("Hi_FieldModel", new { TabName = "HTest01", FieldName = "UTYP", Regex = @"" }).Only("Regex").ExecCommand();
 
+            sqlClient.Update("HTest01", new { SID = "0", UTYP = "U4", UName = "hisql", Age = 36, Salary = 11, Descript = "hisql" }).ExecCommand();
         }
 
         static void Update_Demo2(HiSqlClient sqlClient)
@@ -91,24 +92,26 @@ namespace HiSql.UnitTest
 
             IUpdate update = sqlClient.Update("H_TEST", new { DID = 1, UNAME = "UTYPE" ,UNAME2= "user123" }).Exclude("UNAME");//,
 
-            int _effect = sqlClient.Update("H_TEST", new { DID = 1, UNAME = "UTYPE", UNAME2 = "user123" }).Exclude("UNAME").ExecCommand();
+            //int _effect = sqlClient.Update("H_TEST", new { DID = 1, UNAME = "UTYPE", UNAME2 = "user123" }).Exclude("UNAME").ExecCommand();
             string _sql = update.ToSql();
             Console.WriteLine(_sql);
 
 
             IUpdate update1 = sqlClient.Update("H_TEST").Set(new { UNAME2 = "TEST" }).Where(new Filter { { "DID", OperType.GT, 8 } });
-            int _effect1 = sqlClient.Update("H_TEST").Set(new { UNAME2 = "TEST" }).Where(new Filter { { "DID", OperType.GT, 8 } }).ExecCommand();
+            IUpdate update1_2 = sqlClient.Update("H_TEST").Set(new { UNAME2 = "TEST" }).Where("DID>8");
+            //int _effect1 = sqlClient.Update("H_TEST").Set(new { UNAME2 = "TEST" }).Where(new Filter { { "DID", OperType.GT, 8 } }).ExecCommand();
             string _sql1 = update1.ToSql();
+            string _sql12 = update1_2.ToSql();
             Console.WriteLine(_sql1);
 
             IUpdate update2 = sqlClient.Update<H_Test>(new H_Test {DID=1 ,UNAME2="Haha1"}).Only("UNAME2");
-            int _effect2 = sqlClient.Update<H_Test>(new H_Test { DID = 1, UNAME2 = "Haha1" }).Only("UNAME2").ExecCommand();
+            //int _effect2 = sqlClient.Update<H_Test>(new H_Test { DID = 1, UNAME2 = "Haha1" }).Only("UNAME2").ExecCommand();
             string _sql2 = update2.ToSql();
             Console.WriteLine(_sql2);
 
              
             IUpdate update3 = sqlClient.Update("H_TEST", new List<object> { new { DID = 1,   UNAME2 = "user123" }, new { DID = 2,   UNAME2 = "user124" } }).Only("UNAME2");
-            int _effect3 = sqlClient.Update("H_TEST", new List<object> { new { DID = 1, UNAME2 = "user123" }, new { DID = 2, UNAME2 = "user124" } }).Only("UNAME2").ExecCommand();
+            //int _effect3 = sqlClient.Update("H_TEST", new List<object> { new { DID = 1, UNAME2 = "user123" }, new { DID = 2, UNAME2 = "user124" } }).Only("UNAME2").ExecCommand();
             string _sql3 = update3.ToSql();
             Console.WriteLine(_sql3);
 

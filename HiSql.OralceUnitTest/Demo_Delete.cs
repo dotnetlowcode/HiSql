@@ -62,6 +62,11 @@ namespace HiSql.OralceUnitTest
         }
         static void Delete_Demo(HiSqlClient sqlClient)
         {
+            IDelete where_delete = sqlClient.Delete("H_Test").Where("DID=1");
+            string _where_sql = where_delete.ToSql();
+
+
+
             IDelete delete = sqlClient.Delete("H_Test");
             //int _effect = sqlClient.Delete("H_Test").ExecCommand();
             string _sql = delete.ToSql();

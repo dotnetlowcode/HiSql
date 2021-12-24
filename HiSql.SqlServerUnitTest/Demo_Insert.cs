@@ -54,12 +54,30 @@ namespace HiSql
             //Demo1_Insert3(sqlClient);
             //Demo1_Insert4(sqlClient);
             //Demo1_Insert5(sqlClient);
-            Demo1_Insert6(sqlClient);
+            //Demo1_Insert6(sqlClient);
+            Demo1_Insert7(sqlClient);
             //Demo_dynamic(sqlClient);
+        }
+
+        //测试 表校验检测
+        static void Demo1_Insert7(HiSqlClient sqlClient)
+        {
+            ///
+            //sqlClient.Modi("H_UType", new List<object> {
+            //    new { UTYP = "U1", UTypeName = "普通用户" },
+            //    new { UTYP = "U2", UTypeName = "中级用户" },
+            //    new { UTYP = "U3", UTypeName = "高级用户" }
+            //}).ExecCommand();
+
+            //sqlClient.Update("Hi_FieldModel", new { TabName = "HTest01", FieldName = "UTYP", Regex = @"" ,IsRefTab=true,RefTab= "H_UType",RefField="UTYP", RefFields = "UTYP,UTypeName",RefFieldDesc= "类型编码,类型名称",RefWhere="UTYP<>''" }).ExecCommand();
+            //sqlClient.Update("Hi_FieldModel", new { TabName = "HTest01", FieldName = "UName", Regex = @"^[\w]+[^']$" ,IsRefTab=false,RefTab= "",RefField="", RefFields = "",RefFieldDesc= "",RefWhere="" }).ExecCommand();
+
+            sqlClient.Insert("HTest01", new { SID = "0", UTYP = "U4", UName = "hisql", Age = 36, Salary = 11, Descript = "hisql" }).ExecCommand();
+
         }
         static void Demo1_Insert6(HiSqlClient sqlClient)
         {
-            int v = sqlClient.Insert("H_Test", new H_Test() { Hid=1, UserName="tansar", UserAge=33, ReName="tgm", CreateTime=DateTime.Now, CreateName="tansar" , ModiTime=DateTime.Now, ModiName ="tansar"}).ExecCommand();
+            int v = sqlClient.Insert("H_Test", new H_Test() { Hid=1, UserName="tansar", UserAge=33, ReName="tgm", CreateTime=DateTime.Now, CreateName="tansara" , ModiTime=DateTime.Now, ModiName ="tansarb"}).ExecCommand();
         }
 
         static void Demo1_Insert5(HiSqlClient sqlClient)
@@ -127,7 +145,7 @@ namespace HiSql
 
 
 
-            sqlClient.Insert("HTest01", new { SID = "0", UName = " hisql" , Age = 36, Salary =11, Descript ="hisql"}).ExecCommand();
+            sqlClient.Insert("HTest01", new { SID = "0", UTYP= "U1", UName = "hisql" , Age = 36, Salary =11, Descript ="hisql"}).ExecCommand();
             //string _sql = sqlClient.Modi("H_Test", lstdyn).ToSql(); 
             //string _sql = sqlClient.Insert("H_Test", lstdyn).ToSql(); 
 

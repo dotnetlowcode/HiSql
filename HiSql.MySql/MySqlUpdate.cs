@@ -75,7 +75,11 @@ namespace HiSql
                     }
                 }
 
-                if (this.Wheres.Count > 0)
+                if (this.Filters != null && this.Filters.IsHiSqlWhere && !string.IsNullOrEmpty(this.Filters.HiSqlWhere.Trim()))
+                {
+                    sql_where = Context.DMTab.BuilderWhereSql(new List<TableDefinition> { this.Table }, dictabinfo, null, this.Filters.WhereParse.Result, false);
+                }
+                else if (this.Wheres.Count > 0)
                 {
                     sql_where = Context.DMTab.BuilderWhereSql(new List<TableDefinition> { this.Table }, dictabinfo, null, this.Wheres, false);
                 }

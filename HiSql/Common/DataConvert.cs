@@ -36,6 +36,7 @@ namespace HiSql
 
         }
 
+
         public static List<T> ToList<T>(IDataReader dataReader) 
         {
             List<T> lst = new List<T>();
@@ -330,6 +331,31 @@ namespace HiSql
                 }
             }
             return list;
+        }
+
+        static public List<string> DataTableFieldToList(DataTable dt, string field)
+        {
+            List<string> lst = new List<string>();
+            if (dt != null && dt.Columns.Contains(field) && dt.Rows.Count > 0)
+            {
+                foreach (DataRow drow in dt.Rows)
+                {
+                    lst.Add(drow[field].ToString());
+                }
+            }
+            return lst;
+        }
+        static public HashSet<string> DataTableFieldToHashSet(DataTable dt, string field)
+        {
+            HashSet<string> hash = new HashSet<string>();
+            if (dt != null && dt.Columns.Contains(field) && dt.Rows.Count > 0)
+            {
+                foreach (DataRow drow in dt.Rows)
+                {
+                    hash.Add(drow[field].ToString());
+                }
+            }
+            return hash;
         }
     }
 }

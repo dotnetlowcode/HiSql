@@ -73,18 +73,27 @@ namespace HiSql
                     }   
                 }
 
-                if (this.Wheres.Count > 0)
+                if (this.Filters != null && this.Filters.IsHiSqlWhere && !string.IsNullOrEmpty(this.Filters.HiSqlWhere.Trim()))
+                {
+                    //throw new Exception($"已经指定了按指定数据集合删除就不能再指定Where条件删除");
+                    sql_where=Context.DMTab.BuilderWhereSql(new List<TableDefinition> { this.Table }, dictabinfo, null, this.Filters.WhereParse.Result, false);
+                }
+                else if (this.Wheres.Count > 0)
                 {
                     sql_where= Context.DMTab.BuilderWhereSql(new List<TableDefinition> { this.Table }, dictabinfo, null, this.Wheres, false);
                 }
 
+                Tuple<List<Dictionary<string, string>>, List<Dictionary<string, string>>> rtn_check = this.CheckAllData(this.Table, tabinfo, _field, this.Data, _isonly);
+                int _idx = 0;
                 foreach (object obj in this.Data)
                 {
-                    Tuple<Dictionary<string, string>, Dictionary<string, string>> result = this.CheckData(_isdic,this.Table, obj, (IDMInitalize)Context.DMInitalize, tabinfo, _field, _isonly);
-                    if (result.Item1.Count > 0)
-                    {
-                        sb.AppendLine(Context.DMTab.BuildUpdateSql(tabinfo, this.Table, result.Item1, result.Item2, sql_where));
-                    }
+                    //Tuple<Dictionary<string, string>, Dictionary<string, string>> result = this.CheckData(_isdic,this.Table, obj, (IDMInitalize)Context.DMInitalize, tabinfo, _field, _isonly);
+                    //if (result.Item1.Count > 0)
+                    //{
+                    //    sb.AppendLine(Context.DMTab.BuildUpdateSql(tabinfo, this.Table, result.Item1, result.Item2, sql_where));
+                    //}
+                    sb.AppendLine(Context.DMTab.BuildUpdateSql(tabinfo, this.Table, rtn_check.Item1[_idx], rtn_check.Item2[_idx], sql_where));
+                    _idx++;
                 }
             }
             else

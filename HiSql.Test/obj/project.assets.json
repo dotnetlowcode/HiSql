@@ -254,7 +254,7 @@
           }
         }
       },
-      "HiSql/1.0.2.5": {
+      "HiSql/1.0.2.6": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
@@ -268,11 +268,11 @@
           "bin/placeholder/HiSql.dll": {}
         }
       },
-      "HiSql.SqlServer/1.0.2.3": {
+      "HiSql.SqlServer/1.0.2.6": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
-          "HiSql": "1.0.2.5",
+          "HiSql": "1.0.2.6",
           "System.Data.SqlClient": "4.8.2"
         },
         "compile": {
@@ -865,12 +865,12 @@
         "version.txt"
       ]
     },
-    "HiSql/1.0.2.5": {
+    "HiSql/1.0.2.6": {
       "type": "project",
       "path": "../HiSql/HiSql.csproj",
       "msbuildProject": "../HiSql/HiSql.csproj"
     },
-    "HiSql.SqlServer/1.0.2.3": {
+    "HiSql.SqlServer/1.0.2.6": {
       "type": "project",
       "path": "../HiSql.SqlServer/HiSql.SqlServer.csproj",
       "msbuildProject": "../HiSql.SqlServer/HiSql.SqlServer.csproj"
@@ -878,8 +878,8 @@
   },
   "projectFileDependencyGroups": {
     "net5.0": [
-      "HiSql >= 1.0.2.5",
-      "HiSql.SqlServer >= 1.0.2.3",
+      "HiSql >= 1.0.2.6",
+      "HiSql.SqlServer >= 1.0.2.6",
       "Newtonsoft.Json >= 13.0.1",
       "System.Data.SqlClient >= 4.8.2"
     ]

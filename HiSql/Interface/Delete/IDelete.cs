@@ -30,6 +30,13 @@ namespace HiSql
 
         IDelete Where(Filter where);
 
+        /// <summary>
+        /// 删除数据条件 自定义Hisql条件
+        /// </summary>
+        /// <param name="sqlwhere"></param>
+        /// <returns></returns>
+        IDelete Where(string sqlwhere);
+
         IDelete TrunCate(string tabname);
 
         /// <summary>

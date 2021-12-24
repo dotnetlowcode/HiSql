@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "6JH+fG0S1lDNjaS38XMI5AE9kjxBiDXHpnPZ/YzGaMAPRY0z+WQCkQ38iq3jPSFiWkZuOM2JS4MH7BpHlML4jA==",
+  "dgSpecHash": "bDvq0qIhG2cFtm593N0vAJ/kzkUlLgXsCDBdVQnqs0OpbhTreTcWILWLxrJm6XzZEBpUOL6hxyf7nGh1tOgzpw==",
   "success": true,
   "projectFilePath": "D:\\Project\\OpenSource\\HiSql\\HiSql.HanaUnitTest\\HiSql.HanaUnitTest\\HiSql.HanaUnitTest.csproj",
   "expectedPackageFiles": [
