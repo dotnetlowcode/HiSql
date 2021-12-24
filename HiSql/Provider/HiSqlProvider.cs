@@ -169,7 +169,15 @@ namespace HiSql
         public ICodeFirst CodeFirst => throw new NotImplementedException();
 
 
-
+        /// <summary>
+        /// 根据当前配置 克隆一个新的连接
+        /// 1.0.2.6 以上版本才支持
+        /// </summary>
+        /// <returns></returns>
+        public HiSqlClient CloneClient()
+        {
+            return new HiSqlClient(_currentConnectionConfig);
+        }
 
 
 

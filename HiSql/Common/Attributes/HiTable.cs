@@ -192,6 +192,9 @@ namespace HiSql
         bool _isSys = false;
         bool _isNull = true;//默认允许NULL 如果是主键则需要默认false
 
+
+        bool _custombllkey = false;
+
         bool _isrequire = false;
         bool _isobsolete = false;
 
@@ -314,7 +317,9 @@ namespace HiSql
         public bool IsPrimary
         {
             get { return _isPrimary; }
-            set { _isPrimary = value; }
+
+            //如果没有指定Bllkey 那么是主键的情况下就默认为BLLkey 如果指定了就按指定的
+            set { _isPrimary = value;if (!_custombllkey && _isPrimary) { _isBllKey = _isPrimary; } }
         }
         /// <summary>
         /// 是否自增长
@@ -340,7 +345,7 @@ namespace HiSql
         public bool IsBllKey
         {
             get { return _isBllKey; }
-            set { _isBllKey = value; }
+            set { _isBllKey = value; _custombllkey = true; }
         }
         /// <summary>
         /// 是否忽略
@@ -469,12 +474,14 @@ namespace HiSql
 
         public bool IsStandardField()
         {
-            if (this.ColumnName.ToLower().IsIn<string>("createtime", "createname", "moditime", "modiname"))
-            {
-                return true;
-            }
-            else
-                return false;
+
+            return Constants.IsStandardField(this.ColumnName);
+            //if (this.ColumnName.ToLower().IsIn<string>("createtime", "createname", "moditime", "modiname"))
+            //{
+            //    return true;
+            //}
+            //else
+            //    return false;
         }
 
         public bool IsCreateField()

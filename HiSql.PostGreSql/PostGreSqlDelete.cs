@@ -45,7 +45,12 @@ namespace HiSql
                 Type type = this.Data[0].GetType();
                 bool _isdic = type == typeof(Dictionary<string, string>);
 
-                if (this.Wheres.Count > 0)
+                if (this.Filters != null && this.Filters.IsHiSqlWhere && !string.IsNullOrEmpty(this.Filters.HiSqlWhere.Trim()))
+                {
+                    throw new Exception($"已经指定了按指定数据集合删除就不能再指定Where条件删除");
+                    //sql_where=Context.DMTab.BuilderWhereSql(new List<TableDefinition> { this.Table }, dictabinfo, null, this.Filters.WhereParse.Result, false);
+                }
+                else if (this.Wheres.Count > 0)
                 {
                     sql_where = Context.DMTab.BuilderWhereSql(new List<TableDefinition> { this.Table }, dictabinfo, null, this.Wheres, false);
                 }
@@ -63,7 +68,11 @@ namespace HiSql
             }
             else
             {
-                if (this.Wheres.Count > 0)
+                if (this.Filters != null && this.Filters.IsHiSqlWhere && !string.IsNullOrEmpty(this.Filters.HiSqlWhere.Trim()))
+                {
+                    sql_where = Context.DMTab.BuilderWhereSql(new List<TableDefinition> { this.Table }, dictabinfo, null, this.Filters.WhereParse.Result, false);
+                }
+                else if (this.Wheres.Count > 0)
                 {
                     sql_where = Context.DMTab.BuilderWhereSql(new List<TableDefinition> { this.Table }, dictabinfo, null, this.Wheres, false);
                 }

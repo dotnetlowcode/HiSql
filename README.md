@@ -32,7 +32,58 @@
 传统ORM框架最大的弊端就是完全要依赖于实体用lambda表达式写查询语句，但最大的问题就是如果业务场景需要动态拼接条件时只能又切换到原生数据库的sql语句进行完成，如果自行拼接开发人员还要解决防注入的问题,hisql 刚才完美的解决这些问题,Hisql底层已经对sql注入进行了处理，开发人员只要关注于业务开发
 
 
- `HiSql`不仅仅是一个ORM框架而且是一个`HiSql` SQL语句 如下所示
+
+### 2021.12.24 更新
+1. 新增配置通过正则表达式校验字段值功能
+2. 新增配置某字段值的必须是在某一关联表中存在的校验
+3. bug 更新
+#### 通过正则表达式匹配字段值是否符合要求
+
+平常在系统开发的过程中如用户名 对用户名的规则是有命名规则要求的,如果前端没做判断的话是直接可以写入到数据库中`HiSql` 提供了这种可以校验配置
+
+举例在表`HTest01` 中的字段`UName` (用户名)  如果该用户名只允许数字和字母那么我们可以做一下演示
+```c#
+
+//在系统表Hi_FieldModel 中对表HTest01 的字段加上正则配置 Regex
+
+sqlClient.Update("Hi_FieldModel", new { TabName = "HTest01", FieldName = "UName", Regex = @"^[\w]+[^']$" }).ExecCommand();
+
+
+//执行插入数据
+sqlClient.Insert("HTest01", new { SID = "0", UTYP = "U4", UName = "test hisql ", Age = 36, Salary = 11, Descript = "hisql" }).ExecCommand();
+
+
+
+```
+以上代码会抛出异常 因为UName赋的值 `test hisql ` 有空格不符合正则表达式`^[\w]+[^']$`
+错误显示如：`列[UName]值[dd hisql] 不符合业务配置 ^[\w]+[^']$ 要求`
+
+这样就可以把逻辑性的错误数据拦截在系统之外
+
+
+#### 通过关联表校验
+举例在表`HTest01` 中的字段`UTYP` (用户类型)  这个类型值在表`H_UType` 中 我们做一下演示
+
+```c#
+//在表中添加用户类型 Modi方法的意思是 如果存在则更新没有则插入
+            sqlClient.Modi("H_UType", new List<object> {
+                new { UTYP = "U1", UTypeName = "普通用户" },
+                new { UTYP = "U2", UTypeName = "中级用户" },
+                new { UTYP = "U3", UTypeName = "高级用户" }
+            }).ExecCommand();
+
+// 增加表校验配置
+sqlClient.Update("Hi_FieldModel", new { TabName = "HTest01", FieldName = "UTYP", IsRefTab=true,RefTab= "H_UType",RefField="UTYP", RefFields = "UTYP,UTypeName",RefFieldDesc= "类型编码,类型名称",RefWhere="UTYP<>''" }).ExecCommand();
+
+//执行数据插入
+sqlClient.Insert("HTest01", new { SID = "0", UTYP = "U4", UName = "hisql", Age = 36, Salary = 11, Descript = "hisql" }).ExecCommand();
+
+```
+以上代码会抛出异常 因为 `UTYP` 指定的值`U4` 不存在于表 `H_UType`  中
+错误显示如：`字段[UTYP]配置了表检测 值 [U4] 在表[H_UType]不存在`
+
+
+
 
 
 
@@ -40,7 +91,7 @@
 
 通过这个更新hisql 全面支持select 常用语法
 
-
+ `HiSql`不仅仅是一个ORM框架而且是一个`HiSql` SQL语句 如下更新所示
 #### hisql 语句实现 group by having
 ```c#
 string sql = sqlClient.HiSql($"select FieldName,count(*) as scount  from Hi_FieldModel group by FieldName,  Having count(*) > 0   order by fieldname").ToSql();

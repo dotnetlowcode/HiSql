@@ -62,6 +62,7 @@ namespace HiSql
         IUpdate Set(object obj);
         IUpdate Set(params string[] fields);
 
+        IUpdate Where(string sqlwhere);
         IUpdate Where(Filter where);
 
         /// <summary>
@@ -75,7 +76,7 @@ namespace HiSql
 
 
         Tuple<Dictionary<string, string>, Dictionary<string, string>> CheckData(bool isDic, TableDefinition table, object objdata, IDMInitalize dMInitalize, TabInfo tabinfo, List<string> fields, bool isonly);
-
+        Tuple<List<Dictionary<string, string>>, List<Dictionary<string, string>>> CheckAllData(TableDefinition table, TabInfo tabinfo, List<string> fields, List<object> lstdata, bool isonly);
 
     }
 }

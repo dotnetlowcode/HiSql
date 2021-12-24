@@ -14,6 +14,7 @@ namespace HiSql
         List<FilterDefinition> _list_filter = new List<FilterDefinition>();
         List<object> _list_data = new List<object>();
         bool _isnodblog = false;
+        Filter _where;
         public HiSqlProvider Context { get; set; }
         public TableDefinition Table
         {
@@ -26,6 +27,11 @@ namespace HiSql
         public List<object> Data
         {
             get { return _list_data; }
+        }
+
+        public Filter Filters
+        {
+            get { return _where; }
         }
 
         /// <summary>
@@ -181,7 +187,27 @@ namespace HiSql
                 throw new Exception($"已经指定了Delete 不允许再指定TrunCate");
             return this;
         }
+        public IDelete Where(string sqlwhere)
+        {
+            //需要检测语法
+            if (!_queue.HasQueue("where"))
+            {
+                if (string.IsNullOrEmpty(sqlwhere.Trim()))
+                {
+                    throw new Exception($"指定的hisql where语句[{sqlwhere}]为空");
+                }
 
+                Filter where = new Filter() { sqlwhere };
+
+                _where = where;
+                _queue.Add("where");
+
+            }
+            else
+                throw new Exception($"已经指定了一个Where 不允许重复指定");
+            return this;
+          
+        }
         public IDelete Where(Filter where)
         {
             if (!_queue.HasQueue("table"))
@@ -233,7 +259,7 @@ namespace HiSql
             else throw new Exception($"找不到相关表信息");
         }
 
-        private Dictionary<string, string> CheckDeleteData(bool isDic,bool isRequireKey, List<PropertyInfo> attrs, List<HiColumn> hiColumns, object objdata)
+        private Dictionary<string, string> CheckDeleteData(bool isDic, bool isRequireKey, List<PropertyInfo> attrs, List<HiColumn> hiColumns, object objdata)
         {
 
             Dictionary<string, string> _values = new Dictionary<string, string>();
@@ -241,6 +267,10 @@ namespace HiSql
             Dictionary<string, string> _dic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             if (isDic)
                 _dic = (Dictionary<string, string>)objdata;
+
+            if (!hiColumns.Any(h => h.IsBllKey))
+                throw new Exception($"该表无主键无法用指定数据删除请在Delete方法后用Where的方式进行操作");
+
             foreach (HiColumn hiColumn in hiColumns)
             {
                 if (!isDic)
@@ -268,11 +298,12 @@ namespace HiSql
                         }
                         _value = _vobj.ToString();
                     }
-                    if (hiColumn.IsBllKey && objprop == null && isRequireKey)
+                    if (hiColumn.IsBllKey && objprop == null)//&& isRequireKey
                     {
+                        //默认如果有主键或业务字段则删除是必填 不则会报错
                         throw new Exception($"字段[{hiColumn.ColumnName}] 为业务主键或表主键 删除表数据时必填");
                     }
-                    else if (hiColumn.IsBllKey && isRequireKey && objprop != null)
+                    else //if (hiColumn.IsBllKey && isRequireKey && objprop != null)
                     {
                         if (hiColumn.FieldType.IsIn<HiType>(HiType.NVARCHAR, HiType.NCHAR, HiType.GUID))
                         {
@@ -302,9 +333,16 @@ namespace HiSql
                             _values.Add(hiColumn.ColumnName, $"'{_value}'");
                         }
                     }
+
                 }
                 else
                 {
+
+                    if (hiColumn.IsBllKey && !_dic.ContainsKey(hiColumn.ColumnName))// && isRequireKey
+                    {
+                        //默认如果有主键或业务字段则删除是必填 不则会报错
+                        throw new Exception($"字段[{hiColumn.ColumnName}] 为业务主键或表主键 删除表数据时必填");
+                    }
                     if (_dic.ContainsKey(hiColumn.ColumnName))
                     {
                         _value = _dic[hiColumn.ColumnName].ToString();
@@ -312,7 +350,7 @@ namespace HiSql
                         {
                             throw new Exception($"字段[{hiColumn.ColumnName}] 为必填 无法数据提交");
                         }
-                        if (hiColumn.IsBllKey && isRequireKey  )
+                        if (hiColumn.IsBllKey && isRequireKey)
                         {
                             if (hiColumn.FieldType.IsIn<HiType>(HiType.NVARCHAR, HiType.NCHAR, HiType.GUID))
                             {
@@ -347,17 +385,17 @@ namespace HiSql
                     else
                     {
 
-                        if (hiColumn.IsBllKey && isRequireKey)
+                        if (hiColumn.IsBllKey && !_dic.ContainsKey(hiColumn.ColumnName))
                         {
                             throw new Exception($"字段[{hiColumn.ColumnName}] 为业务主键或表主键 删除表数据时必填");
                         }
-                        if (hiColumn.IsRequire)
-                            throw new Exception($"字段[{hiColumn.ColumnName}] 为必填 无法数据提交");
-                        else
-                            continue;
+                        //if (hiColumn.IsRequire)
+                        //    throw new Exception($"字段[{hiColumn.ColumnName}] 为必填 无法数据提交");
+                        //else
+                        //    continue;
                     }
 
-                    
+
                 }
                 //else if (!isRequireKey && objprop != null)
                 //{ 

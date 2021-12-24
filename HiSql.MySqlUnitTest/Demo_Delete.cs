@@ -65,6 +65,11 @@ namespace HiSql.MySqlUnitTest
 
             Dictionary<string, string> _dic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "DID", "1" } };
 
+
+            IDelete where_delete = sqlClient.Delete("H_Test").Where("DID=1");
+            string _where_sql = where_delete.ToSql();
+
+
             IDelete dic_delete = sqlClient.Delete("H_Test", _dic);
             string _dicsql = dic_delete.ToSql();
 

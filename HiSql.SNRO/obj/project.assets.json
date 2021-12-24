@@ -125,7 +125,7 @@
           "buildTransitive/netcoreapp3.1/_._": {}
         }
       },
-      "HiSql/1.0.2.5": {
+      "HiSql/1.0.2.6": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
@@ -409,7 +409,7 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "HiSql/1.0.2.5": {
+    "HiSql/1.0.2.6": {
       "type": "project",
       "path": "../HiSql/HiSql.csproj",
       "msbuildProject": "../HiSql/HiSql.csproj"
@@ -417,7 +417,7 @@
   },
   "projectFileDependencyGroups": {
     "net5.0": [
-      "HiSql >= 1.0.2.5",
+      "HiSql >= 1.0.2.6",
       "Microsoft.Extensions.Caching.Memory >= 6.0.0"
     ]
   },

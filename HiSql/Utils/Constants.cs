@@ -9,7 +9,10 @@ using System.Threading.Tasks;
 namespace HiSql
 {
 
-
+    /// <summary>
+    /// author:tansar
+    /// mail:tansar@126.com
+    /// </summary>
     public  static class Constants
     {
         public static Type IntType = typeof(int);
@@ -68,6 +71,81 @@ namespace HiSql
 
         private static List<string> _dbCurrentSpport ;
         private static List<string> _dbSpport;
+
+
+        /// <summary>
+        /// 判断是否是标准字段
+        /// </summary>
+        /// <param name="columname"></param>
+        /// <returns></returns>
+        public static bool IsStandardField(string columname)
+        {
+            if (columname.ToLower().IsIn<string>("createtime", "createname", "moditime", "modiname"))
+            {
+                return true;
+            }
+            else
+                return false;
+        }
+        /// <summary>
+        /// 判断是否是标准日期字段(创建或修改）
+        /// </summary>
+        /// <param name="columname"></param>
+        /// <returns></returns>
+        public static bool IsStandardTimeField(string columname)
+        {
+            if (columname.ToLower().IsIn<string>("createtime",  "moditime"))
+            {
+                return true;
+            }
+            else
+                return false;
+        }
+
+        /// <summary>
+        /// 判断是否是标准用户字段(创建或修改)
+        /// </summary>
+        /// <param name="columname"></param>
+        /// <returns></returns>
+        public static bool IsStandardUserField(string columname)
+        {
+            if (columname.ToLower().IsIn<string>("createname", "modiname"))
+            {
+                return true;
+            }
+            else
+                return false;
+        }
+
+        /// <summary>
+        /// 是否创建字段
+        /// </summary>
+        /// <param name="columname"></param>
+        /// <returns></returns>
+        public static bool IsStandardCreateField(string columname)
+        {
+            if (columname.ToLower().IsIn<string>("createname", "createtime"))
+            {
+                return true;
+            }
+            else
+                return false;
+        }
+
+        /// <summary>
+        /// 是否修改字段
+        /// </summary>
+        /// <param name="columname"></param>
+        /// <returns></returns>
+        public static bool IsStandardModiField(string columname)
+        {
+            if (columname.ToLower().IsIn<string>("moditime", "modiname"))
+            {
+                return true;
+            }
+            else
+                return false;
+        }
 
 
         /// <summary>

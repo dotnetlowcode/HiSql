@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v5.0": {
-      "HiSql/1.0.2.5": {
+      "HiSql/1.0.2.6": {
         "dependencies": {
           "Microsoft.Extensions.Caching.Memory": "6.0.0",
           "Newtonsoft.Json": "13.0.1"
@@ -105,7 +105,7 @@
     }
   },
   "libraries": {
-    "HiSql/1.0.2.5": {
+    "HiSql/1.0.2.6": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
