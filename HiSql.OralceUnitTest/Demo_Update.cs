@@ -30,10 +30,14 @@ namespace HiSql.OralceUnitTest
 
         public static void Init(HiSqlClient sqlClient)
         {
-            Update_Demo(sqlClient);
+            //Update_Demo(sqlClient);
+            Update_Demo4(sqlClient);
         }
 
-
+        static void Update_Demo4(HiSqlClient sqlClient)
+        {
+            sqlClient.Update("H_Test").Set(new { UNAME = "UTYPE" }).Where("DID=1").ExecCommand();
+        }
         static void Update_Demo(HiSqlClient sqlClient)
         {
             IUpdate update = sqlClient.Update("H_Test", new { DID = 1, UNAME = "UTYPE", UNAME2 = "user123" }).Exclude("UNAME");//,

@@ -26,8 +26,18 @@ namespace HiSql
         }
         public static void Init(HiSqlClient sqlClient)
         {
-            Delete_Demo(sqlClient);
+            //Delete_Demo(sqlClient);
+            Delete_Demo2(sqlClient);
         }
+
+        static void Delete_Demo2(HiSqlClient sqlClient)
+        {
+            IDelete delete3 = sqlClient.Delete("H_Test4", new List< object>
+            { new { UNAME2  = "user'123" }, new { UNAME2  = "user124" } });
+            //int _effect3 = sqlClient.Delete("H_Test", new List&lt;object&gt; { new { UNAME2 = "user123" }, new { UNAME2 = "user124" } }).ExecCommand();
+            string _sql3 = delete3.ToSql();
+        }
+
         static void Delete_Demo(HiSqlClient sqlClient)
         {
 

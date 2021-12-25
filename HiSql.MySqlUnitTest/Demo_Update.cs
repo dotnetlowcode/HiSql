@@ -30,10 +30,14 @@ namespace HiSql.MySqlUnitTest
 
         public static void Init(HiSqlClient sqlClient)
         {
-            Update_Demo(sqlClient);
+            //Update_Demo(sqlClient);
+            Update_Demo4(sqlClient);
         }
 
-
+        static void Update_Demo4(HiSqlClient sqlClient)
+        {
+            sqlClient.Update("H_Test").Set(new { UNAME = "UTYPE" }).Where("DID=1").ExecCommand();
+        }
         static void Update_Demo(HiSqlClient sqlClient)
         {
 

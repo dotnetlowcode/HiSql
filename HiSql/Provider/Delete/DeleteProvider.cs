@@ -280,7 +280,7 @@ namespace HiSql
                     {
 
                         if (hiColumn.IsRequire)
-                            throw new Exception($"字段[{objprop.Name}] 为必填 无法数据提交");
+                            throw new Exception($"字段[{hiColumn.ColumnName}] 为必填 无法数据提交");
                         else
                             continue;
 
@@ -292,7 +292,7 @@ namespace HiSql
                         if (_vobj == null)
                         {
                             if (hiColumn.IsRequire)
-                                throw new Exception($"字段[{objprop.Name}] 为必填 无法数据提交");
+                                throw new Exception($"字段[{hiColumn.ColumnName}] 为必填 无法数据提交");
                             else
                                 continue;
                         }
