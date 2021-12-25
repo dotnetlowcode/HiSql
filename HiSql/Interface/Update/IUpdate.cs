@@ -59,10 +59,32 @@ namespace HiSql
         IUpdate Exclude(params string[] fields);
 
 
+        /// <summary>
+        /// 更新字段,可以是一个匿名类
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         IUpdate Set(object obj);
+
+        /// <summary>
+        /// 暂不支持
+        /// </summary>
+        /// <param name="fields"></param>
+        /// <returns></returns>
         IUpdate Set(params string[] fields);
 
+        /// <summary>
+        /// hisql 语法更新条件
+        /// </summary>
+        /// <param name="sqlwhere"></param>
+        /// <returns></returns>
         IUpdate Where(string sqlwhere);
+
+        /// <summary>
+        /// 更新条件
+        /// </summary>
+        /// <param name="where"></param>
+        /// <returns></returns>
         IUpdate Where(Filter where);
 
         /// <summary>
@@ -72,11 +94,15 @@ namespace HiSql
         int ExecCommand();
 
 
+        /// <summary>
+        /// 生成该数据库类型的原生sql
+        /// </summary>
+        /// <returns></returns>
         string ToSql();
 
 
         Tuple<Dictionary<string, string>, Dictionary<string, string>> CheckData(bool isDic, TableDefinition table, object objdata, IDMInitalize dMInitalize, TabInfo tabinfo, List<string> fields, bool isonly);
-        Tuple<List<Dictionary<string, string>>, List<Dictionary<string, string>>> CheckAllData(TableDefinition table, TabInfo tabinfo, List<string> fields, List<object> lstdata, bool isonly);
+        Tuple<List<Dictionary<string, string>>, List<Dictionary<string, string>>> CheckAllData(TableDefinition table, TabInfo tabinfo, List<string> fields, List<object> lstdata,bool hisqlwhere, bool isonly);
 
     }
 }

@@ -351,7 +351,7 @@ namespace HiSql
         /// <param name="hiColumns"></param>
         /// <param name="lstdata"></param>
         /// <returns></returns>
-        public Tuple<List<Dictionary<string, string>>, List<Dictionary<string, string>>> CheckAllData(TableDefinition table,TabInfo tabinfo, List<string> fields, List<object> lstdata, bool isonly)
+        public Tuple<List<Dictionary<string, string>>, List<Dictionary<string, string>>> CheckAllData(TableDefinition table,TabInfo tabinfo, List<string> fields, List<object> lstdata, bool hisqlwhere, bool isonly)
         {
             Tuple<List<Dictionary<string, string>>, List<Dictionary<string, string>>> rtn = new Tuple<List<Dictionary<string, string>>, List<Dictionary<string, string>>>(null, null);
             if (table != null)
@@ -394,7 +394,7 @@ namespace HiSql
                                 {
                                     _value = "";
                                     #region 判断必填字段
-                                    if (hiColumn.IsBllKey && !_o.ContainsKey(hiColumn.ColumnName))
+                                    if (hiColumn.IsBllKey && !_o.ContainsKey(hiColumn.ColumnName) && !hisqlwhere)
                                     {
                                         throw new Exception($"行[{_rowidx}] 字段[{hiColumn.ColumnName}] 为业务主键或表主键 更新表数据时必填");
                                     }
@@ -499,7 +499,7 @@ namespace HiSql
 
 
                                     #region 判断必填字段
-                                    if (hiColumn.IsBllKey && !_o.ContainsKey(hiColumn.ColumnName))
+                                    if (hiColumn.IsBllKey && !_o.ContainsKey(hiColumn.ColumnName) && !hisqlwhere)
                                     {
                                         throw new Exception($"行[{_rowidx}] 字段[{hiColumn.ColumnName}] 为业务主键或表主键 更新表数据时必填");
                                     }
@@ -586,7 +586,7 @@ namespace HiSql
                                 _value = "";
                                 var objprop = attrs.Where(p => p.Name.ToLower() == hiColumn.ColumnName.ToLower()).FirstOrDefault();
                                 #region  判断必填 及自增长
-                                if (hiColumn.IsRequire && !hiColumn.IsIdentity && objprop == null)
+                                if (hiColumn.IsRequire && !hiColumn.IsIdentity && objprop == null && !hisqlwhere)
                                 {
                                     throw new Exception($"行[{_rowidx}] 缺少字段[{hiColumn.ColumnName}] 为必填字段");
                                 }

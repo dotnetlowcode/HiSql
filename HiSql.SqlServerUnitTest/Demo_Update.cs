@@ -31,7 +31,13 @@ namespace HiSql.UnitTest
         {
             //Update_Demo(sqlClient);
             //Update_Demo2(sqlClient);
-            Update_Demo3(sqlClient);
+            //Update_Demo3(sqlClient);
+            Update_Demo4(sqlClient);
+        }
+
+        static void Update_Demo4(HiSqlClient sqlClient)
+        {
+            string _sql=sqlClient.Update("HTest01").Set(new { UTYP = "U3" }).Where("SID=0").ToSql();
         }
 
         static void Update_Demo3(HiSqlClient sqlClient)

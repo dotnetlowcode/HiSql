@@ -72,7 +72,7 @@
       }
     },
     "D:\\Project\\OpenSource\\HiSql\\HiSql.Hana\\HiSql.Hana.csproj": {
-      "version": "1.0.2.6",
+      "version": "1.0.2.7",
       "restore": {
         "projectUniqueName": "D:\\Project\\OpenSource\\HiSql\\HiSql.Hana\\HiSql.Hana.csproj",
         "projectName": "HiSql.Hana",
@@ -230,7 +230,7 @@
       }
     },
     "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj": {
-      "version": "1.0.2.6",
+      "version": "1.0.2.7",
       "restore": {
         "projectUniqueName": "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj",
         "projectName": "HiSql",

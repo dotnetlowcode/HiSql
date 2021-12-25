@@ -1,17 +1,3 @@
-D:\Project\NETCORE\HiSql.Oracle\bin\Release\net5.0\HiSql.Oracle.deps.json
-D:\Project\NETCORE\HiSql.Oracle\bin\Release\net5.0\HiSql.Oracle.dll
-D:\Project\NETCORE\HiSql.Oracle\bin\Release\net5.0\ref\HiSql.Oracle.dll
-D:\Project\NETCORE\HiSql.Oracle\bin\Release\net5.0\HiSql.Oracle.pdb
-D:\Project\NETCORE\HiSql.Oracle\obj\Release\net5.0\HiSql.Oracle.GeneratedMSBuildEditorConfig.editorconfig
-D:\Project\NETCORE\HiSql.Oracle\obj\Release\net5.0\HiSql.Oracle.AssemblyInfoInputs.cache
-D:\Project\NETCORE\HiSql.Oracle\obj\Release\net5.0\HiSql.Oracle.AssemblyInfo.cs
-D:\Project\NETCORE\HiSql.Oracle\obj\Release\net5.0\HiSql.Oracle.csproj.CoreCompileInputs.cache
-D:\Project\NETCORE\HiSql.Oracle\obj\Release\net5.0\HiSql.Oracle.dll
-D:\Project\NETCORE\HiSql.Oracle\obj\Release\net5.0\ref\HiSql.Oracle.dll
-D:\Project\NETCORE\HiSql.Oracle\obj\Release\net5.0\HiSql.Oracle.pdb
-D:\Project\NETCORE\HiSql.Oracle\obj\Release\net5.0\HiSql.Oracle.csprojAssemblyReference.cache
-D:\Project\NETCORE\HiSql.Oracle\obj\Release\net5.0\HiSql.Oracle.Properties.Resources.resources
-D:\Project\NETCORE\HiSql.Oracle\obj\Release\net5.0\HiSql.Oracle.csproj.GenerateResource.cache
 D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Release\net5.0\HiSql.Oracle.deps.json
 D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Release\net5.0\HiSql.Oracle.dll
 D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Release\net5.0\ref\HiSql.Oracle.dll
@@ -28,4 +14,3 @@ D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Release\net5.0\HiSql.Oracle.csproj.
 D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Release\net5.0\HiSql.Oracle.dll
 D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Release\net5.0\ref\HiSql.Oracle.dll
 D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Release\net5.0\HiSql.Oracle.pdb
-D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Release\net5.0\HiSql.Oracle.csproj.AssemblyReference.cache

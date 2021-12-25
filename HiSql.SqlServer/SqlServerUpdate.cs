@@ -34,6 +34,7 @@ namespace HiSql
             //SqlServerDM sqldm = null;
             TabInfo tabinfo;
             string sql_where = string.Empty;
+            bool _hisqlwhere = false;
             if (this.Table != null)
             {
                 //sqldm=  Instance.CreateInstance<SqlServerDM>($"{Constants.NameSpace}.{this.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
@@ -76,14 +77,15 @@ namespace HiSql
                 if (this.Filters != null && this.Filters.IsHiSqlWhere && !string.IsNullOrEmpty(this.Filters.HiSqlWhere.Trim()))
                 {
                     //throw new Exception($"已经指定了按指定数据集合删除就不能再指定Where条件删除");
-                    sql_where=Context.DMTab.BuilderWhereSql(new List<TableDefinition> { this.Table }, dictabinfo, null, this.Filters.WhereParse.Result, false);
+                    _hisqlwhere = true;
+                    sql_where =Context.DMTab.BuilderWhereSql(new List<TableDefinition> { this.Table }, dictabinfo, null, this.Filters.WhereParse.Result, false);
                 }
                 else if (this.Wheres.Count > 0)
                 {
                     sql_where= Context.DMTab.BuilderWhereSql(new List<TableDefinition> { this.Table }, dictabinfo, null, this.Wheres, false);
                 }
 
-                Tuple<List<Dictionary<string, string>>, List<Dictionary<string, string>>> rtn_check = this.CheckAllData(this.Table, tabinfo, _field, this.Data, _isonly);
+                Tuple<List<Dictionary<string, string>>, List<Dictionary<string, string>>> rtn_check = this.CheckAllData(this.Table, tabinfo, _field, this.Data, _hisqlwhere, _isonly);
                 int _idx = 0;
                 foreach (object obj in this.Data)
                 {

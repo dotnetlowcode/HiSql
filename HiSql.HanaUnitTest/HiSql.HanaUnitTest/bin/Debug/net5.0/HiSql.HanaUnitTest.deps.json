@@ -8,8 +8,8 @@
     ".NETCoreApp,Version=v5.0": {
       "HiSql.HanaUnitTest/1.0.0": {
         "dependencies": {
-          "HiSql": "1.0.2.6",
-          "HiSql.Hana": "1.0.2.6",
+          "HiSql": "1.0.2.7",
+          "HiSql.Hana": "1.0.2.7",
           "Sap.Data.Hana.Core.v2.1": "2.8.22.0"
         },
         "runtime": {
@@ -141,7 +141,7 @@
           }
         }
       },
-      "HiSql/1.0.2.6": {
+      "HiSql/1.0.2.7": {
         "dependencies": {
           "Microsoft.Extensions.Caching.Memory": "6.0.0",
           "Newtonsoft.Json": "13.0.1"
@@ -150,9 +150,9 @@
           "HiSql.dll": {}
         }
       },
-      "HiSql.Hana/1.0.2.6": {
+      "HiSql.Hana/1.0.2.7": {
         "dependencies": {
-          "HiSql": "1.0.2.6",
+          "HiSql": "1.0.2.7",
           "System.Data.Odbc": "5.0.0"
         },
         "runtime": {
@@ -259,12 +259,12 @@
       "path": "system.runtime.compilerservices.unsafe/6.0.0",
       "hashPath": "system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512"
     },
-    "HiSql/1.0.2.6": {
+    "HiSql/1.0.2.7": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "HiSql.Hana/1.0.2.6": {
+    "HiSql.Hana/1.0.2.7": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

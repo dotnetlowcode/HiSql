@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "dCJPMhuXjleIaPlgaj5mXr3/qm6AZVWxyzxm9gO+CMndF37FJs685s0AbYQ4Ir/d3NHgNvSz7DOkvvYf3ml2qA==",
+  "dgSpecHash": "cqtSW2qFJrhHsL272rNcaOmx/KpKl5RROkl9nll8qa0gBBCGCRRRZvhjpADNuxdzJw39SQhJLQU3BeP8uBqbbA==",
   "success": true,
   "projectFilePath": "D:\\Project\\OpenSource\\HiSql\\HiSql.PostGreSql\\HiSql.PostGreSql.csproj",
   "expectedPackageFiles": [
