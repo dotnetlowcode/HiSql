@@ -6,6 +6,9 @@
     <Company>Hone</Company>
     <Version>1.0.2.7</Version>
     <Description>该包支持Oracle数据库 依赖于HiSql.dll包运行</Description>
+    <ApplicationIcon>hisql-oracle-logo.ico</ApplicationIcon>
+    <PackageIcon>hisql-oracle-logo.jpg</PackageIcon>
+    <PackageIconUrl />
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,6 +32,13 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Data\hisql-oracle-logo.jpg">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

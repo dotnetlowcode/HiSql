@@ -1007,10 +1007,10 @@ namespace HiSql
                                   .ToTable(ref _total);
 
                             }
-                            
-                            if (data != null && data.Rows.Count>0)
+
+                            if (data != null && data.Rows.Count > 0)
                             {
-                                
+
                                 if (data.Rows.Count == _psize)
                                 {
                                     //源表值比较大
@@ -1036,10 +1036,10 @@ namespace HiSql
                             }
 
                         }
-                        
+
                     }
                 }
-                
+
 
                 #endregion
 
