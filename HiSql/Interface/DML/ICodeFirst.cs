@@ -14,7 +14,7 @@ namespace HiSql
         /// <summary>
         /// 安装初始化HiSql
         /// </summary>
-        void InstallHisql();
+        Task InstallHisql();
 
 
         /// <summary>

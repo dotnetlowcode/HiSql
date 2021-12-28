@@ -16,12 +16,12 @@ namespace HiSql
     {
 
 
-        
+
 
         #region 委托事件
-        public delegate DataTable deleGetTable(string sql, params HiParameter[] parameters);
-        public delegate int deleExecCommand(string sql, params HiParameter[] parameters);
-        public delegate object deleExecScalar(string sql);
+        public delegate Task<DataTable> deleGetTable(string sql, params HiParameter[] parameters);
+        public delegate Task<int> deleExecCommand(string sql, params HiParameter[] parameters);
+        public delegate Task<object> deleExecScalar(string sql);
         //public delegate string deleGetTable(string sql, object parameters);
 
         #endregion
@@ -33,7 +33,7 @@ namespace HiSql
         /// 连接库连接上下文
         /// </summary>
         public virtual HiSqlProvider Context { get; set; }
-        
+
         private string _keyParameter = "@";
 
         private CommandType _cmdtype = CommandType.Text;
@@ -52,8 +52,9 @@ namespace HiSql
         /// 从库连接列表(一主多从)
         /// 后期需要实现动态感知从库 及从库的连接 分布
         /// </summary>
-        public virtual List<IDbConnection> SlaveConnections {
-            get;set;
+        public virtual List<IDbConnection> SlaveConnections
+        {
+            get; set;
         }
         /// <summary>
         /// 是否开启SQL 日志
@@ -73,7 +74,7 @@ namespace HiSql
         /// </summary>
         /// <summary>
         /// <summary>
-        public CommandType CmdTyp { get=>_cmdtype; set=>_cmdtype=value ; }
+        public CommandType CmdTyp { get => _cmdtype; set => _cmdtype = value; }
 
         /// <summary>
         /// 设置参数前辍符号 默认@
@@ -100,11 +101,11 @@ namespace HiSql
         /// <returns></returns>
         public bool IsAutoClose()
         {
-            return this.Context.CurrentConnectionConfig.IsAutoClose && this.Transaction == null; 
+            return this.Context.CurrentConnectionConfig.IsAutoClose && this.Transaction == null;
         }
         public AdoProvider()
         {
-            
+
 
             this.CmdTyp = CommandType.Text;//默认
             this.CommandTimeOut = 300;//超时 秒
@@ -143,7 +144,7 @@ namespace HiSql
 
         }
 
-        
+
 
         public virtual void CommitTran()
         {
@@ -229,13 +230,16 @@ namespace HiSql
             throw new NotImplementedException();
         }
 
-        public int ExecCommand(string sql, object parameters)
+        int IDataBase.ExecCommand(string sql, object parameters)
         {
             throw new NotImplementedException();
         }
 
-
         private int execCommand(string sql, params HiParameter[] parameters)
+        {
+            return this.ExecCommandAsync(sql, parameters).ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+        private async Task<int> execCommandAsync(string sql, params HiParameter[] parameters)
         {
             int count = 0;
             bool hassError = false;
@@ -265,8 +269,8 @@ namespace HiSql
                     }
                 }
                 #endregion
-                IDbCommand sqlCommand = GetCommand(sql, parameters);
-                count = sqlCommand.ExecuteNonQuery();
+                DbCommand sqlCommand = GetCommand(sql, parameters);
+                count = await sqlCommand.ExecuteNonQueryAsync();
                 sqlCommand.Dispose();
 
                 #region 执行后操作
@@ -276,7 +280,8 @@ namespace HiSql
                     //执行后日志记录
                     if (OnLogSqlExecuted != null)
                     {
-                        Task.Run(() => {
+                        Task.Run(() =>
+                        {
                             OnLogSqlExecuted(sql, parameters);
                         });
 
@@ -290,7 +295,7 @@ namespace HiSql
                 CmdTyp = CommandType.Text;
                 hassError = true;
                 ExecuteError(sql, parameters, E);
-                _e = E; 
+                _e = E;
                 //throw E;
             }
             finally
@@ -311,12 +316,13 @@ namespace HiSql
         /// <param name="sql"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public virtual int ExecCommand(string sql, params HiParameter[] parameters)
+        public async Task<int> ExecCommandAsync(string sql, params HiParameter[] parameters)
         {
             if (Context.CurrentConnectionConfig.UpperCase)
                 sql = sql.ToUpper();
-            deleExecCommand _deleExecCommand = new deleExecCommand(execCommand);
-            var workTask = Task.Run(() => _deleExecCommand.Invoke(sql, parameters));
+            //deleExecCommand _deleExecCommand = new deleExecCommand(execCommandAsync);
+            //Task.Run(() => _deleExecCommand.Invoke(sql, parameters));
+            var workTask = execCommandAsync(sql, parameters); 
             bool flag = workTask.Wait(this.Context.CurrentConnectionConfig.SqlExecTimeOut, new CancellationToken(false));
             if (flag)
             {
@@ -326,13 +332,16 @@ namespace HiSql
             {
                 if (OnTimeOut != null)
                 {
-                    Task.Run(() => { OnTimeOut(this.Context.CurrentConnectionConfig.SqlExecTimeOut); });
+                    OnTimeOut.BeginInvoke(this.Context.CurrentConnectionConfig.SqlExecTimeOut, (s) =>
+                    {
+                    }, null);
+                    // Task.Run(() => { OnTimeOut(this.Context.CurrentConnectionConfig.SqlExecTimeOut); });
                 }
             }
             return workTask.Result;
         }
 
-        private object execScalar(string sql)
+        private async Task<object> execScalar(string sql)
         {
             object _effect = null;
             bool hassError = false;
@@ -362,9 +371,9 @@ namespace HiSql
                     }
                 }
                 #endregion
-                IDbCommand sqlCommand = GetCommand(sql, null);
-                _effect = sqlCommand.ExecuteScalar();
-                if (_effect == null) _effect = 1; 
+                DbCommand sqlCommand = GetCommand(sql, null);
+                _effect = await sqlCommand.ExecuteScalarAsync();
+                if (_effect == null) _effect = 1;
                 sqlCommand.Dispose();
 
                 #region 执行后操作
@@ -374,7 +383,8 @@ namespace HiSql
                     //执行后日志记录
                     if (OnLogSqlExecuted != null)
                     {
-                        Task.Run(() => {
+                        Task.Run(() =>
+                        {
                             OnLogSqlExecuted(sql, null);
                         });
 
@@ -423,7 +433,7 @@ namespace HiSql
             }
             return workTask.Result;
         }
-      
+
 
         public IDataReader GetDataReader(string sql, object parameters)
         {
@@ -468,13 +478,14 @@ namespace HiSql
                     //执行后日志记录
                     if (OnLogSqlExecuted != null)
                     {
-                        Task.Run(() => {
+                        Task.Run(() =>
+                        {
                             OnLogSqlExecuted(sql, parameters);
                         });
 
                     }
                 }
-                
+
                 //ChooseConnectionEnd(sql);
 
 
@@ -487,10 +498,10 @@ namespace HiSql
                 ExecuteError(sql, parameters, E);
                 throw E;
             }
-            
 
 
-           
+
+
         }
 
         //public DataTable GetDataTable(string sql, object parameters)
@@ -502,7 +513,7 @@ namespace HiSql
         //}
 
 
-        private DataTable getDataTable(string sql, params HiParameter[] parameters)
+        private async Task<DataTable> getDataTable(string sql, params HiParameter[] parameters)
         {
             try
             {
@@ -532,7 +543,7 @@ namespace HiSql
                 //IDataReader sqlDataReader = sqlCommand.ExecuteReader(this.IsAutoClose() ? CommandBehavior.CloseConnection : CommandBehavior.Default);
                 IDataAdapter dataAdapter = this.GetAdapter();
                 DbCommand sqlCommand = GetCommand(sql, parameters);
-               
+
                 this.SetCommandToAdapter(dataAdapter, sqlCommand);
                 DataSet ds = new DataSet();
                 dataAdapter.Fill(ds);
@@ -557,7 +568,8 @@ namespace HiSql
                     //执行后日志记录
                     if (OnLogSqlExecuted != null)
                     {
-                        Task.Run(() => {
+                        Task.Run(() =>
+                        {
                             OnLogSqlExecuted(sql, parameters);
                         });
 
@@ -585,7 +597,7 @@ namespace HiSql
                 sql = sql.ToUpper();
             deleGetTable _deleGetTable = new deleGetTable(getDataTable);
             var workTask = Task.Run(() => _deleGetTable.Invoke(sql, parameters));
-            bool flag = workTask.Wait(this.Context.CurrentConnectionConfig.SqlExecTimeOut, new CancellationToken(false)) ;
+            bool flag = workTask.Wait(this.Context.CurrentConnectionConfig.SqlExecTimeOut, new CancellationToken(false));
             if (flag)
             {
                 //在指定的时间内完成
@@ -602,9 +614,9 @@ namespace HiSql
             //return getDataTable(sql, parameters);
         }
 
-        
 
-        
+
+
 
 
         #region 委托事件
@@ -643,7 +655,7 @@ namespace HiSql
         {
             if (OnSqlError != null)
             {
-                OnSqlError(new HiSqlException(this.Context,E,sql));
+                OnSqlError(new HiSqlException(this.Context, E, sql));
             }
         }
         #endregion
@@ -656,7 +668,7 @@ namespace HiSql
             {
                 foreach (var item in parameters)
                 {
-                    
+
                     Type type = item.Value.GetType();
                     if ((type != Constants.ByteArrayType && type.IsArray == false && item.IsArray == false) || type.FullName.IsList())
                     {
@@ -675,7 +687,7 @@ namespace HiSql
 
                         //参数前辍仅支持@
                         //其实也可以用正则表达式匹配
-                        if (item.ParameterName.Substring(0, 1) == this._keyParameter  && !type.FullName.IsList())
+                        if (item.ParameterName.Substring(0, 1) == this._keyParameter && !type.FullName.IsList())
                         {
                             sql = sql.Replace(this._keyParameter + item.ParameterName.Substring(1), string.Join("", newValues.ToArray()).ToSqlValue());
                             ;
@@ -691,8 +703,8 @@ namespace HiSql
                         item.Value = DBNull.Value;
                     }
 
-                    
-                    
+
+
                 }
             }
         }
@@ -748,13 +760,13 @@ namespace HiSql
         void ChooseConnectionStart(string sql)
         {
             DBAction _dbaction = GetAction(sql);
-            if (this.Transaction == null && this.IsDisabledMasterSlave==false && _dbaction == DBAction.Select)
+            if (this.Transaction == null && this.IsDisabledMasterSlave == false && _dbaction == DBAction.Select)
             {
                 if (this.MasterConnection == null)
                 {
                     this.MasterConnection = this.Connection;
                 }
-                var slaves = this.Context.CurrentConnectionConfig.SlaveConnectionConfigs.Where(it=>it.Weight>0).ToList();
+                var slaves = this.Context.CurrentConnectionConfig.SlaveConnectionConfigs.Where(it => it.Weight > 0).ToList();
 
                 var currentIndex = UtilRandom.GetRandomIndex(slaves.ToDictionary(it => slaves.ToList().IndexOf(it), it => it.Weight));
 
@@ -788,6 +800,20 @@ namespace HiSql
             var result = connectionString1Array.Except(connectionString2Array);
             return result.Count() == 0;
         }
+
+
+
+        public Task<int> ExecCommandAsync(string sql, object parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int ExecCommand(string sql, params HiParameter[] parameters)
+        {
+            return this.execCommand(sql, parameters);
+        }
+
+
         #endregion
 
     }

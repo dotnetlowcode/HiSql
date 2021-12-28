@@ -25,7 +25,7 @@ namespace HiSql.MySqlUnitTest
             }
             public bool ISSYS { get; set; }
         }
-        
+
         public static void Init(HiSqlClient sqlClient)
         {
             //Demo1_Insert(sqlClient);
@@ -37,7 +37,7 @@ namespace HiSql.MySqlUnitTest
         }
 
 
-        static void Demo1_Modi2(HiSqlClient sqlClient)
+        static async void Demo1_Modi2(HiSqlClient sqlClient)
         {
             int _times = 100;
             Console.WriteLine($"[{_times}]条数据 mysql插入测试");
@@ -48,13 +48,13 @@ namespace HiSql.MySqlUnitTest
             }
             Stopwatch watch = Stopwatch.StartNew();
             //string _sql = sqlClient.Modi("Hi_Domain", lstobj).ToSql();
-            int _effect = sqlClient.Modi("H_TEST", lstobj).ExecCommand();
+            int _effect =  sqlClient.Modi("H_TEST", lstobj).ExecCommand();
 
             watch.Stop();
             Console.WriteLine($"[{_times}]条数据,耗时：{watch.Elapsed.ToString()}");
             Console.WriteLine(_effect);
         }
-        static void Demo1_Modi(HiSqlClient sqlClient)
+        static async Task Demo1_Modi(HiSqlClient sqlClient)
         {
             int _times = 500;
             Console.WriteLine($"[{_times}]条数据 mysql插入测试");
@@ -65,19 +65,19 @@ namespace HiSql.MySqlUnitTest
             }
             Stopwatch watch = Stopwatch.StartNew();
             //string _sql = sqlClient.Modi("Hi_Domain", lstobj).ToSql();
-            int _effect = sqlClient.Modi("Hi_Domain", lstobj).ExecCommand();
+            int _effect =  sqlClient.Modi("Hi_Domain", lstobj).ExecCommand();
 
             watch.Stop();
             Console.WriteLine($"[{_times}]条数据,耗时：{watch.Elapsed.ToString()}");
             Console.WriteLine(_effect);
         }
-        static void Demo3_Insert(HiSqlClient sqlClient)
+        static async void Demo3_Insert(HiSqlClient sqlClient)
         {
-            int v=sqlClient.Insert("H_TEST", new H_TEST { UNAME="tgm",UNAME2="tang",ISSYS=true }).ExecCommand();
+            int v =  sqlClient.Insert("H_TEST", new H_TEST { UNAME = "tgm", UNAME2 = "tang", ISSYS = true }).ExecCommand();
         }
 
 
-        static void Demo2_Insert(HiSqlClient sqlClient)
+        static async Task Demo2_Insert(HiSqlClient sqlClient)
         {
             int _times = 100;
             Console.WriteLine($"[{_times}]条数据 HANA插入测试");
@@ -95,7 +95,7 @@ namespace HiSql.MySqlUnitTest
             Console.WriteLine(_effect);
         }
 
-        static void Demo1_Insert(HiSqlClient sqlClient)
+        static async void Demo1_Insert(HiSqlClient sqlClient)
         {
 
             Dictionary<string, string> _dic_data = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "uname", "tansar" }, { "Uname2", "用户123" } };

@@ -11,11 +11,11 @@ namespace HiSql
 
     public class Demo_Insert
     {
-        class H_Test:StandField
+        class H_Test : StandField
         {
-           public int Hid
+            public int Hid
             {
-                get;set;
+                get; set;
             }
             public string UserName
             {
@@ -31,19 +31,19 @@ namespace HiSql
             }
             public DateTime CreateTime
             {
-                get;set;
+                get; set;
             }
             public string CreateName
             {
-                get;set;
+                get; set;
             }
             public DateTime ModiTime
             {
-                get;set;
+                get; set;
             }
             public string ModiName
             {
-                get;set;
+                get; set;
             }
 
         }
@@ -60,7 +60,7 @@ namespace HiSql
         }
 
         //测试 表校验检测
-        static void Demo1_Insert7(HiSqlClient sqlClient)
+        static async Task Demo1_Insert7(HiSqlClient sqlClient)
         {
             ///
             //sqlClient.Modi("H_UType", new List<object> {
@@ -72,23 +72,28 @@ namespace HiSql
             //sqlClient.Update("Hi_FieldModel", new { TabName = "HTest01", FieldName = "UTYP", Regex = @"" ,IsRefTab=true,RefTab= "H_UType",RefField="UTYP", RefFields = "UTYP,UTypeName",RefFieldDesc= "类型编码,类型名称",RefWhere="UTYP<>''" }).ExecCommand();
             //sqlClient.Update("Hi_FieldModel", new { TabName = "HTest01", FieldName = "UName", Regex = @"^[\w]+[^']$" ,IsRefTab=false,RefTab= "",RefField="", RefFields = "",RefFieldDesc= "",RefWhere="" }).ExecCommand();
 
-            sqlClient.Insert("HTest01", new { SID = "0", UTYP = "U4", UName = "hisql", Age = 36, Salary = 11, Descript = "hisql" }).ExecCommand();
+            await sqlClient.Insert("HTest01", new { SID = "0", UTYP = "U4", UName = "hisql", Age = 36, Salary = 11, Descript = "hisql" }).ExecCommandAsync();
 
         }
-        static void Demo1_Insert6(HiSqlClient sqlClient)
+        static async Task Demo1_Insert6(HiSqlClient sqlClient)
         {
-            int v = sqlClient.Insert("H_Test", new H_Test() { Hid=1, UserName="tansar", UserAge=33, ReName="tgm", CreateTime=DateTime.Now, CreateName="tansara" , ModiTime=DateTime.Now, ModiName ="tansarb"}).ExecCommand();
+            var table = sqlClient.Context.DMInitalize.BuildTabStru(typeof(H_Test));
+            var sql = sqlClient.Context.DMTab.BuildTabCreateSql(table.Item1, table.Item2);
+            var i= await sqlClient.Context.DBO.ExecCommandAsync(sql);
+            Console.WriteLine(i);
+            //int v = sqlClient.Insert("H_Test", new H_Test() { Hid = 1, UserName = "tansar", UserAge = 33, ReName = "tgm", CreateTime = DateTime.Now, CreateName = "tansara", ModiTime = DateTime.Now, ModiName = "tansarb" }).ExecCommand();
         }
 
-        static void Demo1_Insert5(HiSqlClient sqlClient)
+        static async Task Demo1_Insert5(HiSqlClient sqlClient)
         {
-            int v = sqlClient.Insert("H_Test3", new { descript = "hello world" }).ExecCommand();
+            var insertObj = sqlClient.Insert("H_TEST", new { descript = "hello world" });
+            int v = await insertObj.ExecCommandAsync();
             if (v > 0)
-            { 
-            
+            {
+
             }
         }
-        static void Demo_dynamic(HiSqlClient sqlClient)
+        static async Task Demo_dynamic(HiSqlClient sqlClient)
         {
             List<object> lstdyn = new List<object>();
             for (int i = 0; i < 10; i++)
@@ -145,7 +150,7 @@ namespace HiSql
 
 
 
-            sqlClient.Insert("HTest01", new { SID = "0", UTYP= "U1", UName = "hisql" , Age = 36, Salary =11, Descript ="hisql"}).ExecCommand();
+            sqlClient.Insert("HTest01", new { SID = "0", UTYP = "U1", UName = "hisql", Age = 36, Salary = 11, Descript = "hisql" }).ExecCommand();
             //string _sql = sqlClient.Modi("H_Test", lstdyn).ToSql(); 
             //string _sql = sqlClient.Insert("H_Test", lstdyn).ToSql(); 
 
@@ -160,7 +165,7 @@ namespace HiSql
         static void Demo1_Insert4(HiSqlClient sqlClient)
         {
             ///测试 非自增长且不允许为空且没有设置默认值且没有传值 
-            string _sql2 = sqlClient.Insert("H_Test", new Dictionary<string, object> { { "UserAge",34 },{ "Hid",5798 } }).ToSql();
+            string _sql2 = sqlClient.Insert("H_Test", new Dictionary<string, object> { { "UserAge", 34 }, { "Hid", 5798 } }).ToSql();
         }
 
 
@@ -179,10 +184,10 @@ namespace HiSql
             sqlClient.Modi<Dictionary<string, string>>("H_Test", list).ExecCommand();
             sqlClient.Modi<Dictionary<string, string>>("H_Test", list).ExecCommand();
         }
-        static void Demo1_Insert(HiSqlClient sqlClient)
+        static async void Demo1_Insert(HiSqlClient sqlClient)
         {
             //Dictionary<string, string> _dic_data = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { {"uname","tansar"},{ "Uname2","用户123"} };
-            string sql4= sqlClient.Modi("H_Test", new { Hid = 1, UserName = "tansar", UserAge = 100, ReName = "Tom" }).ToSql();
+            string sql4 = sqlClient.Modi("H_Test", new { Hid = 1, UserName = "tansar", UserAge = 100, ReName = "Tom" }).ToSql();
 
             //string _sql=sqlClient
             //    .Insert("H_TEST", new { UNAME = "UTYP10", UNAME2 = "用户类10" } )
@@ -195,14 +200,14 @@ namespace HiSql
 
             //string _sql2 = sqlClient.Insert<H_Test>(new H_Test { DID = 123, UNAME="UTYPEHA" ,UNAME2="TEST'" }).ToSql();
 
-            string _sql3= sqlClient.Modi("Hi_Domain", new List<object> { new { Domain = "10097", DomainDesc = "用户类型10097" }, new { Domain = "10098", DomainDesc = "用户类型10098" } }).ToSql();
+            string _sql3 = sqlClient.Modi("Hi_Domain", new List<object> { new { Domain = "10097", DomainDesc = "用户类型10097" }, new { Domain = "10098", DomainDesc = "用户类型10098" } }).ToSql();
             int _effect3 = sqlClient.Modi("Hi_Domain", new List<object> { new { Domain = "10097", DomainDesc = "用户类型10097" }, new { Domain = "10098", DomainDesc = "用户类型10098" } }).ExecCommand();
 
 
 
         }
 
-        static void Demo1_Insert2(HiSqlClient sqlClient)
+        static async Task Demo1_Insert2(HiSqlClient sqlClient)
         {
 
             int _times = 100000;
@@ -215,8 +220,7 @@ namespace HiSql
 
             string _sql = sqlClient
             .Insert("Hi_Domain", new { Domain = "UTYPE", DomainDesc = "用户类型" })
-            .Insert("Hi_Domain", new { Domain = "UTYPE2", DomainDesc = "用户类型2" }).ToSql()
-           ;
+            .Insert("Hi_Domain", new { Domain = "UTYPE2", DomainDesc = "用户类型2" }).ToSql();
             //int _effect=sqlClient
             //.Insert("Hi_Domain", new { Domain = "UTYPE", DomainDesc = "用户类型" })
             //.Insert("Hi_Domain", new { Domain = "UTYPE2", DomainDesc = "用户类型2" })

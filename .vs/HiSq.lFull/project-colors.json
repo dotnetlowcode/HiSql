@@ -45,7 +45,32 @@
       "ProjectGuid": "33758dde-1a27-4159-9fe4-fad7159d500f",
       "DisplayName": "HiSql.SNRO",
       "ColorIndex": 7
+    },
+    "9fe3ef44-5fc1-4468-b494-1779be3e0cd9": {
+      "ProjectGuid": "9fe3ef44-5fc1-4468-b494-1779be3e0cd9",
+      "DisplayName": "HiSql.Test",
+      "ColorIndex": 8
+    },
+    "1baf04b4-7038-441a-b892-ddb3d0bad506": {
+      "ProjectGuid": "1baf04b4-7038-441a-b892-ddb3d0bad506",
+      "DisplayName": "HiSql.Oracle",
+      "ColorIndex": 9
+    },
+    "755e1de4-1364-4f15-8841-83983db39c47": {
+      "ProjectGuid": "755e1de4-1364-4f15-8841-83983db39c47",
+      "DisplayName": "HiSql.Hana",
+      "ColorIndex": 10
+    },
+    "a956321e-c59b-4fcd-8ed8-f74f997cab86": {
+      "ProjectGuid": "a956321e-c59b-4fcd-8ed8-f74f997cab86",
+      "DisplayName": "HiSql.MySql",
+      "ColorIndex": 11
+    },
+    "2e1a94e3-92e7-437d-8a8b-2ed2c0cd7abf": {
+      "ProjectGuid": "2e1a94e3-92e7-437d-8a8b-2ed2c0cd7abf",
+      "DisplayName": "HiSql.PostGreSql",
+      "ColorIndex": 12
     }
   },
-  "NextColorIndex": 8
+  "NextColorIndex": 13
 }

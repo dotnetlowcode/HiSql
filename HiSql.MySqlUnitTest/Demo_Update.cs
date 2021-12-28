@@ -38,7 +38,7 @@ namespace HiSql.MySqlUnitTest
         {
             sqlClient.Update("H_Test").Set(new { UNAME = "UTYPE" }).Where("DID=1").ExecCommand();
         }
-        static void Update_Demo(HiSqlClient sqlClient)
+        static async void Update_Demo(HiSqlClient sqlClient)
         {
 
             Dictionary<string, string> _dic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "DID", "1" }, { "UNAME", "user123" } };

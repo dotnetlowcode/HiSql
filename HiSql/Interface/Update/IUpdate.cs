@@ -95,6 +95,13 @@ namespace HiSql
 
 
         /// <summary>
+        /// 执行结果
+        /// </summary>
+        /// <returns></returns>
+        Task<int> ExecCommandAsync();
+
+
+        /// <summary>
         /// 生成该数据库类型的原生sql
         /// </summary>
         /// <returns></returns>
