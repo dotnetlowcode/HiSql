@@ -57,6 +57,12 @@ namespace HiSql
         int ExecCommand();
 
         /// <summary>
+        /// 将当前操作向数据库执行
+        /// </summary>
+        /// <returns>返回受影响的行数</returns>
+        Task<int> ExecCommandAsync();
+
+        /// <summary>
         /// 将当前操作生成SQL语句
         /// </summary>
         /// <returns>返回SQL语法</returns>

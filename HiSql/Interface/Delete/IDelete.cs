@@ -45,6 +45,12 @@ namespace HiSql
         /// <returns></returns>
         int ExecCommand();
 
+        /// <summary>
+        /// 执行结果
+        /// </summary>
+        /// <returns></returns>
+        Task<int> ExecCommandAsync();
+
 
         string ToSql();
 

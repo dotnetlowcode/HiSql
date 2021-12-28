@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30717.126
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HiSql", "HiSql\HiSql.csproj", "{CA8150B8-C051-4DA4-A2E3-D0CF550321E5}"
 EndProject
@@ -28,6 +28,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HiSql.SNRO", "HiSql.SNRO\HiSql.SNRO.csproj", "{33758DDE-1A27-4159-9FE4-FAD7159D500F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HiSql.Test", "HiSql.Test\HiSql.Test.csproj", "{9FE3EF44-5FC1-4468-B494-1779BE3E0CD9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HiSql.SqlServer.Test", "HiSql.SqlServer.Test\HiSql.SqlServer.Test.csproj", "{F4E42882-38C5-4C4F-B28D-4F04437D3278}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -87,6 +89,10 @@ Global
 		{9FE3EF44-5FC1-4468-B494-1779BE3E0CD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9FE3EF44-5FC1-4468-B494-1779BE3E0CD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9FE3EF44-5FC1-4468-B494-1779BE3E0CD9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4E42882-38C5-4C4F-B28D-4F04437D3278}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4E42882-38C5-4C4F-B28D-4F04437D3278}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4E42882-38C5-4C4F-B28D-4F04437D3278}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4E42882-38C5-4C4F-B28D-4F04437D3278}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

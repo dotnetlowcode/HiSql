@@ -187,7 +187,7 @@ namespace HiSql
 
             if (!string.IsNullOrEmpty(this.ITabName))
             {
-                
+
                 //return   $"insert into   {this.ITabName}   {sb.ToString()} " ;
                 StringBuilder sb_struct = new StringBuilder();
                 HiTable hiTable = new HiTable();
@@ -205,15 +205,15 @@ namespace HiSql
 
                     tabInfo.Columns = this.ResultColumn;
 
-                    if(hiTable.TableType==TableType.Global)
+                    if (hiTable.TableType == TableType.Global)
                         hiTable.TabReName = hiTable.TabName.Substring(2) + "_" + System.Threading.Thread.CurrentThread.ManagedThreadId + "_" + hiTable.TabName.GetHashCode().ToString().Substring(1);
                     else
                         hiTable.TabReName = hiTable.TabName.Substring(2) + "_" + System.Threading.Thread.CurrentThread.ManagedThreadId + "_" + hiTable.TabName.GetHashCode().ToString().Substring(1);
 
 
                     string _sql = Context.DMTab.BuildTabCreateSql(tabInfo.TabModel, tabInfo.GetColumns);
-                    int _effect=Context.DBO.ExecCommand(_sql);
-
+                    Context.DBO.ExecCommand(_sql);
+                    //int _effect=await
                     //sb_struct.AppendLine(_sql);
                 }
                 sb_struct.AppendLine($"insert into   {dbConfig.Table_Pre}{this.ITabName}{dbConfig.Table_After}   {sb.ToString()} ");
@@ -221,7 +221,7 @@ namespace HiSql
 
             }
             else
-                return  sb.ToString();
+                return sb.ToString();
         }
         public override IQuery WithRank(DbRank rank, DbFunction dbFunction, string field, string asname, SortType sortType)
         {

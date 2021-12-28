@@ -62,7 +62,7 @@ namespace HiSql.UnitTest
             //Demo_Query.Init(sqlcient);
 
             //Demo_Delete.Init(sqlcient);
-            //Demo_Insert.Init(sqlcient);
+            Demo_Insert.Init(sqlcient);
             //DemoCodeFirst.Init(sqlcient);
             //Demo_Snro.Init(sqlcient);
             

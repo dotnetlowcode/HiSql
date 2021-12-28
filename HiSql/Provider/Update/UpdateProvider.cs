@@ -30,7 +30,8 @@ namespace HiSql
             get { return _table; }
         }
 
-        public List<FieldDefinition> FieldsOnly {
+        public List<FieldDefinition> FieldsOnly
+        {
             get { return _list_only_field; }
         }
 
@@ -52,8 +53,8 @@ namespace HiSql
             get { return _where; }
         }
         public UpdateProvider()
-        { 
-            
+        {
+
         }
         public IUpdate Exclude(params string[] fields)
         {
@@ -112,18 +113,23 @@ namespace HiSql
         }
 
 
-        public  int ExecCommand()
+        public int ExecCommand()
         {
             string _sql = this.ToSql();
-            
+
             return this.Context.DBO.ExecCommand(_sql);
         }
+        public Task<int> ExecCommandAsync()
+        {
+            string _sql = this.ToSql();
 
-        
+            return this.Context.DBO.ExecCommandAsync(_sql);
+        }
+
 
         public virtual string ToSql()
         {
-            
+
             //请重写该方法
             return "";
         }
@@ -134,7 +140,7 @@ namespace HiSql
             {
                 _table = new TableDefinition(tabname);
                 _queue.Add("table");
-               
+
             }
             else
             {
@@ -187,7 +193,7 @@ namespace HiSql
                 }
                 else
                     _list_data = lstdata;
-                
+
                 _queue.Add("table|list");
             }
             else
@@ -197,7 +203,7 @@ namespace HiSql
 
         public IUpdate Set(object obj)
         {
-            if (_queue.HasQueue("table",true))
+            if (_queue.HasQueue("table", true))
             {
                 if (!_queue.HasQueue("set"))
                 {
@@ -254,14 +260,14 @@ namespace HiSql
                     _list_filter = where.Elements;
                     foreach (FilterDefinition filterDefinition in _list_filter)
                     {
-                        if (string.IsNullOrEmpty(filterDefinition.Field.TabName) )
+                        if (string.IsNullOrEmpty(filterDefinition.Field.TabName))
                         {
                             filterDefinition.Field.TabName = _table.TabName;
                             filterDefinition.Field.AsTabName = _table.AsTabName;
                         }
                     }
                     _queue.Add("where");
-                    
+
                 }
 
             }
@@ -351,7 +357,7 @@ namespace HiSql
         /// <param name="hiColumns"></param>
         /// <param name="lstdata"></param>
         /// <returns></returns>
-        public Tuple<List<Dictionary<string, string>>, List<Dictionary<string, string>>> CheckAllData(TableDefinition table,TabInfo tabinfo, List<string> fields, List<object> lstdata, bool hisqlwhere, bool isonly)
+        public Tuple<List<Dictionary<string, string>>, List<Dictionary<string, string>>> CheckAllData(TableDefinition table, TabInfo tabinfo, List<string> fields, List<object> lstdata, bool hisqlwhere, bool isonly)
         {
             Tuple<List<Dictionary<string, string>>, List<Dictionary<string, string>>> rtn = new Tuple<List<Dictionary<string, string>>, List<Dictionary<string, string>>>(null, null);
             if (table != null)
@@ -495,7 +501,7 @@ namespace HiSql
                                 {
                                     _value = "";
 
-                                    
+
 
 
                                     #region 判断必填字段
@@ -550,11 +556,11 @@ namespace HiSql
                                             }
 
                                         }
-                                        
+
                                         #endregion
 
 
-                                       
+
                                     }
                                 }
 
@@ -751,7 +757,7 @@ namespace HiSql
                                     else
                                     {
                                         //string _sql=DataTableFieldToList(data, hiColumn.RefField).ToArray().ToSqlIn(true);
-                                        _hash = DataConvert. DataTableFieldToHashSet(data, hiColumn.RefField);
+                                        _hash = DataConvert.DataTableFieldToHashSet(data, hiColumn.RefField);
                                     }
                                 }
                                 dic_hash_reg[hiColumn.ColumnName].ExceptWith(_hash);
@@ -775,11 +781,11 @@ namespace HiSql
                 return rtn;
             }
             else
-            throw new Exception($"找不到相关表信息");
-            
+                throw new Exception($"找不到相关表信息");
+
         }
 
-        public Tuple<Dictionary<string, string>, Dictionary<string, string>> CheckData(bool isDic,TableDefinition table, object objdata, IDMInitalize dMInitalize, TabInfo tabinfo, List<string> fields, bool isonly)
+        public Tuple<Dictionary<string, string>, Dictionary<string, string>> CheckData(bool isDic, TableDefinition table, object objdata, IDMInitalize dMInitalize, TabInfo tabinfo, List<string> fields, bool isonly)
         {
             if (table != null)
             {
@@ -787,7 +793,7 @@ namespace HiSql
                 Type type = objdata.GetType();
                 IDMTab mytab = (IDMTab)dMInitalize;
                 List<PropertyInfo> _attrs = type.GetProperties().Where(p => p.MemberType == MemberTypes.Property && p.CanRead == true).ToList();
-                result = CheckUpdateData(isDic,this.Wheres.Count > 0 ? false : true, _attrs, tabinfo.GetColumns, objdata, fields, isonly);
+                result = CheckUpdateData(isDic, this.Wheres.Count > 0 ? false : true, _attrs, tabinfo.GetColumns, objdata, fields, isonly);
                 return result;
             }
             else throw new Exception($"找不到相关表信息");
@@ -803,7 +809,7 @@ namespace HiSql
 
             _value = value;
 
-            
+
             if (Constants.IsStandardTimeField(hiColumn.ColumnName))
             {
                 if (hiColumn.DBDefault != HiTypeDBDefault.FUNDATE)
@@ -961,7 +967,7 @@ namespace HiSql
                     {
                         throw new Exception($"字段[{hiColumn.ColumnName}] 为业务主键或表主键 更新表数据时必填");
                     }
-                    if (objprop != null && objprop.GetValue(objdata) != null   )
+                    if (objprop != null && objprop.GetValue(objdata) != null)
                     {
                         if (hiColumn.FieldType.IsIn<HiType>(HiType.NVARCHAR, HiType.NCHAR, HiType.GUID))
                         {
@@ -1094,13 +1100,13 @@ namespace HiSql
                 }
                 else
                 {
-                    
+
                     if (hiColumn.IsBllKey && _dic == null && isRequireKey)
                     {
                         throw new Exception($"字段[{hiColumn.ColumnName}] 为业务主键或表主键 更新表数据时必填");
                     }
 
-                    if (_dic .ContainsKey(hiColumn.ColumnName))
+                    if (_dic.ContainsKey(hiColumn.ColumnName))
                     {
                         if (hiColumn.FieldType.IsIn<HiType>(HiType.NVARCHAR, HiType.NCHAR, HiType.GUID))
                         {
@@ -1233,10 +1239,10 @@ namespace HiSql
                 }
                 else if (hiColumn.ColumnName.ToLower() == "ModiName".ToLower())
                 {
-                    if(!_values.ContainsKey(hiColumn.ColumnName))
+                    if (!_values.ContainsKey(hiColumn.ColumnName))
                         _values.Add(hiColumn.ColumnName, $"'{Context.CurrentConnectionConfig.User}'");
                     else
-                        _values[hiColumn.ColumnName]= $"'{Context.CurrentConnectionConfig.User}'";
+                        _values[hiColumn.ColumnName] = $"'{Context.CurrentConnectionConfig.User}'";
 
 
                 }

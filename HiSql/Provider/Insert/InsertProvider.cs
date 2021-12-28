@@ -21,7 +21,7 @@ namespace HiSql
         StringBuilder _Sql = new StringBuilder();
 
         List<string> _lstsql = new List<string>();
-        public virtual Action<int,int> OnPageExec => this.Context.CurrentConnectionConfig.AppEvents?.OnPageExec;
+        public virtual Action<int, int> OnPageExec => this.Context.CurrentConnectionConfig.AppEvents?.OnPageExec;
         //分批次执行
         bool _batch_exec = false;
 
@@ -38,15 +38,15 @@ namespace HiSql
         bool _mergeinto = false;
         public IDbConfig DbConfig
         {
-            get;set;
+            get; set;
 
         }
         SynTaxQueue _queue = new SynTaxQueue();
 
 
         public InsertProvider()
-        { 
-            
+        {
+
         }
         public TableDefinition Table
         {
@@ -56,10 +56,15 @@ namespace HiSql
         {
             get { return _list_data; }
         }
-        public  virtual int ExecCommand()
+
+        public virtual int ExecCommand()
         {
+            return ExecCommandAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+        }
 
 
+        public virtual async Task<int> ExecCommandAsync()
+        {
             int i = 0;
 
             if (!this.IsBatchExec)
@@ -79,7 +84,7 @@ namespace HiSql
                         _Sql = new StringBuilder().AppendLine($"declare v_effect integer;  {Environment.NewLine}begin{Environment.NewLine}").AppendLine(_Sql.ToString()).AppendLine("end;");
                     }
 
-                    i = this.Context.DBO.ExecCommand(_Sql.ToString());
+                    i = await this.Context.DBO.ExecCommandAsync(_Sql.ToString());
                     _Sql = new StringBuilder();
                     return i;
                 }
@@ -102,7 +107,7 @@ namespace HiSql
                         }
                         _sb_n.AppendLine(n);
                         _sb_n.AppendLine("end;");
-                        i = this.Context.DBO.ExecCommand(_sb_n.ToString());
+                        i = await this.Context.DBO.ExecCommandAsync(_sb_n.ToString());
 
                         if (OnPageExec != null)
                         {
@@ -113,7 +118,7 @@ namespace HiSql
                 return i;
             }
 
-            
+
         }
 
         void checkData()
@@ -129,9 +134,9 @@ namespace HiSql
                 tabinfo = sqldm.GetTabStruct(this.Table.TabName);
                 _insertTabName = this.Table.TabName;
                 //由于DBType.PostGreSql mergeinto的方法实现逻辑与其它的数据库完全不一样只能特殊处理
-                if (_mergeinto  && Context.CurrentConnectionConfig.DbType != DBType.PostGreSql)
+                if (_mergeinto && Context.CurrentConnectionConfig.DbType != DBType.PostGreSql)
                 {
-                    string _json =  JsonConvert.SerializeObject(tabinfo);
+                    string _json = JsonConvert.SerializeObject(tabinfo);
                     //TabInfo tabinfo2 =  JsonConvert.DeserializeObject<TabInfo>(_json);
                     TabInfo tabinfo2 = ClassExtensions.DeepCopy<TabInfo>(tabinfo);
                     //有数据则更新无数据则插入
@@ -170,7 +175,7 @@ namespace HiSql
                         dMTab.Context = sqldm.Context;
                         //创建临时表
                         //int effect = dMTab.BuildTabCreate(tabinfo);
-                        string _temp_sql = dMTab.BuildTabCreateSql(tabinfo2.TabModel, tabinfo2.Columns,true);
+                        string _temp_sql = dMTab.BuildTabCreateSql(tabinfo2.TabModel, tabinfo2.Columns, true);
 
                         if (this.IsBatchExec)
                         {
@@ -201,23 +206,23 @@ namespace HiSql
             else
                 throw new Exception("未指定要插入的表");
 
-             
+
             //仅限于数据插入
             StringBuilder sb_sql = new StringBuilder();
             if (this.Data != null && this.Data.Count > 0)
             {
 
-                
+
 
                 Type type = this.Data[0].GetType();
-                bool _isdic = type == typeof(Dictionary<string, string>)  || type== typeof(Dictionary<string, object>);
+                bool _isdic = type == typeof(Dictionary<string, string>) || type == typeof(Dictionary<string, object>);
                 List<PropertyInfo> attrs = type.GetProperties().Where(p => p.MemberType == MemberTypes.Property && p.CanRead == true).ToList();
                 int page = this.Data.Count <= DbConfig.BlukSize ? 1 : this.Data.Count % DbConfig.BlukSize == 0 ? this.Data.Count / DbConfig.BlukSize : this.Data.Count / DbConfig.BlukSize + 1;
                 //分数据包 包的大小决定了数据插入的性能问题
                 //insert values 的方式 包大小最高不能超过1000
 
                 //List<Dictionary<string, string>> rtnlst=new List<Dictionary<string, string>> ();//=CheckAllData(tabinfo.GetColumns, this.Data);
-                List<Dictionary<string, string>> rtnlst=CheckAllData(tabinfo.GetColumns, this.Data);
+                List<Dictionary<string, string>> rtnlst = CheckAllData(tabinfo.GetColumns, this.Data);
                 //foreach (var obj in this.Data)
                 //{
                 //    rtnlst.Add(CheckInsertData(_isdic, attrs, tabinfo.GetColumns, obj));
@@ -241,10 +246,10 @@ namespace HiSql
                             sb_sql.Append(_sql);
                         }
                     }
-                    if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.MySql, DBType.Oracle,DBType.Hana))
+                    if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.MySql, DBType.Oracle, DBType.Hana))
                         sb_sql.AppendLine(";");
 
-                    
+
 
 
                     if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.PostGreSql))
@@ -295,7 +300,7 @@ namespace HiSql
                         string _droptable = DbConfig.Drop_Table.Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema).Replace("[$TabName$]", _insertTabName);
                         _mergesql = $"{_mergesql}{Environment.NewLine} {_truncate}{Environment.NewLine} {_droptable}";
                     }
-                    
+
 
                     if (this.IsBatchExec)
                     {
@@ -312,15 +317,15 @@ namespace HiSql
                     //if(!this.IsBatchExec && Context.CurrentConnectionConfig.DbType == DBType.Hana)
                     //    _Sql = new StringBuilder().AppendLine("do begin").AppendLine(_Sql.ToString()).AppendLine("end;");
                 }
-                
+
             }
             else
                 throw new Exception("无数据可插入");
-            
+
 
         }
 
-       
+
         public IInsert Insert(string tabname, object objdata)
         {
             if (_queue.HasQueue("modi"))
@@ -328,13 +333,13 @@ namespace HiSql
             _list_data = new List<object>();
             _table = new TableDefinition(tabname);
             _list_data.Add(objdata);
-            
+
             checkData();
             _queue.Add("insert");
             return this;
         }
 
-        
+
 
         public IInsert Insert(string tabname, List<object> lstdata)
         {
@@ -366,7 +371,7 @@ namespace HiSql
                         _list_data.Add((Dictionary<string, object>)dyn);
                     }
                 }
-                
+
             }
             else
                 _list_data = lstdata;
@@ -423,11 +428,11 @@ namespace HiSql
             if (_queue.HasQueue("modi"))
                 throw new Exception($"已经指定了[Modi]不允许再指定[Insert]");
 
-           
+
             _list_data = new List<object>();
             _table = new TableDefinition(tabname);
             _list_data.Add((object)objdata);
-            
+
             checkData();
             _queue.Add("insert");
 
@@ -540,13 +545,15 @@ namespace HiSql
                     throw new Exception($"已经指定了[Modi]不允许再指定[Modi]");
 
 
-            }else
+            }
+            else
                 throw new Exception($"已经指定了[Insert]不允许再指定[Modi]");
 
-            return this ;
+            return this;
         }
 
-        public IInsert Modi<T>(string tabname, T objdata) {
+        public IInsert Modi<T>(string tabname, T objdata)
+        {
             _mergeinto = true;
             if (!_queue.HasQueue("insert"))
             {
@@ -567,14 +574,15 @@ namespace HiSql
 
             return this;
         }
-        public IInsert Modi<T>(T objdata) {
+        public IInsert Modi<T>(T objdata)
+        {
             _mergeinto = true;
             if (!_queue.HasQueue("insert"))
             {
                 if (!_queue.HasQueue("modi"))
                 {
                     //写入到临时表中
-                    Insert<T>( objdata);
+                    Insert<T>(objdata);
 
                     _queue.Add("modi");
                 }
@@ -588,7 +596,8 @@ namespace HiSql
 
             return this;
         }
-        public IInsert Modi<T>(List<T> lstdata) {
+        public IInsert Modi<T>(List<T> lstdata)
+        {
             _mergeinto = true;
             if (!_queue.HasQueue("insert"))
             {
@@ -609,14 +618,15 @@ namespace HiSql
 
             return this;
         }
-        public IInsert Modi<T>(string tabname, List<T> lstdata) {
+        public IInsert Modi<T>(string tabname, List<T> lstdata)
+        {
             _mergeinto = true;
             if (!_queue.HasQueue("insert"))
             {
                 if (!_queue.HasQueue("modi"))
                 {
                     //写入到临时表中
-                    Insert<T>(tabname,lstdata);
+                    Insert<T>(tabname, lstdata);
 
                     _queue.Add("modi");
                 }
@@ -643,7 +653,7 @@ namespace HiSql
         /// <param name="hiColumns"></param>
         /// <param name="lstdata"></param>
         /// <returns></returns>
-        List<Dictionary<string, string>> CheckAllData( List<HiColumn> hiColumns, List<object> lstdata)
+        List<Dictionary<string, string>> CheckAllData(List<HiColumn> hiColumns, List<object> lstdata)
         {
             List<Dictionary<string, string>> rtnlst = new List<Dictionary<string, string>>();
             if (this.Data != null && this.Data.Count > 0)
@@ -664,13 +674,13 @@ namespace HiSql
                 var arrcol_reg = hiColumns.Where(h => !string.IsNullOrEmpty(h.Regex)).ToList();
                 var arrcol_tab = hiColumns.Where(h => h.IsRefTab).ToList();
 
-                var arrcol = hiColumns.Where(h => !string.IsNullOrEmpty(h.Regex) ||  h.IsRefTab).ToList();
+                var arrcol = hiColumns.Where(h => !string.IsNullOrEmpty(h.Regex) || h.IsRefTab).ToList();
                 foreach (HiColumn hi in arrcol)
                 {
                     //if(!string.IsNullOrEmpty(hi.Regex))
                     dic_hash_reg.Add(hi.ColumnName, new HashSet<string>());
 
-                    
+
                 }
                 int _rowidx = 0;
                 if (_isdic)
@@ -711,21 +721,21 @@ namespace HiSql
                                         DateTime dtime = (DateTime)_o[hiColumn.ColumnName];
                                         if (dtime != null && dtime != DateTime.MinValue)
                                         {
-                                            _value= dtime.ToString("yyyy-MM-dd HH:mm:ss.fff");
+                                            _value = dtime.ToString("yyyy-MM-dd HH:mm:ss.fff");
                                         }
                                     }
                                     else if (hiColumn.FieldType.IsIn<HiType>(HiType.BOOL))
                                     {
                                         if ((bool)_o[hiColumn.ColumnName] == true)
                                         {
-                                            _value= "1";
+                                            _value = "1";
                                         }
                                         else
-                                            _value="0";
+                                            _value = "0";
                                     }
                                     else
                                     {
-                                        _value= _o[hiColumn.ColumnName].ToString();
+                                        _value = _o[hiColumn.ColumnName].ToString();
                                     }
                                     #endregion
 
@@ -735,7 +745,7 @@ namespace HiSql
                                         dic_hash_reg[hiColumn.ColumnName].Add(_value);
                                     }
 
-                                    
+
 
 
                                     #endregion
@@ -748,12 +758,14 @@ namespace HiSql
                                     }
                                     #endregion
                                 }
-                                else {
+                                else
+                                {
                                     #region 未赋值数据处理
                                     if (!hiColumn.IsNull && hiColumn.DBDefault == HiTypeDBDefault.NONE && !hiColumn.IsIdentity)
                                     {
                                         throw new Exception($"行[{_rowidx}] 字段[{hiColumn.ColumnName}]不允许为空数据库中未设置默认值 且插入数据值中未指定值");
-                                    }else  if (Constants.IsStandardField(hiColumn.ColumnName))
+                                    }
+                                    else if (Constants.IsStandardField(hiColumn.ColumnName))
                                     {
                                         var result = checkFieldValue(hiColumn, _rowidx, _value);
                                         if (result.Item1)
@@ -781,7 +793,7 @@ namespace HiSql
                         foreach (Dictionary<string, string> _o in lstdata)
                         {
                             _rowidx++;
-                            
+
                             Dictionary<string, string> _rowdic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                             foreach (HiColumn hiColumn in hiColumns)
                             {
@@ -810,7 +822,7 @@ namespace HiSql
                                     {
                                         dic_hash_reg[hiColumn.ColumnName].Add(_value);
                                     }
-                                    
+
                                     #endregion
 
                                     #region 通用数据有效性校验
@@ -913,7 +925,7 @@ namespace HiSql
                                 {
                                     dic_hash_reg[hiColumn.ColumnName].Add(_dic[hiColumn.ColumnName]);
                                 }
-                               
+
                                 #endregion
 
                                 #region 通用数据有效性校验
@@ -930,7 +942,8 @@ namespace HiSql
                                 if (!hiColumn.IsNull && hiColumn.DBDefault == HiTypeDBDefault.NONE && !hiColumn.IsIdentity)
                                 {
                                     throw new Exception($"行[{_rowidx}] 字段[{hiColumn.ColumnName}]不允许为空数据库中未设置默认值 且插入数据值中未指定值");
-                                }else   if (Constants.IsStandardField(hiColumn.ColumnName))
+                                }
+                                else if (Constants.IsStandardField(hiColumn.ColumnName))
                                 {
                                     var result = checkFieldValue(hiColumn, _rowidx, "");
                                     if (result.Item1)
@@ -943,7 +956,7 @@ namespace HiSql
 
 
                         }
-                        
+
 
                         if (_rowdic.Count > 0)
                         {
@@ -1007,10 +1020,10 @@ namespace HiSql
                                   .ToTable(ref _total);
 
                             }
-                            
-                            if (data != null && data.Rows.Count>0)
+
+                            if (data != null && data.Rows.Count > 0)
                             {
-                                
+
                                 if (data.Rows.Count == _psize)
                                 {
                                     //源表值比较大
@@ -1036,10 +1049,10 @@ namespace HiSql
                             }
 
                         }
-                        
+
                     }
                 }
-                
+
 
                 #endregion
 
@@ -1050,7 +1063,7 @@ namespace HiSql
             return rtnlst;
         }
 
-        Tuple<bool,string> checkFieldValue( HiColumn hiColumn,int rowidx, string value)
+        Tuple<bool, string> checkFieldValue(HiColumn hiColumn, int rowidx, string value)
         {
 
             string _value = "";
@@ -1169,24 +1182,24 @@ namespace HiSql
                     rtn = new Tuple<bool, string>(true, $"'{_value}'");
                 }
             }
-            
-            
+
+
             #endregion
-            
+
             return rtn;
         }
 
-        
+
 
         Dictionary<string, string> CheckInsertData(bool isDic, List<PropertyInfo> attrs, List<HiColumn> hiColumns, object objdata)
         {
             Dictionary<string, string> _values = new Dictionary<string, string>();
 
-            var arrcol_reg = hiColumns.Where(h => string.IsNullOrEmpty(h.Regex) );
+            var arrcol_reg = hiColumns.Where(h => string.IsNullOrEmpty(h.Regex));
             var arrcol_tab = hiColumns.Where(h => h.IsRefTab);
-            
 
-            Dictionary<string, string> _dic =new Dictionary<string, string> (StringComparer.OrdinalIgnoreCase);
+
+            Dictionary<string, string> _dic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             if (isDic)
             {
                 if (typeof(Dictionary<string, object>) == objdata.GetType())
@@ -1205,7 +1218,8 @@ namespace HiSql
                             }
                         }
                     }
-                }else
+                }
+                else
                     _dic = (Dictionary<string, string>)objdata;
             }
 
@@ -1240,7 +1254,7 @@ namespace HiSql
                             if (_value.Length >= hiColumn.FieldLen)
                             {
                                 //sqlserver 的类型定义为varchar(max)
-                                if (hiColumn.FieldLen>=0)
+                                if (hiColumn.FieldLen >= 0)
                                     throw new Exception($"字段[{objprop.Name}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
                             }
                             if (hiColumn.IsRequire)
@@ -1299,7 +1313,7 @@ namespace HiSql
                         {
                             if ((bool)objprop.GetValue(objdata) == true)
                             {
-                                if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.PostGreSql, DBType.Hana,DBType.MySql))
+                                if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.PostGreSql, DBType.Hana, DBType.MySql))
                                 {
                                     _value = "True";
                                     _values.Add(hiColumn.ColumnName, $"{_value}");
@@ -1347,25 +1361,25 @@ namespace HiSql
 
                         if (hiColumn.DBDefault != HiTypeDBDefault.FUNDATE)
                         {
-                            if(!_values.ContainsKey(hiColumn.ColumnName))
+                            if (!_values.ContainsKey(hiColumn.ColumnName))
                                 _values.Add(hiColumn.ColumnName, $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
                             else
-                                _values[hiColumn.ColumnName]= $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'";
+                                _values[hiColumn.ColumnName] = $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'";
                         }
-                            
+
                     }
                     else if (hiColumn.ColumnName == "CreateName" || hiColumn.ColumnName == "ModiName")
                     {
                         if (!_values.ContainsKey(hiColumn.ColumnName))
                             _values.Add(hiColumn.ColumnName, $"'{Context.CurrentConnectionConfig.User}'");
                         else
-                            _values[hiColumn.ColumnName]= $"'{Context.CurrentConnectionConfig.User}'";
+                            _values[hiColumn.ColumnName] = $"'{Context.CurrentConnectionConfig.User}'";
                     }
                     #endregion
                 }
                 else
                 {
-                    
+
                     #region 字典数据
                     if (hiColumn.IsRequire && !hiColumn.IsIdentity && !_dic.ContainsKey(hiColumn.ColumnName))
                     {
@@ -1449,12 +1463,12 @@ namespace HiSql
 
                         if (hiColumn.DBDefault != HiTypeDBDefault.FUNDATE)
                         {
-                            if(!_values.ContainsKey(hiColumn.ColumnName))
+                            if (!_values.ContainsKey(hiColumn.ColumnName))
                                 _values.Add(hiColumn.ColumnName, $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
                             else
-                                _values[hiColumn.ColumnName]= $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'";
+                                _values[hiColumn.ColumnName] = $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'";
                         }
-                            
+
                     }
                     else if (hiColumn.ColumnName.ToLower() == "CreateName".ToLower() || hiColumn.ColumnName.ToLower() == "ModiName".ToLower())
                     {
@@ -1471,7 +1485,7 @@ namespace HiSql
                 }
             }
 
-            
+
 
 
             return _values;

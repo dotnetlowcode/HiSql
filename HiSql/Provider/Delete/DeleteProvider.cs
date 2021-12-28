@@ -37,7 +37,7 @@ namespace HiSql
         /// <summary>
         /// 是否完全没有数据库日志的删除
         /// </summary>
-        public bool IsNoDbLog{ get => _isnodblog;}
+        public bool IsNoDbLog { get => _isnodblog; }
         public DeleteProvider()
         {
 
@@ -139,7 +139,7 @@ namespace HiSql
                 {
                     _list_data.Add((object)obj);
                 }
-                
+
                 _queue.Add("table");
             }
             else
@@ -206,7 +206,7 @@ namespace HiSql
             else
                 throw new Exception($"已经指定了一个Where 不允许重复指定");
             return this;
-          
+
         }
         public IDelete Where(Filter where)
         {
@@ -215,7 +215,7 @@ namespace HiSql
             if (_queue.HasQueue("truncate"))
                 throw new Exception($"Where 不对针对于TrunCate进行操作");
 
-            if (!_queue.HasQueue("where") )
+            if (!_queue.HasQueue("where"))
             {
                 if (where != null && where.Elements.Count > 0)
                 {
@@ -238,14 +238,12 @@ namespace HiSql
             return this;
         }
 
-        public int ExecCommand()
-        {
-            string _sql = this.ToSql();
 
-            return this.Context.DBO.ExecCommand(_sql);
-        }
 
-        public Dictionary<string, string> CheckData(bool isDic,TableDefinition table, object objdata, IDMInitalize dMInitalize, TabInfo tabinfo)
+
+
+
+        public Dictionary<string, string> CheckData(bool isDic, TableDefinition table, object objdata, IDMInitalize dMInitalize, TabInfo tabinfo)
         {
             if (table != null)
             {
@@ -253,7 +251,7 @@ namespace HiSql
                 Type type = objdata.GetType();
                 IDMTab mytab = (IDMTab)dMInitalize;
                 List<PropertyInfo> _attrs = type.GetProperties().Where(p => p.MemberType == MemberTypes.Property && p.CanRead == true).ToList();
-                result = CheckDeleteData(isDic,this.Wheres.Count > 0 ? false : true, _attrs, tabinfo.GetColumns, objdata);
+                result = CheckDeleteData(isDic, this.Wheres.Count > 0 ? false : true, _attrs, tabinfo.GetColumns, objdata);
                 return result;
             }
             else throw new Exception($"找不到相关表信息");
@@ -403,6 +401,18 @@ namespace HiSql
                 //}
             }
             return _values;
+        }
+
+        int IDelete.ExecCommand()
+        {
+            var sql = this.ToSql();
+            return this.Context.DBO.ExecCommand(sql);
+        }
+
+        public Task<int> ExecCommandAsync()
+        {
+            var sql = this.ToSql();
+            return this.Context.DBO.ExecCommandAsync(sql);
         }
     }
 }
