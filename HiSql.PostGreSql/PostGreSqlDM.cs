@@ -1310,6 +1310,9 @@ namespace HiSql
                 else if (filterDefinition.FilterType == FilterType.CONDITION)
                 {
                     HiColumn hiColumn = CheckField(TableList, dictabinfo, Fields, filterDefinition.Field);
+                    if (hiColumn == null)
+                        throw new Exception($"字段[{filterDefinition.Field.AsFieldName}]在表[{filterDefinition.Field.AsTabName}]中不存在");
+
                     sb_where.Append($"{dbConfig.Table_Pre}{filterDefinition.Field.AsTabName}{dbConfig.Table_After}.{dbConfig.Table_Pre}{filterDefinition.Field.AsFieldName}{dbConfig.Table_After}");
                     switch (filterDefinition.OpFilter)
                     {

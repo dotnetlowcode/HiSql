@@ -1097,7 +1097,7 @@ namespace HiSql
                     //中文按1个字符计算
                     //_value = "test";
 
-                    if (_value.Length >= hiColumn.FieldLen)
+                    if (_value.Length > hiColumn.FieldLen)
                     {
                         throw new Exception($"字段[{hiColumn.ColumnName}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
                     }
@@ -1251,7 +1251,7 @@ namespace HiSql
                             //_value = "test";
 
                             _value = (string)objprop.GetValue(objdata);
-                            if (_value.Length >= hiColumn.FieldLen)
+                            if (_value.Length > hiColumn.FieldLen)
                             {
                                 //sqlserver 的类型定义为varchar(max)
                                 if (hiColumn.FieldLen >= 0)
@@ -1400,7 +1400,7 @@ namespace HiSql
                             //中文按1个字符计算
                             //_value = "test";
                             _value = _dic[hiColumn.ColumnName].ToString();
-                            if (_value.Length >= hiColumn.FieldLen)
+                            if (_value.Length > hiColumn.FieldLen)
                             {
                                 throw new Exception($"字段[{hiColumn.ColumnName}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
                             }
