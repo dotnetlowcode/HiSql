@@ -143,8 +143,14 @@ namespace HiSql
                     hiColumn.IsBllKey = hiColumn.IsPrimary;
                     hiColumn.SortNum = Convert.ToInt32(drow["FieldNo"].ToString().Trim());
                     hiColumn.FieldType = HiSqlCommProvider.ConvertToHiType(_dbmapping, drow["FieldType"].ToString().ToLower().Trim());
+                    if (hiColumn.FieldType.IsIn<HiType>(HiType.GUID))
+                    {
+                        //sqlserver guid默认36
+                        hiColumn.FieldLen = 36;
 
-                    hiColumn.FieldLen = Convert.ToInt32(string.IsNullOrEmpty(drow["Lens"].ToString().Trim()) ? "0" : drow["Lens"].ToString().Trim());
+                    }else
+                        hiColumn.FieldLen = Convert.ToInt32(string.IsNullOrEmpty(drow["Lens"].ToString().Trim()) ? "0" : drow["Lens"].ToString().Trim());
+
 
                     if (hiColumn.FieldType.IsIn<HiType>(HiType.DECIMAL))
                     {
