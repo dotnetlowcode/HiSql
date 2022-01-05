@@ -33,11 +33,20 @@ namespace HiSql.UnitTest
             //Query_Demo4(sqlClient);
             //Query_Demo5(sqlClient);
             //Query_Demo6(sqlClient);
-            Query_Demo7(sqlClient);
+            //Query_Demo7(sqlClient);
             //Query_Demo8(sqlClient);
+            Query_Demo9(sqlClient);
             var s = Console.ReadLine();
         }
 
+        static void Query_Demo9(HiSqlClient sqlClient)
+        {
+            List< HiColumn> lst= sqlClient.HiSql("select * from H_Test5 ").ToList<HiColumn>();
+            if (lst.Count > 0)
+            {
+                //var sql=sqlClient.Insert("Hi_FieldModel", lst).ToSql();
+            }
+        }
         static void Query_Demo8(HiSqlClient sqlClient)
         {
             //string sql = sqlClient.HiSql($"select FieldName,FieldType from Hi_FieldModel  group by FieldName,FieldType ")

@@ -270,7 +270,7 @@ namespace HiSql
                 }
                 #endregion
                 DbCommand sqlCommand = GetCommand(sql, parameters);
-                count = await sqlCommand.ExecuteNonQueryAsync();
+                count = await  sqlCommand.ExecuteNonQueryAsync();
                 sqlCommand.Dispose();
 
                 #region 执行后操作

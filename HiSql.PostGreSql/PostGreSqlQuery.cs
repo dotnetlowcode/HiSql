@@ -199,7 +199,7 @@ namespace HiSql
                 if (hiTable.TableType != TableType.Entity)
                 {
                     if (!this.ResultColumn.Any(c => c.IsBllKey))
-                        this.ResultColumn.Insert(0, new HiColumn { ColumnName = "_ID_", IsIdentity = true, IsPrimary = true, FieldDesc = "自增ID", FieldType = HiType.INT, SortNum = 0 });
+                        this.ResultColumn.Insert(0, new HiColumn { FieldName = "_ID_", IsIdentity = true, IsPrimary = true, FieldDesc = "自增ID", FieldType = HiType.INT, SortNum = 0 });
 
                     tabInfo.Columns = this.ResultColumn;
 
@@ -412,18 +412,18 @@ namespace HiSql
         HiColumn checkField(FieldDefinition fieldDefinition, bool allowstart = false)
         {
             HiColumn hiColumn = null;
-            TableDefinition tabinfo = this.TableList.Where(t => t.AsTabName.ToLower() == fieldDefinition.AsTabName.ToLower()).FirstOrDefault();//&& t.Columns.Any(c=>c.ColumnName==fieldDefinition.FieldName)
+            TableDefinition tabinfo = this.TableList.Where(t => t.AsTabName.ToLower() == fieldDefinition.AsTabName.ToLower()).FirstOrDefault();//&& t.Columns.Any(c=>c.FieldName==fieldDefinition.FieldName)
             if (tabinfo != null)
             {
                 if (dictabinfo.ContainsKey(tabinfo.TabName))
                 {
-                    hiColumn = dictabinfo[tabinfo.TabName].Columns.Where(f => f.ColumnName.ToLower() == fieldDefinition.FieldName.ToLower()).FirstOrDefault();
+                    hiColumn = dictabinfo[tabinfo.TabName].Columns.Where(f => f.FieldName.ToLower() == fieldDefinition.FieldName.ToLower()).FirstOrDefault();
                     if (hiColumn == null)
                     {
                         FieldDefinition fieldDefinition1 = this.Fields.Where(f => f.AsFieldName.ToLower() == fieldDefinition.FieldName.ToLower()).FirstOrDefault();
                         if (fieldDefinition1 != null)
                         {
-                            hiColumn = dictabinfo[tabinfo.TabName].Columns.Where(f => f.ColumnName.ToLower() == fieldDefinition1.FieldName.ToLower()).FirstOrDefault();
+                            hiColumn = dictabinfo[tabinfo.TabName].Columns.Where(f => f.FieldName.ToLower() == fieldDefinition1.FieldName.ToLower()).FirstOrDefault();
                             if (hiColumn == null)
                             {
                                 if (fieldDefinition1.FieldName.Trim() != "*" && allowstart == true)

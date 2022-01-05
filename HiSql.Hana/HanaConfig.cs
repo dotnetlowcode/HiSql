@@ -87,7 +87,7 @@ namespace HiSql
 
 
         /// <summary>
-        /// 字段创建时的模板[$ColumnName$]  这是一个可替换的字符串ColumnName是在HiColumn中的属性名
+        /// 字段创建时的模板[$FieldName$]  这是一个可替换的字符串ColumnName是在HiColumn中的属性名
         /// </summary>
         Dictionary<string, string> _fieldtempmapping = new Dictionary<string, string> { };
         Dictionary<HiType, string> _dbmapping = new Dictionary<HiType, string>();
@@ -221,26 +221,26 @@ namespace HiSql
 
             _fieldtempmapping = new Dictionary<string, string> {
                 //样例：[TabName] [varchar](50) NOT NULL,
-                { "nvarchar",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} nvarchar([$FieldLen$]) [$IsNull$]  [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split} "},
-                { "varchar",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} varchar([$FieldLen$]) [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
-                { "nchar",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} nchar([$FieldLen$]) [$IsNull$]  [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split} "},
-                { "char",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} char([$FieldLen$]) [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}"},
+                { "nvarchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} nvarchar([$FieldLen$]) [$IsNull$]  [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split} "},
+                { "varchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} varchar([$FieldLen$]) [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
+                { "nchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} nchar([$FieldLen$]) [$IsNull$]  [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split} "},
+                { "char",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} char([$FieldLen$]) [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}"},
                
                 //样例：[udescript] [text] NULL,
-                { "text",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} text [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
+                { "text",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} text [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
 
-                { "integer",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} integer [$IsIdentity$] [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
-                { "bigint",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} bigint [$IsIdentity$] [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}" },
-                { "smallint",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} smallint  [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
-                { "decimal",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} decimal([$FieldLen$],[$FieldDec$])  [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
+                { "integer",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} integer [$IsIdentity$] [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
+                { "bigint",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} bigint [$IsIdentity$] [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}" },
+                { "smallint",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} smallint  [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
+                { "decimal",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} decimal([$FieldLen$],[$FieldDec$])  [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
 
-                { "boolean",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after}  boolean   [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
+                { "boolean",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  boolean   [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
 
-                { "timestamp",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after}  timestamp   [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
-                { "date",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after}  date    [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}" },
+                { "timestamp",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  timestamp   [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
+                { "date",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  date    [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}" },
 
-                { "binary",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after}  binary   [$IsNull$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
-                { "uniqueidentifier",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after}  varchar(36)   [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
+                { "binary",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  binary   [$IsNull$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
+                { "uniqueidentifier",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  varchar(36)   [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
             };
 
 
@@ -370,13 +370,13 @@ namespace HiSql
                 //.AppendLine($"CONSTRAINT {_temp_table_pre}PK_[$TabName$]_[$ConnectID$]{_temp_table_after} PRIMARY KEY CLUSTERED")
                 .AppendLine("PRIMARY KEY([$Keys$])")
                 .ToString();
-            _temp_table_key2 = "[$ColumnName$] ";//定义主键的排序方式
+            _temp_table_key2 = "[$FieldName$] ";//定义主键的排序方式
 
             _temp_table_key3 = "UNLOAD PRIORITY 5 AUTO MERGE;  ";//TEXTIMAGE_ON [PRIMARY]
 
 
             _temp_field_comment = new StringBuilder()
-                //.AppendLine("EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'[$FieldDesc$]' , @level0type=N'SCHEMA',@level0name=N'[$Schema$]', @level1type=N'TABLE',@level1name=N'[$TabName$]', @level2type=N'COLUMN',@level2name=N'[$ColumnName$]'")
+                //.AppendLine("EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'[$FieldDesc$]' , @level0type=N'SCHEMA',@level0name=N'[$Schema$]', @level1type=N'TABLE',@level1name=N'[$TabName$]', @level2type=N'COLUMN',@level2name=N'[$FieldName$]'")
                 // .AppendLine("GO")
                 .ToString();
 
