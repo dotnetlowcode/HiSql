@@ -11,6 +11,10 @@
 支持SqlServer,MySql,Oracle,Hana,PostGreSql 根据需要单独再引用支持的包
 新增hisql语法 一套sql在不同库执行</Description>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageIcon>hisql-logo.jpg</PackageIcon>
+		<PackageIconUrl />
+		<ApplicationIcon>hisql-logo.ico</ApplicationIcon>
+		<Win32Resource />
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -25,6 +29,13 @@
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net461'">
 		<Reference Include="Microsoft.CSharp" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="hisql-logo.jpg">
+	    <Pack>True</Pack>
+	    <PackagePath></PackagePath>
+	  </None>
 	</ItemGroup>
 
 </Project>

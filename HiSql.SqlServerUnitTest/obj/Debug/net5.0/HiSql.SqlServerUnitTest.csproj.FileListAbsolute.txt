@@ -1,8 +1,3 @@
-D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Debug\net5.0\HiSql.SqlServerUnitTest.csproj.AssemblyReference.cache
-D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Debug\net5.0\HiSql.SqlServerUnitTest.GeneratedMSBuildEditorConfig.editorconfig
-D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Debug\net5.0\HiSql.SqlServerUnitTest.AssemblyInfoInputs.cache
-D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Debug\net5.0\HiSql.SqlServerUnitTest.AssemblyInfo.cs
-D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Debug\net5.0\HiSql.SqlServerUnitTest.csproj.CoreCompileInputs.cache
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\HiSql.SqlServerUnitTest.exe
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\HiSql.SqlServerUnitTest.deps.json
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\HiSql.SqlServerUnitTest.runtimeconfig.json
@@ -30,6 +25,11 @@ D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\HiSql.SqlSe
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\HiSql.SNRO.pdb
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\HiSql.SqlServer.pdb
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\HiSql.pdb
+D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Debug\net5.0\HiSql.SqlServerUnitTest.csproj.AssemblyReference.cache
+D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Debug\net5.0\HiSql.SqlServerUnitTest.GeneratedMSBuildEditorConfig.editorconfig
+D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Debug\net5.0\HiSql.SqlServerUnitTest.AssemblyInfoInputs.cache
+D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Debug\net5.0\HiSql.SqlServerUnitTest.AssemblyInfo.cs
+D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Debug\net5.0\HiSql.SqlServerUnitTest.csproj.CoreCompileInputs.cache
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Debug\net5.0\HiSql.SqlServerUnitTest.csproj.CopyComplete
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Debug\net5.0\HiSql.SqlServerUnitTest.dll
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Debug\net5.0\ref\HiSql.SqlServerUnitTest.dll

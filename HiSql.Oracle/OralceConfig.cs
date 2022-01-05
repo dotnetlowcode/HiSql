@@ -94,7 +94,7 @@ namespace HiSql
         string _temp_sequence_temp = "";
 
         /// <summary>
-        /// 字段创建时的模板[$ColumnName$]  这是一个可替换的字符串ColumnName是在HiColumn中的属性名
+        /// 字段创建时的模板[$FieldName$]  这是一个可替换的字符串ColumnName是在HiColumn中的属性名
         /// </summary>
         Dictionary<string, string> _fieldtempmapping = new Dictionary<string, string> { };
         Dictionary<HiType, string> _dbmapping = new Dictionary<HiType, string>();
@@ -253,42 +253,42 @@ namespace HiSql
 
             _fieldtempmapping = new Dictionary<string, string> {
                 //样例：[TabName] [varchar](50) NOT NULL,
-                { "nvarchar",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after}  nvarchar2 ([$FieldLen$]) [$IsNull$]  [$Default$] [$EXTEND$] "},
-                { "varchar",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after}  varchar2 ([$FieldLen$]) [$IsNull$] [$Default$] [$EXTEND$] "},
-                { "nchar",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after}  nchar ([$FieldLen$]) [$IsNull$] [$Default$] [$EXTEND$]  "},
-                { "char",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after}  char ([$FieldLen$]) [$IsNull$] [$Default$] [$EXTEND$] "},
+                { "nvarchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  nvarchar2 ([$FieldLen$]) [$IsNull$]  [$Default$] [$EXTEND$] "},
+                { "varchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  varchar2 ([$FieldLen$]) [$IsNull$] [$Default$] [$EXTEND$] "},
+                { "nchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  nchar ([$FieldLen$]) [$IsNull$] [$Default$] [$EXTEND$]  "},
+                { "char",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  char ([$FieldLen$]) [$IsNull$] [$Default$] [$EXTEND$] "},
                 //样例：[udescript] [text] NULL,
-                { "text",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after}  long  [$IsNull$] [$Default$] [$EXTEND$] "},
+                { "text",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  long  [$IsNull$] [$Default$] [$EXTEND$] "},
 
-                { "int",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after}  integer  [$IsIdentity$] [$IsNull$] [$Default$] [$EXTEND$] "},
-                { "bigint",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after}  number(18)  [$IsIdentity$] [$IsNull$] [$Default$] [$EXTEND$] " },
-                { "smallint",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after}  number(5)   [$IsNull$] [$Default$] [$EXTEND$] "},
-                { "decimal",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after}  decimal ([$FieldLen$],[$FieldDec$])  [$IsNull$] [$Default$] [$EXTEND$] "},
+                { "int",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  integer  [$IsIdentity$] [$IsNull$] [$Default$] [$EXTEND$] "},
+                { "bigint",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  number(18)  [$IsIdentity$] [$IsNull$] [$Default$] [$EXTEND$] " },
+                { "smallint",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  number(5)   [$IsNull$] [$Default$] [$EXTEND$] "},
+                { "decimal",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  decimal ([$FieldLen$],[$FieldDec$])  [$IsNull$] [$Default$] [$EXTEND$] "},
 
-                { "bit",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after}  number(1)    [$IsNull$] [$Default$] [$EXTEND$] "},
+                { "bit",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  number(1)    [$IsNull$] [$Default$] [$EXTEND$] "},
 
-                { "datetime",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after}  timestamp    [$IsNull$] [$Default$] [$EXTEND$] "},
-                { "date",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after}  date   [$IsNull$] [$Default$] [$EXTEND$] " },
+                { "datetime",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  timestamp    [$IsNull$] [$Default$] [$EXTEND$] "},
+                { "date",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  date   [$IsNull$] [$Default$] [$EXTEND$] " },
 
-                { "image",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after}  BLOB    [$IsNull$] [$EXTEND$] "},
-                { "uniqueidentifier",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after}  varchar2(36)   [$IsNull$] [$Default$] [$EXTEND$] "},
+                { "image",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  BLOB    [$IsNull$] [$EXTEND$] "},
+                { "uniqueidentifier",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  varchar2(36)   [$IsNull$] [$Default$] [$EXTEND$] "},
             };
 
 
             _temp_sequence = new StringBuilder()
-                .AppendLine($"select count(*) into v_secout from user_sequences where SEQUENCE_NAME = upper('[$TabName$]_[$ColumnName$]_SEQ'); ")
+                .AppendLine($"select count(*) into v_secout from user_sequences where SEQUENCE_NAME = upper('[$TabName$]_[$FieldName$]_SEQ'); ")
                 .AppendLine($"IF v_secout > 0 then")
-                .AppendLine($"   execute immediate 'drop sequence [$TabName$]_[$ColumnName$]_SEQ';")
+                .AppendLine($"   execute immediate 'drop sequence [$TabName$]_[$FieldName$]_SEQ';")
                 .AppendLine($"end if;")
-                .AppendLine($"execute immediate 'create sequence [$TabName$]_[$ColumnName$]_SEQ increment by 1 start with 1 minvalue 1 maxvalue 999999999999999';")
+                .AppendLine($"execute immediate 'create sequence [$TabName$]_[$FieldName$]_SEQ increment by 1 start with 1 minvalue 1 maxvalue 999999999999999';")
                 .ToString();
 
             _temp_sequence_temp = new StringBuilder()
-                .AppendLine($"select count(*) into v_secout from user_sequences where SEQUENCE_NAME = upper('[$TabName$]_[$ColumnName$]_SEQ'); ")
+                .AppendLine($"select count(*) into v_secout from user_sequences where SEQUENCE_NAME = upper('[$TabName$]_[$FieldName$]_SEQ'); ")
                 .AppendLine($"IF v_secout > 0 then")
-                .AppendLine($"   execute immediate 'drop sequence [$TabName$]_[$ColumnName$]_SEQ';")
+                .AppendLine($"   execute immediate 'drop sequence [$TabName$]_[$FieldName$]_SEQ';")
                 .AppendLine($"end if;")
-                .AppendLine($"execute immediate 'create sequence [$TabName$]_[$ColumnName$]_SEQ increment by 1 start with 1 minvalue 1 maxvalue 999999999999999';")
+                .AppendLine($"execute immediate 'create sequence [$TabName$]_[$FieldName$]_SEQ increment by 1 start with 1 minvalue 1 maxvalue 999999999999999';")
                 .ToString();
 
 
@@ -419,13 +419,13 @@ namespace HiSql
             _temp_tabel_key = new StringBuilder()
                 .Append($"alter table [$TabName$]  add constraint {_temp_table_pre}PK_[$TabName$]_[$ConnectID$]{_temp_table_after} primary key ([$Keys$])")
                 .ToString();
-            _temp_table_key2 = "[$ColumnName$] ";//定义主键的排序方式
+            _temp_table_key2 = "[$FieldName$] ";//定义主键的排序方式
 
             _temp_table_key3 = "ON [PRIMARY] ";//TEXTIMAGE_ON [PRIMARY]
 
 
             _temp_field_comment = new StringBuilder()
-                .Append("comment on column [$TabName$].[$ColumnName$]  is '[$FieldDesc$]'")
+                .Append("comment on column [$TabName$].[$FieldName$]  is '[$FieldDesc$]'")
                 // .AppendLine("GO")
                 .ToString();
 

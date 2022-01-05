@@ -16,11 +16,20 @@ namespace HiSql.OralceUnitTest
             //Query_Demo2(sqlClient);
             //Query_Demo3(sqlClient);
             //Query_Demo4(sqlClient);
-            Query_Demo8(sqlClient);
+            //Query_Demo8(sqlClient);
 
-            Query_Case(sqlClient);
+            //Query_Case(sqlClient);
+            Query_Demo9(sqlClient);
         }
-        static void Query_Demo8(HiSqlClient sqlClient)
+        //Query_Demo8(sqlClient);
+
+
+
+    static void Query_Demo9(HiSqlClient sqlClient)
+    {
+        sqlClient.HiSql("select * from H_Test").ToTable();
+    }
+    static void Query_Demo8(HiSqlClient sqlClient)
         {
             //string sql = sqlClient.HiSql($"select * from Hi_FieldModel  where (tabname = 'h_test') and  FieldType in (11,21,31) and tabname in (select tabname from Hi_TabModel)").ToSql();
 

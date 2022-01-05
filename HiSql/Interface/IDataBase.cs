@@ -51,9 +51,9 @@ namespace HiSql
         /// <param name="param"></param>
         void ExecAfter(string sql, HiParameter[] param);
 
-        
+
         #endregion`
-        
+
 
         /// <summary>
         /// 执行行SQL的类型(Text,StoredProcedure,TableDirect)
@@ -107,6 +107,16 @@ namespace HiSql
         /// <param name="parameters"></param>
         /// <returns></returns>
         int ExecCommand(string sql, object parameters);
+
+        /// <summary>
+        /// 执行Sql语句 并返回受影响的行
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        Task<int> ExecCommandAsync(string sql, object parameters);
+
+
         /// <summary>
         /// 执行Sql语句 并返回受影响的行 
         /// </summary>
@@ -115,6 +125,13 @@ namespace HiSql
         /// <returns></returns>
         int ExecCommand(string sql, params HiParameter[] parameters);
 
+        /// <summary>
+        /// 执行Sql语句 并返回受影响的行 
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        Task<int> ExecCommandAsync(string sql, params HiParameter[] parameters);
 
         /// <summary>
         /// 返回结果的首行首列 其它忽略

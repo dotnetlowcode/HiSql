@@ -39,16 +39,16 @@ namespace HiSql.PostGreSqlUnitTest
         {
             List<Dictionary<string, string>> list = new List<Dictionary<string, string>>();
 
-            Dictionary<string, string> _dic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "Domain", "UTYPE" }, { "DomainDesc", "用户类型1" }  };
+            Dictionary<string, string> _dic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "Domain", "UTYPE" }, { "DomainDesc", "用户类型1" } };
             list.Add(_dic);
 
-            Dictionary<string, string> _dic1 = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "Domain", "UTYPE1" }, { "DomainDesc", "用户类型2" }  };
+            Dictionary<string, string> _dic1 = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "Domain", "UTYPE1" }, { "DomainDesc", "用户类型2" } };
             list.Add(_dic1);
 
             sqlClient.Modi<Dictionary<string, string>>("Hi_Domain", list).ExecCommand();
             sqlClient.Modi<Dictionary<string, string>>("Hi_Domain", list).ExecCommand();
         }
-        static void Demo1_Modi2(HiSqlClient sqlClient)
+        static async Task Demo1_Modi2(HiSqlClient sqlClient)
         {
             int _times = 10000;
             Console.WriteLine($"[{_times}]条数据 postgresql插入测试");
@@ -59,13 +59,13 @@ namespace HiSql.PostGreSqlUnitTest
             }
             Stopwatch watch = Stopwatch.StartNew();
             //string _sql = sqlClient.Modi("Hi_Domain", lstobj).ToSql();
-            int _effect = sqlClient.Modi("H_TEST", lstobj).ExecCommand();
+            int _effect =  sqlClient.Modi("H_TEST", lstobj).ExecCommand();
 
             watch.Stop();
             Console.WriteLine($"[{_times}]条数据,耗时：{watch.Elapsed.ToString()}");
             Console.WriteLine(_effect);
         }
-        static void Demo1_Modi(HiSqlClient sqlClient)
+        static async void Demo1_Modi(HiSqlClient sqlClient)
         {
             int _times = 500;
             Console.WriteLine($"[{_times}]条数据 mysql插入测试");
@@ -82,7 +82,7 @@ namespace HiSql.PostGreSqlUnitTest
             Console.WriteLine($"[{_times}]条数据,耗时：{watch.Elapsed.ToString()}");
             Console.WriteLine(_effect);
         }
-        static void Demo2_Insert(HiSqlClient sqlClient)
+        static async void Demo2_Insert(HiSqlClient sqlClient)
         {
             int _times = 100;
             Console.WriteLine($"[{_times}]条数据 POSTGRESQL插入测试");
@@ -99,7 +99,7 @@ namespace HiSql.PostGreSqlUnitTest
             Console.WriteLine($"[{_times}]条数据,耗时：{watch.Elapsed.ToString()}");
             Console.WriteLine(_effect);
         }
-        static void Demo1_Insert(HiSqlClient sqlClient)
+        static async void Demo1_Insert(HiSqlClient sqlClient)
         {
 
             int _times = 10000;

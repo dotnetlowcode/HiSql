@@ -187,7 +187,7 @@ namespace HiSql
 
             if (!string.IsNullOrEmpty(this.ITabName))
             {
-                
+
                 //return   $"insert into   {this.ITabName}   {sb.ToString()} " ;
                 StringBuilder sb_struct = new StringBuilder();
                 HiTable hiTable = new HiTable();
@@ -201,19 +201,19 @@ namespace HiSql
                 if (hiTable.TableType != TableType.Entity)
                 {
                     if (!this.ResultColumn.Any(c => c.IsBllKey))
-                        this.ResultColumn.Insert(0, new HiColumn { ColumnName = "_ID_", IsIdentity = true, IsPrimary = true, FieldDesc = "自增ID", FieldType = HiType.INT, SortNum = 0 });
+                        this.ResultColumn.Insert(0, new HiColumn { FieldName = "_ID_", IsIdentity = true, IsPrimary = true, FieldDesc = "自增ID", FieldType = HiType.INT, SortNum = 0 });
 
                     tabInfo.Columns = this.ResultColumn;
 
-                    if(hiTable.TableType==TableType.Global)
+                    if (hiTable.TableType == TableType.Global)
                         hiTable.TabReName = hiTable.TabName.Substring(2) + "_" + System.Threading.Thread.CurrentThread.ManagedThreadId + "_" + hiTable.TabName.GetHashCode().ToString().Substring(1);
                     else
                         hiTable.TabReName = hiTable.TabName.Substring(2) + "_" + System.Threading.Thread.CurrentThread.ManagedThreadId + "_" + hiTable.TabName.GetHashCode().ToString().Substring(1);
 
 
                     string _sql = Context.DMTab.BuildTabCreateSql(tabInfo.TabModel, tabInfo.GetColumns);
-                    int _effect=Context.DBO.ExecCommand(_sql);
-
+                    Context.DBO.ExecCommand(_sql);
+                    //int _effect=await
                     //sb_struct.AppendLine(_sql);
                 }
                 sb_struct.AppendLine($"insert into   {dbConfig.Table_Pre}{this.ITabName}{dbConfig.Table_After}   {sb.ToString()} ");
@@ -221,7 +221,7 @@ namespace HiSql
 
             }
             else
-                return  sb.ToString();
+                return sb.ToString();
         }
         public override IQuery WithRank(DbRank rank, DbFunction dbFunction, string field, string asname, SortType sortType)
         {
@@ -422,18 +422,18 @@ namespace HiSql
         HiColumn checkField(FieldDefinition fieldDefinition, bool allowstart = false)
         {
             HiColumn hiColumn = null;
-            TableDefinition tabinfo = this.TableList.Where(t => t.AsTabName.ToLower() == fieldDefinition.AsTabName.ToLower()).FirstOrDefault();//&& t.Columns.Any(c=>c.ColumnName==fieldDefinition.FieldName)
+            TableDefinition tabinfo = this.TableList.Where(t => t.AsTabName.ToLower() == fieldDefinition.AsTabName.ToLower()).FirstOrDefault();//&& t.Columns.Any(c=>c.FieldName==fieldDefinition.FieldName)
             if (tabinfo != null)
             {
                 if (dictabinfo.ContainsKey(tabinfo.TabName))
                 {
-                    hiColumn = dictabinfo[tabinfo.TabName].Columns.Where(f => f.ColumnName.ToLower() == fieldDefinition.FieldName.ToLower()).FirstOrDefault();
+                    hiColumn = dictabinfo[tabinfo.TabName].Columns.Where(f => f.FieldName.ToLower() == fieldDefinition.FieldName.ToLower()).FirstOrDefault();
                     if (hiColumn == null)
                     {
                         FieldDefinition fieldDefinition1 = this.Fields.Where(f => f.AsFieldName.ToLower() == fieldDefinition.FieldName.ToLower()).FirstOrDefault();
                         if (fieldDefinition1 != null)
                         {
-                            hiColumn = dictabinfo[tabinfo.TabName].Columns.Where(f => f.ColumnName.ToLower() == fieldDefinition1.FieldName.ToLower()).FirstOrDefault();
+                            hiColumn = dictabinfo[tabinfo.TabName].Columns.Where(f => f.FieldName.ToLower() == fieldDefinition1.FieldName.ToLower()).FirstOrDefault();
                             if (hiColumn == null)
                             {
                                 if (fieldDefinition1.FieldName.Trim() != "*" && allowstart == true)

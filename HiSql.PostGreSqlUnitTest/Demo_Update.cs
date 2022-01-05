@@ -38,7 +38,7 @@ namespace HiSql.PostGreSqlUnitTest
         {
             string _sql = sqlClient.Update("H_Test").Set(new { UNAME = "UTYPE" }).Where("DID=1").ToSql();
         }
-        static void Update_Demo(HiSqlClient sqlClient)
+        static async Task Update_Demo(HiSqlClient sqlClient)
         {
             IUpdate update = sqlClient.Update("H_Test", new { DID = 1, UNAME = "UTYPE", UNAME2 = "user123" }).Exclude("UNAME");//,
 

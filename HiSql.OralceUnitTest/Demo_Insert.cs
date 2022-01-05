@@ -48,7 +48,7 @@ namespace HiSql.OralceUnitTest
             sqlClient.Modi<Dictionary<string, string>>("Hi_Domain", list).ExecCommand();
             sqlClient.Modi<Dictionary<string, string>>("Hi_Domain", list).ExecCommand();
         }
-        static void Demo1_Modi2(HiSqlClient sqlClient)
+        static async void Demo1_Modi2(HiSqlClient sqlClient)
         {
             int _times = 100;
             Console.WriteLine($"[{_times}]条数据 postgresql插入测试");
@@ -65,7 +65,7 @@ namespace HiSql.OralceUnitTest
             Console.WriteLine($"[{_times}]条数据,耗时：{watch.Elapsed.ToString()}");
             Console.WriteLine(_effect);
         }
-        static void Demo1_Modi(HiSqlClient sqlClient)
+        static async void Demo1_Modi(HiSqlClient sqlClient)
         {
             int _times = 500;
             Console.WriteLine($"[{_times}]条数据 mysql插入测试");
@@ -90,7 +90,7 @@ namespace HiSql.OralceUnitTest
                  new HiParameter("@NUMS",11),
             });
         }
-        static void Demo1_Insert(HiSqlClient sqlClient)
+        static async void Demo1_Insert(HiSqlClient sqlClient)
         {
 
             int _times = 100000;

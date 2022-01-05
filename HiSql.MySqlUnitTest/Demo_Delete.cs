@@ -60,7 +60,7 @@ namespace HiSql.MySqlUnitTest
 
 
         }
-        static void Delete_Demo(HiSqlClient sqlClient)
+        static async void Delete_Demo(HiSqlClient sqlClient)
         {
 
             Dictionary<string, string> _dic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "DID", "1" } };
@@ -76,7 +76,7 @@ namespace HiSql.MySqlUnitTest
 
 
             IDelete delete = sqlClient.Delete("H_Test");
-            //int _effect = sqlClient.Delete("H_Test").ExecCommand();
+            int _effect = sqlClient.Delete("H_Test").ExecCommand();
             string _sql = delete.ToSql();
 
             IDelete delete1 = sqlClient.Delete("H_Test").Where(new Filter { { "DID", OperType.GT, 200 } });

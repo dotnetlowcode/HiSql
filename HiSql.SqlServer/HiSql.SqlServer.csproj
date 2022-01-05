@@ -10,10 +10,17 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>该包支持SqlServer数据库 依赖于HiSql.dll包运行
 </Description>
+    <ApplicationIcon>hisql-sqlserver-logo.ico</ApplicationIcon>
+    <PackageIcon>hisql-sqlserver-logo.jpg</PackageIcon>
+    <PackageIconUrl />
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="SqlServerInsert.txt" />
+    <None Include="Data\hisql-sqlserver-logo.jpg">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

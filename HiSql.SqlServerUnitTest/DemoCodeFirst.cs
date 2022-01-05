@@ -15,8 +15,8 @@ namespace HiSql
 
             string s = Console.ReadLine();
         }
-        
-        static void CodeFirst_Demo(HiSqlClient sqlClient)
+
+        static async void CodeFirst_Demo(HiSqlClient sqlClient)
         {
             //Tuple<HiTable, List<HiColumn>> tabomdel = sqlClient.Context.DMInitalize.BuildTabStru(typeof(Hi_TabModel));
             //Tuple<HiTable, List<HiColumn>> fieldomdel = sqlClient.Context.DMInitalize.BuildTabStru(typeof(Hi_FieldModel));
@@ -42,7 +42,7 @@ namespace HiSql
 
 
 
-            int _effect = (int)sqlClient.Context.DBO.ExecCommand(_sql);
+            int _effect =  sqlClient.Context.DBO.ExecCommand(_sql);
             //int _effect = (int)sqlClient.Context.DBO.ExecScalar(_sql);
 
         }

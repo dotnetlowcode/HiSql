@@ -6,9 +6,9 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v5.0": {
-      "HiSql.MySql/1.0.2.6": {
+      "HiSql.MySql/1.0.2.7": {
         "dependencies": {
-          "HiSql": "1.0.2.6",
+          "HiSql": "1.0.2.7",
           "MySql.Data": "8.0.26"
         },
         "runtime": {
@@ -299,7 +299,7 @@
           }
         }
       },
-      "HiSql/1.0.2.6": {
+      "HiSql/1.0.2.7": {
         "dependencies": {
           "Microsoft.Extensions.Caching.Memory": "6.0.0",
           "Newtonsoft.Json": "13.0.1"
@@ -311,7 +311,7 @@
     }
   },
   "libraries": {
-    "HiSql.MySql/1.0.2.6": {
+    "HiSql.MySql/1.0.2.7": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
@@ -498,7 +498,7 @@
       "path": "system.windows.extensions/4.7.0",
       "hashPath": "system.windows.extensions.4.7.0.nupkg.sha512"
     },
-    "HiSql/1.0.2.6": {
+    "HiSql/1.0.2.7": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

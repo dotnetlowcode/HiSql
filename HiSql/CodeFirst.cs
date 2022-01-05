@@ -43,7 +43,7 @@ namespace HiSql
         /// 初次使用HiSql时请执行该方法
         /// 执行一次后不需要再执行
         /// </summary>
-        public void InstallHisql()
+        public async Task InstallHisql()
         {
             if (_sqlClient != null)
             {
@@ -53,7 +53,7 @@ namespace HiSql
                 _sql = _sql.Replace("[$Schema$]", _sqlClient.CurrentConnectionConfig.Schema);
 
                 //返回受影响的行
-                int _effect=_sqlClient.Context.DBO.ExecCommand(_sql);
+                int _effect= _sqlClient.Context.DBO.ExecCommand(_sql);
             }
             else
                 throw new Exception($"请先指定数据库连接!");

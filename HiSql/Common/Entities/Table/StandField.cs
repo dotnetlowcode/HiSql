@@ -13,25 +13,25 @@ namespace HiSql
     [System.Serializable]
     public partial class StandField
     {
-        [HiColumn(ColumnName = "CreateTime", FieldDesc = "创建时间", SortNum =990, DBDefault = HiTypeDBDefault.FUNDATE)]
+        [HiColumn(FieldName = "CreateTime", FieldDesc = "创建时间", SortNum =990, DBDefault = HiTypeDBDefault.FUNDATE)]
         /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreateTime { get; set; }
 
-        [HiColumn(ColumnName = "CreateName", FieldDesc = "创建人", SortNum = 991,DBDefault = HiTypeDBDefault.EMPTY)]
+        [HiColumn(FieldName = "CreateName", FieldDesc = "创建人", SortNum = 991,DBDefault = HiTypeDBDefault.EMPTY)]
         /// <summary>
         /// 创建人
         /// </summary>
         public string CreateName { get; set; }
 
-        [HiColumn(ColumnName = "ModiTime", FieldDesc = "修改时间", SortNum = 995 , DBDefault = HiTypeDBDefault.FUNDATE)]
+        [HiColumn(FieldName = "ModiTime", FieldDesc = "修改时间", SortNum = 995 , DBDefault = HiTypeDBDefault.FUNDATE)]
         /// <summary>
         /// 修改时间
         /// </summary>
         public DateTime ModiTime { get; set; }
 
-        [HiColumn(ColumnName = "ModiName", FieldDesc = "修改人", DBDefault=HiTypeDBDefault.EMPTY, SortNum = 998)]
+        [HiColumn(FieldName = "ModiName", FieldDesc = "修改人", DBDefault=HiTypeDBDefault.EMPTY, SortNum = 998)]
         /// <summary>
         /// 修改人
         /// </summary>

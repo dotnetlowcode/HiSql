@@ -34,7 +34,13 @@ namespace HiSql.MySqlUnitTest
             //Query_Case(sqlClient);
             //Query_Demo6(sqlClient);
             //Query_Demo7(sqlClient);
-            Query_Demo8(sqlClient);
+            //Query_Demo8(sqlClient);
+            Query_Demo9(sqlClient);
+        }
+        static void Query_Demo9(HiSqlClient sqlClient)
+        {
+            //int _effect3 = sqlClient.Modi("Hi_Domain", new List<object> { new { Domain = "10097", DomainDesc = "用户类型10097" }, new { Domain = "10098", DomainDesc = "用户类型10098" } }).ExecCommand();
+            DataTable dt= sqlClient.HiSql("select * from h_test").ToTable() ;
         }
         static void Query_Demo8(HiSqlClient sqlClient)
         {

@@ -147,7 +147,7 @@ namespace HiSql.HanaUnitTest
                             _ndrow[_dc.ColumnName] = _value;
 
                         }
-                        //_ndrow[_dc.ColumnName] = _value;
+                        //_ndrow[_dc.FieldName] = _value;
                     }
                     catch (Exception E)
                     {

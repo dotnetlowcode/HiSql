@@ -1,10 +1,3 @@
-D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\net461\HiSql.SqlServer.csproj.AssemblyReference.cache
-D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\net461\HiSql.SqlServer.Properties.Resources.resources
-D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\net461\HiSql.SqlServer.csproj.GenerateResource.cache
-D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\net461\HiSql.SqlServer.GeneratedMSBuildEditorConfig.editorconfig
-D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\net461\HiSql.SqlServer.AssemblyInfoInputs.cache
-D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\net461\HiSql.SqlServer.AssemblyInfo.cs
-D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\net461\HiSql.SqlServer.csproj.CoreCompileInputs.cache
 D:\Project\OpenSource\HiSql\HiSql.SqlServer\bin\Debug\net461\HiSql.SqlServer.dll
 D:\Project\OpenSource\HiSql\HiSql.SqlServer\bin\Debug\net461\HiSql.SqlServer.pdb
 D:\Project\OpenSource\HiSql\HiSql.SqlServer\bin\Debug\net461\Microsoft.Bcl.AsyncInterfaces.dll
@@ -23,6 +16,13 @@ D:\Project\OpenSource\HiSql\HiSql.SqlServer\bin\Debug\net461\System.Runtime.Comp
 D:\Project\OpenSource\HiSql\HiSql.SqlServer\bin\Debug\net461\System.Threading.Tasks.Extensions.dll
 D:\Project\OpenSource\HiSql\HiSql.SqlServer\bin\Debug\net461\HiSql.dll
 D:\Project\OpenSource\HiSql\HiSql.SqlServer\bin\Debug\net461\HiSql.pdb
+D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\net461\HiSql.SqlServer.csproj.AssemblyReference.cache
+D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\net461\HiSql.SqlServer.Properties.Resources.resources
+D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\net461\HiSql.SqlServer.csproj.GenerateResource.cache
+D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\net461\HiSql.SqlServer.GeneratedMSBuildEditorConfig.editorconfig
+D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\net461\HiSql.SqlServer.AssemblyInfoInputs.cache
+D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\net461\HiSql.SqlServer.AssemblyInfo.cs
+D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\net461\HiSql.SqlServer.csproj.CoreCompileInputs.cache
 D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\net461\HiSql.SqlServer.csproj.CopyComplete
 D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\net461\HiSql.SqlServer.dll
 D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\net461\HiSql.SqlServer.pdb

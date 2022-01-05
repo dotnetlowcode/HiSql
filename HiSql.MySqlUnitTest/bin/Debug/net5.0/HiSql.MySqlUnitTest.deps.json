@@ -8,9 +8,9 @@
     ".NETCoreApp,Version=v5.0": {
       "HiSql.MySqlUnitTest/1.0.0": {
         "dependencies": {
-          "HiSql": "1.0.2.6",
-          "HiSql.MySql": "1.0.2.6",
-          "HiSql.Oracle": "1.0.2.6"
+          "HiSql": "1.0.2.7",
+          "HiSql.MySql": "1.0.2.7",
+          "HiSql.Oracle": "1.0.2.7"
         },
         "runtime": {
           "HiSql.MySqlUnitTest.dll": {}
@@ -404,7 +404,7 @@
           }
         }
       },
-      "HiSql/1.0.2.6": {
+      "HiSql/1.0.2.7": {
         "dependencies": {
           "Microsoft.Extensions.Caching.Memory": "6.0.0",
           "Newtonsoft.Json": "13.0.1"
@@ -413,18 +413,18 @@
           "HiSql.dll": {}
         }
       },
-      "HiSql.MySql/1.0.2.6": {
+      "HiSql.MySql/1.0.2.7": {
         "dependencies": {
-          "HiSql": "1.0.2.6",
+          "HiSql": "1.0.2.7",
           "MySql.Data": "8.0.26"
         },
         "runtime": {
           "HiSql.MySql.dll": {}
         }
       },
-      "HiSql.Oracle/1.0.2.6": {
+      "HiSql.Oracle/1.0.2.7": {
         "dependencies": {
-          "HiSql": "1.0.2.6",
+          "HiSql": "1.0.2.7",
           "System.Data.OracleClient": "1.0.8"
         },
         "runtime": {
@@ -719,17 +719,17 @@
       "path": "system.windows.extensions/4.7.0",
       "hashPath": "system.windows.extensions.4.7.0.nupkg.sha512"
     },
-    "HiSql/1.0.2.6": {
+    "HiSql/1.0.2.7": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "HiSql.MySql/1.0.2.6": {
+    "HiSql.MySql/1.0.2.7": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "HiSql.Oracle/1.0.2.6": {
+    "HiSql.Oracle/1.0.2.7": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

@@ -4,6 +4,7 @@
     <id>HiSql.SNRO</id>
     <version>1.0.0.1</version>
     <authors>tansar</authors>
+    <icon>hisql-snro-logo.jpg</icon>
     <projectUrl>http://www.hisql.net/</projectUrl>
     <description>编号服务工具包
 根据此包可以自定义开发编号服务</description>
@@ -16,5 +17,6 @@
   </metadata>
   <files>
     <file src="D:\Project\OpenSource\HiSql\HiSql.SNRO\bin\Debug\net5.0\HiSql.SNRO.dll" target="lib\net5.0\HiSql.SNRO.dll" />
+    <file src="D:\Project\OpenSource\HiSql\HiSql.SNRO\Data\hisql-snro-logo.jpg" target="hisql-snro-logo.jpg" />
   </files>
 </package>

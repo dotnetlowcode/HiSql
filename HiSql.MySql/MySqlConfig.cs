@@ -84,7 +84,7 @@ namespace HiSql
 
         string _temp_fun_date = "";
         /// <summary>
-        /// 字段创建时的模板[$ColumnName$]  这是一个可替换的字符串ColumnName是在HiColumn中的属性名
+        /// 字段创建时的模板[$FieldName$]  这是一个可替换的字符串ColumnName是在HiColumn中的属性名
         /// </summary>
         Dictionary<string, string> _fieldtempmapping = new Dictionary<string, string> { };
         Dictionary<HiType, string> _dbmapping = new Dictionary<HiType, string>();
@@ -242,25 +242,25 @@ namespace HiSql
 
             _fieldtempmapping = new Dictionary<string, string> {
                 //样例：[TabName] [varchar](50) NOT NULL,
-                { "nvarchar",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after}  varchar([$FieldLen$]) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci [$IsNull$]  [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split} "},
-                { "varchar",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} varchar([$FieldLen$]) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
-                { "nchar",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} char([$FieldLen$]) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split} "},
-                { "char",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} char([$FieldLen$]) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
+                { "nvarchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  varchar([$FieldLen$]) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci [$IsNull$]  [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split} "},
+                { "varchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} varchar([$FieldLen$]) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
+                { "nchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} char([$FieldLen$]) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split} "},
+                { "char",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} char([$FieldLen$]) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
                 //样例：[udescript] [text] NULL,
-                { "text",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
+                { "text",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
 
-                { "int",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} int [$IsIdentity$] [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
-                { "bigint",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} bigint [$IsIdentity$] [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}" },
-                { "smallint",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} smallint [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
-                { "decimal",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} decimal([$FieldLen$],[$FieldDec$])  [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
+                { "int",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} int [$IsIdentity$] [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
+                { "bigint",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} bigint [$IsIdentity$] [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}" },
+                { "smallint",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} smallint [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
+                { "decimal",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} decimal([$FieldLen$],[$FieldDec$])  [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
 
-                { "bit",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} bit  [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
+                { "bit",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} bit  [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
 
-                { "datetime",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} datetime  [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
-                { "date",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} date  [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}" },
+                { "datetime",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} datetime  [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
+                { "date",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} date  [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}" },
 
-                { "binary",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} binary  [$IsNull$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
-                { "uniqueidentifier",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci   [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
+                { "binary",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} binary  [$IsNull$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
+                { "uniqueidentifier",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci   [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
             };
 
 
@@ -276,8 +276,9 @@ namespace HiSql
 
                 .AppendLine("[$TabStruct$]")
 
-                .AppendLine("set @_effect=1; ")
-                .AppendLine("select @_effect;")
+                //.AppendLine("set @_effect=1; ")
+                //.AppendLine("select @_effect;")
+                .AppendLine("select 1;")
                 .ToString();
 
             _temp_create_temp_global_table = new StringBuilder()
@@ -286,8 +287,9 @@ namespace HiSql
                 .AppendLine("[$Fields$]")
                 .AppendLine("[$Keys$]")//主键
                 .AppendLine(")[$Primary$]")
-                .AppendLine("set @_effect=1; ")
-                .AppendLine("select @_effect;")
+                //.AppendLine("set @_effect=1; ")
+                //.AppendLine("select @_effect;")
+                .AppendLine("select 1;")
                 .ToString();
 
             _temp_create_temp_global_table_drop = new StringBuilder()
@@ -297,8 +299,9 @@ namespace HiSql
                 .AppendLine("[$Fields$]")
                 .AppendLine("[$Keys$]")//主键
                 .AppendLine(")[$Primary$]")
-                .AppendLine("set @_effect=1; ")
-                .AppendLine("select @_effect;")
+                //.AppendLine("set @_effect=1; ")
+                //.AppendLine("select @_effect;")
+                .AppendLine("select 1;")
                 .ToString();
 
 
@@ -308,9 +311,10 @@ namespace HiSql
                 .AppendLine("[$Fields$]")
                 .AppendLine("[$Keys$]")//主键
                 .AppendLine(")[$Primary$]")
-                .AppendLine("set @_effect=1; ")
-                .AppendLine($"delete {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} ; ")
-                .AppendLine("select @_effect;")
+                //.AppendLine("set @_effect=1; ")
+                .AppendLine($"delete from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} ; ")
+                //.AppendLine("select @_effect;")
+                .AppendLine("select 1;")
                 .ToString();
 
             _temp_create_temp_local_table_drop = new StringBuilder()
@@ -320,8 +324,9 @@ namespace HiSql
                 .AppendLine("[$Fields$]")
                 .AppendLine("[$Keys$]")//主键
                 .AppendLine(")[$Primary$]")
-                .AppendLine("set @_effect=1; ")
-                .AppendLine("select @_effect;")
+                //.AppendLine("set @_effect=1; ")
+                //.AppendLine("select @_effect;")
+                .AppendLine("select 1;")
                 .ToString();
 
 
@@ -339,13 +344,13 @@ namespace HiSql
                 .AppendLine("[$Keys$]")
                 .AppendLine(")USING BTREE")
                 .ToString();
-            _temp_table_key2 = "[$ColumnName$] ASC";//定义主键的排序方式
+            _temp_table_key2 = "[$FieldName$] ASC";//定义主键的排序方式
 
             _temp_table_key3 = "ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;";//TEXTIMAGE_ON [PRIMARY]
 
 
             _temp_field_comment = new StringBuilder()
-                .AppendLine("EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'[$FieldDesc$]' , @level0type=N'SCHEMA',@level0name=N'[$Schema$]', @level1type=N'TABLE',@level1name=N'[$TabName$]', @level2type=N'COLUMN',@level2name=N'[$ColumnName$]'")
+                .AppendLine("EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'[$FieldDesc$]' , @level0type=N'SCHEMA',@level0name=N'[$Schema$]', @level1type=N'TABLE',@level1name=N'[$TabName$]', @level2type=N'COLUMN',@level2name=N'[$FieldName$]'")
                 // .AppendLine("GO")
                 .ToString();
 

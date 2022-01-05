@@ -97,7 +97,7 @@ namespace HiSql
         string _temp_sequence_temp = "";
 
         /// <summary>
-        /// 字段创建时的模板[$ColumnName$]  这是一个可替换的字符串ColumnName是在HiColumn中的属性名
+        /// 字段创建时的模板[$FieldName$]  这是一个可替换的字符串ColumnName是在HiColumn中的属性名
         /// </summary>
         Dictionary<string, string> _fieldtempmapping = new Dictionary<string, string> { };
         Dictionary<HiType, string> _dbmapping = new Dictionary<HiType, string>();
@@ -262,32 +262,32 @@ namespace HiSql
 
             _fieldtempmapping = new Dictionary<string, string> {
                 //样例：[TabName] [varchar](50) NOT NULL,
-                { "nvarchar",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after}  varchar([$FieldLen$])  [$IsNull$]  [$Default$]  [$EXTEND$]  "},
-                { "varchar",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} varchar([$FieldLen$])   [$IsNull$] [$Default$] [$EXTEND$] "},
-                { "nchar",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} char([$FieldLen$])   [$IsNull$] [$Default$]  [$EXTEND$] "},
-                { "char",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} char([$FieldLen$])   [$IsNull$] [$Default$]  [$EXTEND$] "},
+                { "nvarchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  varchar([$FieldLen$])  [$IsNull$]  [$Default$]  [$EXTEND$]  "},
+                { "varchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} varchar([$FieldLen$])   [$IsNull$] [$Default$] [$EXTEND$] "},
+                { "nchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} char([$FieldLen$])   [$IsNull$] [$Default$]  [$EXTEND$] "},
+                { "char",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} char([$FieldLen$])   [$IsNull$] [$Default$]  [$EXTEND$] "},
                 //样例：[udescript] [text] NULL,
-                { "text",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} text   [$IsNull$] [$Default$] [$EXTEND$] "},
+                { "text",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} text   [$IsNull$] [$Default$] [$EXTEND$] "},
 
-                { "int",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} integer [$IsIdentity$] [$IsNull$] [$Default$] [$EXTEND$] "},
-                { "bigint",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} bigint [$IsIdentity$] [$IsNull$] [$Default$]  [$EXTEND$] " },
-                { "smallint",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} smallint [$IsNull$] [$Default$]  [$EXTEND$] "},
-                { "decimal",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} decimal([$FieldLen$],[$FieldDec$])  [$IsNull$] [$Default$] [$EXTEND$] "},
+                { "int",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} integer [$IsIdentity$] [$IsNull$] [$Default$] [$EXTEND$] "},
+                { "bigint",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} bigint [$IsIdentity$] [$IsNull$] [$Default$]  [$EXTEND$] " },
+                { "smallint",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} smallint [$IsNull$] [$Default$]  [$EXTEND$] "},
+                { "decimal",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} decimal([$FieldLen$],[$FieldDec$])  [$IsNull$] [$Default$] [$EXTEND$] "},
 
-                { "bit",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} bool  [$IsNull$] [$Default$]  [$EXTEND$] "},
+                { "bit",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} bool  [$IsNull$] [$Default$]  [$EXTEND$] "},
 
-                { "datetime",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} TIMESTAMP  [$IsNull$] [$Default$]  [$EXTEND$] "},
-                { "date",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} date  [$IsNull$] [$Default$]  [$EXTEND$] " },
+                { "datetime",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} TIMESTAMP  [$IsNull$] [$Default$]  [$EXTEND$] "},
+                { "date",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} date  [$IsNull$] [$Default$]  [$EXTEND$] " },
 
-                { "binary",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} bytea  [$IsNull$]  [$EXTEND$] "},
-                { "uniqueidentifier",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} varchar(36)   [$IsNull$] [$Default$]  [$EXTEND$] "},
+                { "binary",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} bytea  [$IsNull$]  [$EXTEND$] "},
+                { "uniqueidentifier",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} varchar(36)   [$IsNull$] [$Default$]  [$EXTEND$] "},
             };
 
 
             //
             _temp_sequence = new StringBuilder()
-                .AppendLine($"DROP SEQUENCE if EXISTS {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]_[$ColumnName$]_seq{_temp_table_after};  ")
-                .AppendLine($"CREATE SEQUENCE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]_[$ColumnName$]_seq{_temp_table_after}  ")
+                .AppendLine($"DROP SEQUENCE if EXISTS {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]_[$FieldName$]_seq{_temp_table_after};  ")
+                .AppendLine($"CREATE SEQUENCE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]_[$FieldName$]_seq{_temp_table_after}  ")
                 .AppendLine("INCREMENT 1  ")
                 .AppendLine("MINVALUE 1 ")
                 .AppendLine("MAXVALUE 9223372036854775807  ")
@@ -296,8 +296,8 @@ namespace HiSql
                 .ToString();
 
             _temp_sequence_temp = new StringBuilder()
-                .AppendLine($"DROP SEQUENCE if EXISTS  {_temp_table_pre}[$TabName$]_[$ColumnName$]_seq{_temp_table_after};  ")
-                .AppendLine($"CREATE SEQUENCE  {_temp_table_pre}[$TabName$]_[$ColumnName$]_seq{_temp_table_after}  ")
+                .AppendLine($"DROP SEQUENCE if EXISTS  {_temp_table_pre}[$TabName$]_[$FieldName$]_seq{_temp_table_after};  ")
+                .AppendLine($"CREATE SEQUENCE  {_temp_table_pre}[$TabName$]_[$FieldName$]_seq{_temp_table_after}  ")
                 .AppendLine("INCREMENT 1  ")
                 .AppendLine("MINVALUE 1 ")
                 .AppendLine("MAXVALUE 9223372036854775807  ")
@@ -382,13 +382,13 @@ namespace HiSql
             _temp_tabel_key = new StringBuilder()
                 .AppendLine("[$Keys$]")
                 .ToString();
-            _temp_table_key2 = "[$ColumnName$] ";//定义主键的排序方式
+            _temp_table_key2 = "[$FieldName$] ";//定义主键的排序方式
 
             _temp_table_key3 = $"ALTER TABLE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} ADD CONSTRAINT {_temp_field_pre}[$TabName$]_pkey{_temp_field_after} PRIMARY KEY ([$Keys$]);";//TEXTIMAGE_ON [PRIMARY]
             _temp_table_key3_temp = $"ALTER TABLE {_temp_table_pre}[$TabName$]{_temp_table_after} ADD CONSTRAINT {_temp_field_pre}[$TabName$]_pkey{_temp_field_after} PRIMARY KEY ([$Keys$]);";
 
             _temp_field_comment = new StringBuilder()
-                .AppendLine($"COMMENT ON COLUMN {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after}.{_temp_field_pre}[$ColumnName$]{_temp_field_after} IS '[$FieldDesc$]';")
+                .AppendLine($"COMMENT ON COLUMN {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after}.{_temp_field_pre}[$FieldName$]{_temp_field_after} IS '[$FieldDesc$]';")
                 // .AppendLine("GO")
                 .ToString();
 
