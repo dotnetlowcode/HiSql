@@ -14,10 +14,10 @@ namespace HiSql
     {
 
 
-         public static void ToDynamic(dynamic o)
+        public static void ToDynamic(dynamic o)
         {
 
-            var ostr=JsonConvert.SerializeObject(o);
+            var ostr = JsonConvert.SerializeObject(o);
 
             dynamic json = Newtonsoft.Json.Linq.JToken.Parse(ostr) as dynamic;
 
@@ -31,19 +31,19 @@ namespace HiSql
 
             //if (o1 != null)
             //{ 
-                
+
             //}
 
         }
 
 
-        public static List<T> ToList<T>(IDataReader dataReader) 
+        public static List<T> ToList<T>(IDataReader dataReader)
         {
             List<T> lst = new List<T>();
             Type type = typeof(T);
             List<string> fieldNameList = new List<string>();
             string _value = "";
-            List< PropertyInfo> listInfo = type.GetProperties().Where(p => p.CanWrite && p.CanRead && p.MemberType == MemberTypes.Property).ToList();//
+            List<PropertyInfo> listInfo = type.GetProperties().Where(p => p.CanWrite && p.CanRead && p.MemberType == MemberTypes.Property).ToList();//
             for (int i = 0; i < dataReader.FieldCount; i++)
             {
                 fieldNameList.Add(dataReader.GetName(i));
@@ -60,14 +60,14 @@ namespace HiSql
                             PropertyInfo pinfo = listInfo.Where(p => p.Name.ToLower() == n.ToLower()).FirstOrDefault();
                             if (pinfo != null)
                             {
-                                
+
 
                                 if (dataReader[n] is not DBNull)
                                 {
                                     if (pinfo.PropertyType.FullName.IndexOf("bool") >= 0)
                                     {
                                         _value = dataReader[n].ToString().ToLower().Trim();
-                                        if(_value=="1" || _value=="true")
+                                        if (_value == "1" || _value == "true")
                                             pinfo.SetValue(t1, true);
                                         else
                                             pinfo.SetValue(t1, false);
@@ -103,7 +103,7 @@ namespace HiSql
                         foreach (PropertyInfo pinfo in listInfo)
                         {
                             string n = fieldNameList.Where(fn => fn.ToLower() == pinfo.Name.ToLower()).FirstOrDefault();
-                            if(!string.IsNullOrEmpty(n))
+                            if (!string.IsNullOrEmpty(n))
                             {
 
                                 //当不为Null值时才赋值
@@ -182,13 +182,11 @@ namespace HiSql
             return result;
         }
 
-
-
-        public static List<TDynamic> ToDynamic(IDataReader dataReader)
+        public static async Task<List<ExpandoObject>> ToEObjectSync(Task<IDataReader> dataReaderSync)
         {
-            List<TDynamic> result = new List<TDynamic>();
+            var dataReader = await dataReaderSync;
+            List<ExpandoObject> result = new List<ExpandoObject>();
             List<string> fieldNameList = new List<string>();
-            
             for (int i = 0; i < dataReader.FieldCount; i++)
             {
                 fieldNameList.Add(dataReader.GetName(i));
@@ -199,7 +197,40 @@ namespace HiSql
                 TDynamic _dyn = new TDynamic();
                 foreach (string n in fieldNameList)
                 {
-                    if(dataReader[n] is not DBNull)
+                    //针对于hana 的decimal特殊处理
+                    if (dataReader[n].GetType().FullName.IndexOf("HanaDecimal") >= 0)
+                    {
+                        _dyn[n] = Convert.ToDecimal(dataReader[n].ToString());
+                    }
+                    else
+                    {
+                        if (dataReader[n] is not DBNull)
+                            _dyn[n] = dataReader[n];
+                    }
+                }
+                result.Add((ExpandoObject)_dyn);
+            }
+            dataReader.Close();
+            return result;
+        }
+
+
+        public static List<TDynamic> ToDynamic(IDataReader dataReader)
+        {
+            List<TDynamic> result = new List<TDynamic>();
+            List<string> fieldNameList = new List<string>();
+
+            for (int i = 0; i < dataReader.FieldCount; i++)
+            {
+                fieldNameList.Add(dataReader.GetName(i));
+            }
+            while (dataReader.Read())
+            {
+
+                TDynamic _dyn = new TDynamic();
+                foreach (string n in fieldNameList)
+                {
+                    if (dataReader[n] is not DBNull)
                         _dyn[n] = dataReader[n];
                 }
                 result.Add(_dyn);

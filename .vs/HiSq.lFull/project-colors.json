@@ -70,7 +70,12 @@
       "ProjectGuid": "2e1a94e3-92e7-437d-8a8b-2ed2c0cd7abf",
       "DisplayName": "HiSql.PostGreSql",
       "ColorIndex": 12
+    },
+    "f4e42882-38c5-4c4f-b28d-4f04437d3278": {
+      "ProjectGuid": "f4e42882-38c5-4c4f-b28d-4f04437d3278",
+      "DisplayName": "HiSql.SqlServer.Test",
+      "ColorIndex": 13
     }
   },
-  "NextColorIndex": 13
+  "NextColorIndex": 14
 }

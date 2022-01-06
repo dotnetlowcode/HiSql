@@ -59,7 +59,7 @@ namespace HiSql.SqlServer.Test
                      Schema = "dbo",
                      IsEncrypt = true,
                      IsAutoClose = false,
-                     SqlExecTimeOut = 60000,
+                     SqlExecTimeOut = 1,
 
                      AppEvents = new AopEvent()
                      {
@@ -278,5 +278,12 @@ namespace HiSql.SqlServer.Test
 
         }
 
+        [Fact]
+        public void Query()
+        {
+            //sqlClient.HiSql($"select * from ");
+            var data = sqlClient.Query("Hi_TabModel").Field("*").Where(new Filter { { "TabNameA", OperType.EQ, tableName } }).ToEObject(); //.ToList<Dictionary<string, string>>();
+            Assert.True(true);
+        }
     }
 }
