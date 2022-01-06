@@ -29,15 +29,33 @@
 
  目前流行的ORM框架如果需要动态的拼接查询语句，只能用原生的sql进行拼接，无法跨不同数据库执行。hisql推出新的语法一套语句可以在不同的数据库执行
 
-传统ORM框架最大的弊端就是完全要依赖于实体用lambda表达式写查询语句，但最大的问题就是如果业务场景需要动态拼接条件时只能又切换到原生数据库的sql语句进行完成，如果自行拼接开发人员还要解决防注入的问题,hisql 刚才完美的解决这些问题,Hisql底层已经对sql注入进行了处理，开发人员只要关注于业务开发
+传统ORM框架最大的弊端就是完全要依赖于实体用lambda表达式写查询语句，但最大的问题就是如果业务场景需要动态拼接条件时只能又切换到原生数据库的sql语句进行完成，如果自行拼接开发人员还要解决防注入的问题,hisql 刚才完美的解决这些问题,Hisql底层已经对sql注入进行了
+
+处理，开发人员只要关注于业务开发
+
+### 2022.1.6 更新
+1. CodeFirst增加表删除功能
+```c#
+sqlClient.CodeFirst.DropTable("H_Test4");
+``` 
+2. CodeFirst 增加创建表功能
+```c#
+
+
+//tabInfo 为 TabInfo 类型（可以自行构建该类实现动态创建表）
+sqlClient.CodeFirst.CreateTable(tabInfo);
+
+//也可以根据实体类直接创建
+sqlClient.CodeFirst.CreateTable(typeof(H_Test4));
+```
 
 ### 2022.1.5 更新
-1.当物理表结构有变更时 自动将物理表结构信息同步到`Hi_FieldModel` 字段中(需要重启应用)
+1. 当物理表结构有变更时 自动将物理表结构信息同步到`Hi_FieldModel` 字段中(需要重启应用)
 
 
 
 ### 2021.12.25 更新
-1.新增Update的where条件支持Hisql语句 hisql写法请参考2021.12.10-15更新
+1. 新增Update的where条件支持Hisql语句 hisql写法请参考2021.12.10-15更新
 ```c#
 //Where方法中可以写HiSql语法的条件 
 sqlClient.Update("H_Test").Set(new { UNAME = "UTYPE" }).Where("DID=1").ExecCommand();

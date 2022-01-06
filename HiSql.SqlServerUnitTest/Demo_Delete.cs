@@ -27,7 +27,17 @@ namespace HiSql
         public static void Init(HiSqlClient sqlClient)
         {
             //Delete_Demo(sqlClient);
-            Delete_Demo2(sqlClient);
+            //Delete_Demo2(sqlClient);
+            Drop_Demo(sqlClient);
+        }
+
+        static void Drop_Demo(HiSqlClient sqlClient)
+        {
+            string _sql=sqlClient.Drop("H_Test4").ToSql();
+            string _sql2 = sqlClient.TrunCate("H_Test4").ToSql();
+
+            sqlClient.CodeFirst.DropTable("H_Test4");
+
         }
 
         static void Delete_Demo2(HiSqlClient sqlClient)

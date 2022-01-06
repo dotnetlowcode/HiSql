@@ -26,7 +26,13 @@ namespace HiSql.HanaUnitTest
         }
         public static void Init(HiSqlClient sqlClient)
         {
-            Delete_Demo(sqlClient);
+            //Delete_Demo(sqlClient);
+            Drop_Demo(sqlClient);
+        }
+        static void Drop_Demo(HiSqlClient sqlClient)
+        {
+            string _sql = sqlClient.Drop("H_Test4").ToSql();
+            string _sql2 = sqlClient.TrunCate("H_Test4").ToSql();
         }
         static void Delete_Demo(HiSqlClient sqlClient)
         {

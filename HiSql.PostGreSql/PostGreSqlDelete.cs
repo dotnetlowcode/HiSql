@@ -61,7 +61,7 @@ namespace HiSql
                         Dictionary<string, string> result = this.CheckData(_isdic,this.Table, obj, Context.DMInitalize, tabinfo);
                         if (result.Count > 0)
                         {
-                            sb.AppendLine(Context.DMTab.BuildDeleteSql(this.Table, result, sql_where, this.IsNoDbLog));
+                            sb.AppendLine(Context.DMTab.BuildDeleteSql(this.Table, result, sql_where, false));
                         }
                     }
                 }
@@ -76,7 +76,7 @@ namespace HiSql
                 {
                     sql_where = Context.DMTab.BuilderWhereSql(new List<TableDefinition> { this.Table }, dictabinfo, null, this.Wheres, false);
                 }
-                sb.AppendLine(Context.DMTab.BuildDeleteSql(this.Table, new Dictionary<string, string>(), sql_where.ToString(), this.IsNoDbLog));
+                sb.AppendLine(Context.DMTab.BuildDeleteSql(this.Table, new Dictionary<string, string>(), sql_where.ToString(), this.IsTruncate, this.IsDrop));
             }
         }
         #endregion

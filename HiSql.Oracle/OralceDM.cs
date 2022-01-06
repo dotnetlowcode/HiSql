@@ -262,7 +262,7 @@ namespace HiSql
                     int rtn = this.BuildTabCreate(tabInfo);
                     //string _sql = this.BuildTabStructSql(tabInfo.TabModel, tabInfo.Columns).ToString();
                     //this.Context.DBO.ExecCommand(_sql);
-                    GetTabStruct(tabname);
+                    //GetTabStruct(tabname);
                 }
                 else
                 {
@@ -602,13 +602,13 @@ namespace HiSql
 
             return _merge_temp;
         }
-        public string BuildDeleteSql(TableDefinition table, Dictionary<string, string> dic_value, string _where, bool istrunctate = false)
+        public string BuildDeleteSql(TableDefinition table, Dictionary<string, string> dic_value, string _where, bool istrunctate = false, bool isdrop = false)
         {
             string _temp_delete = string.Empty;
             StringBuilder sb_field = new StringBuilder();
-            string _schema = string.IsNullOrEmpty(Context.CurrentConnectionConfig.Schema) ? "dbo" : Context.CurrentConnectionConfig.Schema;
+            string _schema = string.IsNullOrEmpty(Context.CurrentConnectionConfig.Schema) ? "" : Context.CurrentConnectionConfig.Schema;
             int i = 0;
-            if (!istrunctate && dic_value.Count > 0 || !string.IsNullOrEmpty(_where))
+            if ((!istrunctate && !isdrop && dic_value.Count > 0) || !string.IsNullOrEmpty(_where))
             {
                 _temp_delete = dbConfig.Delete_Statement_Where;
                 if (dic_value.Count > 0)
@@ -633,16 +633,26 @@ namespace HiSql
             }
             else
             {
-                if (!istrunctate)
+                if (!istrunctate && !isdrop)
                 {
+                    //删除表
                     _temp_delete = dbConfig.Delete_Statement;
                     _temp_delete = _temp_delete
                         .Replace("[$Schema$]", _schema)
                         .Replace("[$TabName$]", table.TabName);
                 }
-                else
+                else if (istrunctate && !isdrop)
                 {
+                    //Truncate 删除表数据 无日志
                     _temp_delete = dbConfig.Delete_TrunCate;
+                    _temp_delete = _temp_delete
+                        .Replace("[$Schema$]", _schema)
+                        .Replace("[$TabName$]", table.TabName);
+                }
+                else if (!istrunctate && isdrop)
+                {
+                    ///删除表数据
+                    _temp_delete = dbConfig.Drop_Table;
                     _temp_delete = _temp_delete
                         .Replace("[$Schema$]", _schema)
                         .Replace("[$TabName$]", table.TabName);
