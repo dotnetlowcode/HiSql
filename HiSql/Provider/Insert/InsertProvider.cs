@@ -678,7 +678,7 @@ namespace HiSql
                 foreach (HiColumn hi in arrcol)
                 {
                     //if(!string.IsNullOrEmpty(hi.Regex))
-                    dic_hash_reg.Add(hi.ColumnName, new HashSet<string>());
+                    dic_hash_reg.Add(hi.FieldName, new HashSet<string>());
 
 
                 }
@@ -699,26 +699,26 @@ namespace HiSql
                             {
                                 _value = "";
                                 #region  判断必填 及自增长
-                                if (hiColumn.IsRequire && !hiColumn.IsIdentity && !_o.ContainsKey(hiColumn.ColumnName))
+                                if (hiColumn.IsRequire && !hiColumn.IsIdentity && !_o.ContainsKey(hiColumn.FieldName))
                                 {
-                                    throw new Exception($"行[{_rowidx}] 缺少字段[{hiColumn.ColumnName}] 为必填字段");
+                                    throw new Exception($"行[{_rowidx}] 缺少字段[{hiColumn.FieldName}] 为必填字段");
                                 }
-                                if (hiColumn.IsIdentity && _o.ContainsKey(hiColumn.ColumnName))
+                                if (hiColumn.IsIdentity && _o.ContainsKey(hiColumn.FieldName))
                                 {
-                                    _value = _o[hiColumn.ColumnName].ToString();
+                                    _value = _o[hiColumn.FieldName].ToString();
                                     if (_value == "0" || string.IsNullOrEmpty(_value))
                                         continue;
                                     else
-                                        throw new Exception($"行[{_rowidx}] 字段[{hiColumn.ColumnName}] 为自增长字段 不需要外部赋值");
+                                        throw new Exception($"行[{_rowidx}] 字段[{hiColumn.FieldName}] 为自增长字段 不需要外部赋值");
                                 }
                                 #endregion
 
-                                if (_o.ContainsKey(hiColumn.ColumnName))
+                                if (_o.ContainsKey(hiColumn.FieldName))
                                 {
                                     #region 将值转成string 及特殊处理
                                     if (hiColumn.FieldType.IsIn<HiType>(HiType.DATE, HiType.DATETIME))
                                     {
-                                        DateTime dtime = (DateTime)_o[hiColumn.ColumnName];
+                                        DateTime dtime = (DateTime)_o[hiColumn.FieldName];
                                         if (dtime != null && dtime != DateTime.MinValue)
                                         {
                                             _value = dtime.ToString("yyyy-MM-dd HH:mm:ss.fff");
@@ -726,7 +726,7 @@ namespace HiSql
                                     }
                                     else if (hiColumn.FieldType.IsIn<HiType>(HiType.BOOL))
                                     {
-                                        if ((bool)_o[hiColumn.ColumnName] == true)
+                                        if ((bool)_o[hiColumn.FieldName] == true)
                                         {
                                             _value = "1";
                                         }
@@ -735,14 +735,14 @@ namespace HiSql
                                     }
                                     else
                                     {
-                                        _value = _o[hiColumn.ColumnName].ToString();
+                                        _value = _o[hiColumn.FieldName].ToString();
                                     }
                                     #endregion
 
                                     #region 是否需要正则校验
-                                    if (arrcol.Any(h => h.ColumnName == hiColumn.ColumnName))
+                                    if (arrcol.Any(h => h.FieldName == hiColumn.FieldName))
                                     {
-                                        dic_hash_reg[hiColumn.ColumnName].Add(_value);
+                                        dic_hash_reg[hiColumn.FieldName].Add(_value);
                                     }
 
 
@@ -754,7 +754,7 @@ namespace HiSql
                                     var result = checkFieldValue(hiColumn, _rowidx, _value);
                                     if (result.Item1)
                                     {
-                                        _rowdic.Add(hiColumn.ColumnName, result.Item2);
+                                        _rowdic.Add(hiColumn.FieldName, result.Item2);
                                     }
                                     #endregion
                                 }
@@ -763,14 +763,14 @@ namespace HiSql
                                     #region 未赋值数据处理
                                     if (!hiColumn.IsNull && hiColumn.DBDefault == HiTypeDBDefault.NONE && !hiColumn.IsIdentity)
                                     {
-                                        throw new Exception($"行[{_rowidx}] 字段[{hiColumn.ColumnName}]不允许为空数据库中未设置默认值 且插入数据值中未指定值");
+                                        throw new Exception($"行[{_rowidx}] 字段[{hiColumn.FieldName}]不允许为空数据库中未设置默认值 且插入数据值中未指定值");
                                     }
-                                    else if (Constants.IsStandardField(hiColumn.ColumnName))
+                                    else if (Constants.IsStandardField(hiColumn.FieldName))
                                     {
                                         var result = checkFieldValue(hiColumn, _rowidx, _value);
                                         if (result.Item1)
                                         {
-                                            _rowdic.Add(hiColumn.ColumnName, result.Item2);
+                                            _rowdic.Add(hiColumn.FieldName, result.Item2);
                                         }
                                     }
                                     #endregion
@@ -799,28 +799,28 @@ namespace HiSql
                             {
                                 _value = "";
                                 #region  判断必填 及自增长
-                                if (hiColumn.IsRequire && !hiColumn.IsIdentity && !_o.ContainsKey(hiColumn.ColumnName))
+                                if (hiColumn.IsRequire && !hiColumn.IsIdentity && !_o.ContainsKey(hiColumn.FieldName))
                                 {
-                                    throw new Exception($"行[{_rowidx}] 缺少字段[{hiColumn.ColumnName}] 为必填字段");
+                                    throw new Exception($"行[{_rowidx}] 缺少字段[{hiColumn.FieldName}] 为必填字段");
                                 }
-                                if (hiColumn.IsIdentity && _o.ContainsKey(hiColumn.ColumnName))
+                                if (hiColumn.IsIdentity && _o.ContainsKey(hiColumn.FieldName))
                                 {
-                                    _value = _o[hiColumn.ColumnName].ToString();
+                                    _value = _o[hiColumn.FieldName].ToString();
                                     if (_value == "0" || string.IsNullOrEmpty(_value))
                                         continue;
                                     else
-                                        throw new Exception($"行[{_rowidx}] 字段[{hiColumn.ColumnName}] 为自增长字段 不需要外部赋值");
+                                        throw new Exception($"行[{_rowidx}] 字段[{hiColumn.FieldName}] 为自增长字段 不需要外部赋值");
                                 }
                                 #endregion
 
-                                if (_o.ContainsKey(hiColumn.ColumnName) || _o.ContainsKey(hiColumn.ColumnName.ToLower()))
+                                if (_o.ContainsKey(hiColumn.FieldName) || _o.ContainsKey(hiColumn.FieldName.ToLower()))
                                 {
-                                    _value = _o[hiColumn.ColumnName].ToString();
+                                    _value = _o[hiColumn.FieldName].ToString();
 
                                     #region 是否需要正则校验
-                                    if (arrcol.Any(h => h.ColumnName == hiColumn.ColumnName))
+                                    if (arrcol.Any(h => h.FieldName == hiColumn.FieldName))
                                     {
-                                        dic_hash_reg[hiColumn.ColumnName].Add(_value);
+                                        dic_hash_reg[hiColumn.FieldName].Add(_value);
                                     }
 
                                     #endregion
@@ -829,7 +829,7 @@ namespace HiSql
                                     var result = checkFieldValue(hiColumn, _rowidx, _value);
                                     if (result.Item1)
                                     {
-                                        _rowdic.Add(hiColumn.ColumnName, result.Item2);
+                                        _rowdic.Add(hiColumn.FieldName, result.Item2);
                                     }
                                     #endregion
                                 }
@@ -838,14 +838,14 @@ namespace HiSql
                                     #region 未赋值数据处理
                                     if (!hiColumn.IsNull && hiColumn.DBDefault == HiTypeDBDefault.NONE && !hiColumn.IsIdentity)
                                     {
-                                        throw new Exception($"行[{_rowidx}] 字段[{hiColumn.ColumnName}]不允许为空数据库中未设置默认值 且插入数据值中未指定值");
+                                        throw new Exception($"行[{_rowidx}] 字段[{hiColumn.FieldName}]不允许为空数据库中未设置默认值 且插入数据值中未指定值");
                                     }
-                                    else if (Constants.IsStandardField(hiColumn.ColumnName))
+                                    else if (Constants.IsStandardField(hiColumn.FieldName))
                                     {
                                         var result = checkFieldValue(hiColumn, _rowidx, _value);
                                         if (result.Item1)
                                         {
-                                            _rowdic.Add(hiColumn.ColumnName, result.Item2);
+                                            _rowdic.Add(hiColumn.FieldName, result.Item2);
                                         }
                                     }
                                     #endregion
@@ -876,19 +876,19 @@ namespace HiSql
                         foreach (HiColumn hiColumn in hiColumns)
                         {
                             _value = "";
-                            var objprop = attrs.Where(p => p.Name.ToLower() == hiColumn.ColumnName.ToLower()).FirstOrDefault();
+                            var objprop = attrs.Where(p => p.Name.ToLower() == hiColumn.FieldName.ToLower()).FirstOrDefault();
                             #region  判断必填 及自增长
                             if (hiColumn.IsRequire && !hiColumn.IsIdentity && objprop == null)
                             {
-                                throw new Exception($"行[{_rowidx}] 缺少字段[{hiColumn.ColumnName}] 为必填字段");
+                                throw new Exception($"行[{_rowidx}] 缺少字段[{hiColumn.FieldName}] 为必填字段");
                             }
-                            if (hiColumn.IsIdentity && _dic.ContainsKey(hiColumn.ColumnName))
+                            if (hiColumn.IsIdentity && _dic.ContainsKey(hiColumn.FieldName))
                             {
-                                _value = _dic[hiColumn.ColumnName].ToString();
+                                _value = _dic[hiColumn.FieldName].ToString();
                                 if (_value == "0" || string.IsNullOrEmpty(_value))
                                     continue;
                                 else
-                                    throw new Exception($"行[{_rowidx}] 字段[{hiColumn.ColumnName}] 为自增长字段 不需要外部赋值");
+                                    throw new Exception($"行[{_rowidx}] 字段[{hiColumn.FieldName}] 为自增长字段 不需要外部赋值");
                             }
                             #endregion
 
@@ -900,30 +900,35 @@ namespace HiSql
                                     DateTime dtime = (DateTime)objprop.GetValue(objdata);
                                     if (dtime != null && dtime != DateTime.MinValue)
                                     {
-                                        _dic.Add(hiColumn.ColumnName, dtime.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+                                        _dic.Add(hiColumn.FieldName, dtime.ToString("yyyy-MM-dd HH:mm:ss.fff"));
                                     }
                                 }
                                 else if (hiColumn.FieldType.IsIn<HiType>(HiType.BOOL))
                                 {
                                     if ((bool)objprop.GetValue(objdata) == true)
                                     {
-                                        _dic.Add(hiColumn.ColumnName, "1");
+                                        _dic.Add(hiColumn.FieldName, "1");
                                     }
                                     else
-                                        _dic.Add(hiColumn.ColumnName, "0");
+                                        _dic.Add(hiColumn.FieldName, "0");
                                 }
                                 else
                                 {
-                                    _dic.Add(hiColumn.ColumnName, objprop.GetValue(objdata).ToString());
+                                    if (hiColumn.FieldType.IsIn<HiType>(HiType.INT))
+                                    {
+                                        _dic.Add(hiColumn.FieldName, ((int)objprop.GetValue(objdata)).ToString());
+                                    }
+                                    else
+                                        _dic.Add(hiColumn.FieldName, objprop.GetValue(objdata).ToString());
                                 }
-                                _value = _dic[hiColumn.ColumnName];
+                                _value = _dic[hiColumn.FieldName];
                                 #endregion
 
 
                                 #region 是否需要正则校验
-                                if (arrcol.Any(h => h.ColumnName == hiColumn.ColumnName))
+                                if (arrcol.Any(h => h.FieldName == hiColumn.FieldName))
                                 {
-                                    dic_hash_reg[hiColumn.ColumnName].Add(_dic[hiColumn.ColumnName]);
+                                    dic_hash_reg[hiColumn.FieldName].Add(_dic[hiColumn.FieldName]);
                                 }
 
                                 #endregion
@@ -932,7 +937,7 @@ namespace HiSql
                                 var result = checkFieldValue(hiColumn, _rowidx, _value);
                                 if (result.Item1)
                                 {
-                                    _rowdic.Add(hiColumn.ColumnName, result.Item2);
+                                    _rowdic.Add(hiColumn.FieldName, result.Item2);
                                 }
                                 #endregion
                             }
@@ -941,14 +946,14 @@ namespace HiSql
                                 #region 未赋值数据处理
                                 if (!hiColumn.IsNull && hiColumn.DBDefault == HiTypeDBDefault.NONE && !hiColumn.IsIdentity)
                                 {
-                                    throw new Exception($"行[{_rowidx}] 字段[{hiColumn.ColumnName}]不允许为空数据库中未设置默认值 且插入数据值中未指定值");
+                                    throw new Exception($"行[{_rowidx}] 字段[{hiColumn.FieldName}]不允许为空数据库中未设置默认值 且插入数据值中未指定值");
                                 }
-                                else if (Constants.IsStandardField(hiColumn.ColumnName))
+                                else if (Constants.IsStandardField(hiColumn.FieldName))
                                 {
                                     var result = checkFieldValue(hiColumn, _rowidx, "");
                                     if (result.Item1)
                                     {
-                                        _rowdic.Add(hiColumn.ColumnName, result.Item2);
+                                        _rowdic.Add(hiColumn.FieldName, result.Item2);
                                     }
                                 }
                                 #endregion
@@ -976,13 +981,13 @@ namespace HiSql
                 foreach (HiColumn hiColumn in arrcol_reg)
                 {
                     Regex _regex = new Regex(hiColumn.Regex, RegexOptions.IgnoreCase | RegexOptions.Multiline);
-                    if (dic_hash_reg.ContainsKey(hiColumn.ColumnName))
+                    if (dic_hash_reg.ContainsKey(hiColumn.FieldName))
                     {
-                        foreach (string n in dic_hash_reg[hiColumn.ColumnName])
+                        foreach (string n in dic_hash_reg[hiColumn.FieldName])
                         {
                             if (!_regex.Match(n).Success)
                             {
-                                throw new Exception($@"列[{hiColumn.ColumnName}]值[{n}] 不符合业务配置 {hiColumn.Regex} 要求");
+                                throw new Exception($@"列[{hiColumn.FieldName}]值[{n}] 不符合业务配置 {hiColumn.Regex} 要求");
                             }
                         }
 
@@ -999,9 +1004,9 @@ namespace HiSql
                     foreach (HiColumn hiColumn in arrcol_tab)
                     {
                         int _scount = 0;
-                        if (dic_hash_reg.ContainsKey(hiColumn.ColumnName))
+                        if (dic_hash_reg.ContainsKey(hiColumn.FieldName))
                         {
-                            _scount = dic_hash_reg[hiColumn.ColumnName].Count;
+                            _scount = dic_hash_reg[hiColumn.FieldName].Count;
                             //当源表的条件值大于需要匹配的值时 建议将匹配的值用in的方式传入进行匹配
 
                             HashSet<string> _hash = new HashSet<string>();
@@ -1027,7 +1032,7 @@ namespace HiSql
                                 if (data.Rows.Count == _psize)
                                 {
                                     //源表值比较大
-                                    string _sql = dic_hash_reg[hiColumn.ColumnName].ToArray().ToSqlIn(true);
+                                    string _sql = dic_hash_reg[hiColumn.FieldName].ToArray().ToSqlIn(true);
                                     if (!string.IsNullOrEmpty(hiColumn.RefWhere.Trim()))
                                     {
                                         //注意这里的语句是非原生sql 是hisql 可以在不同的数据库中编译执行
@@ -1042,10 +1047,10 @@ namespace HiSql
                                     _hash = DataConvert.DataTableFieldToHashSet(data, hiColumn.RefField);
                                 }
                             }
-                            dic_hash_reg[hiColumn.ColumnName].ExceptWith(_hash);
-                            if (dic_hash_reg[hiColumn.ColumnName].Count > 0)
+                            dic_hash_reg[hiColumn.FieldName].ExceptWith(_hash);
+                            if (dic_hash_reg[hiColumn.FieldName].Count > 0)
                             {
-                                throw new Exception($"字段[{hiColumn.ColumnName}]配置了表检测 值 [{dic_hash_reg[hiColumn.ColumnName].ToArray()[0]}] 在表[{hiColumn.RefTab}]不存在");
+                                throw new Exception($"字段[{hiColumn.FieldName}]配置了表检测 值 [{dic_hash_reg[hiColumn.FieldName].ToArray()[0]}] 在表[{hiColumn.RefTab}]不存在");
                             }
 
                         }
@@ -1076,7 +1081,7 @@ namespace HiSql
 
 
 
-            if (Constants.IsStandardTimeField(hiColumn.ColumnName))
+            if (Constants.IsStandardTimeField(hiColumn.FieldName))
             {
                 if (hiColumn.DBDefault != HiTypeDBDefault.FUNDATE)
                 {
@@ -1085,7 +1090,7 @@ namespace HiSql
 
                 }
             }
-            else if (Constants.IsStandardUserField(hiColumn.ColumnName))
+            else if (Constants.IsStandardUserField(hiColumn.FieldName))
             {
                 _value = $"'{Context.CurrentConnectionConfig.User}'";
                 rtn = new Tuple<bool, string>(true, _value);
@@ -1097,14 +1102,14 @@ namespace HiSql
                     //中文按1个字符计算
                     //_value = "test";
 
-                    if (_value.Length >= hiColumn.FieldLen)
+                    if (_value.Length > hiColumn.FieldLen)
                     {
-                        throw new Exception($"字段[{hiColumn.ColumnName}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
+                        throw new Exception($"字段[{hiColumn.FieldName}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
                     }
                     if (hiColumn.IsRequire)
                     {
                         if (string.IsNullOrEmpty(_value.Trim()))
-                            throw new Exception($"字段[{hiColumn.ColumnName}] 为必填 无法数据提交");
+                            throw new Exception($"字段[{hiColumn.FieldName}] 为必填 无法数据提交");
                     }
 
                     _value = $"'{_value.ToSqlInject()}'";
@@ -1118,12 +1123,12 @@ namespace HiSql
                     //_value = "test";
                     if (_value.LengthZH() > hiColumn.FieldLen)
                     {
-                        throw new Exception($"字段[{hiColumn.ColumnName}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
+                        throw new Exception($"字段[{hiColumn.FieldName}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
                     }
                     if (hiColumn.IsRequire)
                     {
                         if (string.IsNullOrEmpty(_value.Trim()))
-                            throw new Exception($"字段[{hiColumn.ColumnName}] 为必填 无法数据提交");
+                            throw new Exception($"字段[{hiColumn.FieldName}] 为必填 无法数据提交");
                     }
                     _value = $"'{_value.ToSqlInject()}'";
                     rtn = new Tuple<bool, string>(true, _value);
@@ -1229,10 +1234,10 @@ namespace HiSql
                 if (!isDic)
                 {
                     #region 匿名类或实体类的检测
-                    var objprop = attrs.Where(p => p.Name.ToLower() == hiColumn.ColumnName.ToLower()).FirstOrDefault();
+                    var objprop = attrs.Where(p => p.Name.ToLower() == hiColumn.FieldName.ToLower()).FirstOrDefault();
                     if (hiColumn.IsRequire && !hiColumn.IsIdentity && objprop == null)
                     {
-                        throw new Exception($"字段[{hiColumn.ColumnName}] 为必填 无法数据提交");
+                        throw new Exception($"字段[{hiColumn.FieldName}] 为必填 无法数据提交");
                     }
                     if (hiColumn.IsIdentity && objprop != null)
                     {
@@ -1240,7 +1245,7 @@ namespace HiSql
                         if (_value == "0")
                             continue;
                         else
-                            throw new Exception($"字段[{hiColumn.ColumnName}] 为自增长字段 不需要外部赋值");
+                            throw new Exception($"字段[{hiColumn.FieldName}] 为自增长字段 不需要外部赋值");
                     }
 
                     if (objprop != null && objprop.GetValue(objdata) != null)
@@ -1251,7 +1256,7 @@ namespace HiSql
                             //_value = "test";
 
                             _value = (string)objprop.GetValue(objdata);
-                            if (_value.Length >= hiColumn.FieldLen)
+                            if (_value.Length > hiColumn.FieldLen)
                             {
                                 //sqlserver 的类型定义为varchar(max)
                                 if (hiColumn.FieldLen >= 0)
@@ -1263,7 +1268,7 @@ namespace HiSql
                                     throw new Exception($"字段[{objprop.Name}] 为必填 无法数据提交");
                             }
 
-                            _values.Add(hiColumn.ColumnName, $"'{_value.ToSqlInject()}'");
+                            _values.Add(hiColumn.FieldName, $"'{_value.ToSqlInject()}'");
 
                         }
                         else if (hiColumn.FieldType.IsIn<HiType>(HiType.VARCHAR, HiType.CHAR, HiType.TEXT))
@@ -1282,7 +1287,7 @@ namespace HiSql
                                     throw new Exception($"字段[{objprop.Name}] 为必填 无法数据提交");
                             }
 
-                            _values.Add(hiColumn.ColumnName, $"'{_value.ToSqlInject()}'");
+                            _values.Add(hiColumn.FieldName, $"'{_value.ToSqlInject()}'");
                         }
                         else if (hiColumn.FieldType.IsIn<HiType>(HiType.INT, HiType.BIGINT, HiType.DECIMAL, HiType.SMALLINT))
                         {
@@ -1290,12 +1295,12 @@ namespace HiSql
                             _value = objprop.GetValue(objdata).ToString();
                             if (!Tool.IsDecimal(_value))
                             {
-                                throw new Exception($"字段[{hiColumn.ColumnName}]的值[{_value}]非数字,不符合规范");
+                                throw new Exception($"字段[{hiColumn.FieldName}]的值[{_value}]非数字,不符合规范");
                             }
                             //_value = "1";
 
 
-                            _values.Add(hiColumn.ColumnName, $"{_value}");
+                            _values.Add(hiColumn.FieldName, $"{_value}");
                         }
                         else if (hiColumn.FieldType.IsIn<HiType>(HiType.DATE, HiType.DATETIME))
                         {
@@ -1304,7 +1309,7 @@ namespace HiSql
                             //DateTime dtime = DateTime.Now;
                             if (dtime != null && dtime != DateTime.MinValue)
                             {
-                                _values.Add(hiColumn.ColumnName, $"'{dtime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                                _values.Add(hiColumn.FieldName, $"'{dtime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
                             }
 
 
@@ -1316,12 +1321,12 @@ namespace HiSql
                                 if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.PostGreSql, DBType.Hana, DBType.MySql))
                                 {
                                     _value = "True";
-                                    _values.Add(hiColumn.ColumnName, $"{_value}");
+                                    _values.Add(hiColumn.FieldName, $"{_value}");
                                 }
                                 else
                                 {
                                     _value = "1";
-                                    _values.Add(hiColumn.ColumnName, $"'{_value}'");
+                                    _values.Add(hiColumn.FieldName, $"'{_value}'");
                                 }
                             }
                             else
@@ -1329,12 +1334,12 @@ namespace HiSql
                                 if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.PostGreSql, DBType.Hana, DBType.MySql))
                                 {
                                     _value = "False";
-                                    _values.Add(hiColumn.ColumnName, $"{_value}");
+                                    _values.Add(hiColumn.FieldName, $"{_value}");
                                 }
                                 else
                                 {
                                     _value = "0";
-                                    _values.Add(hiColumn.ColumnName, $"'{_value}'");
+                                    _values.Add(hiColumn.FieldName, $"'{_value}'");
                                 }
                             }
 
@@ -1343,7 +1348,7 @@ namespace HiSql
                         else
                         {
                             _value = (string)objprop.GetValue(objdata);
-                            _values.Add(hiColumn.ColumnName, $"'{_value}'");
+                            _values.Add(hiColumn.FieldName, $"'{_value}'");
                         }
                     }
                     else
@@ -1351,29 +1356,29 @@ namespace HiSql
                         //非自增长且不允许为空且没有设置默认值且没有传值的情况下应该抛出异常 不然底层库会报错
                         if (!hiColumn.IsNull && hiColumn.DBDefault == HiTypeDBDefault.NONE && !hiColumn.IsIdentity)
                         {
-                            throw new Exception($"字段[{hiColumn.ColumnName}]不允许为空数据库中未设置默认值 且插入数据值中未指定值");
+                            throw new Exception($"字段[{hiColumn.FieldName}]不允许为空数据库中未设置默认值 且插入数据值中未指定值");
                         }
                     }
 
-                    if (hiColumn.ColumnName == "CreateTime" || hiColumn.ColumnName == "ModiTime")
+                    if (hiColumn.FieldName == "CreateTime" || hiColumn.FieldName == "ModiTime")
                     {
 
 
                         if (hiColumn.DBDefault != HiTypeDBDefault.FUNDATE)
                         {
-                            if (!_values.ContainsKey(hiColumn.ColumnName))
-                                _values.Add(hiColumn.ColumnName, $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                            if (!_values.ContainsKey(hiColumn.FieldName))
+                                _values.Add(hiColumn.FieldName, $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
                             else
-                                _values[hiColumn.ColumnName] = $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'";
+                                _values[hiColumn.FieldName] = $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'";
                         }
 
                     }
-                    else if (hiColumn.ColumnName == "CreateName" || hiColumn.ColumnName == "ModiName")
+                    else if (hiColumn.FieldName == "CreateName" || hiColumn.FieldName == "ModiName")
                     {
-                        if (!_values.ContainsKey(hiColumn.ColumnName))
-                            _values.Add(hiColumn.ColumnName, $"'{Context.CurrentConnectionConfig.User}'");
+                        if (!_values.ContainsKey(hiColumn.FieldName))
+                            _values.Add(hiColumn.FieldName, $"'{Context.CurrentConnectionConfig.User}'");
                         else
-                            _values[hiColumn.ColumnName] = $"'{Context.CurrentConnectionConfig.User}'";
+                            _values[hiColumn.FieldName] = $"'{Context.CurrentConnectionConfig.User}'";
                     }
                     #endregion
                 }
@@ -1381,73 +1386,73 @@ namespace HiSql
                 {
 
                     #region 字典数据
-                    if (hiColumn.IsRequire && !hiColumn.IsIdentity && !_dic.ContainsKey(hiColumn.ColumnName))
+                    if (hiColumn.IsRequire && !hiColumn.IsIdentity && !_dic.ContainsKey(hiColumn.FieldName))
                     {
-                        throw new Exception($"字段[{hiColumn.ColumnName}] 为必填 无法数据提交");
+                        throw new Exception($"字段[{hiColumn.FieldName}] 为必填 无法数据提交");
                     }
-                    if (hiColumn.IsIdentity && _dic.ContainsKey(hiColumn.ColumnName))
+                    if (hiColumn.IsIdentity && _dic.ContainsKey(hiColumn.FieldName))
                     {
-                        _value = _dic[hiColumn.ColumnName].ToString();
+                        _value = _dic[hiColumn.FieldName].ToString();
                         if (_value == "0" || string.IsNullOrEmpty(_value))
                             continue;
                         else
-                            throw new Exception($"字段[{hiColumn.ColumnName}] 为自增长字段 不需要外部赋值");
+                            throw new Exception($"字段[{hiColumn.FieldName}] 为自增长字段 不需要外部赋值");
                     }
-                    if (_dic.ContainsKey(hiColumn.ColumnName))
+                    if (_dic.ContainsKey(hiColumn.FieldName))
                     {
                         if (hiColumn.FieldType.IsIn<HiType>(HiType.NVARCHAR, HiType.NCHAR, HiType.GUID))
                         {
                             //中文按1个字符计算
                             //_value = "test";
-                            _value = _dic[hiColumn.ColumnName].ToString();
-                            if (_value.Length >= hiColumn.FieldLen)
+                            _value = _dic[hiColumn.FieldName].ToString();
+                            if (_value.Length > hiColumn.FieldLen)
                             {
-                                throw new Exception($"字段[{hiColumn.ColumnName}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
+                                throw new Exception($"字段[{hiColumn.FieldName}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
                             }
                             if (hiColumn.IsRequire)
                             {
                                 if (string.IsNullOrEmpty(_value.Trim()))
-                                    throw new Exception($"字段[{hiColumn.ColumnName}] 为必填 无法数据提交");
+                                    throw new Exception($"字段[{hiColumn.FieldName}] 为必填 无法数据提交");
                             }
 
-                            _values.Add(hiColumn.ColumnName, $"'{_value.ToSqlInject()}'");
+                            _values.Add(hiColumn.FieldName, $"'{_value.ToSqlInject()}'");
 
                         }
                         else if (hiColumn.FieldType.IsIn<HiType>(HiType.VARCHAR, HiType.CHAR, HiType.TEXT))
                         {
                             //中文按两个字符计算
-                            _value = _dic[hiColumn.ColumnName].ToString();
+                            _value = _dic[hiColumn.FieldName].ToString();
                             //_value = "test";
                             if (_value.LengthZH() > hiColumn.FieldLen)
                             {
-                                throw new Exception($"字段[{hiColumn.ColumnName}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
+                                throw new Exception($"字段[{hiColumn.FieldName}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
                             }
                             if (hiColumn.IsRequire)
                             {
                                 if (string.IsNullOrEmpty(_value.Trim()))
-                                    throw new Exception($"字段[{hiColumn.ColumnName}] 为必填 无法数据提交");
+                                    throw new Exception($"字段[{hiColumn.FieldName}] 为必填 无法数据提交");
                             }
-                            _values.Add(hiColumn.ColumnName, $"'{_value.ToSqlInject()}'");
+                            _values.Add(hiColumn.FieldName, $"'{_value.ToSqlInject()}'");
                         }
                         else if (hiColumn.FieldType.IsIn<HiType>(HiType.INT, HiType.BIGINT, HiType.DECIMAL, HiType.SMALLINT))
                         {
-                            _value = _dic[hiColumn.ColumnName].ToString();
+                            _value = _dic[hiColumn.FieldName].ToString();
                             //_value = "1";
-                            _values.Add(hiColumn.ColumnName, $"{_value}");
+                            _values.Add(hiColumn.FieldName, $"{_value}");
                         }
                         else if (hiColumn.FieldType.IsIn<HiType>(HiType.DATE, HiType.DATETIME))
                         {
-                            DateTime dtime = DateTime.Parse(_dic[hiColumn.ColumnName].ToString());
+                            DateTime dtime = DateTime.Parse(_dic[hiColumn.FieldName].ToString());
                             //DateTime dtime = DateTime.Now;
                             if (dtime != null)
                             {
-                                _values.Add(hiColumn.ColumnName, $"'{dtime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                                _values.Add(hiColumn.FieldName, $"'{dtime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
                             }
                         }
                         else
                         {
-                            _value = _dic[hiColumn.ColumnName].ToString();
-                            _values.Add(hiColumn.ColumnName, $"'{_value}'");
+                            _value = _dic[hiColumn.FieldName].ToString();
+                            _values.Add(hiColumn.FieldName, $"'{_value}'");
                         }
                     }
                     else
@@ -1455,29 +1460,29 @@ namespace HiSql
                         //非自增长且不允许为空且没有设置默认值且没有传值的情况下应该抛出异常 不然底层库会报错
                         if (!hiColumn.IsNull && hiColumn.DBDefault == HiTypeDBDefault.NONE && !hiColumn.IsIdentity)
                         {
-                            throw new Exception($"字段[{hiColumn.ColumnName}]不允许为空数据库中未设置默认值 且插入数据值中未指定值");
+                            throw new Exception($"字段[{hiColumn.FieldName}]不允许为空数据库中未设置默认值 且插入数据值中未指定值");
                         }
                     }
-                    if (hiColumn.ColumnName.ToLower() == "CreateTime".ToLower() || hiColumn.ColumnName.ToLower() == "ModiTime".ToLower())
+                    if (hiColumn.FieldName.ToLower() == "CreateTime".ToLower() || hiColumn.FieldName.ToLower() == "ModiTime".ToLower())
                     {
 
                         if (hiColumn.DBDefault != HiTypeDBDefault.FUNDATE)
                         {
-                            if (!_values.ContainsKey(hiColumn.ColumnName))
-                                _values.Add(hiColumn.ColumnName, $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                            if (!_values.ContainsKey(hiColumn.FieldName))
+                                _values.Add(hiColumn.FieldName, $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
                             else
-                                _values[hiColumn.ColumnName] = $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'";
+                                _values[hiColumn.FieldName] = $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'";
                         }
 
                     }
-                    else if (hiColumn.ColumnName.ToLower() == "CreateName".ToLower() || hiColumn.ColumnName.ToLower() == "ModiName".ToLower())
+                    else if (hiColumn.FieldName.ToLower() == "CreateName".ToLower() || hiColumn.FieldName.ToLower() == "ModiName".ToLower())
                     {
-                        if (!_values.ContainsKey(hiColumn.ColumnName))
+                        if (!_values.ContainsKey(hiColumn.FieldName))
                         {
-                            _values.Add(hiColumn.ColumnName, $"'{Context.CurrentConnectionConfig.User}'");
+                            _values.Add(hiColumn.FieldName, $"'{Context.CurrentConnectionConfig.User}'");
                         }
                         else
-                            _values[hiColumn.ColumnName] = $"'{Context.CurrentConnectionConfig.User}'";
+                            _values[hiColumn.FieldName] = $"'{Context.CurrentConnectionConfig.User}'";
 
 
                     }

@@ -124,9 +124,8 @@ namespace HiSql
         [JsonIgnore]
         public List<HiColumn> StandKey
         {
-            get
-            {
-                return Columns.Where(it => it.ColumnName.ToLower().IsIn<string>("createtime", "createname", "moditime", "modiname") == true).ToList();
+            get {
+                return Columns.Where(it => it.FieldName.ToLower().IsIn<string>("createtime", "createname", "moditime", "modiname") == true).ToList();
             }
         }
 

@@ -85,7 +85,7 @@ namespace HiSql
                 foreach (DataRow drow in table.Rows)
                 {
                     HiColumn hiColumn = new HiColumn();
-                    hiColumn.ColumnName = drow["FieldName"].ToString().Trim();
+                    hiColumn.FieldName = drow["FieldName"].ToString().Trim();
                     //hiColumn.FieldType
                     hiColumn.IsPrimary = drow["IsPrimary"].ToString().Trim().IsIn<string>("1","True") ? true : false;
                     hiColumn.IsIdentity= drow["IsIdentity"].ToString().Trim().IsIn<string>("1", "True") ? true : false;
@@ -140,6 +140,91 @@ namespace HiSql
 
             //return tabInfo;
         }
+
+
+        public static TabInfo TabMerge(TabInfo phytabInfo, TabInfo tabInfo)
+        {
+            //List<FieldChange> fieldChanges = TabToCompare(phytabInfo, tabInfo);
+
+            List<HiColumn> phyhiColumns = phytabInfo.GetColumns;
+            List<HiColumn> newColumns = new List<HiColumn>();
+            List<HiColumn> hiColumns = tabInfo.GetColumns;
+            foreach (HiColumn hiColumn in phyhiColumns)
+            {
+                var column = hiColumns.Where(p => p.FieldName.ToLower() == hiColumn.FieldName.ToLower()).FirstOrDefault();
+                if (column != null)
+                {
+                    hiColumn.Regex = column.Regex;
+                    hiColumn.IsRefTab = column.IsRefTab;
+                    hiColumn.RefTab = column.RefTab;
+                    hiColumn.RefField = column.RefField;
+                    hiColumn.RefFields = column.RefFields;
+                    hiColumn.RefFieldDesc = column.RefFieldDesc;
+                }
+                newColumns.Add(hiColumn);
+            }
+            phytabInfo.Columns = newColumns;
+            return phytabInfo;
+        }
+
+
+        /// <summary>
+        /// 物理表的结构信息与表结构表的数据进行对比
+        /// </summary>
+        /// <param name="phytabInfo">物理表结构信息</param>
+        /// <param name="tabInfo">表结构信息</param>
+        /// <returns></returns>
+        public static List<FieldChange> TabToCompare(TabInfo phytabInfo, TabInfo tabInfo)
+        {
+            List<FieldChange> fieldChanges = new List<FieldChange>();
+            var phycolumns = phytabInfo.GetColumns;
+            var columns = tabInfo.GetColumns;
+
+            //以物理表为基准匹配
+            foreach (HiColumn column in phycolumns)
+            {
+                var _column = columns.Where(h => h.FieldName.ToLower() == column.FieldName.ToLower()).FirstOrDefault();
+                if (_column!=null)
+                {
+                    //可能变更也可能没有变更
+
+                    if (string.IsNullOrEmpty(column.TabName))
+                        column.TabName = _column.TabName;
+
+                    if (!ClassExtensions.CompareProperties(column, _column))
+                    {
+                        //说明有变更
+                        fieldChanges.Add(new FieldChange { FieldName = column.FieldName, Action = TabFieldAction.MODI });
+                    }
+                    else
+                    {
+                        //无变更
+                        fieldChanges.Add(new FieldChange { FieldName = column.FieldName, Action = TabFieldAction.NONE });
+                    }
+                }
+                else
+                {
+                    //说明是有新增字段或重命名字段
+                    fieldChanges.Add(new FieldChange { FieldName = column.FieldName, Action = TabFieldAction.ADD });
+                }
+            }
+
+            foreach(HiColumn column in columns)
+            {
+                var _column= phycolumns.Where(h => h.FieldName.ToLower() == column.FieldName.ToLower()).FirstOrDefault();
+                if (_column == null)
+                {
+                    //说明该字段是删除
+                    fieldChanges.Add(new FieldChange { FieldName = column.FieldName, Action = TabFieldAction.DELETE });
+                }
+
+            }
+
+
+
+            return fieldChanges;
+        }
+
         public static TabInfo TabToEntity(DataSet tabset)
         {
             TabInfo tabInfo = null;
@@ -268,6 +353,14 @@ namespace HiSql
                                             {
                                                 prop.SetValue(hiColumn, Convert.ToInt16(drow[prop.Name].ToString()));
                                             }
+                                            else if (prop.PropertyType.Name == "Boolean")
+                                            {
+                                                prop.SetValue(hiColumn, drow[prop.Name]);
+                                            }
+                                            else if (prop.PropertyType.Name == "String")
+                                            {
+                                                prop.SetValue(hiColumn, drow[prop.Name].ToString().Trim());
+                                            }
                                             else
                                                 prop.SetValue(hiColumn, drow[prop.Name]);
                                         }
@@ -281,7 +374,7 @@ namespace HiSql
                         }
                         else
                         {
-                            if (prop.Name == "ColumnName")
+                            if (prop.Name == "FieldName")
                             {
                                 prop.SetValue(hiColumn, drow["FieldName"]);
                             }
@@ -346,13 +439,13 @@ namespace HiSql
                     .Where(it => it is HiColumn).Select(it => (HiColumn)it).FirstOrDefault();
                     if (!hiColumn.IsNullOrEmpty())
                     {
-                        if (hiColumn.ColumnName == string.Empty)
+                        if (hiColumn.FieldName == string.Empty)
                         {
-                            hiColumn.ColumnName = n.Name;
+                            hiColumn.FieldName = n.Name;
                         }
                         if (hiColumn.FieldDesc == string.Empty)
                         {
-                            hiColumn.FieldDesc = hiColumn.ColumnName;
+                            hiColumn.FieldDesc = hiColumn.FieldName;
                         }
 
                         _hicolumn =hiColumn.MoveCross< HiColumn>(_hicolumn);
@@ -366,7 +459,7 @@ namespace HiSql
                     }
                     else
                     {
-                        _hicolumn.ColumnName = n.Name;
+                        _hicolumn.FieldName = n.Name;
                         tabinfo.Columns.Add(_hicolumn);
                        
                     }

@@ -36,6 +36,59 @@ namespace HiSql
             return t;
         }
 
+
+        public static bool CompareProperties<T>(T obj1, T obj2)
+        {
+            //为空判断
+            if (obj1 == null && obj2 == null)
+                return true;
+            else if (obj1 == null || obj2 == null)
+                return false;
+
+            Type t1 = obj1.GetType();
+            Type t2 = obj2.GetType();
+            if (t1 != t2) return false;
+            PropertyInfo[] props = t1.GetProperties().Where(p=>p.CanWrite==true && !Constants.IsStandardField(p.Name) && (p.Name.ToLower()!= "SortNum".ToLower() && p.Name.ToLower() != "IsSys".ToLower()) && p.MemberType==MemberTypes.Property ).ToArray();
+            foreach (var po in props)
+            {
+                if (IsCanCompare(po.PropertyType))
+                {
+                    if (!po.GetValue(obj1).Equals(po.GetValue(obj2)))
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    var b = CompareProperties(po.GetValue(obj1), po.GetValue(obj2));
+                    if (!b) return false;
+                }
+            }
+
+            return true;
+        }
+        /// <summary>
+        /// 该类型是否可直接进行值的比较
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        private static bool IsCanCompare(Type t)
+        {
+            if (t.IsValueType)
+            {
+                return true;
+            }
+            else
+            {
+                //String是特殊的引用类型，它可以直接进行值的比较
+                if (t.FullName == typeof(String).FullName)
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
+
         public static T DeepCopy<T>(T RealObject)
         {
             using (Stream objectStream = new MemoryStream())

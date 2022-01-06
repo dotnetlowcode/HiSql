@@ -6,6 +6,9 @@
     <Authors>tansar</Authors>
     <Company>Hone</Company>
     <Description>该包支持MySql数据库 依赖于HiSql.dll包运行</Description>
+    <PackageIcon>hisql-mysql-logo.jpg</PackageIcon>
+    <PackageIconUrl />
+    <ApplicationIcon>hisql-mysql-logo.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,6 +32,13 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Data\hisql-mysql-logo.jpg">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

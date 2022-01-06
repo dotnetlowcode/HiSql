@@ -91,7 +91,7 @@ namespace HiSql
         
 
         /// <summary>
-        /// 字段创建时的模板[$ColumnName$]  这是一个可替换的字符串ColumnName是在HiColumn中的属性名
+        /// 字段创建时的模板[$FieldName$]  这是一个可替换的字符串ColumnName是在HiColumn中的属性名
         /// </summary>
         Dictionary<string, string> _fieldtempmapping = new Dictionary<string, string> { };
         Dictionary<HiType, string> _dbmapping =new Dictionary<HiType, string> ();
@@ -251,25 +251,25 @@ namespace HiSql
 
             _fieldtempmapping = new Dictionary<string, string> {
                 //样例：[TabName] [varchar](50) NOT NULL,
-                { "nvarchar",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} {_temp_field_pre}nvarchar{_temp_field_after}([$FieldLen$]) [$IsNull$]  [$Default$] [$EXTEND$]{_temp_field_split} "},
-                { "varchar",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} {_temp_field_pre}varchar{_temp_field_after}([$FieldLen$]) [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}"},
-                { "nchar",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} {_temp_field_pre}nchar{_temp_field_after}([$FieldLen$]) [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split} "},
-                { "char",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} {_temp_field_pre}char{_temp_field_after}([$FieldLen$]) [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}"},
+                { "nvarchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} {_temp_field_pre}nvarchar{_temp_field_after}([$FieldLen$]) [$IsNull$]  [$Default$] [$EXTEND$]{_temp_field_split} "},
+                { "varchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} {_temp_field_pre}varchar{_temp_field_after}([$FieldLen$]) [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}"},
+                { "nchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} {_temp_field_pre}nchar{_temp_field_after}([$FieldLen$]) [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split} "},
+                { "char",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} {_temp_field_pre}char{_temp_field_after}([$FieldLen$]) [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}"},
                 //样例：[udescript] [text] NULL,
-                { "text",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} {_temp_field_pre}text{_temp_field_after} [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}"},
+                { "text",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} {_temp_field_pre}text{_temp_field_after} [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}"},
 
-                { "int",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} {_temp_field_pre}int{_temp_field_after} [$IsIdentity$] [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}"},
-                { "bigint",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} {_temp_field_pre}bigint{_temp_field_after} [$IsIdentity$] [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}" },
-                { "smallint",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} {_temp_field_pre}smallint{_temp_field_after}  [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}"},
-                { "decimal",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} {_temp_field_pre}decimal{_temp_field_after}([$FieldLen$],[$FieldDec$])  [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}"},
+                { "int",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} {_temp_field_pre}int{_temp_field_after} [$IsIdentity$] [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}"},
+                { "bigint",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} {_temp_field_pre}bigint{_temp_field_after} [$IsIdentity$] [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}" },
+                { "smallint",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} {_temp_field_pre}smallint{_temp_field_after}  [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}"},
+                { "decimal",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} {_temp_field_pre}decimal{_temp_field_after}([$FieldLen$],[$FieldDec$])  [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}"},
 
-                { "bit",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} {_temp_field_pre}bit{_temp_field_after}   [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}"},
+                { "bit",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} {_temp_field_pre}bit{_temp_field_after}   [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}"},
 
-                { "datetime",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} {_temp_field_pre}datetime{_temp_field_after}   [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}"},
-                { "date",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} {_temp_field_pre}date{_temp_field_after}   [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}" },
+                { "datetime",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} {_temp_field_pre}datetime{_temp_field_after}   [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}"},
+                { "date",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} {_temp_field_pre}date{_temp_field_after}   [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}" },
 
-                { "image",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} {_temp_field_pre}binary{_temp_field_after}   [$IsNull$] [$EXTEND$]{_temp_field_split}"},
-                { "uniqueidentifier",$"{_temp_field_pre}[$ColumnName$]{_temp_field_after} {_temp_field_pre}uniqueidentifier{_temp_field_after}   [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}"},
+                { "image",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} {_temp_field_pre}binary{_temp_field_after}   [$IsNull$] [$EXTEND$]{_temp_field_split}"},
+                { "uniqueidentifier",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} {_temp_field_pre}uniqueidentifier{_temp_field_after}   [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}"},
             };
 
 
@@ -375,13 +375,13 @@ namespace HiSql
                 .AppendLine("[$Keys$]")
                 .AppendLine(")WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]")
                 .ToString();
-            _temp_table_key2 = "[$ColumnName$] ASC";//定义主键的排序方式
+            _temp_table_key2 = "[$FieldName$] ASC";//定义主键的排序方式
 
             _temp_table_key3 = "ON [PRIMARY] ";//TEXTIMAGE_ON [PRIMARY]
 
 
             _temp_field_comment = new StringBuilder()
-                .AppendLine("EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'[$FieldDesc$]' , @level0type=N'SCHEMA',@level0name=N'[$Schema$]', @level1type=N'TABLE',@level1name=N'[$TabName$]', @level2type=N'COLUMN',@level2name=N'[$ColumnName$]'")
+                .AppendLine("EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'[$FieldDesc$]' , @level0type=N'SCHEMA',@level0name=N'[$Schema$]', @level1type=N'TABLE',@level1name=N'[$TabName$]', @level2type=N'COLUMN',@level2name=N'[$FieldName$]'")
                 // .AppendLine("GO")
                 .ToString();
 

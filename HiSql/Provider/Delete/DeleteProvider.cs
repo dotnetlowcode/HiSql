@@ -273,12 +273,12 @@ namespace HiSql
             {
                 if (!isDic)
                 {
-                    var objprop = attrs.Where(p => p.Name.ToLower() == hiColumn.ColumnName.ToLower()).FirstOrDefault();
+                    var objprop = attrs.Where(p => p.Name.ToLower() == hiColumn.FieldName.ToLower()).FirstOrDefault();
                     if (objprop == null)
                     {
 
                         if (hiColumn.IsRequire)
-                            throw new Exception($"字段[{hiColumn.ColumnName}] 为必填 无法数据提交");
+                            throw new Exception($"字段[{hiColumn.FieldName}] 为必填 无法数据提交");
                         else
                             continue;
 
@@ -290,7 +290,7 @@ namespace HiSql
                         if (_vobj == null)
                         {
                             if (hiColumn.IsRequire)
-                                throw new Exception($"字段[{hiColumn.ColumnName}] 为必填 无法数据提交");
+                                throw new Exception($"字段[{hiColumn.FieldName}] 为必填 无法数据提交");
                             else
                                 continue;
                         }
@@ -299,36 +299,36 @@ namespace HiSql
                     if (hiColumn.IsBllKey && objprop == null)//&& isRequireKey
                     {
                         //默认如果有主键或业务字段则删除是必填 不则会报错
-                        throw new Exception($"字段[{hiColumn.ColumnName}] 为业务主键或表主键 删除表数据时必填");
+                        throw new Exception($"字段[{hiColumn.FieldName}] 为业务主键或表主键 删除表数据时必填");
                     }
                     else //if (hiColumn.IsBllKey && isRequireKey && objprop != null)
                     {
                         if (hiColumn.FieldType.IsIn<HiType>(HiType.NVARCHAR, HiType.NCHAR, HiType.GUID))
                         {
-                            if (_value.Length >= hiColumn.FieldLen)
+                            if (_value.Length > hiColumn.FieldLen)
                             {
                                 throw new Exception($"字段[{objprop.Name}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
                             }
-                            _values.Add(hiColumn.ColumnName, $"'{_value.ToSqlInject()}'");
+                            _values.Add(hiColumn.FieldName, $"'{_value.ToSqlInject()}'");
                         }
                         else if (hiColumn.FieldType.IsIn<HiType>(HiType.VARCHAR, HiType.CHAR, HiType.TEXT))
                         {
 
-                            _values.Add(hiColumn.ColumnName, $"'{_value.ToSqlInject()}'");
+                            _values.Add(hiColumn.FieldName, $"'{_value.ToSqlInject()}'");
                         }
                         else if (hiColumn.FieldType.IsIn<HiType>(HiType.INT, HiType.BIGINT, HiType.DECIMAL, HiType.SMALLINT))
                         {
-                            _values.Add(hiColumn.ColumnName, $"{_value}");
+                            _values.Add(hiColumn.FieldName, $"{_value}");
                         }
                         else if (hiColumn.FieldType.IsIn<HiType>(HiType.DATE, HiType.DATETIME))
                         {
                             _value = objprop.GetValue(objdata).ToString();
                             DateTime dtime = Convert.ToDateTime(_value);
-                            _values.Add(hiColumn.ColumnName, $"'{dtime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                            _values.Add(hiColumn.FieldName, $"'{dtime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
                         }
                         else
                         {
-                            _values.Add(hiColumn.ColumnName, $"'{_value}'");
+                            _values.Add(hiColumn.FieldName, $"'{_value}'");
                         }
                     }
 
@@ -336,59 +336,59 @@ namespace HiSql
                 else
                 {
 
-                    if (hiColumn.IsBllKey && !_dic.ContainsKey(hiColumn.ColumnName))// && isRequireKey
+                    if (hiColumn.IsBllKey && !_dic.ContainsKey(hiColumn.FieldName))// && isRequireKey
                     {
                         //默认如果有主键或业务字段则删除是必填 不则会报错
-                        throw new Exception($"字段[{hiColumn.ColumnName}] 为业务主键或表主键 删除表数据时必填");
+                        throw new Exception($"字段[{hiColumn.FieldName}] 为业务主键或表主键 删除表数据时必填");
                     }
-                    if (_dic.ContainsKey(hiColumn.ColumnName))
+                    if (_dic.ContainsKey(hiColumn.FieldName))
                     {
-                        _value = _dic[hiColumn.ColumnName].ToString();
+                        _value = _dic[hiColumn.FieldName].ToString();
                         if (hiColumn.IsRequire && string.IsNullOrEmpty(_value))
                         {
-                            throw new Exception($"字段[{hiColumn.ColumnName}] 为必填 无法数据提交");
+                            throw new Exception($"字段[{hiColumn.FieldName}] 为必填 无法数据提交");
                         }
                         if (hiColumn.IsBllKey && isRequireKey)
                         {
                             if (hiColumn.FieldType.IsIn<HiType>(HiType.NVARCHAR, HiType.NCHAR, HiType.GUID))
                             {
-                                if (_value.Length >= hiColumn.FieldLen)
+                                if (_value.Length > hiColumn.FieldLen)
                                 {
-                                    throw new Exception($"字段[{hiColumn.ColumnName}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
+                                    throw new Exception($"字段[{hiColumn.FieldName}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
                                 }
-                                _values.Add(hiColumn.ColumnName, $"'{_value.ToSqlInject()}'");
+                                _values.Add(hiColumn.FieldName, $"'{_value.ToSqlInject()}'");
                             }
                             else if (hiColumn.FieldType.IsIn<HiType>(HiType.VARCHAR, HiType.CHAR, HiType.TEXT))
                             {
 
-                                _values.Add(hiColumn.ColumnName, $"'{_value.ToSqlInject()}'");
+                                _values.Add(hiColumn.FieldName, $"'{_value.ToSqlInject()}'");
                             }
                             else if (hiColumn.FieldType.IsIn<HiType>(HiType.INT, HiType.BIGINT, HiType.DECIMAL, HiType.SMALLINT))
                             {
-                                _values.Add(hiColumn.ColumnName, $"{_value}");
+                                _values.Add(hiColumn.FieldName, $"{_value}");
                             }
                             else if (hiColumn.FieldType.IsIn<HiType>(HiType.DATE, HiType.DATETIME))
                             {
                                 //_value = objprop.GetValue(objdata).ToString();
-                                DateTime dtime = DateTime.Parse(_dic[hiColumn.ColumnName].ToString());
+                                DateTime dtime = DateTime.Parse(_dic[hiColumn.FieldName].ToString());
                                 //DateTime dtime = Convert.ToDateTime(_value);
-                                _values.Add(hiColumn.ColumnName, $"'{dtime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                                _values.Add(hiColumn.FieldName, $"'{dtime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
                             }
                             else
                             {
-                                _values.Add(hiColumn.ColumnName, $"'{_value}'");
+                                _values.Add(hiColumn.FieldName, $"'{_value}'");
                             }
                         }
                     }
                     else
                     {
 
-                        if (hiColumn.IsBllKey && !_dic.ContainsKey(hiColumn.ColumnName))
+                        if (hiColumn.IsBllKey && !_dic.ContainsKey(hiColumn.FieldName))
                         {
-                            throw new Exception($"字段[{hiColumn.ColumnName}] 为业务主键或表主键 删除表数据时必填");
+                            throw new Exception($"字段[{hiColumn.FieldName}] 为业务主键或表主键 删除表数据时必填");
                         }
                         //if (hiColumn.IsRequire)
-                        //    throw new Exception($"字段[{hiColumn.ColumnName}] 为必填 无法数据提交");
+                        //    throw new Exception($"字段[{hiColumn.FieldName}] 为必填 无法数据提交");
                         //else
                         //    continue;
                     }

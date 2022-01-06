@@ -202,12 +202,9 @@ namespace HiSql
     [Serializable]
     public class HiColumn : Attribute
     {
-        [JsonIgnore]
-        public override object TypeId { get; }
-
-        private string _ColumnName = string.Empty;
-
-        private string _fieldDesc = string.Empty;
+        private string _ColumnName= "";
+        string _tabName = "";
+        private string _fieldDesc = "";
         bool _isPrimary = false;
         bool _isIdentity = false;
         bool _isBllKey = false;
@@ -223,9 +220,9 @@ namespace HiSql
 
         int _fieldLen = 0;
         int _fieldDec = 0;
-        string _sno = string.Empty;
-        string _sno_num = string.Empty;
-        string _regex = string.Empty;
+        string _sno = "";
+        string _sno_num = "";
+        string _regex = "";
 
         string _default = "";//设置默认值
 
@@ -233,22 +230,33 @@ namespace HiSql
         bool _issearch = true;
         SrchMode _srchmode = SrchMode.Single;
         bool _isreftab = false;
-        string _reftab = string.Empty;
-        string _reffield = string.Empty;
-        string _reffields = string.Empty;
-        string _reffielddesc = string.Empty;
-        string _refwhere = string.Empty;
+        string _reftab = "";
+        string _reffield = "";
+        string _reffields = "";
+        string _reffielddesc = "";
+        string _refwhere = "";
         HiType _fieldtype = HiType.NONE;//默认为未设置
         HiTypeDBDefault _dbdefalut = HiTypeDBDefault.NONE;
 
         int _sortnum = 0;
 
 
+        [JsonIgnore]
+        public override object TypeId { get; }
+        
+        /// <summary>
+        /// 表名
+        /// </summary>
+        public string TabName
+        {
+            get { return _tabName; }
+            set { _tabName = value; }
+        }
 
         /// <summary>
         /// 字段名
         /// </summary>
-        public string ColumnName
+        public string FieldName
         {
             get { return _ColumnName; }
             set { _ColumnName = value; }
@@ -509,8 +517,8 @@ namespace HiSql
         public bool IsStandardField()
         {
 
-            return Constants.IsStandardField(this.ColumnName);
-            //if (this.ColumnName.ToLower().IsIn<string>("createtime", "createname", "moditime", "modiname"))
+            return Constants.IsStandardField(this.FieldName);
+            //if (this.FieldName.ToLower().IsIn<string>("createtime", "createname", "moditime", "modiname"))
             //{
             //    return true;
             //}
@@ -520,7 +528,7 @@ namespace HiSql
 
         public bool IsCreateField()
         {
-            if (this.ColumnName.ToLower().IsIn<string>("createtime", "createname"))
+            if (this.FieldName.ToLower().IsIn<string>("createtime", "createname" ))
             {
                 return true;
             }
@@ -529,7 +537,7 @@ namespace HiSql
         }
         public bool IsModiField()
         {
-            if (this.ColumnName.ToLower().IsIn<string>("moditime", "modiname"))
+            if (this.FieldName.ToLower().IsIn<string>("moditime", "modiname"))
             {
                 return true;
             }
@@ -538,7 +546,7 @@ namespace HiSql
         }
         public bool IsStandardTime()
         {
-            if (this.ColumnName.ToLower().IsIn<string>("moditime", "createtime"))
+            if (this.FieldName.ToLower().IsIn<string>("moditime", "createtime"))
             {
                 return true;
             }

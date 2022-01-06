@@ -162,7 +162,7 @@ namespace HiSql.HanaUnitTest
             {
                 foreach (DataRow drow in dt_s.Rows)
                 {
-                    var _drow = dr_schema.Select($"ColumnName='{drow["FieldName"].ToString()}'").FirstOrDefault();
+                    var _drow = dr_schema.Select($"FieldName='{drow["FieldName"].ToString()}'").FirstOrDefault();
                     if (_drow != null)
                     {
                         drow["IsPrimary"] = _drow["IsKey"];

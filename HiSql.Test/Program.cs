@@ -1102,7 +1102,7 @@ namespace HiSql.Test
                         tabInfo.Columns.Add(
                             new HiColumn()
                             {
-                                ColumnName=n.Name,
+                                FieldName=n.Name,
                             }
                             );
                     }
