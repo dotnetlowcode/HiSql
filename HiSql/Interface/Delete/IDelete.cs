@@ -39,6 +39,14 @@ namespace HiSql
 
         IDelete TrunCate(string tabname);
 
+
+        /// <summary>
+        /// 删除表(高风险操作)
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <returns></returns>
+        IDelete Drop(string tabname);
+
         /// <summary>
         /// 执行结果
         /// </summary>

@@ -105,7 +105,7 @@ namespace HiSql
         /// <returns></returns>
         //Tuple< Dictionary<string, string>,Dictionary<string,string>> CheckUpdateData(bool requireKey, List<PropertyInfo> attrs, List<HiColumn> hiColumns, object objdata,List<string> fields,bool isonly);
 
-        string BuildDeleteSql(TableDefinition table, Dictionary<string, string> dic_value, string _where, bool istruncate = false);
+        string BuildDeleteSql(TableDefinition table, Dictionary<string, string> dic_value, string _where, bool istruncate = false,bool isdrop=false);
         string BuildUpdateSql(TableDefinition table, Dictionary<string, string> dic_value, Dictionary<string, string> dic_primary, string _where);
 
         /// <summary>
