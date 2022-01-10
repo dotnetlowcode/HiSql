@@ -50,7 +50,13 @@ namespace HiSql
         /// <returns></returns>
         bool DropTable(string tabname,bool nolog=false);
 
-        
+
+        /// <summary>
+        /// 清空表中所有数据不留痕迹
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <returns></returns>
+        bool Truncate(string tabname);
 
         /// <summary>
         /// Init数据库 暂不支持该功能

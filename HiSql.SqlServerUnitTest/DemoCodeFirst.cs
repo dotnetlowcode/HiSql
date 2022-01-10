@@ -16,6 +16,19 @@ namespace HiSql
             string s = Console.ReadLine();
         }
 
+        static void CodeFirst_Table(HiSqlClient sqlClient)
+        {
+            //sqlClient.CodeFirst.CreateTable(typeof(HiSql.SNRO.Hi_Snro));
+
+            //TabInfo tabInfo = new TabInfo();
+            //tabInfo.TabModel = new HiTable() { };
+            //tabInfo.Columns = new List<HiColumn> { };
+            //sqlClient.CodeFirst.CreateTable(tabInfo);
+
+            //sqlClient.CodeFirst.DropTable("H_Test");
+
+            sqlClient.CodeFirst.Truncate("H_Test");
+        }
         static async void CodeFirst_Demo(HiSqlClient sqlClient)
         {
             //Tuple<HiTable, List<HiColumn>> tabomdel = sqlClient.Context.DMInitalize.BuildTabStru(typeof(Hi_TabModel));

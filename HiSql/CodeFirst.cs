@@ -136,5 +136,22 @@ namespace HiSql
             else
                 throw new Exception($"请先指定数据库连接!");
         }
+
+        /// <summary>
+        /// 清空表中数据
+        /// 高风险操作
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <returns></returns>
+        public bool Truncate(string tabname)
+        {
+            if (_sqlClient != null)
+            {
+                _sqlClient.TrunCate(tabname).ExecCommand();
+                return true;
+            }
+            else
+                throw new Exception($"请先指定数据库连接!");
+        }
     }
 }

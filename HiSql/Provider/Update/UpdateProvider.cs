@@ -415,6 +415,10 @@ namespace HiSql
                                             {
                                                 _value = dtime.ToString("yyyy-MM-dd HH:mm:ss.fff");
                                             }
+                                            else
+                                            {
+                                                _value= DateTime.MinValue.ToString("yyyy-MM-dd HH:mm:ss.fff");
+                                            }
                                         }
                                         else if (hiColumn.FieldType.IsIn<HiType>(HiType.BOOL))
                                         {
@@ -614,6 +618,10 @@ namespace HiSql
                                         if (dtime != null && dtime != DateTime.MinValue)
                                         {
                                             _dic.Add(hiColumn.FieldName, dtime.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+                                        }
+                                        else
+                                        {
+                                            _dic.Add(hiColumn.FieldName, DateTime.MinValue.ToString("yyyy-MM-dd HH:mm:ss.fff"));
                                         }
                                     }
                                     else if (hiColumn.FieldType.IsIn<HiType>(HiType.BOOL))
