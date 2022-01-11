@@ -143,7 +143,19 @@ namespace HiSql
             }
 
         }
+        /// <summary>
+        /// 开启事务指定隔离级别
+        /// </summary>
+        /// <param name="iso"></param>
+        public virtual void BeginTran(IsolationLevel iso)
+        {
+            TryOpen();
+            if (this.Transaction == null)
+            {
+                this.Transaction = this.Connection.BeginTransaction(iso);
+            }
 
+        }
 
 
         public virtual void CommitTran()

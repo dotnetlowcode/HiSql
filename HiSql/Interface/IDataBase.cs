@@ -170,6 +170,12 @@ namespace HiSql
         void BeginTran();
 
         /// <summary>
+        /// 开启事务 并指定锁定级别
+        /// </summary>
+        /// <param name="iso"></param>
+        void BeginTran(IsolationLevel iso);
+
+        /// <summary>
         /// 事务回滚
         /// </summary>
         void RollBackTran();

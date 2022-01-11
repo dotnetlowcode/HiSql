@@ -686,9 +686,38 @@ namespace HiSql
 
                                     #endregion
                                 }
+                                else
+                                {
+                                    //if (Constants.IsStandardModiField(hiColumn.FieldName))
+                                    //{
+                                    //    if (_values.ContainsKey(hiColumn.FieldName))
+                                    //        _values.Remove(hiColumn.FieldName);
+
+                                    //    if (Constants.IsStandardTimeField(hiColumn.FieldName))
+                                    //        _values.Add(hiColumn.FieldName,$"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                                    //    else
+                                    //        _values.Add(hiColumn.FieldName, $"'{this.Context.CurrentConnectionConfig.User}'");
+                                    //}
+                                }
                             }
                             if (_values.Count > 0)
                             {
+                                var _column = hiColumns.Where(h => h.FieldName.ToLower() == "moditime").FirstOrDefault();
+                                if (_column!=null)
+                                {
+                                    if (_values.ContainsKey(_column.FieldName))
+                                        _values.Remove(_column.FieldName);
+                                    _values.Add(_column.FieldName, $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                                }
+                                _column= hiColumns.Where(h => h.FieldName.ToLower() == "modiname").FirstOrDefault();
+                                if (_column != null)
+                                {
+                                    if (_values.ContainsKey(_column.FieldName))
+                                        _values.Remove(_column.FieldName);
+                                    _values.Add(_column.FieldName, $"'{this.Context.CurrentConnectionConfig.User}'");
+                                }
+
+
                                 lst_value.Add(_values);
                                 lst_primary.Add(_primary);
                             }
