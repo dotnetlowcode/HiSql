@@ -8,8 +8,8 @@
     ".NETCoreApp,Version=v5.0": {
       "HiSql.PostGreSqlUnitTest/1.0.0": {
         "dependencies": {
-          "HiSql": "1.0.2.6",
-          "HiSql.PostGreSql": "1.0.2.6"
+          "HiSql": "1.0.2.9",
+          "HiSql.PostGreSql": "1.0.2.9"
         },
         "runtime": {
           "HiSql.PostGreSqlUnitTest.dll": {}
@@ -113,7 +113,7 @@
           }
         }
       },
-      "HiSql/1.0.2.6": {
+      "HiSql/1.0.2.9": {
         "dependencies": {
           "Microsoft.Extensions.Caching.Memory": "6.0.0",
           "Newtonsoft.Json": "13.0.1"
@@ -122,9 +122,9 @@
           "HiSql.dll": {}
         }
       },
-      "HiSql.PostGreSql/1.0.2.6": {
+      "HiSql.PostGreSql/1.0.2.9": {
         "dependencies": {
-          "HiSql": "1.0.2.6",
+          "HiSql": "1.0.2.9",
           "Npgsql": "5.0.7"
         },
         "runtime": {
@@ -216,12 +216,12 @@
       "path": "system.runtime.compilerservices.unsafe/6.0.0",
       "hashPath": "system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512"
     },
-    "HiSql/1.0.2.6": {
+    "HiSql/1.0.2.9": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "HiSql.PostGreSql/1.0.2.6": {
+    "HiSql.PostGreSql/1.0.2.9": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

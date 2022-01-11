@@ -11,6 +11,39 @@ namespace HiSql
 
     public class Demo_Insert
     {
+        [System.Serializable]
+        [HiTable(IsEdit = true, TabName = "HTest01")]
+        public class HTest01 : StandField
+        {
+            [HiColumn(FieldDesc = "编号", IsPrimary = true, IsBllKey = true, FieldType = HiType.INT, SortNum = 1, IsSys = false, DBDefault = HiTypeDBDefault.EMPTY)]
+            public int SID
+            {
+                get; set;
+            }
+            [HiColumn(FieldDesc = "姓名", FieldType = HiType.NVARCHAR, FieldLen = 50, IsNull = false, SortNum = 2, DBDefault = HiTypeDBDefault.EMPTY)]
+            public string UName
+            {
+                get; set;
+            }
+
+            [HiColumn(FieldDesc = "年龄", FieldType = HiType.INT, IsNull = false, SortNum = 3, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY)]
+            public int Age
+            {
+                get; set;
+            }
+
+            [HiColumn(FieldDesc = "薪水", FieldType = HiType.DECIMAL, FieldDec = 2, FieldLen = 18, IsNull = false, SortNum = 4, DBDefault = HiTypeDBDefault.EMPTY)]
+            public int Salary
+            {
+                get; set;
+            }
+            [HiColumn(FieldDesc = "描述编号", FieldType = HiType.NVARCHAR, FieldLen = 100, IsNull = false, SortNum = 5, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY)]
+            public string Descript
+            {
+                get; set;
+            }
+
+        }
         class H_Test : StandField
         {
             public int Hid
@@ -55,7 +88,7 @@ namespace HiSql
             //Demo1_Insert4(sqlClient);
             //Demo1_Insert5(sqlClient);
             //Demo1_Insert6(sqlClient);
-            Demo1_Insert7(sqlClient);
+            //Demo1_Insert7(sqlClient);
             //Demo_dynamic(sqlClient);
         }
 
@@ -71,8 +104,12 @@ namespace HiSql
 
             //sqlClient.Update("Hi_FieldModel", new { TabName = "HTest01", FieldName = "UTYP", Regex = @"" ,IsRefTab=true,RefTab= "H_UType",RefField="UTYP", RefFields = "UTYP,UTypeName",RefFieldDesc= "类型编码,类型名称",RefWhere="UTYP<>''" }).ExecCommand();
             //sqlClient.Update("Hi_FieldModel", new { TabName = "HTest01", FieldName = "UName", Regex = @"^[\w]+[^']$" ,IsRefTab=false,RefTab= "",RefField="", RefFields = "",RefFieldDesc= "",RefWhere="" }).ExecCommand();
-            
-            await sqlClient.Insert("HTest01", new { SID = "0", UTYP = "U4", UName = "hisql", Age = 36, Salary = 11, Descript = "hisql" }).ExecCommandAsync();
+
+            int _effect1 = sqlClient.Insert("HTest01", new HTest01 { SID = 123456, UName = "tansar", Age = 25, Salary = 1999, Descript = "hello world" }).ExecCommand();
+
+
+            //sqlClient.Delete("HTest01", new HTest01 { SID = 123456 }).ExecCommand();
+            //await sqlClient.Insert("HTest01", new { SID = "0", UTYP = "U4", UName = "hisql", Age = 36, Salary = 11, Descript = "hisql" }).ExecCommandAsync();
 
         }
         static async Task Demo1_Insert6(HiSqlClient sqlClient)

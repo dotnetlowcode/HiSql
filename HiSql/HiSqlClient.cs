@@ -474,6 +474,12 @@ namespace HiSql
             return _context.TrunCate(tabname);
 
         }
+
+        public IDelete Drop(string tabname)
+        {
+            return _context.Drop(tabname);
+
+        }
         #endregion
     }
 }

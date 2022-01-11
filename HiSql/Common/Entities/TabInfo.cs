@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,14 +24,17 @@ namespace HiSql
         /// <summary>
         /// 表名称
         /// </summary>
-        public string DbTabName {
-            get {
+        public string DbTabName
+        {
+            get
+            {
                 if (_tabName == null)
                     return EntityName;
                 else
                     return _tabName;
             }
-            set {
+            set
+            {
                 _tabName = value;
             }
         }
@@ -39,35 +43,43 @@ namespace HiSql
         /// </summary>
         public HiTable TabModel
         {
-            get;set;
+            get; set;
         }
         /// <summary>
         /// 表字段的结构信息
         /// </summary>
-        public List<HiColumn> Columns {
-            get {
-                return _columns ;
+        public List<HiColumn> Columns
+        {
+            get
+            {
+                return _columns;
             }
             set { _columns = value; }
         }
+
+        [JsonIgnore]
         public List<HiColumn> GetColumns
         {
-            get {
+            get
+            {
                 return _columns.OrderByDescending(it => it.IsPrimary).ThenBy(it => it.SortNum).ToList();
             }
         }
         /// <summary>
         /// 获取主键字段
         /// </summary>
+        [JsonIgnore]
         public List<HiColumn> PrimaryKey
         {
-            get {
-                return Columns.Where(it => it.IsPrimary == true).OrderBy(it=>it.SortNum).ToList() ;
+            get
+            {
+                return Columns.Where(it => it.IsPrimary == true).OrderBy(it => it.SortNum).ToList();
             }
         }
         /// <summary>
         /// 获取业务KEY
         /// </summary>
+        [JsonIgnore]
         public List<HiColumn> BllKey
         {
             get
@@ -79,9 +91,11 @@ namespace HiSql
         /// <summary>
         /// 如果一个表中的主键是自增长,且业务主键也是该主键的话是不允许进行Merge Into操作
         /// </summary>
+        [JsonIgnore]
         public bool IsAllowMergeInto
         {
-            get {
+            get
+            {
                 bool _isllow = true;
                 var identitykey = Columns.Where(c => c.IsIdentity && c.IsPrimary).OrderBy(it => it.SortNum).ToList();
                 if (identitykey.Count > 0)
@@ -107,6 +121,7 @@ namespace HiSql
         /// <summary>
         /// 获取标准字段
         /// </summary>
+        [JsonIgnore]
         public List<HiColumn> StandKey
         {
             get {

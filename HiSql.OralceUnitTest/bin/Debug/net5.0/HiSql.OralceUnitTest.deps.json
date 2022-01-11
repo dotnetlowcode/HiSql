@@ -8,8 +8,8 @@
     ".NETCoreApp,Version=v5.0": {
       "HiSql.OralceUnitTest/1.0.0": {
         "dependencies": {
-          "HiSql": "1.0.2.7",
-          "HiSql.Oracle": "1.0.2.7"
+          "HiSql": "1.0.2.9",
+          "HiSql.Oracle": "1.0.2.9"
         },
         "runtime": {
           "HiSql.OralceUnitTest.dll": {}
@@ -207,7 +207,7 @@
           "System.Runtime": "4.3.0"
         }
       },
-      "HiSql/1.0.2.7": {
+      "HiSql/1.0.2.9": {
         "dependencies": {
           "Microsoft.Extensions.Caching.Memory": "6.0.0",
           "Newtonsoft.Json": "13.0.1"
@@ -216,9 +216,9 @@
           "HiSql.dll": {}
         }
       },
-      "HiSql.Oracle/1.0.2.7": {
+      "HiSql.Oracle/1.0.2.9": {
         "dependencies": {
-          "HiSql": "1.0.2.7",
+          "HiSql": "1.0.2.9",
           "System.Data.OracleClient": "1.0.8"
         },
         "runtime": {
@@ -408,12 +408,12 @@
       "path": "system.threading.tasks/4.3.0",
       "hashPath": "system.threading.tasks.4.3.0.nupkg.sha512"
     },
-    "HiSql/1.0.2.7": {
+    "HiSql/1.0.2.9": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "HiSql.Oracle/1.0.2.7": {
+    "HiSql.Oracle/1.0.2.9": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

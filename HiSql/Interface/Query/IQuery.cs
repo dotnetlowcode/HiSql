@@ -5,18 +5,20 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data;
 using System.Linq.Expressions;
+using System.Dynamic;
 
 namespace HiSql
 {
 
 
 
-    public partial interface IQuery {
+    public partial interface IQuery
+    {
         HiSqlProvider Context { get; set; }
 
         IQuery Query(string tabname, string rename);
         IQuery Query(string tabname);
-        IQuery HiSql(string hisql,IQuery query);
+        IQuery HiSql(string hisql, IQuery query);
         IQuery Query(params IQuery[] query);
 
         IQuery As(string retabname);
@@ -47,7 +49,7 @@ namespace HiSql
 
         IQuery Join(JoinDefinition join);
 
-        IQuery Join(string tabname, string retabname,JoinType joinType= JoinType.Inner);
+        IQuery Join(string tabname, string retabname, JoinType joinType = JoinType.Inner);
 
         IQuery Join(string tabname, JoinType joinType = JoinType.Inner);
 
@@ -78,7 +80,7 @@ namespace HiSql
         /// <param name="field">排名字段</param>
         /// <param name="asname">排名字段重命名</param>
         /// <returns></returns>
-        IQuery WithRank(DbRank rank, DbFunction dbFunction, string field, string asname,SortType sortType);
+        IQuery WithRank(DbRank rank, DbFunction dbFunction, string field, string asname, SortType sortType);
         IQuery WithRank(DbRank rank, Ranks ranks, string asname);
 
         /// <summary>
@@ -86,7 +88,7 @@ namespace HiSql
         /// </summary>
         /// <param name="lockMode"></param>
         /// <returns></returns>
-        IQuery WithLock(LockMode lockMode =LockMode.NONE);
+        IQuery WithLock(LockMode lockMode = LockMode.NONE);
 
         /// <summary>
         /// 显示第几页的数据
@@ -166,7 +168,7 @@ namespace HiSql
         /// <returns></returns>
         IQuery EndAs(string asfieldname, Type type);
 
-        IQuery EndAs(string asfieldname );
+        IQuery EndAs(string asfieldname);
 
 
         /// <summary>
@@ -182,12 +184,13 @@ namespace HiSql
         /// <returns></returns>
         string ToSql();
 
+
         /// <summary>
         /// 将结果集返回指定的实体类结果集
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        List<T> ToList<T>() ;
+        List<T> ToList<T>();
         /// <summary>
         /// 当有分页时返回实体数据，并返回当前查询条件的总记录数
         /// </summary>
@@ -232,9 +235,25 @@ namespace HiSql
         /// <returns></returns>
         string ToJson(ref int total);
 
+        /// <summary>
+        /// 将数据转成动态对象
+        /// </summary>
+        /// <returns></returns>
+        List<ExpandoObject> ToEObject();
 
+        /// <summary>
+        /// 将数据转成动态对象
+        /// </summary>
+        /// <returns></returns>
+        Task<List<ExpandoObject>> ToEObjectAsync();
 
+        /// <summary>
+        /// 当有分页时返回总条数，并将数据转成动态对象
+        /// </summary>
+        /// <param name="total"></param>
+        /// <returns></returns>
+        Task<List<ExpandoObject>> ToEObjectAsync(ref int total);
     }
-    //查询对象
-    
+ 
+
 }

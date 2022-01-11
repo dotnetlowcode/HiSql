@@ -902,6 +902,8 @@ namespace HiSql
                                     {
                                         _dic.Add(hiColumn.FieldName, dtime.ToString("yyyy-MM-dd HH:mm:ss.fff"));
                                     }
+                                    else
+                                        _dic.Add(hiColumn.FieldName, DateTime.MinValue.ToString("yyyy-MM-dd HH:mm:ss.fff"));
                                 }
                                 else if (hiColumn.FieldType.IsIn<HiType>(HiType.BOOL))
                                 {

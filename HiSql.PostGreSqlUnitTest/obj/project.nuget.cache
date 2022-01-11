@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "BH2ozQA7KsSqDx4Nv2rt2JR22Q87vwmZaFeo7aUnLrEXaSIMcFuTqDV6aSRkp2HfEZT+pczmUhoAgiGcMAHWOQ==",
+  "dgSpecHash": "K8/+nR/FZwDK1bWTj9yaIlBRN61sHPY69NdCNTkCyX5y/S8tiIUoVI98GvqL05FzRe0F0IUDQLLnZ6jzfYGIww==",
   "success": true,
   "projectFilePath": "D:\\Project\\OpenSource\\HiSql\\HiSql.PostGreSqlUnitTest\\HiSql.PostGreSqlUnitTest.csproj",
   "expectedPackageFiles": [
@@ -14,7 +14,8 @@
     "C:\\Users\\admin\\.nuget\\packages\\npgsql\\5.0.7\\npgsql.5.0.7.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\system.buffers\\4.5.1\\system.buffers.4.5.1.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\system.memory\\4.5.4\\system.memory.4.5.4.nupkg.sha512",
-    "C:\\Users\\admin\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512"
+    "C:\\Users\\admin\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
+    "C:\\Users\\admin\\.nuget\\packages\\hisql\\1.0.2.9\\hisql.1.0.2.9.nupkg.sha512"
   ],
   "logs": []
 }

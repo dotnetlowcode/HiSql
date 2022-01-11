@@ -142,6 +142,16 @@ namespace HiSql
         /// </returns>
         object ExecScalar(string sql);
 
+
+        /// <summary>
+        /// 返回结果的首行首列 其它忽略
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <returns>
+        /// 
+        /// </returns>
+        Task<object> ExecScalarAsync(string sql);
+
         /// <summary>
         /// 释放对象
         /// </summary>
@@ -168,10 +178,6 @@ namespace HiSql
         /// 提交事务
         /// </summary>
         void CommitTran();
-
-
-
-
-
+        Task<IDataReader> GetDataReaderAsync(string sql, params HiParameter[] parameters);
     }
 }

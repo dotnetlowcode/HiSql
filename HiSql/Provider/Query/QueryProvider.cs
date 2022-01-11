@@ -174,7 +174,7 @@ namespace HiSql
         /// <summary>
         /// having
         /// </summary>
-        public Having  Havings
+        public Having Havings
         {
             get { return _having; }
         }
@@ -188,7 +188,8 @@ namespace HiSql
             set { _list_column = value; }
         }
 
-        public bool IsPage {
+        public bool IsPage
+        {
             get { return _ispage; }
         }
 
@@ -229,7 +230,8 @@ namespace HiSql
         /// </summary>
         public List<TableDefinition> TableList
         {
-            get {
+            get
+            {
                 List<TableDefinition> _list = new List<TableDefinition>();
                 foreach (TableDefinition _tab in _list_table)
                 {
@@ -266,7 +268,8 @@ namespace HiSql
                     }
 
                     _isMultiSubQuery = true;//表示当前查询是多表子查询
-                } else
+                }
+                else
                     throw new Exception($"使用子查询时未指定对应的子查询");
             }
             else
@@ -279,7 +282,7 @@ namespace HiSql
         /// </summary>
         /// <param name="hisql"></param>
         /// <returns></returns>
-        public IQuery HiSql(string hisql,IQuery query)
+        public IQuery HiSql(string hisql, IQuery query)
         {
             //编译hisql
             AST.SelectParse selectParse = new AST.SelectParse(hisql, query);
@@ -397,7 +400,7 @@ namespace HiSql
 
             return this;
         }
-        
+
         /// <summary>
         /// 重命名表
         /// </summary>
@@ -527,7 +530,7 @@ namespace HiSql
             else
                 throw new Exception("[Having]必须在Group之后");
 
-            
+
 
 
             return this;
@@ -537,15 +540,15 @@ namespace HiSql
             if (_queue.LastQueue() == "group")
             {
 
-                
-                if (havings==null || havings.Elements.Count == 0)
+
+                if (havings == null || havings.Elements.Count == 0)
                 {
                     throw new Exception($"[Having]未指定过滤条件");
                 }
                 else
                 {
-                 
-                    _list_having=havings.Elements;
+
+                    _list_having = havings.Elements;
                     foreach (HavingDefinition havingDefinition in _list_having)
                     {
                         if (string.IsNullOrEmpty(havingDefinition.Field.TabName) && !this.IsMultiSubQuery)
@@ -556,8 +559,9 @@ namespace HiSql
                     }
                 }
 
-                
-            }else
+
+            }
+            else
                 throw new Exception("[Having]必须在Group之后");
 
             return this;
@@ -588,7 +592,7 @@ namespace HiSql
         /// <param name="retabname">重命名表</param>
         /// <param name="joinType">关联类型 默认inner</param>
         /// <returns></returns>
-        public IQuery Join(string tabname, string retabname,JoinType joinType= JoinType.Inner)
+        public IQuery Join(string tabname, string retabname, JoinType joinType = JoinType.Inner)
         {
             _currjoin = new JoinDefinition(tabname, retabname);
             _currjoin.JoinType = joinType;
@@ -601,7 +605,7 @@ namespace HiSql
         /// <param name="tabname">关联的表名</param>
         /// <param name="joinType">关联的类型 默认inner</param>
         /// <returns></returns>
-        public IQuery Join(string tabname,JoinType joinType=JoinType.Inner)
+        public IQuery Join(string tabname, JoinType joinType = JoinType.Inner)
         {
             _currjoin = new JoinDefinition(tabname);
             _currjoin.JoinType = joinType;
@@ -941,7 +945,7 @@ namespace HiSql
         public IQuery Where(Filter where)
         {
             if (!_queue.HasQueue("where"))
-            { 
+            {
                 if (where != null && where.Elements.Count > 0)
                 {
                     if (!where.IsBracketOk)
@@ -964,7 +968,8 @@ namespace HiSql
                 }
                 _where = where;
 
-            }else
+            }
+            else
                 throw new Exception($"已经指定了一个Where 不允许重复指定");
             return this;
         }
@@ -999,6 +1004,41 @@ namespace HiSql
 
             return "";
         }
+
+
+
+        public  Task<List<ExpandoObject>> ToEObjectAsync(ref int total)
+        {
+            string _sql = this.ToSql();
+            total = 0;
+            if (this.IsPage && !string.IsNullOrEmpty(this.PageTotalSql.ToString().Trim()))
+            {
+                var obj = this.Context.DBO.ExecScalar(this.PageTotalSql.ToString());
+                total = Convert.ToInt32(obj.ToString());
+            }
+            var dr =  this.Context.DBO.GetDataReaderAsync(_sql, null);
+            var _result = DataConvert.ToEObjectSync(dr);
+            return _result;
+        }
+
+
+        public async Task<List<ExpandoObject>> ToEObjectAsync()
+        {
+            string _sql = this.ToSql();
+            IDataReader dr = await this.Context.DBO.GetDataReaderAsync(_sql, null);
+            List<ExpandoObject> _result = DataConvert.ToEObject(dr);
+            dr.Close();
+            return _result;
+        }
+
+
+        public List<ExpandoObject> ToEObject()
+        {
+            return ToEObjectAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+
+
+
         public List<T> ToList<T>()
         {
             string _sql = this.ToSql();
@@ -1007,6 +1047,9 @@ namespace HiSql
             dr.Close();
             return _result;
         }
+
+
+
 
         public List<T> ToList<T>(ref int total)
         {
@@ -1040,14 +1083,14 @@ namespace HiSql
                 total = Convert.ToInt32(obj.ToString());
 
             }
-                
+
 
             return this.Context.DBO.GetDataTable(_sql, null);
         }
         public List<TDynamic> ToDynamic()
         {
             string _sql = this.ToSql();
-            
+
 
             IDataReader dr = this.Context.DBO.GetDataReader(_sql, null);
             List<TDynamic> result = DataConvert.ToDynamic(dr);
@@ -1111,7 +1154,7 @@ namespace HiSql
             {
                 // && t.DbServer == table.DbServer
                 // && t.Schema == table.Schema
-                if (_list_table.Where(t => t!=null && (((t.TabName == table.TabName && t.AsTabName == table.AsTabName) || (  t.AsTabName == table.TabName && table.TabName==table.AsTabName)))).Count() == 0)
+                if (_list_table.Where(t => t != null && (((t.TabName == table.TabName && t.AsTabName == table.AsTabName) || (t.AsTabName == table.TabName && table.TabName == table.AsTabName)))).Count() == 0)
                 {
                     //表示不存在 则添加
                     _list_table.Add(table);
@@ -1133,7 +1176,7 @@ namespace HiSql
         public IQuery Case(string fieldname)
         {
 
-            
+
             if (_queue.LastQueue() == "case")
             {
                 throw new Exception($"不能重复指定[Case]方法");
@@ -1174,7 +1217,8 @@ namespace HiSql
             {
                 throw new Exception($"[When]方法只能在[Case]或[Then]后面");
             }
-            else {
+            else
+            {
                 _queue.Add("when");
                 WhenDefinition whenDefinition = new WhenDefinition(fieldexpress);
                 whenDefinition.Field = _currcase[0].CaseField;
@@ -1202,13 +1246,15 @@ namespace HiSql
                     ThenDefinition thenDefinition = new ThenDefinition(thenvalue);
                     _currcase[0].WhenList[_currcase[0].WhenList.Count - 1].Then = thenDefinition;
                 }
-                else {
+                else
+                {
                     throw new Exception($"[Then]方法只能在[When]后面");
                 }
             }
             return this;
         }
-        public IQuery Else(string elsevalue) {
+        public IQuery Else(string elsevalue)
+        {
             //else 只能在then后面
 
             if (_currcase.Count != 1)
@@ -1276,7 +1322,9 @@ namespace HiSql
             }
             return this;
         }
+
+
     }
 
-    
+
 }

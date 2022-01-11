@@ -310,19 +310,22 @@ namespace HiSql
                 throw _e;
             return count;
         }
+
+
+
         /// <summary>
         /// 执行sql语句 返回受影响的行
         /// </summary>
         /// <param name="sql"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public async Task<int> ExecCommandAsync(string sql, params HiParameter[] parameters)
+        public Task<int> ExecCommandAsync(string sql, params HiParameter[] parameters)
         {
             if (Context.CurrentConnectionConfig.UpperCase)
                 sql = sql.ToUpper();
             //deleExecCommand _deleExecCommand = new deleExecCommand(execCommandAsync);
-            //Task.Run(() => _deleExecCommand.Invoke(sql, parameters));
-            var workTask = execCommandAsync(sql, parameters); 
+            //var workTask = Task.Run(() => _deleExecCommand.Invoke(sql, parameters));
+            var workTask = execCommandAsync(sql, parameters);
             bool flag = workTask.Wait(this.Context.CurrentConnectionConfig.SqlExecTimeOut, new CancellationToken(false));
             if (flag)
             {
@@ -335,10 +338,10 @@ namespace HiSql
                     OnTimeOut.BeginInvoke(this.Context.CurrentConnectionConfig.SqlExecTimeOut, (s) =>
                     {
                     }, null);
-                    // Task.Run(() => { OnTimeOut(this.Context.CurrentConnectionConfig.SqlExecTimeOut); });
+                    //Task.Run(() => { OnTimeOut(this.Context.CurrentConnectionConfig.SqlExecTimeOut); });
                 }
             }
-            return workTask.Result;
+            return workTask;
         }
 
         private async Task<object> execScalar(string sql)
@@ -413,12 +416,18 @@ namespace HiSql
                 throw _e;
             return _effect;
         }
+
         public virtual object ExecScalar(string sql)
+        {
+            return ExecScalarAsync(sql).ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+
+        public virtual Task<object> ExecScalarAsync(string sql)
         {
             if (Context.CurrentConnectionConfig.UpperCase)
                 sql = sql.ToUpper();
-            deleExecScalar _deleExecScalar = new deleExecScalar(execScalar);
-            var workTask = Task.Run(() => _deleExecScalar.Invoke(sql));
+            //deleExecScalar _deleExecScalar = new deleExecScalar(execScalar);
+            var workTask = execScalar(sql); //Task.Run(() => _deleExecScalar.Invoke(sql));
             bool flag = workTask.Wait(this.Context.CurrentConnectionConfig.SqlExecTimeOut, new CancellationToken(false));
             if (flag)
             {
@@ -428,10 +437,14 @@ namespace HiSql
             {
                 if (OnTimeOut != null)
                 {
-                    Task.Run(() => { OnTimeOut(this.Context.CurrentConnectionConfig.SqlExecTimeOut); });
+                    OnTimeOut.BeginInvoke(this.Context.CurrentConnectionConfig.SqlExecTimeOut, (o) =>
+                    {
+                        //OnTimeOut 回调
+                    }, null);
+                    //Task.Run(() => { OnTimeOut(this.Context.CurrentConnectionConfig.SqlExecTimeOut); });
                 }
             }
-            return workTask.Result;
+            return workTask;
         }
 
 
@@ -441,6 +454,11 @@ namespace HiSql
         }
 
         public IDataReader GetDataReader(string sql, params HiParameter[] parameters)
+        {
+            return GetDataReaderAsync(sql, parameters).ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+
+        public async Task<IDataReader> GetDataReaderAsync(string sql, params HiParameter[] parameters)
         {
             try
             {
@@ -469,8 +487,9 @@ namespace HiSql
                 }
                 #endregion
 
-                IDbCommand sqlCommand = GetCommand(sql, parameters);
-                IDataReader sqlDataReader = sqlCommand.ExecuteReader(this.IsAutoClose() ? CommandBehavior.CloseConnection : CommandBehavior.Default);
+                DbCommand sqlCommand = GetCommand(sql, parameters);
+
+                IDataReader sqlDataReader = await sqlCommand.ExecuteReaderAsync(this.IsAutoClose() ? CommandBehavior.CloseConnection : CommandBehavior.Default);
 
                 #region 执行后操作
                 if (this.IsSqlLog)

@@ -468,6 +468,19 @@ namespace HiSql
             return result;
         }
 
+        /// <summary>
+        /// 删除表(高风险操作)
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <returns></returns>
+        public IDelete Drop(string tabname)
+        {
+            IDelete result = Instance.GetDelete(this.Context.CurrentConnectionConfig);
+            result.Context = this.Context;
+            result.Drop(tabname);
+            return result;
+        }
+
         #endregion
 
 

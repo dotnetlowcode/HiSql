@@ -249,7 +249,6 @@ namespace HiSql
                         //oracleclient 返回的值不标准所以需要进行特殊处理
                         switch (prop.PropertyType.Name)
                         {
-
                             case "TabStoreType":
                                 prop.SetValue(hiTable, (TabStoreType)Convert.ToInt32(tabModel.Rows[0][prop.Name].ToString()));
                                 break;
@@ -262,7 +261,6 @@ namespace HiSql
                             case "TabStatus":
                                 prop.SetValue(hiTable, (TabStatus)Convert.ToInt32(tabModel.Rows[0][prop.Name].ToString()));
                                 break;
-
                             default:
                                 if (prop.PropertyType.Name == "Boolean" && (tabModel.Rows[0][prop.Name].GetType().Name.ToLower().IndexOf("int") >= 0 || tabModel.Rows[0][prop.Name].GetType().Name.ToLower().IndexOf("decimal") >= 0))
                                 {

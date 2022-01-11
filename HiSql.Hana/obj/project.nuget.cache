@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "wX46MFG0tgyWuHu1adK2rL0qmuHvE93lFgXzx1WcJuLQESEBRc5lrOEWdCLVjLjxxkRVilh8W+yTUtqyqQqa8A==",
+  "dgSpecHash": "9blJzw07tG7StiiwD7SwLZlAqciGvHQatm6wUoBI/YNIGzPW9mSxaDemhbcbrsaK09/tKZ/MQiy/QphhaEoY1g==",
   "success": true,
   "projectFilePath": "D:\\Project\\OpenSource\\HiSql\\HiSql.Hana\\HiSql.Hana.csproj",
   "expectedPackageFiles": [
@@ -18,7 +18,8 @@
     "C:\\Users\\admin\\.nuget\\packages\\system.memory\\4.5.4\\system.memory.4.5.4.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\system.numerics.vectors\\4.5.0\\system.numerics.vectors.4.5.0.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
-    "C:\\Users\\admin\\.nuget\\packages\\system.threading.tasks.extensions\\4.5.4\\system.threading.tasks.extensions.4.5.4.nupkg.sha512"
+    "C:\\Users\\admin\\.nuget\\packages\\system.threading.tasks.extensions\\4.5.4\\system.threading.tasks.extensions.4.5.4.nupkg.sha512",
+    "C:\\Users\\admin\\.nuget\\packages\\hisql\\1.0.2.9\\hisql.1.0.2.9.nupkg.sha512"
   ],
   "logs": []
 }

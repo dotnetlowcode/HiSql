@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,16 +14,19 @@ namespace HiSql
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, Inherited = true)]
     public class HiIndex : Attribute
-    { 
-        
+    {
+
     }
     /// <summary>
     /// 用于描述表结构属性信息(可以根据这些信息动态创建表)
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class,Inherited =true)]
+    [AttributeUsage(AttributeTargets.Class, Inherited = true)]
     [Serializable]
-    public class HiTable:Attribute
+    public class HiTable : Attribute
     {
+        [JsonIgnore]
+        public override object TypeId { get; }
+
 
         string _tabName = "";
         string _tabReName = "";
@@ -48,7 +52,7 @@ namespace HiSql
 
 
 
-        
+
         public TableType TableType
         {
             get { return tableType; }
@@ -77,10 +81,15 @@ namespace HiSql
         /// <summary>
         /// 表名
         /// </summary>
-        public string TabName { get {
+        public string TabName
+        {
+            get
+            {
                 return _tabName;
-            } set {
-                _tabName= value;
+            }
+            set
+            {
+                _tabName = value;
 
                 Dictionary<string, string> _dic = Tool.RegexGrp(Constants.REG_TABNAME, _tabName);
                 switch (_dic["flag"].ToString())
@@ -105,12 +114,17 @@ namespace HiSql
         /// <summary>
         /// 表的别名
         /// </summary>
-        public string TabReName { get {
+        public string TabReName
+        {
+            get
+            {
                 if (string.IsNullOrEmpty(_tabReName))
                     return _tabName;
                 else
                     return _tabReName;
-            } set { _tabReName = value; } }
+            }
+            set { _tabReName = value; }
+        }
 
         /// <summary>
         /// 表描述
@@ -123,15 +137,21 @@ namespace HiSql
         /// <summary>
         /// 表的存储类型
         /// </summary>
-        public TabStoreType TabStoreType { get { return _tabStoreType; } 
-            
-            set { _tabStoreType = value; } }
+        public TabStoreType TabStoreType
+        {
+            get { return _tabStoreType; }
+
+            set { _tabStoreType = value; }
+        }
 
         /// <summary>
         /// 表类型
         /// </summary>
-        public TabType TabType { get { return _tabType; } 
-            set { _tabType = value; } }
+        public TabType TabType
+        {
+            get { return _tabType; }
+            set { _tabType = value; }
+        }
 
         /// <summary>
         /// 表的缓存类型
@@ -165,20 +185,20 @@ namespace HiSql
         /// <summary>
         /// 日志表
         /// </summary>
-        public string LogTable { get { return _logtable; }set { _logtable = value; } }
-        
-        public int LogExprireDay { get { return _logexprireday; }set { _logexprireday = value; } }
+        public string LogTable { get { return _logtable; } set { _logtable = value; } }
+
+        public int LogExprireDay { get { return _logexprireday; } set { _logexprireday = value; } }
         public HiTable()
-        { 
-        
+        {
+
         }
     }
 
     /// <summary>
     /// 字段列描述信息(根据这个信息可以动态创建表的列)
     /// </summary>
-    
-    [AttributeUsage(AttributeTargets.Property,Inherited =true)]
+
+    [AttributeUsage(AttributeTargets.Property, Inherited = true)]
     [Serializable]
     public class HiColumn : Attribute
     {
@@ -220,6 +240,10 @@ namespace HiSql
 
         int _sortnum = 0;
 
+
+        [JsonIgnore]
+        public override object TypeId { get; }
+        
         /// <summary>
         /// 表名
         /// </summary>
@@ -250,7 +274,8 @@ namespace HiSql
         /// <summary>
         /// 设置数据库默认值
         /// </summary>
-        public HiTypeDBDefault DBDefault {
+        public HiTypeDBDefault DBDefault
+        {
 
             get { return _dbdefalut; }
             set { _dbdefalut = value; }
@@ -267,15 +292,20 @@ namespace HiSql
         /// <summary>
         /// 字段描述
         /// </summary>
-        public string FieldDesc { get {
+        public string FieldDesc
+        {
+            get
+            {
 
                 if (_fieldDesc == string.Empty)
                 {
                     return _ColumnName;
                 }
-                return _fieldDesc; 
-            
-            } set { _fieldDesc = value; } }
+                return _fieldDesc;
+
+            }
+            set { _fieldDesc = value; }
+        }
 
         /// <summary>
         /// 字段长度
@@ -300,7 +330,7 @@ namespace HiSql
         public string SNO
         {
             get { return _sno; }
-            set {_sno = value;}
+            set { _sno = value; }
         }
         /// <summary>
         /// 子编号
@@ -328,7 +358,7 @@ namespace HiSql
             get { return _isPrimary; }
 
             //如果没有指定Bllkey 那么是主键的情况下就默认为BLLkey 如果指定了就按指定的
-            set { _isPrimary = value;if (!_custombllkey && _isPrimary) { _isBllKey = _isPrimary; } }
+            set { _isPrimary = value; if (!_custombllkey && _isPrimary) { _isBllKey = _isPrimary; } }
         }
         /// <summary>
         /// 是否自增长
@@ -366,18 +396,21 @@ namespace HiSql
         }
         public bool IsRequire
         {
-            get {
+            get
+            {
                 if (_isPrimary && !IsIdentity)
                     return _isPrimary;
                 else
-                    return _isrequire; }
+                    return _isrequire;
+            }
             set { _isrequire = value; }
         }
 
         public bool IsObsolete
         {
             get { return _isobsolete; }
-            set {
+            set
+            {
                 _isobsolete = value;
             }
         }
@@ -397,7 +430,7 @@ namespace HiSql
         }
 
 
-        
+
 
         //扩展 字段
 
@@ -462,7 +495,7 @@ namespace HiSql
         public string RefFields
         {
             get { return _reffields; }
-            set { _reffields = value;  }
+            set { _reffields = value; }
         }
         /// <summary>
         /// 引用字段清单 描述

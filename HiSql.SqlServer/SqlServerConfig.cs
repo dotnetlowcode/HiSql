@@ -282,16 +282,17 @@ namespace HiSql
                 .AppendLine("[$Fields$]")
                 .AppendLine("[$Keys$]")//主键
                 .AppendLine(")[$Primary$]")
-                .AppendLine($"delete dbo.{_temp_table_pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{_temp_table_after} where TabName='[$TabName$]'")
-                .AppendLine($"delete dbo.{_temp_table_pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{_temp_table_after} where TabName='[$TabName$]'")
-
-                .AppendLine("[$TabStruct$]")
+                
                 .AppendLine("[$Comment$]")
 
                 .AppendLine("set @_effect=1 ")
                 .AppendLine("end")
-                .AppendLine("else")
-                .AppendLine("set @_effect=0 ")
+                .AppendLine($"delete dbo.{_temp_table_pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{_temp_table_after} where TabName='[$TabName$]'")
+                .AppendLine($"delete dbo.{_temp_table_pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{_temp_table_after} where TabName='[$TabName$]'")
+
+                .AppendLine("[$TabStruct$]")
+                //.AppendLine("else")
+                .AppendLine("set @_effect=1 ")
                 .AppendLine("select @_effect")
                 .ToString();
 

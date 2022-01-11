@@ -14,6 +14,12 @@ namespace HiSql
         List<FilterDefinition> _list_filter = new List<FilterDefinition>();
         List<object> _list_data = new List<object>();
         bool _isnodblog = false;
+
+        //无日志清除表数据
+        bool _istruncate = false;
+        //删除表
+        bool _isdrop = false;
+
         Filter _where;
         public HiSqlProvider Context { get; set; }
         public TableDefinition Table
@@ -32,6 +38,21 @@ namespace HiSql
         public Filter Filters
         {
             get { return _where; }
+        }
+
+        /// <summary>
+        /// 是否无日志清除表数据
+        /// </summary>
+        public bool IsTruncate
+        {
+            get { return _istruncate; }
+        }
+        /// <summary>
+        /// 是否删除表
+        /// </summary>
+        public bool IsDrop
+        {
+            get { return _isdrop; }
         }
 
         /// <summary>
@@ -175,18 +196,33 @@ namespace HiSql
         /// <returns></returns>
         public IDelete TrunCate(string tabname)
         {
-            if (!_queue.HasQueue("table"))
+            if (!_queue.HasQueue("table") && !_queue.HasQueue("drop"))
             {
                 _table = new TableDefinition(tabname);
                 if (_table.TableType != TableType.Entity)
                     throw new Exception($"TrunCate 只能对实体表进行操作");
                 _isnodblog = true;
                 _queue.Add("truncate");
+                _istruncate = true;
             }
             else
-                throw new Exception($"已经指定了Delete 不允许再指定TrunCate");
+                throw new Exception($"已经指定了Delete或Drop 不允许再指定TrunCate");
             return this;
         }
+        public IDelete Drop(string tabname)
+        {
+            if (!_queue.HasQueue("table") && !_queue.HasQueue("truncate"))
+            {
+                _table = new TableDefinition(tabname);
+                _isnodblog = true;
+                _queue.Add("drop");
+                _isdrop = true;
+
+            }else
+                throw new Exception($"已经指定了Delete或TrunCate 不允许再指定Drop");
+            return this;
+        }
+
         public IDelete Where(string sqlwhere)
         {
             //需要检测语法

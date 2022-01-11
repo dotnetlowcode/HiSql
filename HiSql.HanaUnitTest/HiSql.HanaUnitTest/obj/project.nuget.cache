@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "Is0hBsPpk2uVTAxzEmIkHYie3285ttnhKOxRHkaWkJyv0N9+vHLd9c3rtLErMywTZAJ38CeKGO03dWp6eR/40w==",
+  "dgSpecHash": "9QqKhAFSpqUugk19Jbwx6vrIy/vJ183sOLcY275Vmj8zWGOCHbASP1bmAsVTBVGdAKmwOYbWPleOEhqQ38/PLQ==",
   "success": true,
   "projectFilePath": "D:\\Project\\OpenSource\\HiSql\\HiSql.HanaUnitTest\\HiSql.HanaUnitTest\\HiSql.HanaUnitTest.csproj",
   "expectedPackageFiles": [
@@ -15,7 +15,8 @@
     "C:\\Users\\admin\\.nuget\\packages\\system.buffers\\4.5.1\\system.buffers.4.5.1.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\system.data.odbc\\5.0.0\\system.data.odbc.5.0.0.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\system.memory\\4.5.4\\system.memory.4.5.4.nupkg.sha512",
-    "C:\\Users\\admin\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512"
+    "C:\\Users\\admin\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
+    "C:\\Users\\admin\\.nuget\\packages\\hisql\\1.0.2.9\\hisql.1.0.2.9.nupkg.sha512"
   ],
   "logs": []
 }

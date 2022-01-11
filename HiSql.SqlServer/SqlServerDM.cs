@@ -18,7 +18,7 @@ namespace HiSql
         StringBuilder _Sql = new StringBuilder();
         public virtual HiSqlProvider Context { get; set; }
         SqlServerConfig dbConfig = new SqlServerConfig(true);
-        public SqlServerDM() 
+        public SqlServerDM()
         {
         }
 
@@ -270,7 +270,7 @@ namespace HiSql
         /// 默认空值
         /// </summary>
         /// <returns></returns>
-        public string GetDbDefault(HiColumn hiColumn,string tabname="")
+        public string GetDbDefault(HiColumn hiColumn, string tabname = "")
         {
             string _default = "";
             if (hiColumn.DBDefault != HiTypeDBDefault.NONE)
@@ -312,8 +312,9 @@ namespace HiSql
         /// <returns></returns>
         public TabInfo GetTabStruct(string tabname)
         {
-            string _schema = string.IsNullOrEmpty(Context.CurrentConnectionConfig.Schema)?"dbo": Context.CurrentConnectionConfig.Schema;
-            return HiSqlCommProvider.InitTabMaping(tabname, () => {
+            string _schema = string.IsNullOrEmpty(Context.CurrentConnectionConfig.Schema) ? "dbo" : Context.CurrentConnectionConfig.Schema;
+            return HiSqlCommProvider.InitTabMaping(tabname, () =>
+            {
                 tabname = tabname.ToSqlInject();
                 DataSet ds = new DataSet();
                 DataTable dt_model = this.Context.DBO.GetDataTable($"select * from {dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{dbConfig.Table_After} where TabName='{tabname}'", new HiParameter("@TabName", tabname));
@@ -340,7 +341,7 @@ namespace HiSql
                     int rtn = this.BuildTabCreate(tabInfo);
                     //string _sql = this.BuildTabStructSql(tabInfo.TabModel, tabInfo.Columns).ToString();
                     //this.Context.DBO.ExecCommand(_sql);
-                    GetTabStruct(tabname);
+                    //GetTabStruct(tabname);
                 }
                 else
                 {
@@ -416,15 +417,15 @@ namespace HiSql
 
             string _schema = string.IsNullOrEmpty(this.Context.CurrentConnectionConfig.Schema) ? "dbo" : this.Context.CurrentConnectionConfig.Schema;
 
-            sb.AppendLine(dbConfig.Delete_Statement_Where.Replace("[$Schema$]", _schema)
-                .Replace("[$TabName$]", Constants.HiSysTable["Hi_TabModel"])
-                .Replace("[$Where$]", $"{dbConfig.Field_Pre}TabName{dbConfig.Field_After}{dbConfig.Field_After}='{hiTable.TabName}'")
-                );
+            //sb.AppendLine(dbConfig.Delete_Statement_Where.Replace("[$Schema$]", _schema)
+            //    .Replace("[$TabName$]", Constants.HiSysTable["Hi_TabModel"])
+            //    .Replace("[$Where$]", $"{dbConfig.Field_Pre}TabName{dbConfig.Field_After}='{hiTable.TabName}'")
+            //    );
 
-            sb.AppendLine(dbConfig.Delete_Statement_Where.Replace("[$Schema$]", _schema)
-                .Replace("[$TabName$]", Constants.HiSysTable["Hi_FieldModel"])
-                .Replace("[$Where$]", $"{dbConfig.Field_Pre}TabName{dbConfig.Field_After}{dbConfig.Field_After}='{hiTable.TabName}'")
-                );
+            //sb.AppendLine(dbConfig.Delete_Statement_Where.Replace("[$Schema$]", _schema)
+            //    .Replace("[$TabName$]", Constants.HiSysTable["Hi_FieldModel"])
+            //    .Replace("[$Where$]", $"{dbConfig.Field_Pre}TabName{dbConfig.Field_After}='{hiTable.TabName}'")
+            //    );
 
             sb.AppendLine($"insert into {dbConfig.Schema_Pre}{_schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{Constants.HiSysTable["Hi_TabModel"]}{dbConfig.Table_After} (")
                .Append($"{dbConfig.Field_Pre}TabName{dbConfig.Field_After}{dbConfig.Field_Split}")
@@ -665,13 +666,13 @@ namespace HiSql
 
             return _merge_temp;
         }
-        public string BuildDeleteSql(TableDefinition table, Dictionary<string, string> dic_value, string _where, bool istrunctate = false)
+        public string BuildDeleteSql(TableDefinition table, Dictionary<string, string> dic_value, string _where, bool istrunctate = false,bool isdrop=false)
         {
             string _temp_delete = string.Empty;
             StringBuilder sb_field = new StringBuilder();
             string _schema = string.IsNullOrEmpty(Context.CurrentConnectionConfig.Schema) ? "dbo" : Context.CurrentConnectionConfig.Schema;
             int i = 0;
-            if (!istrunctate && dic_value.Count > 0 || !string.IsNullOrEmpty(_where))
+            if ((!istrunctate && !isdrop && dic_value.Count > 0) || !string.IsNullOrEmpty(_where))
             {
                 _temp_delete = dbConfig.Delete_Statement_Where;
                 if (dic_value.Count > 0)
@@ -696,22 +697,32 @@ namespace HiSql
             }
             else
             {
-                if (!istrunctate)
+                if (!istrunctate && !isdrop)
                 {
+                    //删除表
                     _temp_delete = dbConfig.Delete_Statement;
                     _temp_delete = _temp_delete
                         .Replace("[$Schema$]", _schema)
                         .Replace("[$TabName$]", table.TabName);
                 }
-                else
+                else if (istrunctate && !isdrop)
                 {
+                    //Truncate 删除表数据 无日志
                     _temp_delete = dbConfig.Delete_TrunCate;
                     _temp_delete = _temp_delete
                         .Replace("[$Schema$]", _schema)
                         .Replace("[$TabName$]", table.TabName);
                 }
+                else if(!istrunctate &&  isdrop)
+                {
+                    ///删除表数据
+                    _temp_delete = dbConfig.Drop_Table;
+                    _temp_delete = _temp_delete
+                        .Replace("[$Schema$]", _schema)
+                        .Replace("[$TabName$]", table.TabName);
+                }
             }
-            
+
 
             return _temp_delete;
         }
@@ -724,15 +735,15 @@ namespace HiSql
         /// <param name="dic_primary"></param>
         /// <param name="_where"></param>
         /// <returns></returns>
-        public string BuildUpdateSql(TableDefinition table, Dictionary<string, string> dic_value, Dictionary<string, string> dic_primary,string _where)
+        public string BuildUpdateSql(TableDefinition table, Dictionary<string, string> dic_value, Dictionary<string, string> dic_primary, string _where)
         {
-            string _temp_sql = string .Empty;
+            string _temp_sql = string.Empty;
             int i = 0;
             StringBuilder sb = new StringBuilder();
             StringBuilder sb_field = new StringBuilder();
             StringBuilder sb_primary = new StringBuilder();
 
-            string _schema =string.IsNullOrEmpty( Context.CurrentConnectionConfig.Schema)?"dbo": Context.CurrentConnectionConfig.Schema;
+            string _schema = string.IsNullOrEmpty(Context.CurrentConnectionConfig.Schema) ? "dbo" : Context.CurrentConnectionConfig.Schema;
 
             if (dic_primary.Count() > 0 || !string.IsNullOrEmpty(_where))
             {
@@ -804,7 +815,7 @@ namespace HiSql
             {
                 var columninfo = tabinfo.Columns.Where(c => c.FieldName.ToLower() == n.ToLower()).FirstOrDefault();
                 //只有是字段类型为数字的才支撑
-                if (columninfo != null && columninfo.FieldType.IsIn<HiType>(HiType.INT,HiType.BIGINT,HiType.DECIMAL,HiType.SMALLINT))
+                if (columninfo != null && columninfo.FieldType.IsIn<HiType>(HiType.INT, HiType.BIGINT, HiType.DECIMAL, HiType.SMALLINT))
                 {
                     ///检测是否有以字段更新字段的语法
                     List<Dictionary<string, string>> _lstdic = Tool.RegexGrps(Constants.REG_UPDATE, dic_value[n]);
@@ -896,7 +907,7 @@ namespace HiSql
                                 .Replace("[$FieldLen$]", hiColumn.FieldLen.ToString())
                                 .Replace("[$IsNull$]", hiColumn.IsPrimary ? "NOT NULL" : hiColumn.IsNull == true ? "NULL" : "NOT NULL")
                                 .Replace("[$Default$]", hiColumn.IsPrimary ? "" : GetDbDefault(hiColumn))
-                                .Replace("[$EXTEND$]", hiTable.TableType==TableType.Var && hiColumn.IsPrimary ? "primary key" : "")
+                                .Replace("[$EXTEND$]", hiTable.TableType == TableType.Var && hiColumn.IsPrimary ? "primary key" : "")
                                 ;
                             break;
                         case "int":
@@ -971,7 +982,7 @@ namespace HiSql
             return _str_temp_field;
         }
 
-        
+
 
 
         /// <summary>
@@ -1004,9 +1015,13 @@ namespace HiSql
         {
             string _sql = BuildTabCreateSql(tabInfo.TabModel, tabInfo.GetColumns);
             int _effect = (int)this.Context.DBO.ExecScalar(_sql);
-            
+
             return _effect;
         }
+
+
+
+
         /// <summary>
         /// 根据表结构信息生成底层创建表的语句
         /// </summary>
@@ -1018,7 +1033,7 @@ namespace HiSql
             string _temp_create = dbConfig.Table_Create;
             if (hiTable != null)
             {
-                if (hiTable.TableType==TableType.Var)  // && !hiTable.IsGlobalTemp && !hiTable.IsLocalTemp
+                if (hiTable.TableType == TableType.Var)  // && !hiTable.IsGlobalTemp && !hiTable.IsLocalTemp
                 {
                     //hiTable.TabName = $"@{hiTable.TabName}";
                     _temp_create = dbConfig.Table_Declare_Table;
@@ -1040,7 +1055,7 @@ namespace HiSql
                 if (!string.IsNullOrEmpty(keys))
                 {
                     keys = dbConfig.Table_Key.Replace("[$TabName$]", hiTable.TabName)
-                        .Replace("[$Keys$]", keys).Replace("[$ConnectID$]",this.Context.ConnectedId);
+                        .Replace("[$Keys$]", keys).Replace("[$ConnectID$]", this.Context.ConnectedId);
                 }
 
                 string _fields_str = BuildFieldStatment(hiTable, lstHiTable);
@@ -1124,11 +1139,11 @@ namespace HiSql
                     {
                         if (whereResult.Result.ContainsKey("fields"))
                         {
-                            
+
                             FieldDefinition field = new FieldDefinition(whereResult.Result["fields"].ToString());
                             HiColumn hiColumn = CheckField(TableList, dictabinfo, Fields, field);
                             sb_sql.Append($"{dbConfig.Table_Pre}{field.AsTabName}{dbConfig.Table_After}.{dbConfig.Table_Pre}{field.AsFieldName}{dbConfig.Table_After}");
-                            
+
                             if (hiColumn != null)
                             {
                                 string _value = whereResult.Result["value"].ToString();
@@ -1171,15 +1186,15 @@ namespace HiSql
                             FieldDefinition field = new FieldDefinition(whereResult.Result["fields"].ToString());
                             HiColumn hiColumn = CheckField(TableList, dictabinfo, Fields, field);
                             sb_sql.Append($"{dbConfig.Table_Pre}{field.AsTabName}{dbConfig.Table_After}.{dbConfig.Table_Pre}{field.AsFieldName}{dbConfig.Table_After}");
-                            
-                            if (hiColumn==null)
+
+                            if (hiColumn == null)
                                 throw new Exception($"字段[{whereResult.Result["fields"].ToString()}]出现错误");
 
                             string _content = whereResult.Result["content"].ToString();
                             if (Tool.RegexMatch(AST.SelectParse.Constants.REG_SELECT, _content))
                             {
 
-                               
+
                                 //检测出是select 语句
                                 SelectParse selectParse = new SelectParse(_content, Context, true);
                                 string _sql = selectParse.Query.ToSql();
@@ -1201,7 +1216,7 @@ namespace HiSql
                                 }
                                 else
                                     throw new Exception($"语句[{whereResult.Result["fields"].ToString()}] 附近有语法错误,无匹配的in范围值");
-                            
+
 
 
                             }
@@ -1217,7 +1232,7 @@ namespace HiSql
                                 }
                                 else
                                     throw new Exception($"语句[{whereResult.Result["fields"].ToString()}] 附近有语法错误,无匹配的in范围值");
-                           
+
                             }
                             else
                                 throw new Exception($"语句[{_content}]附近有语法错误");
@@ -1242,7 +1257,7 @@ namespace HiSql
         /// 生成WHERE语句
         /// </summary>
         /// <returns></returns>
-        public string BuilderWhereSql(List<TableDefinition> TableList, Dictionary<string, TabInfo> dictabinfo, List<FieldDefinition> Fields, List<FilterDefinition> Wheres,bool issubquery)
+        public string BuilderWhereSql(List<TableDefinition> TableList, Dictionary<string, TabInfo> dictabinfo, List<FieldDefinition> Fields, List<FilterDefinition> Wheres, bool issubquery)
         {
             StringBuilder sb_where = new StringBuilder();
             int _idx = 0;
@@ -1263,7 +1278,7 @@ namespace HiSql
                         }
                         else
                         {
-                            if(Wheres[_idx + 1].FilterType != FilterType.BRACKET_RIGHT)
+                            if (Wheres[_idx + 1].FilterType != FilterType.BRACKET_RIGHT)
                                 throw new Exception($"在括号[)]后如果还有其它的条件则必需要有逻辑操作符[and|or]");
                         }
                     }
@@ -1336,7 +1351,7 @@ namespace HiSql
                         }
                     }
                 }
-                
+
                 _idx++;
             }
 
@@ -1372,7 +1387,7 @@ namespace HiSql
                     {
                         if (joinOnFilterDefinition.Left != null && joinOnFilterDefinition.Right != null)
                         {
-                            
+
                             HiColumn hiColumnL = CheckField(TableList, dictabinfo, Fields, joinOnFilterDefinition.Left);
                             HiColumn hiColumnR = CheckField(TableList, dictabinfo, Fields, joinOnFilterDefinition.Right);
 
@@ -1411,7 +1426,7 @@ namespace HiSql
             {
                 if (!issubquery)
                 {
-                    
+
                     HiColumn hiColumn = CheckField(TableList, dictabinfo, Fields, groupDefinition.Field);
 
                     sb_group.Append($"{dbConfig.Table_Pre}{groupDefinition.Field.AsTabName}{dbConfig.Table_After}.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}");
@@ -1443,17 +1458,17 @@ namespace HiSql
         /// <param name="PageSize"></param>
         /// <param name="issubquery"></param>
         /// <returns></returns>
-        public string BuildOrderBySql(ref StringBuilder sb_group,   Dictionary<string, TabInfo> dictabinfo, QueryProvider queryProvider)
+        public string BuildOrderBySql(ref StringBuilder sb_group, Dictionary<string, TabInfo> dictabinfo, QueryProvider queryProvider)
         {
             int _idx = 0;
             bool _flag = false;
             StringBuilder sb_sort = new StringBuilder();
-            foreach (SortByDefinition sortByDefinition in  queryProvider.Sorts)
+            foreach (SortByDefinition sortByDefinition in queryProvider.Sorts)
             {
                 if (!queryProvider.IsMultiSubQuery)
                 {
                     CheckField(queryProvider.TableList, dictabinfo, queryProvider.Fields, sortByDefinition.Field);
-                   
+
                     _flag = false;
                     sb_sort.Append($"{dbConfig.Table_Pre}{sortByDefinition.Field.AsTabName}{dbConfig.Table_After}.{dbConfig.Field_Pre}{sortByDefinition.Field.AsFieldName}{dbConfig.Field_After}");
                     if (queryProvider.Groups.Count > 0)
@@ -1533,8 +1548,8 @@ namespace HiSql
                     //字段值
                     if (whereResult.SType == StatementType.FieldValue)
                     {
-                        FieldDefinition field = new FieldDefinition(whereResult.Result["left"].ToString(),true);
-                        
+                        FieldDefinition field = new FieldDefinition(whereResult.Result["left"].ToString(), true);
+
                         HiColumn hiColumn = CheckField(TableList, dictabinfo, Fields, field, true);
 
 
@@ -1550,21 +1565,21 @@ namespace HiSql
                                     break;
                                 case DbFunction.COUNT:
                                     sb_sql.Append($"count(*) {whereResult.Result["op"].ToString()} '{whereResult.Result["value"].ToString()}'");
-                                    
+
                                     break;
                                 case DbFunction.MAX:
                                     sb_sql.Append($"max({dbConfig.Field_Pre}{field.FieldName}{dbConfig.Field_After}) {whereResult.Result["op"].ToString()} '{whereResult.Result["value"].ToString()}'");
-                                    
+
 
 
                                     break;
                                 case DbFunction.MIN:
                                     sb_sql.Append($"min({dbConfig.Field_Pre}{field.FieldName}{dbConfig.Field_After}) {whereResult.Result["op"].ToString()} '{whereResult.Result["value"].ToString()}'");
-                                    
+
                                     break;
                                 case DbFunction.SUM:
                                     sb_sql.Append($"sum({dbConfig.Field_Pre}{field.FieldName}{dbConfig.Field_After}) {whereResult.Result["op"].ToString()} '{whereResult.Result["value"].ToString()}'");
-                                    
+
                                     break;
                                 default:
                                     break;
@@ -1578,7 +1593,7 @@ namespace HiSql
                                 throw new Exception($"Having字段[{whereResult.Result["left"]}]在表中不存在");
 
                         }
-                        
+
                         //if (whereResult.Result.ContainsKey("fields"))
                         //{
 
@@ -1891,7 +1906,7 @@ namespace HiSql
         /// <param name="fieldDefinition"></param>
         /// <param name="allowstart"></param>
         /// <returns></returns>
-        public HiColumn CheckField(List<TableDefinition> TableList, Dictionary<string, TabInfo> dictabinfo, List<FieldDefinition> Fields,FieldDefinition fieldDefinition, bool allowstart = false)
+        public HiColumn CheckField(List<TableDefinition> TableList, Dictionary<string, TabInfo> dictabinfo, List<FieldDefinition> Fields, FieldDefinition fieldDefinition, bool allowstart = false)
         {
             HiColumn hiColumn = null;
 
@@ -1913,7 +1928,7 @@ namespace HiSql
                 if (dictabinfo.ContainsKey(tabinfo.TabName))
                 {
                     hiColumn = dictabinfo[tabinfo.TabName].Columns.Where(f => f.FieldName.ToLower() == fieldDefinition.FieldName.ToLower()).FirstOrDefault();
-                    if (hiColumn == null && Fields!=null && Fields.Count>0)
+                    if (hiColumn == null && Fields != null && Fields.Count > 0)
                     {
                         FieldDefinition fieldDefinition1 = Fields.Where(f => f.AsFieldName.ToLower() == fieldDefinition.FieldName.ToLower()).FirstOrDefault();
                         if (fieldDefinition1 != null)
@@ -1948,49 +1963,49 @@ namespace HiSql
         {
             //if (fieldDefinition.Case != null)
             //{
-                StringBuilder sb_case = new StringBuilder();
+            StringBuilder sb_case = new StringBuilder();
 
-                sb_case.AppendLine("case");
-                foreach (WhenDefinition whenDefinition in fieldDefinition.Case.WhenList)
+            sb_case.AppendLine("case");
+            foreach (WhenDefinition whenDefinition in fieldDefinition.Case.WhenList)
+            {
+
+
+                switch (whenDefinition.OperSymbol)
                 {
+                    case OperType.EQ:
+                        sb_case.AppendLine($"   when {dbConfig.Field_Pre}{whenDefinition.Field.AsFieldName}{dbConfig.Field_After} = {whenDefinition.Value} then {whenDefinition.Then.ThenValue}");
+                        break;
+                    case OperType.GT:
+                        sb_case.AppendLine($"   when {dbConfig.Field_Pre}{whenDefinition.Field.AsFieldName}{dbConfig.Field_After} > {whenDefinition.Value} then {whenDefinition.Then.ThenValue}");
+                        break;
+                    case OperType.LT:
+                        sb_case.AppendLine($"   when {dbConfig.Field_Pre}{whenDefinition.Field.AsFieldName}{dbConfig.Field_After} < {whenDefinition.Value} then {whenDefinition.Then.ThenValue}");
+                        break;
+                    case OperType.GE:
+                        sb_case.AppendLine($"   when {dbConfig.Field_Pre}{whenDefinition.Field.AsFieldName}{dbConfig.Field_After} >= {whenDefinition.Value} then {whenDefinition.Then.ThenValue}");
+                        break;
+                    case OperType.LE:
+                        sb_case.AppendLine($"   when {dbConfig.Field_Pre}{whenDefinition.Field.AsFieldName}{dbConfig.Field_After} <= {whenDefinition.Value} then {whenDefinition.Then.ThenValue}");
+                        break;
+                    case OperType.NE:
+                        sb_case.AppendLine($"   when {whenDefinition.Field.AsFieldName}{dbConfig.Field_After} <> {whenDefinition.Value} then {whenDefinition.Then.ThenValue}");
+                        break;
 
-
-                    switch (whenDefinition.OperSymbol)
-                    {
-                        case OperType.EQ:
-                            sb_case.AppendLine($"   when {dbConfig.Field_Pre}{whenDefinition.Field.AsFieldName}{dbConfig.Field_After} = {whenDefinition.Value} then {whenDefinition.Then.ThenValue}");
-                            break;
-                        case OperType.GT:
-                            sb_case.AppendLine($"   when {dbConfig.Field_Pre}{whenDefinition.Field.AsFieldName}{dbConfig.Field_After} > {whenDefinition.Value} then {whenDefinition.Then.ThenValue}");
-                            break;
-                        case OperType.LT:
-                            sb_case.AppendLine($"   when {dbConfig.Field_Pre}{whenDefinition.Field.AsFieldName}{dbConfig.Field_After} < {whenDefinition.Value} then {whenDefinition.Then.ThenValue}");
-                            break;
-                        case OperType.GE:
-                            sb_case.AppendLine($"   when {dbConfig.Field_Pre}{whenDefinition.Field.AsFieldName}{dbConfig.Field_After} >= {whenDefinition.Value} then {whenDefinition.Then.ThenValue}");
-                            break;
-                        case OperType.LE:
-                            sb_case.AppendLine($"   when {dbConfig.Field_Pre}{whenDefinition.Field.AsFieldName}{dbConfig.Field_After} <= {whenDefinition.Value} then {whenDefinition.Then.ThenValue}");
-                            break;
-                        case OperType.NE:
-                            sb_case.AppendLine($"   when {whenDefinition.Field.AsFieldName}{dbConfig.Field_After} <> {whenDefinition.Value} then {whenDefinition.Then.ThenValue}");
-                            break;
-
-                        default:
-                            sb_case.AppendLine($"   when {dbConfig.Field_Pre}{whenDefinition.Field.AsFieldName}{dbConfig.Field_After} = {whenDefinition.Value} then {whenDefinition.Then.ThenValue}");
-                            break;
-                    }
-
+                    default:
+                        sb_case.AppendLine($"   when {dbConfig.Field_Pre}{whenDefinition.Field.AsFieldName}{dbConfig.Field_After} = {whenDefinition.Value} then {whenDefinition.Then.ThenValue}");
+                        break;
                 }
-                if (fieldDefinition.Case.Else != null)
-                {
-                    sb_case.AppendLine($"   else {fieldDefinition.Case.Else.ElseValue}");
-                }
-                if (fieldDefinition.Case.EndAs != null)
-                {
-                    sb_case.AppendLine($"end as {dbConfig.Field_Pre}{fieldDefinition.Case.EndAs.AsFieldName}{dbConfig.Field_After}");
-                }
-                return sb_case.ToString();
+
+            }
+            if (fieldDefinition.Case.Else != null)
+            {
+                sb_case.AppendLine($"   else {fieldDefinition.Case.Else.ElseValue}");
+            }
+            if (fieldDefinition.Case.EndAs != null)
+            {
+                sb_case.AppendLine($"end as {dbConfig.Field_Pre}{fieldDefinition.Case.EndAs.AsFieldName}{dbConfig.Field_After}");
+            }
+            return sb_case.ToString();
             //}
             //else
             //{
@@ -2013,7 +2028,7 @@ namespace HiSql
 
         }
 
-        string getInValue(bool issubquery,HiColumn hiColumn, FilterDefinition filterDefinition, object value)
+        string getInValue(bool issubquery, HiColumn hiColumn, FilterDefinition filterDefinition, object value)
         {
             string _value = string.Empty;
             StringBuilder _sb_value = new StringBuilder();

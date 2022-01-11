@@ -32,8 +32,19 @@ namespace HiSql
         string GetDbType(HiType type);
 
 
+        /// <summary>
+        /// 获取表结构信息
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <returns></returns>
         TabInfo GetTabStruct(string tabname);
 
+        /// <summary>
+        /// 根据结构信息创建表
+        /// </summary>
+        /// <param name="tabInfo"></param>
+        /// <returns></returns>
+        int BuildTabCreate(TabInfo tabInfo);
         HiSqlProvider Context { get; set; }
     }
 }

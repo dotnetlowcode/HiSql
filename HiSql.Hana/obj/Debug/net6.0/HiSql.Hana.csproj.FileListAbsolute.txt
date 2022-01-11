@@ -5,7 +5,6 @@ D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Debug\net6.0\HiSql.Hana.pdb
 D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Debug\net6.0\HiSql.dll
 D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Debug\net6.0\Sap.Data.Hana.Core.v2.1.dll
 D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Debug\net6.0\HiSql.pdb
-D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\net6.0\HiSql.Hana.csproj.AssemblyReference.cache
 D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\net6.0\HiSql.Hana.Properties.Resources.resources
 D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\net6.0\HiSql.Hana.csproj.GenerateResource.cache
 D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\net6.0\HiSql.Hana.GeneratedMSBuildEditorConfig.editorconfig
@@ -16,3 +15,4 @@ D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\net6.0\HiSql.Hana.csproj.CopyCo
 D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\net6.0\HiSql.Hana.dll
 D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\net6.0\ref\HiSql.Hana.dll
 D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\net6.0\HiSql.Hana.pdb
+D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\net6.0\HiSql.Hana.csproj.AssemblyReference.cache
