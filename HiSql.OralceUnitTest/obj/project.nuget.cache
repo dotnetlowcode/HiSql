@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "/0j0c6esL+HjWWOrehQYoz+LiDPQumRy0bOdR9uHV9tzwtIFxXWcpBUH3gfHiP3d3JooFPy9X8J9rLdYUJaDNQ==",
+  "dgSpecHash": "fpyir6vj3rLXB+fFzH26YnO294w462HfAKUspouBGp66qMtNf/dvOLs/P4+zdwCLn6rn4SYMs2joiQPlwWElTA==",
   "success": true,
   "projectFilePath": "D:\\Project\\OpenSource\\HiSql\\HiSql.OralceUnitTest\\HiSql.OralceUnitTest.csproj",
   "expectedPackageFiles": [
@@ -28,8 +28,7 @@
     "C:\\Users\\admin\\.nuget\\packages\\system.runtime.extensions\\4.3.0\\system.runtime.extensions.4.3.0.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\system.text.encoding\\4.3.0\\system.text.encoding.4.3.0.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\system.text.regularexpressions\\4.3.0\\system.text.regularexpressions.4.3.0.nupkg.sha512",
-    "C:\\Users\\admin\\.nuget\\packages\\system.threading.tasks\\4.3.0\\system.threading.tasks.4.3.0.nupkg.sha512",
-    "C:\\Users\\admin\\.nuget\\packages\\hisql\\1.0.2.9\\hisql.1.0.2.9.nupkg.sha512"
+    "C:\\Users\\admin\\.nuget\\packages\\system.threading.tasks\\4.3.0\\system.threading.tasks.4.3.0.nupkg.sha512"
   ],
   "logs": []
 }

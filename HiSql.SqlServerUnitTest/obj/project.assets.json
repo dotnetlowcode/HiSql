@@ -254,7 +254,7 @@
           }
         }
       },
-      "HiSql/1.0.2.9": {
+      "HiSql/1.0.3": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
@@ -272,7 +272,7 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
-          "HiSql": "1.0.2.9",
+          "HiSql": "1.0.3",
           "Microsoft.Extensions.Caching.Memory": "6.0.0"
         },
         "compile": {
@@ -282,11 +282,11 @@
           "bin/placeholder/HiSql.SNRO.dll": {}
         }
       },
-      "HiSql.SqlServer/1.0.2.9": {
+      "HiSql.SqlServer/1.0.3": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
-          "HiSql": "1.0.2.9",
+          "HiSql": "1.0.3",
           "System.Data.SqlClient": "4.8.2"
         },
         "compile": {
@@ -879,7 +879,7 @@
         "version.txt"
       ]
     },
-    "HiSql/1.0.2.9": {
+    "HiSql/1.0.3": {
       "type": "project",
       "path": "../HiSql/HiSql.csproj",
       "msbuildProject": "../HiSql/HiSql.csproj"
@@ -889,7 +889,7 @@
       "path": "../HiSql.SNRO/HiSql.SNRO.csproj",
       "msbuildProject": "../HiSql.SNRO/HiSql.SNRO.csproj"
     },
-    "HiSql.SqlServer/1.0.2.9": {
+    "HiSql.SqlServer/1.0.3": {
       "type": "project",
       "path": "../HiSql.SqlServer/HiSql.SqlServer.csproj",
       "msbuildProject": "../HiSql.SqlServer/HiSql.SqlServer.csproj"
@@ -897,9 +897,9 @@
   },
   "projectFileDependencyGroups": {
     "net5.0": [
-      "HiSql >= 1.0.2.9",
+      "HiSql >= 1.0.3",
       "HiSql.SNRO >= 1.0.0.1",
-      "HiSql.SqlServer >= 1.0.2.9",
+      "HiSql.SqlServer >= 1.0.3",
       "Newtonsoft.Json >= 13.0.1"
     ]
   },

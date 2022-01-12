@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "hWSA4ezf0uPbylPJVxrDklKQzUNHbxawmCK41TOkQ6yNpKlf6+wVD5BI/MUKjUVhYpTpBDEVTbFqB58uhcGorQ==",
+  "dgSpecHash": "bxAxtwSix+UDZy0dyAl/zVV/u+ALxSDHtCLfdIRlaoU16KFEm4fLAd7jjUvPCoC2NUcZ664UKybHgKQckfif0Q==",
   "success": true,
   "projectFilePath": "D:\\Project\\OpenSource\\HiSql\\HiSql.SqlServerUnitTest\\HiSql.SqlServerUnitTest.csproj",
   "expectedPackageFiles": [
@@ -23,9 +23,7 @@
     "C:\\Users\\admin\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\system.security.accesscontrol\\4.7.0\\system.security.accesscontrol.4.7.0.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\system.security.principal.windows\\4.7.0\\system.security.principal.windows.4.7.0.nupkg.sha512",
-    "C:\\Users\\admin\\.nuget\\packages\\hisql\\1.0.2.9\\hisql.1.0.2.9.nupkg.sha512",
-    "C:\\Users\\admin\\.nuget\\packages\\hisql.snro\\1.0.0.1\\hisql.snro.1.0.0.1.nupkg.sha512",
-    "C:\\Users\\admin\\.nuget\\packages\\hisql.sqlserver\\1.0.2.9\\hisql.sqlserver.1.0.2.9.nupkg.sha512"
+    "C:\\Users\\admin\\.nuget\\packages\\hisql.snro\\1.0.0.1\\hisql.snro.1.0.0.1.nupkg.sha512"
   ],
   "logs": []
 }

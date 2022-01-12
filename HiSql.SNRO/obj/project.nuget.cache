@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "eDA9zrbYYfNAAKcFy8HcMgnmnuUPZATHXjbI7THpFj4MOzg5Xo7FoGovF6bwedbHI6R3fbZFvdgaSHHR3wVZew==",
+  "dgSpecHash": "UhjaPPiScUmlkySS0o5/pcfADo7PBtWBAzno9IuqUzMrSxW6KmrFmRHrMj51Rc1xVsVpd6154YJ8WIgPaXb05w==",
   "success": true,
   "projectFilePath": "D:\\Project\\OpenSource\\HiSql\\HiSql.SNRO\\HiSql.SNRO.csproj",
   "expectedPackageFiles": [
@@ -13,8 +13,7 @@
     "C:\\Users\\admin\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\system.buffers\\4.5.1\\system.buffers.4.5.1.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\system.memory\\4.5.4\\system.memory.4.5.4.nupkg.sha512",
-    "C:\\Users\\admin\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
-    "C:\\Users\\admin\\.nuget\\packages\\hisql\\1.0.2.9\\hisql.1.0.2.9.nupkg.sha512"
+    "C:\\Users\\admin\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512"
   ],
   "logs": []
 }

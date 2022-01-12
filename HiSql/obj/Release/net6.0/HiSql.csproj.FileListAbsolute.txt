@@ -9,3 +9,4 @@ D:\Project\OpenSource\HiSql\HiSql\obj\Release\net6.0\HiSql.csproj.CoreCompileInp
 D:\Project\OpenSource\HiSql\HiSql\obj\Release\net6.0\HiSql.dll
 D:\Project\OpenSource\HiSql\HiSql\obj\Release\net6.0\ref\HiSql.dll
 D:\Project\OpenSource\HiSql\HiSql\obj\Release\net6.0\HiSql.pdb
+D:\Project\OpenSource\HiSql\HiSql\obj\Release\net6.0\HiSql.csproj.AssemblyReference.cache

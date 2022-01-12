@@ -6,9 +6,9 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v5.0": {
-      "HiSql.Oracle/1.0.2.9": {
+      "HiSql.Oracle/1.0.3": {
         "dependencies": {
-          "HiSql": "1.0.2.9",
+          "HiSql": "1.0.3",
           "System.Data.OracleClient": "1.0.8"
         },
         "runtime": {
@@ -207,7 +207,7 @@
           "System.Runtime": "4.3.0"
         }
       },
-      "HiSql/1.0.2.9": {
+      "HiSql/1.0.3": {
         "dependencies": {
           "Microsoft.Extensions.Caching.Memory": "6.0.0",
           "Newtonsoft.Json": "13.0.1"
@@ -219,7 +219,7 @@
     }
   },
   "libraries": {
-    "HiSql.Oracle/1.0.2.9": {
+    "HiSql.Oracle/1.0.3": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
@@ -399,7 +399,7 @@
       "path": "system.threading.tasks/4.3.0",
       "hashPath": "system.threading.tasks.4.3.0.nupkg.sha512"
     },
-    "HiSql/1.0.2.9": {
+    "HiSql/1.0.3": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

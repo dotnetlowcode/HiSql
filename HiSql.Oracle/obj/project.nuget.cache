@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "79Gxvn9U//ypIyVd3SGXMe6Tr5pd2+UmW6L7qGOL2V+fLwXt1TxKDDzNKXY+XH79oNJpZUpj7/VH+nrcuOl5IA==",
+  "dgSpecHash": "T5oRVFvWC5veDBfEDZPg1OpBKlVMxvvFHA1dOzoc5Xx05Pnj4Gja+xElC7Imgb5AsyCK03dcL0R79hFC434X3g==",
   "success": true,
   "projectFilePath": "D:\\Project\\OpenSource\\HiSql\\HiSql.Oracle\\HiSql.Oracle.csproj",
   "expectedPackageFiles": [
@@ -31,8 +31,7 @@
     "C:\\Users\\admin\\.nuget\\packages\\system.text.encoding\\4.3.0\\system.text.encoding.4.3.0.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\system.text.regularexpressions\\4.3.0\\system.text.regularexpressions.4.3.0.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\system.threading.tasks\\4.3.0\\system.threading.tasks.4.3.0.nupkg.sha512",
-    "C:\\Users\\admin\\.nuget\\packages\\system.threading.tasks.extensions\\4.5.4\\system.threading.tasks.extensions.4.5.4.nupkg.sha512",
-    "C:\\Users\\admin\\.nuget\\packages\\hisql\\1.0.2.9\\hisql.1.0.2.9.nupkg.sha512"
+    "C:\\Users\\admin\\.nuget\\packages\\system.threading.tasks.extensions\\4.5.4\\system.threading.tasks.extensions.4.5.4.nupkg.sha512"
   ],
   "logs": []
 }

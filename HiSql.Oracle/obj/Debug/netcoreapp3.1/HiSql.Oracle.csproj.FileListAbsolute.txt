@@ -12,3 +12,4 @@ D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Debug\netcoreapp3.1\HiSql.Oracle.cs
 D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Debug\netcoreapp3.1\HiSql.Oracle.csproj.CopyComplete
 D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Debug\netcoreapp3.1\HiSql.Oracle.dll
 D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Debug\netcoreapp3.1\HiSql.Oracle.pdb
+D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Debug\netcoreapp3.1\HiSql.Oracle.csproj.AssemblyReference.cache

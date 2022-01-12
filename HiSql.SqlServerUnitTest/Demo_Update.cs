@@ -37,7 +37,16 @@ namespace HiSql.UnitTest
 
         static void Update_Demo4(HiSqlClient sqlClient)
         {
-            string _sql=sqlClient.Update("HTest01").Set(new { UTYP = "U3" }).Where("SID=0").ToSql();
+            sqlClient.BeginTran(System.Data.IsolationLevel.ReadUncommitted);
+            int _effect= sqlClient.Update("HTest01", new { sid = 123456, UName = "tansar", Age = 25, Salary = 1999.9, Descript = "hello worl111da" }).ExecCommand();
+            //string _sql=sqlClient.Update("HTest01").Set(new { UTYP = "U3" }).Where("SID=0").ToSql();
+
+            sqlClient.Modi("H_UType", new List<object> {
+                new { UTYP = "U1", UTypeName = "普通用户" },
+                new { UTYP = "U2", UTypeName = "中级用户" },
+                new { UTYP = "U3", UTypeName = "高级用户" }
+            }).ExecCommand();
+            //sqlClient.CommitTran();
         }
 
         static void Update_Demo3(HiSqlClient sqlClient)

@@ -539,7 +539,7 @@
           }
         }
       },
-      "HiSql/1.0.2.9": {
+      "HiSql/1.0.3": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
@@ -553,11 +553,11 @@
           "bin/placeholder/HiSql.dll": {}
         }
       },
-      "HiSql.MySql/1.0.2.9": {
+      "HiSql.MySql/1.0.3": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
-          "HiSql": "1.0.2.9",
+          "HiSql": "1.0.3",
           "MySql.Data": "8.0.26"
         },
         "compile": {
@@ -567,11 +567,11 @@
           "bin/placeholder/HiSql.MySql.dll": {}
         }
       },
-      "HiSql.Oracle/1.0.2.9": {
+      "HiSql.Oracle/1.0.3": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
-          "HiSql": "1.0.2.9",
+          "HiSql": "1.0.3",
           "System.Data.OracleClient": "1.0.8"
         },
         "compile": {
@@ -2210,17 +2210,17 @@
         "version.txt"
       ]
     },
-    "HiSql/1.0.2.9": {
+    "HiSql/1.0.3": {
       "type": "project",
       "path": "../HiSql/HiSql.csproj",
       "msbuildProject": "../HiSql/HiSql.csproj"
     },
-    "HiSql.MySql/1.0.2.9": {
+    "HiSql.MySql/1.0.3": {
       "type": "project",
       "path": "../HiSql.MySql/HiSql.MySql.csproj",
       "msbuildProject": "../HiSql.MySql/HiSql.MySql.csproj"
     },
-    "HiSql.Oracle/1.0.2.9": {
+    "HiSql.Oracle/1.0.3": {
       "type": "project",
       "path": "../HiSql.Oracle/HiSql.Oracle.csproj",
       "msbuildProject": "../HiSql.Oracle/HiSql.Oracle.csproj"
@@ -2228,9 +2228,9 @@
   },
   "projectFileDependencyGroups": {
     "net5.0": [
-      "HiSql >= 1.0.2.9",
-      "HiSql.MySql >= 1.0.2.9",
-      "HiSql.Oracle >= 1.0.2.9"
+      "HiSql >= 1.0.3",
+      "HiSql.MySql >= 1.0.3",
+      "HiSql.Oracle >= 1.0.3"
     ]
   },
   "packageFolders": {

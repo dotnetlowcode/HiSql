@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Linq.Expressions;
-
+using System.Data;
 namespace HiSql
 {
     /// <summary>
@@ -272,12 +272,21 @@ namespace HiSql
             _isOpen = true;
         }
 
-
+        /// <summary>
+        /// 开启事务
+        /// </summary>
         public void BeginTran()
         {
             this.Context.DBO.BeginTran();
         }
-
+        /// <summary>
+        /// 开启事务 设定隔离级别
+        /// </summary>
+        /// <param name="iso"></param>
+        public   void BeginTran(IsolationLevel iso)
+        {
+            this.Context.DBO.BeginTran(iso);
+        }
         public void CommitTran()
         {
             this.Context.DBO.CommitTran();
