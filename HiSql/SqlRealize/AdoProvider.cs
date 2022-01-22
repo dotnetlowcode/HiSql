@@ -363,10 +363,9 @@ namespace HiSql
             {
                 if (OnTimeOut != null)
                 {
-                    OnTimeOut.BeginInvoke(this.Context.CurrentConnectionConfig.SqlExecTimeOut, (s) =>
-                    {
-                    }, null);
-                    //Task.Run(() => { OnTimeOut(this.Context.CurrentConnectionConfig.SqlExecTimeOut); });
+                    Task.Run(() => { 
+                        OnTimeOut(this.Context.CurrentConnectionConfig.SqlExecTimeOut);
+                    });
                 }
             }
             return workTask;
