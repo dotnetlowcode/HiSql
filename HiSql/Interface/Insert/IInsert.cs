@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -39,7 +40,7 @@ namespace HiSql
         IInsert Insert<T>(string tabname, List<T> lstdata);
 
 
-
+        
         IInsert Modi(string tabname, List<object> lstdata);
 
         IInsert Modi(string tabname, object objdata);

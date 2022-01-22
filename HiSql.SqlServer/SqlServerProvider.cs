@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Diagnostics;
+//using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,6 +43,72 @@ namespace HiSql
             set {
                 base._DbConnection = value;
             }
+        }
+        public override async Task<int> BulkCopy(DataTable sourceTable, TabInfo tabInfo, Dictionary<string, string> columnMapping = null)
+        {
+            if (sourceTable != null && sourceTable.Rows.Count > 0)
+            {
+                SqlServerConfig sqlServerConfig = new SqlServerConfig();
+                int _batchsize = sqlServerConfig.BulkUnitSize / sourceTable.Columns.Count;
+                if (_batchsize < sourceTable.Columns.Count) _batchsize = 0;
+
+                var conn = new  SqlConnection(base.Context.CurrentConnectionConfig.ConnectionString);
+                 SqlBulkCopy sqlBulkCopy = getBulkInstance(conn);
+
+                sqlBulkCopy.DestinationTableName = tabInfo.TabModel.TabName;
+               
+                try
+                {
+                    if (columnMapping != null)
+                    {
+                        foreach (string n in columnMapping.Keys)
+                        {
+                            sqlBulkCopy.ColumnMappings.Add(n, columnMapping[n]);
+                        }
+                    }
+                    
+                    sqlBulkCopy.BatchSize = _batchsize;
+                    await sqlBulkCopy.WriteToServerAsync(sourceTable);
+                   
+                    
+                    conn.Close();
+                }
+                catch (Exception E)
+                {
+                    conn.Close();
+                    throw E;
+                }
+                return sourceTable.Rows.Count;
+            }
+            else return 0;
+        }
+     
+
+        private  SqlBulkCopy getBulkInstance( SqlConnection conn)
+        {
+
+             SqlBulkCopy bulkcopy = null;
+            if (this.Context.DBO.Transaction != null)
+            {
+                //如果主连接有事务那么也同样开启事务
+             
+                bulkcopy = new  SqlBulkCopy(( SqlConnection)conn, SqlBulkCopyOptions.CheckConstraints, (SqlTransaction)this.Context.DBO.Transaction);
+            }
+            else
+            {
+                
+                bulkcopy= new  SqlBulkCopy(( SqlConnection)conn);
+            }
+            if (conn.State == System.Data.ConnectionState.Closed)
+            {
+                //打开连接
+                conn.Open();
+            }
+            ///设置超时时间 如果平台执行SQL的超时时间设置为一样
+            //bulkcopy.BulkCopyTimeout = this.Context.CurrentConnectionConfig.SqlExecTimeOut;
+
+
+            return bulkcopy;
         }
 
         public override IDataAdapter GetAdapter()
@@ -100,5 +168,7 @@ namespace HiSql
         {
             ((SqlDataAdapter)dataAdapter).SelectCommand = (SqlCommand)command;
         }
+
+        
     }
 }

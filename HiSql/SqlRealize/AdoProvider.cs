@@ -125,6 +125,14 @@ namespace HiSql
         /// <returns></returns>
         public abstract DbCommand GetCommand(string sql, HiParameter[] param);
 
+
+        /// <summary>
+        /// 向表批量复制插入
+        /// </summary>
+        /// <param name="sourceTable"></param>
+        /// <param name="tabName"></param>
+        public abstract Task<int> BulkCopy(DataTable sourceTable, TabInfo tabInfo,Dictionary<string,string> columnMapping=null);
+
         public abstract IDataAdapter GetAdapter();
         public abstract void SetCommandToAdapter(IDataAdapter adapter, DbCommand command);
         #endregion
@@ -157,6 +165,14 @@ namespace HiSql
 
         }
 
+        public virtual int ExecBulkCopyCommand(DataTable sourceTable, TabInfo tabInfo, Dictionary<string,string> columnMapping=null)
+        {
+            return  this.BulkCopy(sourceTable, tabInfo, columnMapping).ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+        public virtual Task<int> ExecBulkCopyCommandAsync(DataTable sourceTable, TabInfo tabInfo, Dictionary<string, string> columnMapping = null)
+        {
+            return this.BulkCopy(sourceTable, tabInfo, columnMapping);
+        }
 
         public virtual void CommitTran()
         {

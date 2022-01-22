@@ -108,6 +108,25 @@ namespace HiSql
         /// <returns></returns>
         int ExecCommand(string sql, object parameters);
 
+
+        /// <summary>
+        /// 批量
+        /// </summary>
+        /// <param name="sourceTable"></param>
+        /// <param name="tabInfo"></param>
+        /// <param name="columnMapping"></param>
+        /// <returns></returns>
+        int ExecBulkCopyCommand(DataTable sourceTable, TabInfo tabInfo,Dictionary<string,string> columnMapping=null);
+
+        /// <summary>
+        /// 异步批量写入
+        /// </summary>
+        /// <param name="sourceTable"></param>
+        /// <param name="tabInfo"></param>
+        /// <param name="columnMapping"></param>
+        /// <returns></returns>
+        Task<int> ExecBulkCopyCommandAsync(DataTable sourceTable, TabInfo tabInfo, Dictionary<string, string> columnMapping = null);
+
         /// <summary>
         /// 执行Sql语句 并返回受影响的行
         /// </summary>

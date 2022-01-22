@@ -12,6 +12,7 @@ namespace HiSql
         /// 数据包大小 经过测试200这个值是比较合理
         /// </summary>
         int _bluksize = 200;
+        int _bulkunitsize = 250000;
         string _temp_schema_pre = "`";
         string _temp_schema_after = "`";
 
@@ -98,6 +99,7 @@ namespace HiSql
         }
         public string Fun_CurrDATE { get => _temp_fun_date; }
         public int BlukSize { get => _bluksize; set => _bluksize = value; }
+        public int BulkUnitSize { get => _bulkunitsize; set => _bulkunitsize = value; }
         public string Schema_Pre { get => _temp_schema_pre; }
         public string Schema_After { get => _temp_schema_after; }
         public string Table_Pre { get => _temp_table_pre; }

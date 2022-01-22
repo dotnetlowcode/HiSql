@@ -457,6 +457,37 @@ namespace HiSql
         {
             return _context.Update(tabname, lstdata);
         }
+
+
+        /// <summary>
+        /// 批量写入
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <param name="lstdata"></param>
+        /// <returns></returns>
+        public int BulkCopyExecCommand(string tabname, List<object> lstdata)
+        {
+            TabInfo tabInfo = this.Context.DMInitalize.GetTabStruct(tabname);
+            return _context.BulkCopyExecCommand(tabInfo, lstdata);
+
+        }
+        /// <summary>
+        /// 批量写入
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <param name="lstdata"></param>
+        /// <returns></returns>
+        public int BulkCopyExecCommand(string tabname, DataTable souretable)
+        {
+            TabInfo tabInfo = this.Context.DMInitalize.GetTabStruct(tabname);
+            return _context.BulkCopyExecCommand(tabInfo, souretable);
+        }
+
+        public Task<int> BulkCopyExecCommandAsyc(string tabname, DataTable souretable)
+        {
+            TabInfo tabInfo = this.Context.DMInitalize.GetTabStruct(tabname);
+            return _context.BulkCopyExecCommandAsyc(tabInfo, souretable);
+        }
         #endregion
 
 
@@ -489,6 +520,8 @@ namespace HiSql
             return _context.Drop(tabname);
 
         }
+
+        
         #endregion
     }
 }

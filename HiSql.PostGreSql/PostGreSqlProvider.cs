@@ -41,6 +41,11 @@ namespace HiSql
             }
         }
 
+        public override async Task<int> BulkCopy(DataTable sourceTable, TabInfo tabInfo, Dictionary<string, string> columnMapping = null)
+        {
+            throw new NotImplementedException();
+        }
+
         public override IDataAdapter GetAdapter()
         {
             return new NpgsqlDataAdapter();

@@ -32,9 +32,17 @@ namespace HiSql.UnitTest
             //Update_Demo(sqlClient);
             //Update_Demo2(sqlClient);
             //Update_Demo3(sqlClient);
-            Update_Demo4(sqlClient);
+            //Update_Demo4(sqlClient);
+            Update_Demo5(sqlClient);
         }
 
+        static void Update_Demo5(HiSqlClient sqlClient)
+        {
+            string sql2 = sqlClient.Update("HTest01").Set(new { UName = "TEST" }).Where("SID=123456").ToSql();
+            string sql = sqlClient.Update("HTest01").Set(new { UName = "TEST" }).Where(new Filter { { "SID", OperType.EQ, 123456 } }).ToSql();
+
+            string sql3=sqlClient.Update("HTest01", new { SID = 123456, Salary = "`Salary`+1" }).ToSql();
+        }
         static void Update_Demo4(HiSqlClient sqlClient)
         {
             sqlClient.BeginTran(System.Data.IsolationLevel.ReadUncommitted);

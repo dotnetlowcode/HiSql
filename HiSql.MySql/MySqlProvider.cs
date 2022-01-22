@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 namespace HiSql
 {
@@ -37,6 +38,11 @@ namespace HiSql
             {
                 base._DbConnection = value;
             }
+        }
+
+        public override async Task<int> BulkCopy(DataTable sourceTable, TabInfo tabInfo, Dictionary<string, string> columnMapping = null)
+        {
+            throw new NotImplementedException();
         }
 
         public override IDataAdapter GetAdapter()
