@@ -118,6 +118,16 @@ namespace HiSql
         /// <returns></returns>
         int ExecBulkCopyCommand(DataTable sourceTable, TabInfo tabInfo,Dictionary<string,string> columnMapping=null);
 
+
+        /// <summary>
+        /// 批量插入数据对象
+        /// </summary>
+        /// <param name="lstdata"></param>
+        /// <param name="tabInfo"></param>
+        /// <param name="columnMapping"></param>
+        /// <returns></returns>
+        int ExecBulkCopyCommand<T>(List<T> lstdata, TabInfo tabInfo, Dictionary<string, string> columnMapping = null);
+
         /// <summary>
         /// 异步批量写入
         /// </summary>
@@ -126,6 +136,15 @@ namespace HiSql
         /// <param name="columnMapping"></param>
         /// <returns></returns>
         Task<int> ExecBulkCopyCommandAsync(DataTable sourceTable, TabInfo tabInfo, Dictionary<string, string> columnMapping = null);
+
+        /// <summary>
+        /// 批量异步插入数据对象
+        /// </summary>
+        /// <param name="lstdata"></param>
+        /// <param name="tabInfo"></param>
+        /// <param name="columnMapping"></param>
+        /// <returns></returns>
+        Task<int> ExecBulkCopyCommandAsync<T>(List<T> lstdata, TabInfo tabInfo, Dictionary<string, string> columnMapping = null);
 
         /// <summary>
         /// 执行Sql语句 并返回受影响的行

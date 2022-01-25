@@ -281,7 +281,7 @@ namespace HiSql
         /// <typeparam name="T"></typeparam>
         /// <param name="lst"></param>
         /// <returns></returns>
-        static public DataTable ToTable<T>(List<T> lst,TabInfo tabInfo,string user) {
+        static public DataTable ToTable<T>(List<T> lst,TabInfo tabInfo,string user="HiSql") {
 
             DataTable table= BuildDataTable(tabInfo);
             var _typname = "";
@@ -410,6 +410,7 @@ namespace HiSql
                 var columns = table.Columns;
                 foreach (var data in lst)
                 {
+                    #region 解析 Dictionary<string, object>
                     Dictionary<string, object> _dic = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
                     _dic = data as Dictionary<string, object>;
                     DataRow drow = table.NewRow();
@@ -488,6 +489,8 @@ namespace HiSql
                     }
 
                     table.Rows.Add(drow);
+
+                    #endregion
                 }
             }
             else if (_type == _typedicstr)
@@ -495,6 +498,7 @@ namespace HiSql
                 var columns = table.Columns;
                 foreach (var  data in lst)
                 {
+                    #region 解析 Dictionary<string, string>
                     Dictionary<string, string> _dic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                     _dic = data as Dictionary<string, string>;
                     DataRow drow = table.NewRow();
@@ -582,12 +586,15 @@ namespace HiSql
                     }
 
                     table.Rows.Add(drow);
+
+                    #endregion
                 }
             }
             else
             {
                 //实体类
 
+                #region 解析实体类
                 Type type = lst[0].GetType();
                 PropertyInfo[] properties = type.GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
 
@@ -603,14 +610,6 @@ namespace HiSql
                         if (pinfo != null)
                         {
                             var obj = pinfo.GetValue(lst[i]);
-                            //if (obj != null)
-                            //{
-                            //    row[i] = obj;
-                            //}
-                            //else
-                            //{
-                            //    row[i] = DBNull.Value;
-                            //}
                             drow[dc.ColumnName] = obj;
                         }
                         else
@@ -621,20 +620,15 @@ namespace HiSql
                                 //row[i] = user;
                             }
                         }
-                        
                         rowidx++;
                     }
                     table.Rows.Add(drow);
-                    //table.Rows.Add(row);
-
                 }
-
-
-
+                #endregion
             }
             return table;
         }
-        static DataTable BuildDataTable(TabInfo tabInfo)
+        static public DataTable BuildDataTable(TabInfo tabInfo)
         {
             DataTable table = null;
             if (tabInfo != null)
@@ -702,6 +696,568 @@ namespace HiSql
 
             return table;
         }
+
+        static public string ToCSV<T>(List<T> lst, TabInfo tabInfo, DBType dbType,bool hasHeader=false, string user="HiSql")
+        {
+            StringBuilder sbcsv = new StringBuilder();
+            DataTable table = BuildDataTable(tabInfo);
+            var _typname = "";
+            Type _type = null;
+
+        
+            
+         
+
+
+            Type _typedic = typeof(Dictionary<string, object>);
+            Type _typedicstr = typeof(Dictionary<string, string>);
+            if (lst.Count > 0)
+            {
+                _type = lst[0].GetType();
+                _typname = lst[0].GetType().FullName;
+            }
+
+            else
+                return "";
+
+            if (hasHeader)
+            {
+                for (int i = 0; i < table.Columns.Count; i++)
+                {
+                    sbcsv.Append($"\"{table.Columns[i].ColumnName}\"");
+                    if (i < table.Columns.Count - 1)
+                        sbcsv.Append(",");
+                }
+                sbcsv.AppendLine();
+            }
+            
+
+
+
+            if (_typname.IndexOf("TDynamic") >= 0 || _typname.IndexOf("ExpandoObject") >= 0)
+            {
+                List<Dictionary<string, object>> _list_data = new List<Dictionary<string, object>>();
+                if (_typname.IndexOf("TDynamic") >= 0)
+                {
+
+                    foreach (var obj in lst)
+                    {
+                        TDynamic dyn = (dynamic)obj;
+                        _list_data.Add((Dictionary<string, object>)dyn);
+                    }
+
+                }
+                else if (_typname.IndexOf("ExpandoObject") >= 0)
+                {
+                    foreach (var obj in lst)
+                    {
+                        TDynamic dyn = new TDynamic(obj);
+                        _list_data.Add((Dictionary<string, object>)dyn);
+                    }
+
+                }
+
+                var columns = table.Columns;
+                int _idx = 0;
+                foreach (Dictionary<string, object> _dic in _list_data)
+                {
+
+                    _idx = 0;
+                    foreach (DataColumn dc in columns)
+                    {
+                        object _value = null;
+                        if (_dic.ContainsKey(dc.ColumnName))
+                        {
+                            _value = _dic[dc.ColumnName];
+                        }
+                        else if (_dic.ContainsKey(dc.ColumnName.ToLower()))
+                        {
+                            _value = _dic[dc.ColumnName.ToLower()];
+                        }
+                        else if (_dic.ContainsKey(dc.ColumnName.ToUpper()))
+                        {
+                            _value = _dic[dc.ColumnName.ToUpper()];
+                        }
+                        else
+                        {
+                            if (Constants.IsStandardUserField(dc.ColumnName))
+                            {
+                                _value = user;
+                            }
+                            if (Constants.IsStandardUserField(dc.ColumnName))
+                            {
+                                _value = DateTime.Now;
+                            }
+                        }
+                        if (_value != null)
+                        {
+                            Type _typ = _value.GetType();
+                            if (dc.DataType == Constants.StringType)
+                            {
+                                //drow[dc.ColumnName] = _value;
+                                sbcsv.Append($"\"{_value.ToString().Replace("\"", "\"\"")}\"");
+                            }
+                            else if (dc.DataType == Constants.DecType || dc.DataType == Constants.FloatType)
+                            {
+                                if (_value != null)
+                                    sbcsv.Append(_value.ToString());
+                                else
+                                    sbcsv.Append("0");
+                            }
+                            else if (dc.DataType == Constants.IntType || dc.DataType == Constants.ShortType)
+                            {
+                                if (_value != null)
+                                    sbcsv.Append(_value.ToString());
+                                else
+                                    sbcsv.Append("0");
+                            }
+                            else if (dc.DataType == Constants.LongType)
+                            {
+                                if (_value != null)
+                                    sbcsv.Append(_value.ToString());
+                                else
+                                    sbcsv.Append("0");
+                            }
+                            else if (dc.DataType == Constants.DateType || dc.DataType == Constants.DateTimeOffsetType)
+                            {
+
+                                if (Constants.IsStandardTimeField(dc.ColumnName))
+                                {
+                                    sbcsv.Append(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+                                }
+                                else
+                                {
+                                    if (_value != null && (_typ == Constants.DateType || _typ == Constants.DateType))
+                                        sbcsv.Append(((DateTime)_value).ToString("yyyy-MM-dd HH:mm:ss.fff"));
+                                    else
+                                        sbcsv.Append(DateTime.MinValue.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+                                }
+                                
+                            }
+                            else if (dc.DataType == Constants.BoolType)
+                            {
+                                if (_value != null)
+                                {
+                                    if (dbType.IsIn<DBType>(DBType.PostGreSql, DBType.Hana, DBType.MySql))
+                                    {
+                                        if ((Boolean)_value == true)
+                                            sbcsv.Append("True");
+                                        else
+                                            sbcsv.Append("False");
+                                    }
+                                    else
+                                    {
+                                        if ((Boolean)_value == true)
+                                            sbcsv.Append("1");
+                                        else
+                                            sbcsv.Append("0");
+                                    }
+                                }
+                                else
+                                {
+                                    if (dbType.IsIn<DBType>(DBType.PostGreSql, DBType.Hana, DBType.MySql))
+                                    {
+                                        sbcsv.Append("False");
+                                    }
+                                    else
+                                        sbcsv.Append("0");
+                                }
+                                    
+                            }
+                        }
+
+                        if (_idx < columns.Count - 1)
+                            sbcsv.Append(",");
+                        _idx++;
+                    }
+                    sbcsv.AppendLine();
+                    //table.Rows.Add(drow);
+                }
+            }
+            else if (_type == _typedic)
+            {
+                var columns = table.Columns;
+                int _idx = 0;
+                foreach (var data in lst)
+                {
+                    #region 解析 Dictionary<string, object>
+                    Dictionary<string, object> _dic = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+                    _dic = data as Dictionary<string, object>;
+                    DataRow drow = table.NewRow();
+                    _idx = 0;
+                    foreach (DataColumn dc in columns)
+                    {
+                        object _value = null;
+                        if (_dic.ContainsKey(dc.ColumnName))
+                        {
+                            _value = _dic[dc.ColumnName];
+                        }
+                        else if (_dic.ContainsKey(dc.ColumnName.ToLower()))
+                        {
+                            _value = _dic[dc.ColumnName.ToLower()];
+                        }
+                        else if (_dic.ContainsKey(dc.ColumnName.ToUpper()))
+                        {
+                            _value = _dic[dc.ColumnName.ToUpper()];
+                        }
+                        else
+                        {
+                            if (Constants.IsStandardUserField(dc.ColumnName))
+                            {
+                                _value = user;
+                            }
+                            if (Constants.IsStandardTimeField(dc.ColumnName))
+                            {
+                                _value = DateTime.Now;
+                            }
+                        }
+                        if (_value != null)
+                        {
+                            Type _typ = _value.GetType();
+                            if (dc.DataType == Constants.StringType)
+                            {
+                                
+                                sbcsv.Append($"\"{_value.ToString().Replace("\"", "\"\"")}\"");
+                            }
+                            else if (dc.DataType == Constants.DecType || dc.DataType == Constants.FloatType)
+                            {
+                                if (_value != null)
+                                    sbcsv.Append(_value.ToString());
+                                else
+                                    sbcsv.Append("0");
+                            }
+                            else if (dc.DataType == Constants.IntType || dc.DataType == Constants.ShortType)
+                            {
+                                if (_value != null)
+                                    sbcsv.Append(_value.ToString());
+                                else
+                                    sbcsv.Append("0");
+                            }
+                            else if (dc.DataType == Constants.LongType)
+                            {
+                                if (_value != null)
+                                    sbcsv.Append(_value.ToString());
+                                else
+                                    sbcsv.Append("0");
+                            }
+                            else if (dc.DataType == Constants.DateType || dc.DataType == Constants.DateTimeOffsetType)
+                            {
+                                
+                                if (Constants.IsStandardTimeField(dc.ColumnName))
+                                {
+                                    sbcsv.Append(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+                                }
+                                else
+                                {
+                                    if (_value != null && (_typ == Constants.DateType || _typ == Constants.DateType))
+                                        sbcsv.Append(((DateTime)_value).ToString("yyyy-MM-dd HH:mm:ss.fff"));
+                                    else
+                                        sbcsv.Append(DateTime.MinValue.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+                                }
+                            }
+                            else if (dc.DataType == Constants.BoolType)
+                            {
+                                if (_value != null)
+                                {
+                                    if (dbType.IsIn<DBType>(DBType.PostGreSql, DBType.Hana, DBType.MySql))
+                                    {
+                                        if ((Boolean)_value == true)
+                                            sbcsv.Append("True");
+                                        else
+                                            sbcsv.Append("False");
+                                    }
+                                    else
+                                    {
+                                        if ((Boolean)_value == true)
+                                            sbcsv.Append("1");
+                                        else
+                                            sbcsv.Append("0");
+                                    }
+                                }
+                                else
+                                {
+                                    if (dbType.IsIn<DBType>(DBType.PostGreSql, DBType.Hana, DBType.MySql))
+                                    {
+                                        sbcsv.Append("False");
+                                    }
+                                    else
+                                        sbcsv.Append("0");
+                                }
+                            }
+                        }
+                        if (_idx < columns.Count - 1)
+                            sbcsv.Append(",");
+                        _idx++;
+                    }
+                    
+                    sbcsv.AppendLine();
+                    #endregion
+                }
+            }
+            else if (_type == _typedicstr)
+            {
+                var columns = table.Columns;
+                int _idx=0;
+                foreach (var data in lst)
+                {
+                    #region 解析 Dictionary<string, string>
+                    Dictionary<string, string> _dic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                    _dic = data as Dictionary<string, string>;
+                    DataRow drow = table.NewRow();
+                    _idx = 0;
+                    foreach (DataColumn dc in columns)
+                    {
+                        string _value = null;
+                        if (_dic.ContainsKey(dc.ColumnName))
+                        {
+                            _value = _dic[dc.ColumnName];
+                        }
+                        else if (_dic.ContainsKey(dc.ColumnName.ToLower()))
+                        {
+                            _value = _dic[dc.ColumnName.ToLower()];
+                        }
+                        else if (_dic.ContainsKey(dc.ColumnName.ToUpper()))
+                        {
+                            _value = _dic[dc.ColumnName.ToUpper()];
+                        }
+                        else
+                        {
+                            if (Constants.IsStandardUserField(dc.ColumnName))
+                            {
+                                _value = user;
+                            }
+                            if (Constants.IsStandardTimeField(dc.ColumnName))
+                            {
+                                _value = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+                            }
+                        }
+                        if (_value != null)
+                        {
+                            if (dc.DataType == Constants.StringType)
+                            {
+                                sbcsv.Append($"\"{_value.ToString().Replace("\"", "\"\"")}\"");
+                            }
+                            else if (dc.DataType == Constants.DecType || dc.DataType == Constants.FloatType)
+                            {
+                                if (!string.IsNullOrEmpty(_value))
+                                    sbcsv.Append(_value.ToString());
+                                else
+                                    sbcsv.Append("0");
+                            }
+                            else if (dc.DataType == Constants.IntType || dc.DataType == Constants.ShortType)
+                            {
+                                if (!string.IsNullOrEmpty(_value))
+                                    sbcsv.Append(_value.ToString());
+                                else
+                                    sbcsv.Append("0");
+                            }
+                            else if (dc.DataType == Constants.LongType)
+                            {
+                                if (!string.IsNullOrEmpty(_value))
+                                    sbcsv.Append(_value.ToString());
+                                else
+                                    sbcsv.Append("0");
+                            }
+                            else if (dc.DataType == Constants.DateType || dc.DataType == Constants.DateTimeOffsetType)
+                            {
+                                
+                                if (Constants.IsStandardTimeField(dc.ColumnName))
+                                {
+                                    sbcsv.Append(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+                                }
+                                else
+                                {
+                                    if (!string.IsNullOrEmpty(_value))
+                                        sbcsv.Append(Convert.ToDateTime(_value).ToString("yyyy-MM-dd HH:mm:ss.fff"));
+                                    else
+                                        sbcsv.Append(DateTime.MinValue.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+                                }
+
+                            }
+                            else if (dc.DataType == Constants.BoolType)
+                            {
+                                if (_value != null)
+                                {
+                                    if (dbType.IsIn<DBType>(DBType.PostGreSql, DBType.Hana, DBType.MySql))
+                                    {
+                                        if (_value == "true" || _value == "1")
+                                            sbcsv.Append("True");
+                                        else
+                                            sbcsv.Append("False");
+                                    }
+                                    else
+                                    {
+                                        if (_value == "true" || _value == "1")
+                                            sbcsv.Append("1");
+                                        else
+                                            sbcsv.Append("0");
+                                    }
+                                }
+                                else
+                                {
+                                    if (dbType.IsIn<DBType>(DBType.PostGreSql, DBType.Hana, DBType.MySql))
+                                    {
+                                        sbcsv.Append("False");
+                                    }
+                                    else
+                                        sbcsv.Append("0");
+                                }
+                            }
+                        }
+                        if (_idx < columns.Count - 1)
+                            sbcsv.Append(",");
+                        _idx++;
+                    }
+
+                    sbcsv.AppendLine();
+                    
+                    #endregion
+                }
+            }
+            else
+            {
+                //实体类
+
+                #region 解析实体类
+                Type type = lst[0].GetType();
+                PropertyInfo[] properties = type.GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+
+                var columns = table.Columns;
+                for (int i = 0; i < lst.Count; i++)
+                {
+                    DataRow drow = table.NewRow();
+                    var row = new object[table.Columns.Count];
+                    var rowidx = 0;
+                    foreach (DataColumn dc in columns)
+                    {
+                        
+                        var pinfo = properties.Where(p => p.Name.ToLower() == dc.ColumnName.ToLower()).FirstOrDefault();
+                        if (pinfo != null)
+                        {
+                            var obj = pinfo.GetValue(lst[i]);
+                            if (dc.DataType == Constants.StringType)
+                            {
+
+                                sbcsv.Append($"\"{obj.ToString().Replace("\"", "\"\"")}\"");
+                            }
+                            else if (dc.DataType == Constants.BoolType)
+                            {
+                                if (obj != null)
+                                {
+                                    if (dbType.IsIn<DBType>(DBType.PostGreSql, DBType.Hana, DBType.MySql))
+                                    {
+                                        if (obj.ToString().ToLower() == "true" || obj.ToString() == "1")
+                                            sbcsv.Append("True");
+                                        else
+                                            sbcsv.Append("False");
+                                    }
+                                    else
+                                    {
+                                        if (obj.ToString().ToLower() == "true" || obj.ToString() == "1")
+                                            sbcsv.Append("1");
+                                        else
+                                            sbcsv.Append("0");
+                                    }
+                                }
+                                else
+                                {
+                                    if (dbType.IsIn<DBType>(DBType.PostGreSql, DBType.Hana, DBType.MySql))
+                                    {
+                                        sbcsv.Append("False");
+                                    }
+                                    else
+                                        sbcsv.Append("0");
+                                }
+                            }
+                            else
+                            {
+                                sbcsv.Append($"{obj.ToString()}");
+                            }
+                        }
+                        else
+                        {
+                            if (Constants.IsStandardUserField(dc.ColumnName))
+                            {
+                                //drow[dc.ColumnName] = user;
+                                //row[i] = user;
+                                sbcsv.Append($"\"{user}\"");
+                            }
+                        }
+                        if (rowidx < columns.Count - 1)
+                            sbcsv.Append(",");
+
+                        rowidx++;
+                        
+                    }
+                    sbcsv.AppendLine();
+                }
+                #endregion
+            }
+            
+
+            return sbcsv.ToString();
+        }
+
+        /// <summary>
+        /// 将TABLE数据转成csv
+        /// </summary>
+        /// <param name="table"></param>
+        /// <param name="dbType"></param>
+        /// <returns></returns>
+        static public string ToCSV(DataTable table, DBType dbType, bool hasHeader = false)
+        {
+            
+            /*理论上讲还要根据字段的类型及长度 来校验数据 以期再更新*/
+            StringBuilder sbcsv = new StringBuilder();
+
+            if (hasHeader)
+            {
+                for (int i = 0; i < table.Columns.Count; i++)
+                {
+                    sbcsv.Append($"\"{table.Columns[i].ColumnName}\"");
+                    if (i < table.Columns.Count - 1)
+                        sbcsv.Append(",");
+                }
+                sbcsv.AppendLine();
+            }
+
+            int colcount = table.Columns.Count;
+            foreach (DataRow drow in table.Rows)
+            {
+                for (int i = 0; i < colcount; i++)
+                {
+                    if (table.Columns[i].DataType == Constants.StringType)
+                    {
+                        sbcsv.Append($"\"{drow[i].ToString().Replace("\"", "\"\"")}\"");
+                    }
+                    else if (table.Columns[i].DataType == Constants.BoolType)
+                    {
+                        if (dbType.IsIn<DBType>(DBType.PostGreSql, DBType.Hana, DBType.MySql))
+                        {
+                            if ((Boolean)drow[i] == true)
+                                sbcsv.Append("True");
+                            else
+                                sbcsv.Append("False");
+                        }
+                        else
+                        {
+                            if ((Boolean)drow[i] == true)
+                                sbcsv.Append("1");
+                            else
+                                sbcsv.Append("0");
+                        }
+                    }else
+                        sbcsv.Append(drow[i].ToString());
+                    if (i <= colcount - 1)
+                        sbcsv.Append(",");
+                }
+
+                sbcsv.AppendLine();
+            }
+
+            return sbcsv.ToString();
+        }
+
 
 
         /// <summary>

@@ -43,8 +43,65 @@ namespace HiSql
 
         public override async Task<int> BulkCopy(DataTable sourceTable, TabInfo tabInfo, Dictionary<string, string> columnMapping = null)
         {
-            throw new NotImplementedException();
+            var conn = new NpgsqlConnection(base.Context.CurrentConnectionConfig.ConnectionString);
+            try
+            {
+
+                PostGreSqlConfig postGreSqlConfig = new PostGreSqlConfig();
+                if (conn.State != ConnectionState.Open)
+                    conn.Open();
+
+                List<string> lstcol = new List<string>();
+                foreach (DataColumn dc in sourceTable.Columns)
+                {
+                    lstcol.Add($"{postGreSqlConfig.Field_Pre}{dc.ColumnName}{postGreSqlConfig.Field_After}");
+                }
+
+                if (tabInfo.Columns.Any(p => p.IsIdentity))
+                {
+                    throw new Exception($"PostGreSql 表[{tabInfo.TabModel.TabName}]包括自增长字段不允许进行批量写入");
+                }
+
+                using (var binary = conn.BeginBinaryImport($"COPY {postGreSqlConfig.Schema_Pre}{this.Context.CurrentConnectionConfig.Schema}{postGreSqlConfig.Schema_After}.{postGreSqlConfig.Table_Pre}{tabInfo.TabModel.TabName}{postGreSqlConfig.Table_After} ({string.Join(",", lstcol)})  FROM STDIN (FORMAT BINARY)"))
+                {
+                    foreach (DataRow drow in sourceTable.Rows)
+                    {
+                        binary.StartRow();
+                        foreach (DataColumn dc in sourceTable.Columns)
+                        {
+                            var _value = drow[dc.ColumnName];
+                            if (_value != null)
+                            {
+                                binary.Write(_value);
+                            }
+                            else
+                                binary.Write(DBNull.Value);
+                        }
+                    }
+                    binary.Complete();
+                }
+            }
+            catch (Exception E)
+            {
+                throw new Exception($"批量写入时错误:{E.Message}");
+            }
+            finally
+            {
+                if (conn.State == ConnectionState.Open)
+                    conn.Close();
+            }
+            return sourceTable.Rows.Count;
         }
+
+        public override Task<int> BulkCopy<T>(List<T> lstobj, TabInfo tabInfo, Dictionary<string, string> columnMapping = null)
+        {
+            DataTable sourceTable = DataConvert.ToTable(lstobj,tabInfo,this.Context.CurrentConnectionConfig.User);
+            return BulkCopy(sourceTable, tabInfo);
+            
+        }
+
+        
+
 
         public override IDataAdapter GetAdapter()
         {

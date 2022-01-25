@@ -323,17 +323,30 @@ namespace HiSql
         /// <param name="tabname"></param>
         /// <param name="lstdata"></param>
         /// <returns></returns>
-        public int BulkCopyExecCommand(TabInfo tabInfo, List<object> lstdata)
+        public int BulkCopyExecCommand<T>(TabInfo tabInfo, List<T> lstdata)
         {
-            //TabInfo tabinfo = this.Context.DMInitalize.GetTabStruct(tabname);
-            DataTable sourcetable = DataConvert.ToTable(lstdata, tabInfo, this.Context.CurrentConnectionConfig.User);
-            Dictionary<string, string> columnMap = new Dictionary<string, string>();
-            foreach (DataColumn dc in sourcetable.Columns)
+            //仅mysql不通过datatable进行数据插入
+            if (Context.CurrentConnectionConfig.DbType == DBType.MySql)
             {
-                columnMap.Add(dc.ColumnName, dc.ColumnName);
+                DataTable sourcetable = DataConvert.BuildDataTable(tabInfo);
+                Dictionary<string, string> columnMap = new Dictionary<string, string>();
+                foreach (DataColumn dc in sourcetable.Columns)
+                {
+                    columnMap.Add(dc.ColumnName, dc.ColumnName);
+                }
+                return this.Context.DBO.ExecBulkCopyCommand(lstdata, tabInfo, columnMap);
             }
-
-            return this.Context.DBO.ExecBulkCopyCommand(sourcetable, tabInfo, columnMap);
+            else
+            {
+                DataTable sourcetable = DataConvert.ToTable(lstdata, tabInfo, Context.CurrentConnectionConfig.User);
+                Dictionary<string, string> columnMap = new Dictionary<string, string>();
+                foreach (DataColumn dc in sourcetable.Columns)
+                {
+                    columnMap.Add(dc.ColumnName, dc.ColumnName);
+                }
+                return this.Context.DBO.ExecBulkCopyCommand(sourcetable, tabInfo, columnMap);
+            }
+            
            
 
         }
@@ -361,6 +374,32 @@ namespace HiSql
             }
             return this.Context.DBO.ExecBulkCopyCommandAsync(sourcetable, tabInfo, columnMap);
         }
+        public Task<int> BulkCopyExecCommandAsyc<T>(TabInfo tabInfo, List<T> lstdata)
+        {
+            Dictionary<string, string> columnMap = new Dictionary<string, string>();
+            if (Context.CurrentConnectionConfig.DbType == DBType.MySql)
+            {
+                DataTable sourcetable = DataConvert.BuildDataTable(tabInfo);
+                
+                foreach (DataColumn dc in sourcetable.Columns)
+                {
+                    columnMap.Add(dc.ColumnName, dc.ColumnName);
+                }
+
+                return this.Context.DBO.ExecBulkCopyCommandAsync(lstdata, tabInfo, columnMap);
+            }
+            else
+            {
+                DataTable sourcetable = DataConvert.ToTable(lstdata, tabInfo, this.Context.CurrentConnectionConfig.User);
+                foreach (DataColumn dc in sourcetable.Columns)
+                {
+                    columnMap.Add(dc.ColumnName, dc.ColumnName);
+                }
+                return this.Context.DBO.ExecBulkCopyCommandAsync(sourcetable, tabInfo, columnMap);
+            }
+            
+        }
+
 
 
         public IInsert Modi(string tabname, List<object> lstobj)

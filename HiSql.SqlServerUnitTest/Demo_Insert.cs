@@ -92,9 +92,26 @@ namespace HiSql
             //Demo1_Insert7(sqlClient);
             //Demo_dynamic(sqlClient);
 
-            Demo1_Insert8(sqlClient);
+            //Demo1_Insert8(sqlClient);
+            Demo1_Insert9(sqlClient);
         }
 
+
+        static void Demo1_Insert9(HiSqlClient sqlClient)
+        {
+            TabInfo tabinfo = sqlClient.Context.DMInitalize.GetTabStruct("HTest01");
+
+            List<Dictionary<string, object>> lstdata = new List<Dictionary<string, object>>();
+            int _count = 100;
+            Random random = new Random();
+            for (int i = 0; i < _count; i++)
+            {
+                lstdata.Add(new Dictionary<string, object> { { "SID", (i + 1) }, { "UName", $"tansar{i}" }, { "Age", 20 + (i % 50) }, { "Salary", 5000 + (i % 2000) + random.Next(10) }, { "descript", "hello world" } });
+
+
+            }
+            string _josn=DataConvert.ToCSV(lstdata, tabinfo, DBType.MySql,true, "tansar");
+        }
 
         static async void Demo1_Insert8(HiSqlClient sqlClient)
         {

@@ -82,7 +82,13 @@ namespace HiSql
             }
             else return 0;
         }
-     
+
+        public override Task<int> BulkCopy<T>(List<T> lstobj, TabInfo tabInfo, Dictionary<string, string> columnMapping = null)
+        {
+            DataTable sourceTable = DataConvert.ToTable(lstobj, tabInfo, this.Context.CurrentConnectionConfig.User);
+            return BulkCopy(sourceTable, tabInfo);
+            
+        }
 
         private  SqlBulkCopy getBulkInstance( SqlConnection conn)
         {
@@ -169,6 +175,5 @@ namespace HiSql
             ((SqlDataAdapter)dataAdapter).SelectCommand = (SqlCommand)command;
         }
 
-        
     }
 }

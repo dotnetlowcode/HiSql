@@ -49,9 +49,77 @@ namespace HiSql
 
         public override async Task<int> BulkCopy(DataTable sourceTable, TabInfo tabInfo, Dictionary<string, string> columnMapping = null)
         {
+            if (sourceTable != null && sourceTable.Rows.Count > 0)
+            {
+                HanaConfig hanaConfig = new HanaConfig();
+                int _batchsize = hanaConfig.BulkUnitSize / sourceTable.Columns.Count;
+                if (_batchsize < sourceTable.Columns.Count) _batchsize = 0;
+
+                var conn = new HanaConnection(base.Context.CurrentConnectionConfig.ConnectionString);
+                HanaBulkCopy sqlBulkCopy = getBulkInstance(conn);
+
+                sqlBulkCopy.DestinationTableName = tabInfo.TabModel.TabName;
+
+                try
+                {
+                    if (columnMapping != null)
+                    {
+                        foreach (string n in columnMapping.Keys)
+                        {
+                            sqlBulkCopy.ColumnMappings.Add(n, columnMapping[n]);
+                        }
+                    }
+
+                    sqlBulkCopy.BatchSize = _batchsize;
+                    sqlBulkCopy.WriteToServer(sourceTable);
+
+
+                    conn.Close();
+                }
+                catch (Exception E)
+                {
+                    conn.Close();
+                    throw E;
+                }
+                return sourceTable.Rows.Count;
+            }
+            else return 0;
+
             throw new NotImplementedException();
         }
 
+        public override Task<int> BulkCopy<T>(List<T> lstobj, TabInfo tabInfo, Dictionary<string, string> columnMapping = null)
+        {
+            DataTable sourceTable = DataConvert.ToTable(lstobj, tabInfo, this.Context.CurrentConnectionConfig.User);
+            return BulkCopy(sourceTable, tabInfo);
+        }
+        private HanaBulkCopy getBulkInstance(HanaConnection conn)
+        {
+
+
+            HanaBulkCopy bulkcopy = null;
+            if (this.Context.DBO.Transaction != null)
+            {
+                //如果主连接有事务那么也同样开启事务
+
+                bulkcopy = new HanaBulkCopy((HanaConnection)conn, HanaBulkCopyOptions.Default, (HanaTransaction)this.Context.DBO.Transaction);
+            }
+            else
+            {
+
+                bulkcopy = new HanaBulkCopy((HanaConnection)conn);
+            }
+            if (conn.State == System.Data.ConnectionState.Closed)
+            {
+                //打开连接
+                conn.Open();
+            }
+            ///设置超时时间 如果平台执行SQL的超时时间设置为一样
+            //bulkcopy.BulkCopyTimeout = this.Context.CurrentConnectionConfig.SqlExecTimeOut;
+
+
+            return bulkcopy;
+        }
         public override IDataAdapter GetAdapter()
         {
             return new HanaDataAdapter();
@@ -61,6 +129,7 @@ namespace HiSql
         {
             TryOpen();
             HanaCommand sqlCommand = new HanaCommand(sql, (HanaConnection)this.Connection);
+
             
             sqlCommand.CommandType = this.CmdTyp;
             sqlCommand.CommandTimeout = this.CommandTimeOut;

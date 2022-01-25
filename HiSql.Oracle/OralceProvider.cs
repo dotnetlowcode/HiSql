@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -48,9 +49,16 @@ namespace HiSql
 
         public override async Task<int> BulkCopy(DataTable sourceTable, TabInfo tabInfo, Dictionary<string, string> columnMapping = null)
         {
-            throw new NotImplementedException();
+
+            throw new Exception($"针对Oracle数据没有找到合适的BulkCopy的驱动暂时不支持");
+            //throw new NotImplementedException();
         }
 
+        public override Task<int> BulkCopy<T>(List<T> lstobj, TabInfo tabInfo, Dictionary<string, string> columnMapping = null)
+        {
+            throw new Exception($"针对Oracle数据没有找到合适的BulkCopy的驱动暂时不支持");
+        }
+        
         public override IDataAdapter GetAdapter()
         {
             return new OracleDataAdapter();

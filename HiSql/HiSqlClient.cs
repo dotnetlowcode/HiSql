@@ -465,7 +465,7 @@ namespace HiSql
         /// <param name="tabname"></param>
         /// <param name="lstdata"></param>
         /// <returns></returns>
-        public int BulkCopyExecCommand(string tabname, List<object> lstdata)
+        public int BulkCopyExecCommand<T>(string tabname, List<T> lstdata)
         {
             TabInfo tabInfo = this.Context.DMInitalize.GetTabStruct(tabname);
             return _context.BulkCopyExecCommand(tabInfo, lstdata);
@@ -483,10 +483,18 @@ namespace HiSql
             return _context.BulkCopyExecCommand(tabInfo, souretable);
         }
 
+ 
+
         public Task<int> BulkCopyExecCommandAsyc(string tabname, DataTable souretable)
         {
             TabInfo tabInfo = this.Context.DMInitalize.GetTabStruct(tabname);
             return _context.BulkCopyExecCommandAsyc(tabInfo, souretable);
+        }
+
+        public Task<int> BulkCopyExecCommandAsyc<T>(string tabname, List<T> lstdata)
+        {
+            TabInfo tabInfo = this.Context.DMInitalize.GetTabStruct(tabname);
+            return _context.BulkCopyExecCommandAsyc(tabInfo, lstdata);
         }
         #endregion
 

@@ -1058,8 +1058,8 @@ namespace HiSql
         public int BuildTabCreate(TabInfo tabInfo)
         {
             string _sql = BuildTabCreateSql(tabInfo.TabModel, tabInfo.GetColumns);
-            int _effect = (int)this.Context.DBO.ExecScalar(_sql);
-
+            string v = this.Context.DBO.ExecScalar(_sql).ToString();
+            int _effect = Convert.ToInt32(v);
             return _effect;
         }
 
