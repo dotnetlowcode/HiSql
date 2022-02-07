@@ -14,4 +14,3 @@ D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Release\net5.0\HiSql.Oracle.csproj.
 D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Release\net5.0\HiSql.Oracle.dll
 D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Release\net5.0\ref\HiSql.Oracle.dll
 D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Release\net5.0\HiSql.Oracle.pdb
-D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Release\net5.0\HiSql.Oracle.csproj.AssemblyReference.cache

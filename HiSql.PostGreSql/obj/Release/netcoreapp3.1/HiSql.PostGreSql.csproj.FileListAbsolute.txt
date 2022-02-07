@@ -3,7 +3,6 @@ D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Release\netcoreapp3.1\HiSql.Pos
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Release\netcoreapp3.1\HiSql.PostGreSql.pdb
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Release\netcoreapp3.1\HiSql.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Release\netcoreapp3.1\HiSql.pdb
-D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Release\netcoreapp3.1\HiSql.PostGreSql.csproj.AssemblyReference.cache
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Release\netcoreapp3.1\HiSql.PostGreSql.Properties.Resources.resources
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Release\netcoreapp3.1\HiSql.PostGreSql.csproj.GenerateResource.cache
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Release\netcoreapp3.1\HiSql.PostGreSql.GeneratedMSBuildEditorConfig.editorconfig

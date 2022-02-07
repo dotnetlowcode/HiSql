@@ -1378,7 +1378,7 @@ namespace HiSql
                     if (joinDefinition.JoinType == JoinType.Inner)
                         sb_join.Append($" inner join");
                     else if (joinDefinition.JoinType == JoinType.Left)
-                        sb_join.Append($" left inner join");
+                        sb_join.Append($" left  join");
                     else if (joinDefinition.JoinType == JoinType.Right)
                         sb_join.Append($" outer join");
                     sb_join.Append($" {dbConfig.Table_Pre}{joinDefinition.Right.TabName}{dbConfig.Table_After} as {dbConfig.Table_Pre}{joinDefinition.Right.AsTabName}{dbConfig.Table_After}");
