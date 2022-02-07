@@ -33,6 +33,41 @@
 
 处理，开发人员只要关注于业务开发
 
+
+
+### 2022.2.7 更新
+新增bulkcopy功能
+hisql已经支持BulkCopy的数据有 SqlServer,Oacle,MySql,PostGreSql,Hana
+
+如果表数据插入超过1W 可以用此功能，如果小于这个数建议使用常规方式插入
+
+
+
+
+1. 通过DataTable向表批量写入
+```c#
+int _effect= await  sqlClient.BulkCopyExecCommandAsyc("HTest01", dt);
+
+```
+
+2. 通过字典批量写入
+```c#
+List<Dictionary<string, object>> lstdata = new List<Dictionary<string, object>>();
+int _count = 1000000;
+Random random = new Random();
+for (int i = 0; i < _count; i++)
+{
+    lstdata.Add(new Dictionary<string, object> { { "SID", (i + 1) }, { "UName", $"tansar{i}" }, { "Age", 20 + (i % 50) }, { "Salary", 5000 + (i % 2000) + random.Next(10) }, { "descript", "hello world" } });
+}
+
+int _effect = sqlClient.BulkCopyExecCommand("HTest01", lstdata); 
+
+```
+
+
+
+
+
 ### 2022.1.6 更新
 1. CodeFirst增加表删除功能
 ```c#

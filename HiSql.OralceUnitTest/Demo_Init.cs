@@ -16,7 +16,7 @@ namespace HiSql.OralceUnitTest
                          DbType = DBType.Oracle,
                          DbServer = "local-HoneBI",
                          //ConnectionString = "server=192.168.1.90,8433;uid=sa;pwd=Hone@123;database=HoneBI",
-                         ConnectionString = "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=ORCL)));User Id=SYSTEM;Password=Hone@123",//; MultipleActiveResultSets = true;
+                         ConnectionString = "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=ORCL)));User Id=SYSTEM;Password=root",//; MultipleActiveResultSets = true;
                          Schema = "SYSTEM",
                          IsEncrypt = true,
                          IsAutoClose = false,

@@ -12,7 +12,7 @@ namespace HiSql
         /// 数据包大小 经过测试200这个值是比较合理
         /// </summary>
         int _bluksize = 200;
-        int _bulkunitsize = 250000;
+        int _bulkunitsize = 500000;
         string _temp_schema_pre = "";
         string _temp_schema_after = "";
 
