@@ -125,6 +125,25 @@ namespace HiSql
         /// <returns></returns>
         public abstract DbCommand GetCommand(string sql, HiParameter[] param);
 
+
+        /// <summary>
+        /// 向表批量复制插入
+        /// </summary>
+        /// <param name="sourceTable"></param>
+        /// <param name="tabName"></param>
+        public abstract Task<int> BulkCopy(DataTable sourceTable, TabInfo tabInfo,Dictionary<string,string> columnMapping=null);
+
+
+        /// <summary>
+        /// 批量对象插入
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="lstobj"></param>
+        /// <param name="tabInfo"></param>
+        /// <param name="columnMapping"></param>
+        /// <returns></returns>
+        public abstract Task<int> BulkCopy<T>(List<T> lstobj, TabInfo tabInfo, Dictionary<string, string> columnMapping = null);
+
         public abstract IDataAdapter GetAdapter();
         public abstract void SetCommandToAdapter(IDataAdapter adapter, DbCommand command);
         #endregion
@@ -157,6 +176,23 @@ namespace HiSql
 
         }
 
+        public virtual int ExecBulkCopyCommand(DataTable sourceTable, TabInfo tabInfo, Dictionary<string,string> columnMapping=null)
+        {
+            return  this.BulkCopy(sourceTable, tabInfo, columnMapping).ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+        public virtual int ExecBulkCopyCommand<T>(List<T> lstdata, TabInfo tabInfo, Dictionary<string, string> columnMapping = null)
+        {
+            return this.BulkCopy(lstdata, tabInfo, columnMapping).ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+
+        public virtual Task<int> ExecBulkCopyCommandAsync(DataTable sourceTable, TabInfo tabInfo, Dictionary<string, string> columnMapping = null)
+        {
+            return this.BulkCopy(sourceTable, tabInfo, columnMapping);
+        }
+        public virtual Task<int> ExecBulkCopyCommandAsync<T>(List<T> lstdata, TabInfo tabInfo, Dictionary<string, string> columnMapping = null)
+        {
+            return this.BulkCopy(lstdata, tabInfo, columnMapping);
+        }
 
         public virtual void CommitTran()
         {

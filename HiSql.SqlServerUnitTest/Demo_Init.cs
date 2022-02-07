@@ -8,18 +8,20 @@ namespace HiSql.UnitTest
 {
     class Demo_Init
     {
+
         public static HiSqlClient GetSqlClient()
         {
+            
 
             HiSqlClient sqlclient = new HiSqlClient(
                      new ConnectionConfig()
                      {
                          DbType = DBType.SqlServer,
                          DbServer = "local-HoneBI",
-                         ConnectionString = "server=(local);uid=sa;pwd=Hone@123;database=HiSql;",//; MultipleActiveResultSets = true;
+                         ConnectionString = "server=(local);uid=sa;pwd=Hone@123;database=HiSql;Encrypt=True; TrustServerCertificate=True;",//; MultipleActiveResultSets = true;
                          User = "tansar",//可以指定登陆用户的帐号
                          SlaveConnectionConfigs = new List<SlaveConnectionConfig> {
-                             { new SlaveConnectionConfig{ ConnectionString=" server=(local);uid=sa;pwd=Hone@123;database=HiSql; " , Weight=3} },
+                             { new SlaveConnectionConfig{ ConnectionString=" server=(local);uid=sa;pwd=Hone@123;database=HiSql;Encrypt=True; TrustServerCertificate=True;" , Weight=3} },
                              //{ new SlaveConnectionConfig{ ConnectionString=" server=(local);uid=sa;pwd=Hone@123;database=HiSql; " , Weight=3} },
                              //{ new SlaveConnectionConfig{ ConnectionString="  server=(local);uid=sa;pwd=Hone@123;database=HiSql;" , Weight=4} },
                              //{ new SlaveConnectionConfig{ ConnectionString="    erver=(local);uid=sa;pwd=Hone@123;database=HiSql;" , Weight=10} }
