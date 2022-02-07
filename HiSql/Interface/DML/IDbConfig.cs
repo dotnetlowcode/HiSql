@@ -24,6 +24,11 @@ namespace HiSql
         public string Fun_CurrDATE { get; }
 
         public int BlukSize { get; set; }
+
+        /// <summary>
+        /// 批量写入表时最优的参数（行*列）
+        /// </summary>
+        public int BulkUnitSize { get; set; }
         /// <summary>
         /// Schema 前辍
         /// </summary>

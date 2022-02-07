@@ -72,7 +72,7 @@
       }
     },
     "D:\\Project\\OpenSource\\HiSql\\HiSql.PostGreSql\\HiSql.PostGreSql.csproj": {
-      "version": "1.0.3",
+      "version": "1.0.3.1",
       "restore": {
         "projectUniqueName": "D:\\Project\\OpenSource\\HiSql\\HiSql.PostGreSql\\HiSql.PostGreSql.csproj",
         "projectName": "HiSql.PostGreSql",
@@ -230,7 +230,7 @@
       }
     },
     "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj": {
-      "version": "1.0.3",
+      "version": "1.0.3.1",
       "restore": {
         "projectUniqueName": "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj",
         "projectName": "HiSql",
@@ -287,6 +287,10 @@
         "netcoreapp3.1": {
           "targetAlias": "netcoreapp3.1",
           "dependencies": {
+            "Microsoft.Data.SqlClient": {
+              "target": "Package",
+              "version": "[4.0.0, )"
+            },
             "Microsoft.Extensions.Caching.Memory": {
               "target": "Package",
               "version": "[6.0.0, )"
@@ -316,6 +320,10 @@
         "net5.0": {
           "targetAlias": "net5.0",
           "dependencies": {
+            "Microsoft.Data.SqlClient": {
+              "target": "Package",
+              "version": "[4.0.0, )"
+            },
             "Microsoft.Extensions.Caching.Memory": {
               "target": "Package",
               "version": "[6.0.0, )"
@@ -345,6 +353,10 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "dependencies": {
+            "Microsoft.Data.SqlClient": {
+              "target": "Package",
+              "version": "[4.0.0, )"
+            },
             "Microsoft.Extensions.Caching.Memory": {
               "target": "Package",
               "version": "[6.0.0, )"
@@ -374,6 +386,10 @@
         "net461": {
           "targetAlias": "net461",
           "dependencies": {
+            "Microsoft.Data.SqlClient": {
+              "target": "Package",
+              "version": "[4.0.0, )"
+            },
             "Microsoft.Extensions.Caching.Memory": {
               "target": "Package",
               "version": "[6.0.0, )"

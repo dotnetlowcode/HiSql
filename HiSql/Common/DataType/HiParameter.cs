@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Data;
+//using Microsoft.Data;
 using System.Data.Common;
 namespace HiSql
 {

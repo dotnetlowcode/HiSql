@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace HiSql.OralceUnitTest
 {
+    
     class Demo_Insert
     {
         class H_Test
@@ -30,9 +31,39 @@ namespace HiSql.OralceUnitTest
             //Demo1_Insert(sqlClient);
             //Demo1_Modi(sqlClient);
             //Demo1_Modi2(sqlClient);
-           //Demo1_Insert2(sqlClient);
-            Demo1_Insert3(sqlClient);
+            //Demo1_Insert2(sqlClient);
+            //Demo1_Insert3(sqlClient);
+
+            Demo4_Insert1(sqlClient);
             string s = Console.ReadLine();
+        }
+        static void Demo4_Insert1(HiSqlClient sqlClient)
+        {
+            TabInfo tabinfo = sqlClient.Context.DMInitalize.GetTabStruct("HTest01");
+
+            List<Dictionary<string, object>> lstdata = new List<Dictionary<string, object>>();
+            int _count = 1000000;
+            Random random = new Random();
+            for (int i = 0; i < _count; i++)
+            {
+                lstdata.Add(new Dictionary<string, object> { { "SID", (i + 1) }, { "UName", $"tansar{i}" }, { "Age", 20 + (i % 50) }, { "Salary", 5000 + (i % 2000) + random.Next(10) }, { "descript", "hello world" } });
+
+
+            }
+
+            sqlClient.CodeFirst.Truncate("HTest01");
+            //string _josn = DataConvert.ToCSV(lstdata, tabinfo, DBType.MySql, true, "tansar");
+
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
+
+            int _effect = sqlClient.BulkCopyExecCommand("HTest01", lstdata);
+
+            sw.Stop();
+            Console.WriteLine($"写入{_effect}条 耗时{sw.Elapsed}秒");
+            var s = Console.ReadLine();
         }
 
         static void Demo1_Insert3(HiSqlClient sqlClient)

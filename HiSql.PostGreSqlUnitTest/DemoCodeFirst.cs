@@ -11,11 +11,15 @@ namespace HiSql.PostGreSqlUnitTest
         public static void Init(HiSqlClient sqlClient)
         {
             //CodeFirst_Demo(sqlClient);
-            Snro_Demo(sqlClient);
+            //Snro_Demo(sqlClient);
+            Create_Table(sqlClient);
             string s = Console.ReadLine();
         }
 
-
+        static void Create_Table(HiSqlClient sqlClient)
+        {
+            sqlClient.CodeFirst.CreateTable(typeof(Table.HTest01));
+        }
         static void Snro_Demo(HiSqlClient sqlClient)
         { 
             

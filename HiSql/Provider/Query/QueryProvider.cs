@@ -812,7 +812,7 @@ namespace HiSql
                         sortby.Add(_dic_sort["field"].ToString(), SortType.ASC);
                     else
                     {
-                        sortby.Add(_dic_sort["field"].ToString(), _dic_sort["field"].ToString().ToLower() == "asc" ? SortType.ASC : SortType.DESC);
+                        sortby.Add(_dic_sort["field"].ToString(), _dic_sort["sort"].ToString().ToLower() == "asc" ? SortType.ASC : SortType.DESC);
                     }
                 }
                 else

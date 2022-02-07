@@ -657,6 +657,8 @@ namespace HiSql
                         .Replace("[$Schema$]", _schema)
                         .Replace("[$TabName$]", table.TabName);
                 }
+
+                _temp_delete = new StringBuilder().AppendLine("begin").AppendLine(_temp_delete).AppendLine("end;").ToString();
             }
 
 
@@ -851,7 +853,7 @@ namespace HiSql
                             _str_temp_field = _str_temp_field.Replace("[$FieldName$]", hiColumn.FieldName)
                                 .Replace("[$IsIdentity$]", hiColumn.IsIdentity ? "IDENTITY(1,1)" : "")
                                 .Replace("[$IsNull$]", hiColumn.IsPrimary ? "NOT NULL" : hiColumn.IsIdentity ? "NOT NULL" : hiColumn.IsNull == true ? hiColumn.DBDefault != HiTypeDBDefault.NONE ?"":"NULL" : "NOT NULL")
-                                .Replace("[$Default$]", hiColumn.IsPrimary || hiColumn.IsIdentity ? "" : GetDbDefault(hiColumn, hiTable.TabName))
+                                .Replace("[$Default$]", hiColumn.IsPrimary || hiColumn.IsIdentity || !hiColumn.IsNull ? "" : GetDbDefault(hiColumn, hiTable.TabName))
                                 .Replace("[$EXTEND$]", hiTable.TableType == TableType.Var && hiColumn.IsPrimary ? "primary key" : "")
                                 ;
                             break;
@@ -866,7 +868,7 @@ namespace HiSql
                                 .Replace("[$FieldLen$]", hiColumn.FieldLen.ToString())
                                 .Replace("[$FieldDec$]", hiColumn.FieldDec.ToString())
                                 .Replace("[$IsNull$]", hiColumn.IsIdentity ? "NOT NULL" : hiColumn.IsNull == true ? hiColumn.DBDefault != HiTypeDBDefault.NONE ? "" : "NULL" : "NOT NULL")
-                                .Replace("[$Default$]", hiColumn.IsPrimary || hiColumn.IsIdentity ? "" : GetDbDefault(hiColumn, hiTable.TabName))
+                                .Replace("[$Default$]", hiColumn.IsPrimary || hiColumn.IsIdentity || !hiColumn.IsNull ? "" : GetDbDefault(hiColumn, hiTable.TabName))
                                 .Replace("[$EXTEND$]", hiTable.TableType == TableType.Var && hiColumn.IsPrimary ? "primary key" : "")
                                 ;
                             break;
@@ -963,8 +965,8 @@ namespace HiSql
         public int BuildTabCreate(TabInfo tabInfo)
         {
             string _sql = BuildTabCreateSql(tabInfo.TabModel, tabInfo.GetColumns);
-            int _effect = (int)this.Context.DBO.ExecScalar(_sql);
-
+            string v = this.Context.DBO.ExecScalar(_sql).ToString();
+            int _effect = Convert.ToInt32(v);
             return _effect;
         }
         /// <summary>

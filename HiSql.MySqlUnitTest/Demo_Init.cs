@@ -16,7 +16,7 @@ namespace HiSql.MySqlUnitTest
                          DbType = DBType.MySql,
                          DbServer = "local-HoneBI",
                          //ConnectionString = "server=192.168.1.90,8433;uid=sa;pwd=Hone@123;database=HoneBI",
-                         ConnectionString = "data source=localhost;database=hone;user id=root;password=Hone@123;pooling=false;charset=utf8",//; MultipleActiveResultSets = true;
+                         ConnectionString = "data source=localhost;database=hone;user id=root;password=Hone@123;pooling=false;charset=utf8;AllowLoadLocalInfile=true",//; MultipleActiveResultSets = true;
                          Schema = "hone",
                          IsEncrypt = true,
                          IsAutoClose = false,

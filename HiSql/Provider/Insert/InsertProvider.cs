@@ -380,7 +380,7 @@ namespace HiSql
             _queue.Add("insert");
             return this;
         }
-
+        
         public virtual string ToSql()
         {
 

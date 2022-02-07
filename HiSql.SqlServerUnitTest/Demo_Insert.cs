@@ -89,8 +89,86 @@ namespace HiSql
             //Demo1_Insert4(sqlClient);
             //Demo1_Insert5(sqlClient);
             //Demo1_Insert6(sqlClient);
-            Demo1_Insert7(sqlClient);
+            //Demo1_Insert7(sqlClient);
             //Demo_dynamic(sqlClient);
+
+            //Demo1_Insert8(sqlClient);
+            Demo1_Insert9(sqlClient);
+        }
+
+
+        static void Demo1_Insert9(HiSqlClient sqlClient)
+        {
+            TabInfo tabinfo = sqlClient.Context.DMInitalize.GetTabStruct("HTest01");
+
+            List<Dictionary<string, object>> lstdata = new List<Dictionary<string, object>>();
+            int _count = 100;
+            Random random = new Random();
+            for (int i = 0; i < _count; i++)
+            {
+                lstdata.Add(new Dictionary<string, object> { { "SID", (i + 1) }, { "UName", $"tansar{i}" }, { "Age", 20 + (i % 50) }, { "Salary", 5000 + (i % 2000) + random.Next(10) }, { "descript", "hello world" } });
+
+
+            }
+            string _josn=DataConvert.ToCSV(lstdata, tabinfo, DBType.MySql,true, "tansar");
+        }
+
+        static async void Demo1_Insert8(HiSqlClient sqlClient)
+        {
+            TabInfo tabinfo = sqlClient.Context.DMInitalize.GetTabStruct("HTest01");
+
+            //List<Dictionary<string, object>> lstdata = new List<Dictionary<string, object>> {
+            //    new Dictionary<string, object> { { "SID", 123456 }, { "UName", "tansar" }, { "Age", 25 }, { "Salary", 1999.9 }, { "descript", "hello world" } },
+            //    new Dictionary<string, object> { { "SID", 123457 }, { "UName", "tansar" }, { "Age", 25 }, { "Salary", 1999.9 }, { "descript", "hello world" } }
+            //};
+
+            List<Dictionary<string, object>> lstdata = new List<Dictionary<string, object>>();
+            int _count = 1000000;
+            Random random = new Random();
+            for (int i = 0; i < _count; i++)
+            {
+                lstdata.Add(new Dictionary<string, object> { { "SID", (i + 1) }, { "UName", $"tansar{i}" }, { "Age", 20 + (i % 50) }, { "Salary", 5000 + (i % 2000) + random.Next(10) }, { "descript", "hello world" } });
+
+
+            }
+
+
+
+            //List<TDynamic> lstdyn = new List<TDynamic>();
+            //TDynamic t1 = new TDynamic();
+            //t1["SID"] = 123456;
+            //t1["UName"] = "tansar";
+            //t1["Age"] = 25;
+            //t1["Salary"] = 1999.9;
+            //t1["descript"] = "hello world";
+            //lstdyn.Add(t1);
+
+            //TDynamic t2 = new TDynamic();
+            //t2["SID"] = 123457;
+            //t2["UName"] = "tansar";
+            //t2["Age"] = 25;
+            //t2["Salary"] = 1999.9;
+            //t2["descript"] = "hello world";
+            //lstdyn.Add(t2);
+
+            //var lstdata2 = new List<object> {
+            //    new { UTYP = "U1", UTypeName = "普通用户" },
+            //    new { UTYP = "U2", UTypeName = "中级用户" },
+            //    new { UTYP = "U3", UTypeName = "高级用户" }
+            //};
+
+            sqlClient.TrunCate("HTest01").ExecCommand();
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            DataTable dt= DataConvert.ToTable(lstdata, tabinfo,sqlClient.CurrentConnectionConfig.User);
+            sw.Stop();
+            Console.WriteLine($"数据转换Table{_count}条 耗时{sw.Elapsed}秒");
+            sw.Reset();
+            sw.Start();
+            int _effect= await  sqlClient.BulkCopyExecCommandAsyc("HTest01", dt);
+            Console.WriteLine($"写入{_effect}条 耗时{sw.Elapsed}秒");
+            var s = Console.ReadLine();
+
         }
 
         //测试 表校验检测

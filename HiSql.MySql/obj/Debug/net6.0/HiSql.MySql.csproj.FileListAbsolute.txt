@@ -14,4 +14,3 @@ D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Debug\net6.0\HiSql.MySql.csproj.Copy
 D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Debug\net6.0\HiSql.MySql.dll
 D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Debug\net6.0\ref\HiSql.MySql.dll
 D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Debug\net6.0\HiSql.MySql.pdb
-D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Debug\net6.0\HiSql.MySql.csproj.AssemblyReference.cache

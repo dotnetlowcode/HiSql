@@ -5,7 +5,7 @@
   },
   "projects": {
     "D:\\Project\\OpenSource\\HiSql\\HiSql.Oracle\\HiSql.Oracle.csproj": {
-      "version": "1.0.3",
+      "version": "1.0.3.1",
       "restore": {
         "projectUniqueName": "D:\\Project\\OpenSource\\HiSql\\HiSql.Oracle\\HiSql.Oracle.csproj",
         "projectName": "HiSql.Oracle",
@@ -78,6 +78,10 @@
         "netcoreapp3.1": {
           "targetAlias": "netcoreapp3.1",
           "dependencies": {
+            "Oracle.ManagedDataAccess.Core": {
+              "target": "Package",
+              "version": "[2.19.130, )"
+            },
             "System.Data.OracleClient": {
               "target": "Package",
               "version": "[1.0.8, )"
@@ -103,6 +107,10 @@
         "net5.0": {
           "targetAlias": "net5.0",
           "dependencies": {
+            "Oracle.ManagedDataAccess.Core": {
+              "target": "Package",
+              "version": "[3.21.4, )"
+            },
             "System.Data.OracleClient": {
               "target": "Package",
               "version": "[1.0.8, )"
@@ -128,6 +136,10 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "dependencies": {
+            "Oracle.ManagedDataAccess.Core": {
+              "target": "Package",
+              "version": "[3.21.4, )"
+            },
             "System.Data.OracleClient": {
               "target": "Package",
               "version": "[1.0.8, )"
@@ -153,6 +165,10 @@
         "net461": {
           "targetAlias": "net461",
           "dependencies": {
+            "Oracle.ManagedDataAccess": {
+              "target": "Package",
+              "version": "[19.13.0, )"
+            },
             "System.Data.OracleClient": {
               "target": "Package",
               "version": "[1.0.8, )"
@@ -163,7 +179,7 @@
       }
     },
     "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj": {
-      "version": "1.0.3",
+      "version": "1.0.3.1",
       "restore": {
         "projectUniqueName": "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj",
         "projectName": "HiSql",
@@ -220,6 +236,10 @@
         "netcoreapp3.1": {
           "targetAlias": "netcoreapp3.1",
           "dependencies": {
+            "Microsoft.Data.SqlClient": {
+              "target": "Package",
+              "version": "[4.0.0, )"
+            },
             "Microsoft.Extensions.Caching.Memory": {
               "target": "Package",
               "version": "[6.0.0, )"
@@ -249,6 +269,10 @@
         "net5.0": {
           "targetAlias": "net5.0",
           "dependencies": {
+            "Microsoft.Data.SqlClient": {
+              "target": "Package",
+              "version": "[4.0.0, )"
+            },
             "Microsoft.Extensions.Caching.Memory": {
               "target": "Package",
               "version": "[6.0.0, )"
@@ -278,6 +302,10 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "dependencies": {
+            "Microsoft.Data.SqlClient": {
+              "target": "Package",
+              "version": "[4.0.0, )"
+            },
             "Microsoft.Extensions.Caching.Memory": {
               "target": "Package",
               "version": "[6.0.0, )"
@@ -307,6 +335,10 @@
         "net461": {
           "targetAlias": "net461",
           "dependencies": {
+            "Microsoft.Data.SqlClient": {
+              "target": "Package",
+              "version": "[4.0.0, )"
+            },
             "Microsoft.Extensions.Caching.Memory": {
               "target": "Package",
               "version": "[6.0.0, )"

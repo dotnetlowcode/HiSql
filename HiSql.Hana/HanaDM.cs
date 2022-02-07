@@ -992,8 +992,8 @@ namespace HiSql
             sb_sql.AppendLine("end;");
 
 
-            int _effect = (int)this.Context.DBO.ExecScalar(sb_sql.ToString());
-
+            string v = this.Context.DBO.ExecScalar(_sql).ToString();
+            int _effect = Convert.ToInt32(v);
             return _effect;
         }
         /// <summary>
