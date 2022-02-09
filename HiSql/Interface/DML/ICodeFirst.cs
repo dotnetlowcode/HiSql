@@ -18,7 +18,7 @@ namespace HiSql
 
 
 
-
+        [Obsolete("该方法已经弃用请用DbFirst中的CreateTable")]
         /// <summary>
         /// 创建表
         /// </summary>
@@ -26,6 +26,8 @@ namespace HiSql
         /// <returns></returns>
         bool CreateTable(TabInfo tabInfo);
 
+
+        [Obsolete("该方法已经弃用请用DbFirst中的CreateTable")]
         /// <summary>
         /// 根据实体类型创建表
         /// </summary>
@@ -34,6 +36,7 @@ namespace HiSql
         bool CreateTable(Type type);
 
 
+        [Obsolete("该方法已经弃用请用DbFirst中的ModiTable")]
         /// <summary>
         /// 修改表
         /// </summary>
@@ -42,6 +45,7 @@ namespace HiSql
         bool ModiTable(TabInfo tabInfo);
 
 
+        [Obsolete("该方法已经弃用请用DbFirst中的DropTable")]
         /// <summary>
         /// 删除表
         /// </summary>
@@ -50,6 +54,7 @@ namespace HiSql
         /// <returns></returns>
         bool DropTable(string tabname,bool nolog=false);
 
+        [Obsolete("该方法已经弃用请用DbFirst中的Truncate")]
 
         /// <summary>
         /// 清空表中所有数据不留痕迹

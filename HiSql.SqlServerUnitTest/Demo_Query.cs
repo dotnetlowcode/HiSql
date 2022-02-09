@@ -39,13 +39,17 @@ namespace HiSql.UnitTest
             var s = Console.ReadLine();
         }
 
+        
+
         static void Query_Demo9(HiSqlClient sqlClient)
         {
-            List< HiColumn> lst= sqlClient.HiSql("select * from H_Test5 ").ToList<HiColumn>();
-            if (lst.Count > 0)
+            var json = sqlClient.HiSql("select * from H_Test5 ").ToJson();
+            if (!json.IsNullOrEmpty())
             {
                 //var sql=sqlClient.Insert("Hi_FieldModel", lst).ToSql();
             }
+
+            json = sqlClient.HiSql("select * from H_Test5 ").ToJson();
         }
         static void Query_Demo8(HiSqlClient sqlClient)
         {

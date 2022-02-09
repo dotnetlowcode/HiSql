@@ -40,6 +40,9 @@ namespace HiSql
 
         private ICodeFirst codeFirst = new CodeFirst();
 
+
+        private IDbFirst dbFirst = new DbFirst();
+
         //ICache _mcache = new MCache(null);
         /// <summary>
         /// 连接管道
@@ -48,7 +51,13 @@ namespace HiSql
         public HiSqlClient(ConnectionConfig config)
         {
             initContext(config);
+
+            //如果有需要也可以克隆一个连接
+            //this.CloneClient();
             codeFirst.SqlClient = this;
+            dbFirst.SqlClient = this;
+
+
         }
 
         
@@ -83,6 +92,12 @@ namespace HiSql
         /// CodeFirst
         /// </summary>
         public ICodeFirst CodeFirst => codeFirst;
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public IDbFirst DbFirst => dbFirst;
         #endregion
 
 

@@ -36,6 +36,82 @@ namespace HiSql
             return t;
         }
 
+        /// <summary>
+        /// 元组Item1=true 表示 比对结果集相同
+        /// 元组Item1=false 表示 比对结果集不相同 Item2=true 表示是物理表结构有变更
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj1"></param>
+        /// <param name="obj2"></param>
+        /// <returns></returns>
+        public static Tuple<bool,bool> CompareTabProperties<T>(T obj1, T obj2)
+        {
+            //为空判断
+            if (obj1 == null && obj2 == null)
+                return  new Tuple<bool, bool>(true,false);
+            else if (obj1 == null || obj2 == null)
+                return new Tuple<bool, bool>(false, false);
+
+            Type t1 = obj1.GetType();
+            Type t2 = obj2.GetType();
+            if (t1 != t2) return new Tuple<bool, bool>(false, false);
+
+            //比对是否是表结构有变更
+
+            PropertyInfo[] props = t1.GetProperties().Where(p => p.CanWrite == true && !Constants.IsStandardField(p.Name) &&
+            //(p.Name.ToLower()!= "SortNum".ToLower() && p.Name.ToLower() != "IsSys".ToLower()) 
+            (
+
+                 p.Name.ToLower().IsIn("FieldDesc".ToLower(), "IsIdentity".ToLower(), "IsPrimary".ToLower(), "FieldName".ToLower(),
+                "FieldType".ToLower(), "DefaultValue".ToLower(), "FieldLen".ToLower(), "FieldDec".ToLower(), "IsNull".ToLower())
+            )
+            && p.MemberType == MemberTypes.Property).ToArray();
+            foreach (var po in props)
+            {
+                if (IsCanCompare(po.PropertyType))
+                {
+                    if (!po.GetValue(obj1).Equals(po.GetValue(obj2)))
+                    {
+                        return new Tuple<bool, bool>(false, true);
+                    }
+                }
+                else
+                {
+                    var b = CompareTabProperties(po.GetValue(obj1), po.GetValue(obj2));
+                    if (!b.Item1) return b;
+                }
+            }
+
+            //配置有变更
+            props = t1.GetProperties().Where(p => p.CanWrite == true && !Constants.IsStandardField(p.Name)
+            &&
+            (
+                 p.Name.ToLower().NotIn("FieldDesc".ToLower(), "IsIdentity".ToLower(), "IsPrimary".ToLower(), "FieldName".ToLower(),
+                "FieldType".ToLower(), "DefaultValue".ToLower(), "FieldLen".ToLower(), "FieldDec".ToLower(), "IsNull".ToLower(),
+                "SortNum".ToLower(), "IsSys".ToLower())
+                )
+
+            && p.MemberType == MemberTypes.Property).ToArray();
+
+            foreach (var po in props)
+            {
+                if (IsCanCompare(po.PropertyType))
+                {
+                    if (!po.GetValue(obj1).Equals(po.GetValue(obj2)))
+                    {
+                        return new Tuple<bool, bool>(false, false);
+                    }
+                }
+                else
+                {
+                    var b = CompareTabProperties(po.GetValue(obj1), po.GetValue(obj2));
+                    if (!b.Item1) return b;
+                }
+            }
+
+
+            return new Tuple<bool, bool>(true, false);
+        }
 
         public static bool CompareProperties<T>(T obj1, T obj2)
         {
@@ -48,7 +124,14 @@ namespace HiSql
             Type t1 = obj1.GetType();
             Type t2 = obj2.GetType();
             if (t1 != t2) return false;
-            PropertyInfo[] props = t1.GetProperties().Where(p=>p.CanWrite==true && !Constants.IsStandardField(p.Name) && (p.Name.ToLower()!= "SortNum".ToLower() && p.Name.ToLower() != "IsSys".ToLower()) && p.MemberType==MemberTypes.Property ).ToArray();
+            PropertyInfo[] props = t1.GetProperties().Where(p=>p.CanWrite==true && !Constants.IsStandardField(p.Name) &&
+            //(p.Name.ToLower()!= "SortNum".ToLower() && p.Name.ToLower() != "IsSys".ToLower()) 
+            (
+                
+                 p.Name.ToLower().IsIn("FieldDesc".ToLower(), "IsIdentity".ToLower(), "IsPrimary".ToLower(), "FieldName".ToLower(),
+                "FieldType".ToLower(), "DefaultValue".ToLower(), "FieldLen".ToLower(), "FieldDec".ToLower(), "IsNull".ToLower())
+            )
+            && p.MemberType==MemberTypes.Property ).ToArray();
             foreach (var po in props)
             {
                 if (IsCanCompare(po.PropertyType))

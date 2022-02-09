@@ -65,6 +65,7 @@ namespace HiSql.UnitTest
             //Demo_Insert.Init(sqlcient);
             //DemoCodeFirst.Init(sqlcient);
             //Demo_Snro.Init(sqlcient);
+            //Demo_DbCode.Init(sqlcient);
             
             Console.Read();
         }

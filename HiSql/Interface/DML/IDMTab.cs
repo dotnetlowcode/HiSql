@@ -58,6 +58,9 @@ namespace HiSql
 
         string BuildFieldStatement(HiTable hiTable, HiColumn hiColumn);
 
+
+        //string BuildChangeFieldStatement(TabInfo tabInfo,)
+
         string BuildFieldStatment(HiTable hiTable, List<HiColumn> lstColumn);
 
         /// <summary>
