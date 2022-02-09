@@ -231,18 +231,18 @@ namespace HiSql
         public TabInfo GetTabStruct(string tabname)
         {
             string _schema = string.IsNullOrEmpty(Context.CurrentConnectionConfig.Schema) ? "dbo" : Context.CurrentConnectionConfig.Schema;
-            return HiSqlCommProvider.InitTabMaping(tabname, () => {
+            List<HiColumn> _lstmodi = new List<HiColumn>();
+            List<object> _lstdel = new List<object>();
+            HiSqlClient _client = null;
+            TabInfo newtabinfo = HiSqlCommProvider.InitTabMaping(tabname, () =>
+            {
                 tabname = tabname.ToSqlInject();
                 DataSet ds = new DataSet();
-
-                //test
-                //DataTable dt_model2 = this.Context.DBO.GetDataTable($"select * from SYSTEM.Hi_TabModel where TabName='Hi_TabModel'");
-                //this.Context.DBO.BeginTran();
-                DataTable dt_model = this.Context.DBO.GetDataTable($"select * from {dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{dbConfig.Table_After} where TabName=upper('{tabname}')",null);
+                DataTable dt_model = this.Context.DBO.GetDataTable($"select * from {dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{dbConfig.Table_After} where TabName='{tabname}'", new HiParameter("@TabName", tabname));
                 dt_model.TableName = Constants.HiSysTable["Hi_TabModel"].ToString();
                 ds.Tables.Add(dt_model);
 
-                DataTable dt_struct = Context.DBO.GetDataTable($"select * from {dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{dbConfig.Table_After} where TabName=upper('{tabname}') order by sortnum asc", null);
+                DataTable dt_struct = Context.DBO.GetDataTable($"select * from {dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{dbConfig.Table_After} where TabName='{tabname}' order by sortnum asc", new HiParameter("@TabName", tabname));
                 dt_struct.TableName = Constants.HiSysTable["Hi_FieldModel"].ToString();
                 ds.Tables.Add(dt_struct);
 
@@ -274,7 +274,9 @@ namespace HiSql
                         tabname.ToLower() != Constants.HiSysTable["Hi_TabModel"].ToString().ToLower()
                     )
                     {
-                        HiSqlClient _client = this.Context.CloneClient();
+                        #region 与物理表进行比对
+                        //如果不一样（则有变更物理表） 则以物理表的数据为准
+
                         var phytabInfo = TabDefinitionToEntity(dts, dbConfig.DbMapping);
                         List<FieldChange> fieldChanges = HiSqlCommProvider.TabToCompare(phytabInfo, tabInfo);
                         List<HiColumn> lstcolumn = tabInfo.GetColumns;
@@ -282,7 +284,7 @@ namespace HiSql
                         phytabInfo = HiSqlCommProvider.TabMerge(phytabInfo, tabInfo);
                         List<HiColumn> phyclumn = phytabInfo.GetColumns;
                         var delfield = fieldChanges.Where(f => f.Action == TabFieldAction.DELETE).ToList();
-                        var modifield = fieldChanges.Where(f => f.Action == TabFieldAction.ADD || f.Action == TabFieldAction.MODI).ToList();
+                        var modifield = fieldChanges.Where(f => f.Action == TabFieldAction.ADD || (f.Action == TabFieldAction.MODI && f.IsTabChange == true)).ToList();
                         if (delfield != null && delfield.Count > 0)
                         {
                             List<object> lstobj = new List<object>();
@@ -291,12 +293,13 @@ namespace HiSql
                                 HiColumn column = lstcolumn.Where(h => h.FieldName.ToLower() == fieldChange.FieldName.ToLower()).FirstOrDefault();
                                 if (column != null)
                                 {
-                                    lstobj.Add(new { TabName = column.TabName, FieldName = column.FieldName });
+                                    //lstobj.Add(new { TabName = column.TabName, FieldName = column.FieldName });
+                                    _lstdel.Add(new { TabName = column.TabName, FieldName = column.FieldName });
                                 }
                             }
                             if (lstobj.Count > 0)
                             {
-                                _client.Delete(Constants.HiSysTable["Hi_FieldModel"].ToString(), lstobj).ExecCommand();
+                                //_client.Delete(Constants.HiSysTable["Hi_FieldModel"].ToString(), lstobj).ExecCommand();
                             }
                         }
                         if (modifield != null && modifield.Count > 0)
@@ -308,19 +311,31 @@ namespace HiSql
                                 if (_column != null)
                                 {
                                     _column.TabName = phytabInfo.TabModel.TabName;
-                                    lstobj.Add(_column);
+                                    //lstobj.Add(_column);
+                                    _lstmodi.Add(_column);
                                 }
                             }
                             if (lstobj.Count > 0)
                             {
-                                _client.Modi(Constants.HiSysTable["Hi_FieldModel"].ToString(), lstobj).ExecCommand();
+                                //_client.Modi(Constants.HiSysTable["Hi_FieldModel"].ToString(), lstobj).ExecCommand();
                             }
                         }
                         tabInfo = phytabInfo;
+
+                        #endregion
                     }
                 }
                 return tabInfo;
             });
+
+            if (_lstdel.Count > 0 || _lstmodi.Count > 0)
+                _client = this.Context.CloneClient();
+
+            if (_lstdel.Count > 0)
+                _client.Delete(Constants.HiSysTable["Hi_FieldModel"].ToString(), _lstdel).ExecCommand();
+            if (_lstmodi.Count > 0)
+                _client.Modi(Constants.HiSysTable["Hi_FieldModel"].ToString(), _lstmodi).ExecCommand();
+            return newtabinfo;
         }
         #endregion
 

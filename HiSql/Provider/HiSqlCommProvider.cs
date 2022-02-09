@@ -160,6 +160,12 @@ namespace HiSql
                     hiColumn.RefField = column.RefField;
                     hiColumn.RefFields = column.RefFields;
                     hiColumn.RefFieldDesc = column.RefFieldDesc;
+
+
+                    hiColumn.IsRequire = column.IsRequire;
+                    hiColumn.IsShow = column.IsShow;
+                    hiColumn.IsSearch = column.IsSearch;
+                    
                 }
                 newColumns.Add(hiColumn);
             }
@@ -191,21 +197,30 @@ namespace HiSql
                     if (string.IsNullOrEmpty(column.TabName))
                         column.TabName = _column.TabName;
 
-                    if (!ClassExtensions.CompareProperties(column, _column))
+                    var rtntuple = ClassExtensions.CompareTabProperties(column, _column);
+
+                    //if (!ClassExtensions.CompareProperties(column, _column))
+                    //{
+                    //    //说明有变更
+                    //    fieldChanges.Add(new FieldChange { OldColumn=_column,NewColumn=column,  FieldName = column.FieldName, Action = TabFieldAction.MODI });
+                    //}
+                    //else
+                    //{
+                    //    //无变更
+                    //    fieldChanges.Add(new FieldChange { FieldName = column.FieldName, Action = TabFieldAction.NONE });
+                    //}
+
+                    if (!rtntuple.Item1)
                     {
-                        //说明有变更
-                        fieldChanges.Add(new FieldChange { FieldName = column.FieldName, Action = TabFieldAction.MODI });
+                        fieldChanges.Add(new FieldChange { IsTabChange=rtntuple.Item2, OldColumn = _column, NewColumn = column, FieldName = column.FieldName, Action = TabFieldAction.MODI });
                     }
-                    else
-                    {
-                        //无变更
-                        fieldChanges.Add(new FieldChange { FieldName = column.FieldName, Action = TabFieldAction.NONE });
-                    }
+
+
                 }
                 else
                 {
                     //说明是有新增字段或重命名字段
-                    fieldChanges.Add(new FieldChange { FieldName = column.FieldName, Action = TabFieldAction.ADD });
+                    fieldChanges.Add(new FieldChange { IsTabChange=true, NewColumn=column, FieldName = column.FieldName, Action = TabFieldAction.ADD });
                 }
             }
 
@@ -215,7 +230,7 @@ namespace HiSql
                 if (_column == null)
                 {
                     //说明该字段是删除
-                    fieldChanges.Add(new FieldChange { FieldName = column.FieldName, Action = TabFieldAction.DELETE });
+                    fieldChanges.Add(new FieldChange { IsTabChange=true, OldColumn= column, FieldName = column.FieldName, Action = TabFieldAction.DELETE });
                 }
 
             }

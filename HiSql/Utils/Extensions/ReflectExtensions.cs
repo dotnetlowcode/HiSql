@@ -44,6 +44,18 @@ namespace HiSql
         }
 
         /// <summary>
+        /// not in
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="thisValue"></param>
+        /// <param name="values"></param>
+        /// <returns></returns>
+        public static bool NotIn<T>(this T thisValue, params T[] values)
+        {
+            return !values.Contains(thisValue);
+        }
+
+        /// <summary>
         /// 是否是字符串类型的字段
         /// </summary>
         /// <param name="thisValue"></param>
