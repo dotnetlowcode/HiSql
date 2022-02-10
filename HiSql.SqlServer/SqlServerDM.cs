@@ -276,7 +276,7 @@ namespace HiSql
             if (hiColumn.DBDefault != HiTypeDBDefault.NONE)
             {
                 if (hiColumn.FieldType.IsIn<HiType>(HiType.NCHAR, HiType.CHAR, HiType.NVARCHAR, HiType.VARCHAR))
-                    _default = "''";
+                    _default = $"'{hiColumn.DefaultValue.ToSqlInject()}'";//modi by tgm date:20220210
                 else if (hiColumn.FieldType.IsIn<HiType>(HiType.INT, HiType.BIGINT, HiType.SMALLINT, HiType.DECIMAL, HiType.BOOL))
                 {
                     if (Tool.IsDecimal(hiColumn.DefaultValue.Trim()))
@@ -903,6 +903,59 @@ namespace HiSql
             }
             else return "";
         }
+
+        /// <summary>
+        /// 生成修改表结构字段语句
+        /// </summary>
+        /// <param name="hiTable"></param>
+        /// <param name="hiColumn"></param>
+        /// <returns></returns>
+        public string BuildChangeFieldStatement(HiTable hiTable, HiColumn hiColumn, TabFieldAction tabFieldAction)
+        {
+            string _fieldsql = BuildFieldStatement(hiTable, hiColumn);
+
+            var rtn=Tool.RegexGrpOrReplace(@""+ dbConfig.Field_Split + @"{1}\s*$", _fieldsql);
+            //_fieldsql.Replace()
+
+            if (rtn.Item1)
+            {
+                _fieldsql = rtn.Item3;
+            }
+
+
+            string _changesql = string.Empty;
+            if (tabFieldAction == TabFieldAction.ADD)
+                _changesql = dbConfig.Add_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$TempColumn$]", _fieldsql);
+            else if (tabFieldAction == TabFieldAction.DELETE)
+            {
+                var _delsql = dbConfig.Del_Default;
+                _delsql = _delsql.Replace("[$TabName$]", hiColumn.TabName)
+                .Replace("[$FieldName$]", hiColumn.FieldName)
+                .Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema);
+                _changesql = new StringBuilder()
+                    .AppendLine(_delsql)
+                    .AppendLine( dbConfig.Del_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$FieldName$]", $"{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}")).ToString();
+            
+                
+            }
+            else if (tabFieldAction == TabFieldAction.MODI)
+            {
+
+                var rtn1= Tool.RegexGrpOrReplace(@"\s*default\s*.*$", _fieldsql);
+                if (rtn1.Item1)
+                    _fieldsql = rtn1.Item3;
+                _changesql = new StringBuilder().AppendLine(dbConfig.Modi_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$TempColumn$]", _fieldsql))
+                    //.AppendLine(";go")
+                    .AppendLine(BuildFieldDefaultValue(hiColumn))
+                    .ToString();
+            }
+            else
+                return "";
+
+            
+
+            return _changesql;
+        }
         /// <summary>
         /// 生成字段语句
         /// </summary>
@@ -1137,6 +1190,24 @@ namespace HiSql
             }
             return sb_sql.ToString();
         }
+        
+
+        public string  BuildFieldDefaultValue(HiColumn hiColumn)
+        {
+            string _setsql = dbConfig.Set_Default;
+
+            string _value = GetDbDefault(hiColumn);
+
+            _setsql = _setsql.Replace("[$TabName$]", hiColumn.TabName)
+                .Replace("[$FieldName$]", hiColumn.FieldName)
+                .Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema)
+                .Replace("[$KEY$]", (hiColumn.TabName + hiColumn.FieldName).ToHash())
+                .Replace("[$DefValue$]", _value.Replace("'","''"))
+                ;
+
+            return _setsql;
+        }
+
 
         /// <summary>
         /// 解析hisql中间语言语法
