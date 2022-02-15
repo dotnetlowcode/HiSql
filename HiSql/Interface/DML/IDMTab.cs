@@ -1,6 +1,7 @@
 ﻿using HiSql.AST;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -40,6 +41,97 @@ namespace HiSql
         int BuildTabCreate(TabInfo tabInfo);
 
 
+        /// <summary>
+        /// 获取物理表或视图的信息
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <returns></returns>
+        DataTable GetTableDefinition(string tabname);
+
+        /// <summary>
+        /// 获取当前库所有物理表清单
+        /// </summary>
+        /// <returns></returns>
+        DataTable GetTableList();
+
+        /// <summary>
+        /// 获取当前库所有视图清单
+        /// </summary>
+        /// <returns></returns>
+        DataTable GetViewList();
+
+
+        /// <summary>
+        /// 创建视图
+        /// </summary>
+        /// <param name="viewname"></param>
+        /// <param name="viewsql"></param>
+        /// <returns></returns>
+        string CreateView(string viewname, string viewsql);
+
+        /// <summary>
+        /// 修改视图
+        /// </summary>
+        /// <param name="viewname"></param>
+        /// <param name="viewsql"></param>
+        /// <returns></returns>
+        string ModiView(string viewname, string viewsql);
+
+
+        /// <summary>
+        /// 删除视图
+        /// </summary>
+        /// <param name="viewname"></param>
+        /// <returns></returns>
+        string DropView(string viewname);
+
+
+        /// <summary>
+        /// 对指定表创建索引
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <param name="hiColumns"></param>
+        /// <returns></returns>
+        string CreateIndex(string tabname,string indexname,List<HiColumn> hiColumns);
+
+        /// <summary>
+        /// 删除索引
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <param name="indexname"></param>
+        /// <returns></returns>
+        string DropIndex(string tabname, string indexname);
+
+
+        /// <summary>
+        /// 获取所有表和视图
+        /// </summary>
+        /// <returns></returns>
+        DataTable GetAllTables();
+
+
+        /// <summary>
+        /// 获取表的过引列表
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <returns></returns>
+        List<TabIndex> GetIndexs(string tabname);
+
+
+        /// <summary>
+        /// 获取指定表指定表的索引明细
+        /// </summary>
+        /// <param name="indexname"></param>
+        /// <returns></returns>
+        List<TabIndexDetail> GetIndexDetails(string tabname, string indexname);
+        
+
+
+        /// <summary>
+        /// 获取全局临时表清单
+        /// </summary>
+        /// <returns></returns>
+        DataTable GetGlobalTables();
 
         string BuildTabStructSql(HiTable hiTable, List<HiColumn> lstHiTable);
 

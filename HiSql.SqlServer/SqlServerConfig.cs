@@ -100,6 +100,76 @@ namespace HiSql
         string _temp_deldefalut = "";
 
         /// <summary>
+        /// 所有物理实体表
+        /// </summary>
+        string _temp_gettables = "";
+
+        /// <summary>
+        /// 获取所有视图
+        /// </summary>
+        string _temp_getviews = "";
+
+        /// <summary>
+        /// 获取表和视图
+        /// </summary>
+        string _temp_getalltables = "";
+
+
+        /// <summary>
+        /// 检测表或视图是否存在
+        /// </summary>
+        string _temp_check_table_exists = "";
+
+        /// <summary>
+        /// 创建视图
+        /// </summary>
+        string _temp_create_view = "";
+
+
+        /// <summary>
+        /// 修改视图
+        /// </summary>
+        string _temp_modi_view = "";
+
+
+        /// <summary>
+        /// 删除视图
+        /// </summary>
+        string _temp_drop_view = "";
+
+
+        /// <summary>
+        /// 临时表查询
+        /// </summary>
+        string _temp_globaltempdb_query = "";
+
+
+        /// <summary>
+        /// 获取索引明细
+        /// </summary>
+        string _temp_get_indexdetail = "";
+
+
+        /// <summary>
+        /// 获取指定表的索引
+        /// </summary>
+        string _temp_get_tabindex = "";
+
+
+        /// <summary>
+        /// 索引创建模板
+        /// </summary>
+        string _temp_create_index = "";
+
+
+        /// <summary>
+        /// 删除索引
+        /// </summary>
+        string _temp_drop_index = "";
+
+       
+
+        /// <summary>
         /// 字段创建时的模板[$FieldName$]  这是一个可替换的字符串ColumnName是在HiColumn中的属性名
         /// </summary>
         Dictionary<string, string> _fieldtempmapping = new Dictionary<string, string> { };
@@ -197,6 +267,64 @@ namespace HiSql
         public string Set_Default { get => _temp_setdefalut; }
 
         public string Del_Default { get => _temp_deldefalut; }
+
+        public string Get_Tables { get => _temp_gettables; }
+
+        public string Get_Views { get => _temp_getviews; }
+
+        public string Get_AllTables { get => _temp_getalltables; }
+
+        /// <summary>
+        /// 获取创建视图的模板
+        /// </summary>
+        public string Get_CreateView { get => _temp_create_view; }
+
+
+        /// <summary>
+        /// 修改视图
+        /// </summary>
+        public string Get_ModiView { get => _temp_modi_view; }
+
+
+        /// <summary>
+        /// 删除视图
+        /// </summary>
+        public string Get_DropView { get => _temp_drop_view; }
+
+        /// <summary>
+        /// 获取表或视图是否存在
+        /// </summary>
+        public string Get_CheckTabExists { get => _temp_check_table_exists; }
+
+        /// <summary>
+        /// 获取全局临时表
+        /// </summary>
+        public string Get_GlobalTables { get => _temp_globaltempdb_query; }
+
+
+        /// <summary>
+        /// 获取索引明细
+        /// </summary>
+        public string Get_IndexDetail { get => _temp_get_indexdetail; }
+
+        /// <summary>
+        /// 获取指定表的索引
+        /// </summary>
+
+        public string Get_TabIndexs { get => _temp_get_tabindex; }
+
+
+
+        /// <summary>
+        /// 获取创建索引
+        /// </summary>
+        public string Get_CreateIndex { get => _temp_create_index; }
+
+
+        /// <summary>
+        /// 删除索引
+        /// </summary>
+        public string Get_DropIndex { get => _temp_drop_index; }
 
         /// <summary>
         /// 根据表的类型生成对应数据库的名称
@@ -515,7 +643,27 @@ UNION ALL
                 .AppendLine("   end")
                 .ToString();
 
-            _temp_deldefalut= new StringBuilder()
+
+            //获取当前库中所有的表
+            _temp_gettables = new StringBuilder()
+                .AppendLine("select [name] as TabName,(case when xtype='U' then 'Table' else 'View' end ) as TabType,crdate as CreateTime")
+                .AppendLine("from sysobjects where xtype='U' order by crdate desc ")
+                .ToString();
+
+            //获取所有视图
+            _temp_getviews = new StringBuilder()
+                .AppendLine("select [name] as TabName,(case when xtype='U' then 'Table' else 'View' end ) as TabType,crdate as CreateTime")
+                .AppendLine("from sysobjects where xtype='V' order by crdate desc ")
+                .ToString();
+
+            //获取表和视图
+            _temp_getalltables= new StringBuilder()
+                .AppendLine("select [name] as TabName,(case when xtype='U' then 'Table' else 'View' end ) as TabType,crdate as CreateTime ")
+                .AppendLine("from sysobjects where (xtype='U' or xtype='V')  order by xtype ASC, crdate desc ")
+                .ToString();
+
+            //删除字段默认值
+            _temp_deldefalut = new StringBuilder()
                 .AppendLine("declare @_constname varchar(200)")
                 .AppendLine("if exists(select a.name as fieldname, b.name as consname from syscolumns as a inner join sysobjects as b on a.cdefault=b.id where a.id=object_id('[$TabName$]') and a.name='[$FieldName$]')")
                 .AppendLine("   begin   ")
@@ -525,6 +673,123 @@ UNION ALL
                 .AppendLine("       exec('ALTER TABLE [$Schema$].[$TabName$] DROP CONSTRAINT '+@_constname)")
                 .AppendLine("   end")
                 .ToString();
+
+            //判断表或视图存不存在
+            _temp_check_table_exists = new StringBuilder()
+                .AppendLine("select [name] as TabName,(case when xtype='U' then 'Table' else 'View' end ) as TabType,crdate as CreateTime")
+                .AppendLine("from sysobjects where (xtype='V' or xtype='U' )   and [name]='[$TabName$]' ")
+                .ToString();
+
+
+            //创建视图
+            _temp_create_view = new StringBuilder()
+                .AppendLine("CREATE VIEW [$Schema$].[$TabName$]")
+                .AppendLine("AS")
+                .AppendLine("[$ViewSql$]")
+                .ToString();
+
+            //修改视图
+            _temp_modi_view= new StringBuilder()
+                .AppendLine("ALTER VIEW [$Schema$].[$TabName$]")
+                .AppendLine("AS")
+                .AppendLine("[$ViewSql$]")
+                .ToString();
+
+            //删除视图
+            _temp_drop_view = "DROP VIEW  [$Schema$].[$TabName$]";
+
+            //获取临时表清单
+            _temp_globaltempdb_query = "select [name] as TabName ,(case when name<>'' then 'Global' end) as TabType,crdate as CreateTime from tempdb.dbo.sysobjects where [name] like '##%' order by [name] , crdate desc";
+
+
+            //获取索引明细
+            _temp_get_indexdetail = new StringBuilder()
+                .AppendLine("SELECT")
+                .AppendLine("TableId=O.[object_id],")
+                .AppendLine("TableName=O.Name,")
+                .AppendLine("IndexId=ISNULL(KC.[object_id],IDX.index_id),")
+                .AppendLine("IndexName=IDX.Name,")
+                .AppendLine("IndexType=ISNULL(case KC.type_desc when 'PRIMARY_KEY_CONSTRAINT' then 'Key_Index' else 'Index' end,'Index'),")
+                .AppendLine("ColumnIdx=IDXC.index_column_id,")
+                .AppendLine("ColumnID=C.Column_id,")
+                .AppendLine("ColumnName=C.Name,")
+                .AppendLine("Sort=CASE INDEXKEY_PROPERTY(IDXC.[object_id],IDXC.index_id,IDXC.index_column_id,'IsDescending')")
+                .AppendLine("WHEN 1 THEN 'DESC' WHEN 0 THEN 'ASC' ELSE '' END,")
+                .AppendLine("IPrimary=CASE WHEN IDX.is_primary_key=1 THEN N'Y'ELSE N'' END,")
+                .AppendLine("[IsUnique]=CASE WHEN IDX.is_unique=1 THEN N'Y'ELSE N'' END,")
+                .AppendLine("Ignore_dup_key=CASE WHEN IDX.ignore_dup_key=1 THEN N'Y'ELSE N'' END,")
+                .AppendLine("Disabled=CASE WHEN IDX.is_disabled=1 THEN N'Y'ELSE N'' END,")
+                .AppendLine("Fill_factor=IDX.fill_factor,")
+                .AppendLine("Padded=CASE WHEN IDX.is_padded=1 THEN N'Y'ELSE N'' END")
+                .AppendLine("FROM sys.indexes IDX ")
+                .AppendLine("INNER JOIN sys.index_columns IDXC")
+                .AppendLine("ON IDX.[object_id]=IDXC.[object_id]")
+                .AppendLine("AND IDX.index_id=IDXC.index_id")
+                .AppendLine("LEFT JOIN sys.key_constraints KC")
+                .AppendLine("ON IDX.[object_id]=KC.[parent_object_id]")
+                .AppendLine("AND IDX.index_id=KC.unique_index_id")
+                .AppendLine("INNER JOIN sys.objects O")
+                .AppendLine("ON O.[object_id]=IDX.[object_id]")
+                .AppendLine("INNER JOIN sys.columns C")
+                .AppendLine("ON O.[object_id]=C.[object_id]")
+                .AppendLine("AND O.type='U'")
+                .AppendLine("AND O.is_ms_shipped=0")
+                .AppendLine("AND IDXC.Column_id=C.Column_id where O.name='[$TabName$]' and IDX.name='[$IndexName$]' ")
+                .ToString();
+
+            //获取指定表的索引清单
+            _temp_get_tabindex = new StringBuilder()
+                .AppendLine("select distinct TableName, IndexName,IndexType,[Disabled] from (")
+                .AppendLine("SELECT")
+                .AppendLine("TableId=O.[object_id],")
+                .AppendLine("TableName=O.Name,")
+                .AppendLine("IndexId=ISNULL(KC.[object_id],IDX.index_id),")
+                .AppendLine("IndexName=IDX.Name,")
+                .AppendLine("IndexType=ISNULL(case KC.type_desc when 'PRIMARY_KEY_CONSTRAINT' then 'Key_Index' else 'Index' end,'Index'),")
+                .AppendLine("ColumnIdx=IDXC.index_column_id,")
+                .AppendLine("ColumnID=C.Column_id,")
+                .AppendLine("ColumnName=C.Name,")
+                .AppendLine("Sort=CASE INDEXKEY_PROPERTY(IDXC.[object_id],IDXC.index_id,IDXC.index_column_id,'IsDescending')")
+                .AppendLine("WHEN 1 THEN 'DESC' WHEN 0 THEN 'ASC' ELSE '' END,")
+                .AppendLine("IPrimary=CASE WHEN IDX.is_primary_key=1 THEN N'Y'ELSE N'' END,")
+                .AppendLine("[IsUnique]=CASE WHEN IDX.is_unique=1 THEN N'Y'ELSE N'' END,")
+                .AppendLine("Ignore_dup_key=CASE WHEN IDX.ignore_dup_key=1 THEN N'Y'ELSE N'' END,")
+                .AppendLine("Disabled=CASE WHEN IDX.is_disabled=1 THEN N'Y'ELSE N'' END,")
+                .AppendLine("Fill_factor=IDX.fill_factor,")
+                .AppendLine("Padded=CASE WHEN IDX.is_padded=1 THEN N'Y'ELSE N'' END")
+                .AppendLine("FROM sys.indexes IDX ")
+                .AppendLine("INNER JOIN sys.index_columns IDXC")
+                .AppendLine("ON IDX.[object_id]=IDXC.[object_id]")
+                .AppendLine("AND IDX.index_id=IDXC.index_id")
+                .AppendLine("LEFT JOIN sys.key_constraints KC")
+                .AppendLine("ON IDX.[object_id]=KC.[parent_object_id]")
+                .AppendLine("AND IDX.index_id=KC.unique_index_id")
+                .AppendLine("INNER JOIN sys.objects O")
+                .AppendLine("ON O.[object_id]=IDX.[object_id]")
+                .AppendLine("INNER JOIN sys.columns C")
+                .AppendLine("ON O.[object_id]=C.[object_id]")
+                .AppendLine("AND O.type='U'")
+                .AppendLine("AND O.is_ms_shipped=0")
+                .AppendLine("AND IDXC.Column_id=C.Column_id where O.name='[$TabName$]'  ")
+                .AppendLine(") as hisql_index  ")
+                .ToString();
+
+
+            //表创建非聚集索引
+            _temp_create_index = new StringBuilder()
+                .AppendLine("CREATE NONCLUSTERED INDEX [$IndexName$] ON [$Schema$].[$TabName$]")
+                .AppendLine("(")
+                .AppendLine("[$Key$]")
+                .AppendLine(") WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)")
+                .AppendLine("ON [PRIMARY]")
+                
+                .ToString();
+
+            //删除索引
+            _temp_drop_index = new StringBuilder()
+                .AppendLine("DROP INDEX [$IndexName$] ON [$Schema$].[$TabName$]")
+                .ToString();
+
 
             //批量MERGE更新模版
             _temp_merge_into = new StringBuilder()

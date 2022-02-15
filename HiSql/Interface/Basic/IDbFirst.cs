@@ -55,7 +55,7 @@ namespace HiSql
         /// <param name="tabname"></param>
         /// <param name="columns"></param>
         /// <returns></returns>
-        Tuple<bool, string> CreateIndex(string tabname, List<HiColumn> columns);
+        Tuple<bool, string,string> CreateIndex(string tabname,string indexname, List<HiColumn> columns, OpLevel opLevel);
 
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace HiSql
         /// <param name="tabname"></param>
         /// <param name="indexname"></param>
         /// <returns></returns>
-        Tuple<bool, string> DelIndex(string tabname,string indexname);
+        Tuple<bool, string, string> DelIndex(string tabname,string indexname, OpLevel opLevel);
 
 
 
@@ -73,7 +73,7 @@ namespace HiSql
         /// </summary>
         /// <param name="tabname"></param>
         /// <returns></returns>
-        List<string> GetTabIndex(string tabname);
+        List<TabIndex> GetTabIndexs(string tabname);
 
         /// <summary>
         /// 获取表索引的字段列
@@ -81,21 +81,21 @@ namespace HiSql
         /// <param name="tabname"></param>
         /// <param name="indexname"></param>
         /// <returns></returns>
-        List<HiColumn> GetTabIndexColumn(string tabname, string indexname);
+        List<TabIndexDetail> GetTabIndexDetail(string tabname, string indexname);
 
 
         /// <summary>
         /// 获取所有物理表
         /// </summary>
         /// <returns></returns>
-        List<string> GetTables();
+        List<TableInfo> GetTables();
 
 
         /// <summary>
         /// 获取所有视图
         /// </summary>
         /// <returns></returns>
-        List<string> GetViews();
+        List<TableInfo> GetViews();
 
         /// <summary>
         /// 创建视图
@@ -103,14 +103,31 @@ namespace HiSql
         /// <param name="viewname"></param>
         /// <param name="viewsql"></param>
         /// <returns></returns>
-        Tuple<bool, string> CreateView(string viewname, string viewsql);
+        Tuple<bool, string,string> CreateView(string viewname, string viewsql, OpLevel opLevel);
 
 
+        /// <summary>
+        /// 修改视图
+        /// </summary>
+        /// <param name="viewname"></param>
+        /// <param name="viewsql"></param>
+        /// <param name="opLevel"></param>
+        /// <returns></returns>
+        Tuple<bool, string, string> ModiView(string viewname, string viewsql, OpLevel opLevel);
+
+
+        /// <summary>
+        /// 删除视图
+        /// </summary>
+        /// <param name="viewname"></param>
+        /// <param name="opLevel"></param>
+        /// <returns></returns>
+        Tuple<bool, string, string> DropView(string viewname,  OpLevel opLevel);
         /// <summary>
         /// 获取所有物理表和视图
         /// </summary>
         /// <returns></returns>
-        List<string> GetAllTables();
+        List<TableInfo> GetAllTables();
 
 
         /// <summary>
@@ -139,7 +156,7 @@ namespace HiSql
         /// 获取全局临时表
         /// </summary>
         /// <returns></returns>
-        List<string> GetGlobalTempTables();
+        List<TableInfo> GetGlobalTempTables();
 
         /// <summary>
         /// 创建表
