@@ -133,6 +133,14 @@ namespace HiSql
         public string Delete_TrunCate { get; }
 
         public string Drop_Table { get; }
+
+
+        public string Add_Column { get; }
+
+        public string Del_Column { get; }
+
+        public string Modi_Column { get; }
+
         /// <summary>
         /// 表批量更新
         /// </summary>

@@ -40,9 +40,54 @@ namespace HiSql
         /// <param name="hiColumn"></param>
         /// <param name="opLevel"></param>
         /// <returns></returns>
-        public Tuple<bool, string> AddColumn(string tabname, HiColumn hiColumn, OpLevel opLevel)
+        public Tuple<bool, string, string> AddColumn(string tabname, HiColumn hiColumn, OpLevel opLevel)
         {
-            throw new NotImplementedException();
+
+            bool _isok = false;
+            string _msg = "";
+            string _sql = "";
+
+            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
+
+            idm.Context = SqlClient.Context;
+            //获取当前最新物理表结构信息
+            HiSqlCommProvider.RemoveTabInfoCache(tabname);
+            //获取最新
+            TabInfo tabinfo= idm.GetTabStruct(tabname);
+            if (tabinfo.Columns.Any(c => c.FieldName.ToLower() == hiColumn.FieldName.ToLower()))
+            {
+                _msg = $"向表[{tabname}]添加新字段[{hiColumn.FieldName}]失败 原因:该字段[{hiColumn.FieldName}]已经存在于表[{tabname}]中";
+            }
+            else
+            {
+                _sql = idm.BuildChangeFieldStatement(tabinfo.TabModel, hiColumn, TabFieldAction.ADD);
+                if (opLevel == OpLevel.Execute)
+                {
+                    //执行数据库命令
+    
+                    _sqlClient.BeginTran();
+                    try
+                    {
+                        _sqlClient.Context.DBO.ExecCommand(_sql, null);
+                        _sqlClient.CommitTran();
+                        _isok = true;
+                        _msg = $"向表[{tabname}]添加字段[{hiColumn.FieldName}]成功";
+                    }
+                    catch (Exception E)
+                    {
+                        _sqlClient.RollBackTran();
+                        _isok = false;
+                        _msg = E.Message.ToString();
+                    }
+                }
+                else {
+                    _isok = true;
+                    _msg = $"向表[{tabname}]添加新字段[{hiColumn.FieldName}]检测成功";
+                }
+            }
+                _sql = idm.BuildChangeFieldStatement(tabinfo.TabModel, hiColumn, TabFieldAction.ADD);
+            return new Tuple<bool, string, string>(_isok, _msg, _sql);
+            //throw new NotImplementedException();
         }
 
         /// <summary>
@@ -95,9 +140,51 @@ namespace HiSql
         /// <param name="hiColumn"></param>
         /// <param name="opLevel"></param>
         /// <returns></returns>
-        public Tuple<bool, string> DelColumn(string tabname, HiColumn hiColumn, OpLevel opLevel)
+        public Tuple<bool, string, string> DelColumn(string tabname, HiColumn hiColumn, OpLevel opLevel)
         {
-            throw new NotImplementedException();
+            bool _isok = false;
+            string _msg = "";
+            string _sql = "";
+            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
+
+            idm.Context = SqlClient.Context;
+            //获取当前最新物理表结构信息
+            HiSqlCommProvider.RemoveTabInfoCache(tabname);
+            //获取最新
+            TabInfo tabinfo = idm.GetTabStruct(tabname);
+            if (!tabinfo.Columns.Any(c => c.FieldName.ToLower() == hiColumn.FieldName.ToLower()))
+            {
+                _msg = $"向表[{tabname}]删除字段[{hiColumn.FieldName}]失败 原因:该字段[{hiColumn.FieldName}]不存在于表[{tabname}]中";
+            }
+            else
+            {
+                _sql = idm.BuildChangeFieldStatement(tabinfo.TabModel, hiColumn, TabFieldAction.DELETE);
+                if (opLevel == OpLevel.Execute)
+                {
+                    //执行数据库命令
+
+                    _sqlClient.BeginTran();
+                    try
+                    {
+                        _sqlClient.Context.DBO.ExecCommand(_sql, null);
+                        _sqlClient.CommitTran();
+                        _isok = true;
+                        _msg = $"向表[{tabname}]删除字段[{hiColumn.FieldName}]成功";
+                    }
+                    catch (Exception E)
+                    {
+                        _sqlClient.RollBackTran();
+                        _isok = false;
+                        _msg = E.Message.ToString();
+                    }
+                }
+                else
+                {
+                    _isok = true;
+                    _msg = $"向表[{tabname}]删除字段[{hiColumn.FieldName}]检测成功";
+                }
+            }
+            return new Tuple<bool, string, string>(_isok, _msg, _sql);
         }
 
 
@@ -216,9 +303,54 @@ namespace HiSql
         /// <param name="hiColumn"></param>
         /// <param name="opLevel"></param>
         /// <returns></returns>
-        public Tuple<bool, string> ModiColumn(string tabname, HiColumn hiColumn, OpLevel opLevel)
+        public Tuple<bool, string,string> ModiColumn(string tabname, HiColumn hiColumn, OpLevel opLevel)
         {
-            throw new NotImplementedException();
+            bool _isok = false;
+            string _msg = "";
+            string _sql = "";
+            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
+
+            idm.Context = SqlClient.Context;
+            //获取当前最新物理表结构信息
+            HiSqlCommProvider.RemoveTabInfoCache(tabname);
+            //获取最新
+            TabInfo tabinfo = idm.GetTabStruct(tabname);
+            if (!tabinfo.Columns.Any(c => c.FieldName.ToLower() == hiColumn.FieldName.ToLower()))
+            {
+                _msg = $"向表[{tabname}]修改字段[{hiColumn.FieldName}]失败 原因:该字段[{hiColumn.FieldName}]不存在于表[{tabname}]中";
+            }
+            else
+            {
+                _sql = idm.BuildChangeFieldStatement(tabinfo.TabModel, hiColumn, TabFieldAction.MODI);
+                if (opLevel == OpLevel.Execute)
+                {
+                    //执行数据库命令
+                    _sqlClient.BeginTran();
+                    try
+                    {
+                        _sqlClient.Context.DBO.ExecCommand(_sql, null);
+                        _sqlClient.CommitTran();
+                        _isok = true;
+                        _msg = $"向表[{tabname}]修改字段[{hiColumn.FieldName}]成功";
+                    }
+                    catch (Exception E)
+                    {
+                        _sqlClient.RollBackTran();
+                        _isok = false;
+                        _msg = E.Message.ToString();
+                    }
+
+                    
+
+                    
+                }
+                else
+                {
+                    _isok = true;
+                    _msg = $"向表[{tabname}]修改字段[{hiColumn.FieldName}]检测成功";
+                }
+            }
+            return new Tuple<bool, string,string>(_isok, _msg, _sql);
         }
 
         /// <summary>
@@ -227,7 +359,7 @@ namespace HiSql
         /// <param name="tabInfo"></param>
         /// <param name="opLevel"></param>
         /// <returns></returns>
-        public Tuple<bool, string> ModiTable(TabInfo tabInfo, OpLevel opLevel)
+        public Tuple<bool, string,string> ModiTable(TabInfo tabInfo, OpLevel opLevel)
         {
             throw new NotImplementedException();
         }

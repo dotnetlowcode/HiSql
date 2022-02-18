@@ -94,6 +94,13 @@ namespace HiSql
         /// </summary>
         string _temp_sequence_temp = "";
 
+
+        string _temp_addcolumn = "alter table [$TabName$] add [$TempColumn$] ";
+
+        string _temp_delcolumn = "alter table [$TabName$] drop column [$FieldName$]";
+
+        string _temp_modicolumn = "alter table [$TabName$] alter column [$TempColumn$]";
+
         /// <summary>
         /// 字段创建时的模板[$FieldName$]  这是一个可替换的字符串ColumnName是在HiColumn中的属性名
         /// </summary>
@@ -173,6 +180,25 @@ namespace HiSql
         public string Sequence { get => _temp_sequence; }
 
         public string Sequence_Temp { get => _temp_sequence_temp; }
+
+
+
+        /// <summary>
+        /// 新添加列的模板
+        /// </summary>
+        public string Add_Column { get => _temp_addcolumn; }
+
+
+        /// <summary>
+        /// 删除列的模版
+        /// </summary>
+        public string Del_Column { get => _temp_delcolumn; }
+
+
+        /// <summary>
+        /// 修改列的模板
+        /// </summary>
+        public string Modi_Column { get => _temp_delcolumn; }
 
         /// <summary>
         /// 根据表的类型生成对应数据库的名称
