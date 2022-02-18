@@ -95,7 +95,9 @@ namespace HiSql
 
         string _temp_modicolumn = "alter table [$TabName$] alter column [$TempColumn$]";
 
-        
+        string _temp_setdefalut = "";
+
+        string _temp_deldefalut = "";
 
         /// <summary>
         /// 字段创建时的模板[$FieldName$]  这是一个可替换的字符串ColumnName是在HiColumn中的属性名
@@ -189,8 +191,12 @@ namespace HiSql
         /// <summary>
         /// 修改列的模板
         /// </summary>
-        public string Modi_Column { get => _temp_delcolumn; }
+        public string Modi_Column { get => _temp_modicolumn; }
 
+
+        public string Set_Default { get => _temp_setdefalut; }
+
+        public string Del_Default { get => _temp_deldefalut; }
 
         /// <summary>
         /// 根据表的类型生成对应数据库的名称
@@ -491,7 +497,34 @@ UNION ALL
                 .AppendLine("	order by a.id,a.colorder")
                 .ToString();
 
+            
+            _temp_setdefalut = new StringBuilder()
+                .AppendLine("declare @_constname varchar(200)")
+                .AppendLine("if exists(select a.name as fieldname, b.name as consname from syscolumns as a inner join sysobjects as b on a.cdefault=b.id where a.id=object_id('[$TabName$]') and a.name='[$FieldName$]')")
+                .AppendLine("   begin   ")
+                .AppendLine("       select @_constname = b.name from syscolumns as a ")
+                .AppendLine("       inner join sysobjects as b on a.cdefault=b.id")
+                .AppendLine("       where a.id=object_id('[$TabName$]') and a.name='[$FieldName$]'")
+                .AppendLine("       exec('ALTER TABLE [$Schema$].[$TabName$] DROP CONSTRAINT '+@_constname)")
+                .AppendLine("       exec('ALTER TABLE [$Schema$].[$TabName$] ADD CONSTRAINT '+@_constname+ ' [$DefValue$] ' + ' FOR [$FieldName$]' )")
+                .AppendLine("   end")
+                .AppendLine("else")
+                .AppendLine("   begin")
+                .AppendLine("       set @_constname ='DF_H_[$TabName$]_[$FieldName$]_[$KEY$]'")
+                .AppendLine("       exec('ALTER TABLE [$Schema$].[$TabName$] ADD CONSTRAINT '+@_constname + ' [$DefValue$] FOR [$FieldName$]')")
+                .AppendLine("   end")
+                .ToString();
 
+            _temp_deldefalut= new StringBuilder()
+                .AppendLine("declare @_constname varchar(200)")
+                .AppendLine("if exists(select a.name as fieldname, b.name as consname from syscolumns as a inner join sysobjects as b on a.cdefault=b.id where a.id=object_id('[$TabName$]') and a.name='[$FieldName$]')")
+                .AppendLine("   begin   ")
+                .AppendLine("       select @_constname = b.name from syscolumns as a ")
+                .AppendLine("       inner join sysobjects as b on a.cdefault=b.id")
+                .AppendLine("       where a.id=object_id('[$TabName$]') and a.name='[$FieldName$]'")
+                .AppendLine("       exec('ALTER TABLE [$Schema$].[$TabName$] DROP CONSTRAINT '+@_constname)")
+                .AppendLine("   end")
+                .ToString();
 
             //批量MERGE更新模版
             _temp_merge_into = new StringBuilder()

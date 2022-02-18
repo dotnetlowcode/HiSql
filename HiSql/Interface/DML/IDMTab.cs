@@ -58,10 +58,15 @@ namespace HiSql
 
         string BuildFieldStatement(HiTable hiTable, HiColumn hiColumn);
 
+        string BuildChangeFieldStatement(HiTable hiTable, HiColumn hiColumn, TabFieldAction tabFieldAction);
+
 
         //string BuildChangeFieldStatement(TabInfo tabInfo,)
 
         string BuildFieldStatment(HiTable hiTable, List<HiColumn> lstColumn);
+
+        string BuildFieldDefaultValue(HiColumn hiColumn);
+
 
         /// <summary>
         /// 检测向表插入数据

@@ -19,7 +19,7 @@ namespace HiSql
         /// <param name="tabname"></param>
         /// <param name="hiColumn"></param>
         /// <returns></returns>
-        Tuple<bool,string> ModiColumn(string tabname, HiColumn hiColumn,OpLevel opLevel);
+        Tuple<bool,string,string> ModiColumn(string tabname, HiColumn hiColumn,OpLevel opLevel);
 
         /// <summary>
         /// 添加列
@@ -27,7 +27,7 @@ namespace HiSql
         /// <param name="tabname"></param>
         /// <param name="hiColumn"></param>
         /// <returns></returns>
-        Tuple<bool, string> AddColumn(string tabname, HiColumn hiColumn, OpLevel opLevel);
+        Tuple<bool, string,string> AddColumn(string tabname, HiColumn hiColumn, OpLevel opLevel);
 
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace HiSql
         /// <param name="hiColumn"></param>
         /// <param name="opLevel"></param>
         /// <returns></returns>
-        Tuple<bool, string> DelColumn(string tabname, HiColumn hiColumn, OpLevel opLevel);
+        Tuple<bool, string, string> DelColumn(string tabname, HiColumn hiColumn, OpLevel opLevel);
 
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace HiSql
         /// <param name="tabInfo"></param>
         /// <param name="opLevel"></param>
         /// <returns></returns>
-        Tuple<bool, string> ModiTable(TabInfo tabInfo, OpLevel opLevel);
+        Tuple<bool, string,string> ModiTable(TabInfo tabInfo, OpLevel opLevel);
 
 
         /// <summary>
