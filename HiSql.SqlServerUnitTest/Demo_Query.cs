@@ -43,6 +43,9 @@ namespace HiSql.UnitTest
 
         static void Query_Demo9(HiSqlClient sqlClient)
         {
+
+            var _sql = sqlClient.HiSql("select * from HTest01 where  CreateTime>='2022-02-17 09:27:50' and CreateTime<='2022-03-22 09:27:50'").ToSql();
+
             var json = sqlClient.HiSql("select * from H_Test5 ").ToJson();
             if (!json.IsNullOrEmpty())
             {

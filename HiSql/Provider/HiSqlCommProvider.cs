@@ -31,17 +31,38 @@ namespace HiSql
                 .Replace("[$TABLE$]", table.TabName)
                 ;
         }
-        public static TabInfo InitTabMaping(string tabnane,Func<TabInfo> GetInfo)
+
+        /// <summary>
+        /// 初始化表结构缓存
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <param name="GetInfo"></param>
+        /// <returns></returns>
+        public static TabInfo InitTabMaping(string tabname,Func<TabInfo> GetInfo)
         {
             
-            string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", tabnane);
+            string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", tabname);
             return CacheContext.MCache.GetOrCreate<TabInfo>(_keyname, () => {
                 return GetInfo();
             });
                 
            
         }
+
+        /// <summary>
+        /// 移除表结构缓存信息
+        /// </summary>
+        /// <param name="tabname"></param>
+        public static void RemoveTabInfoCache(string tabname)
+        {
+            string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", tabname);
+            if(CacheContext.MCache.Exists(_keyname))
+                CacheContext.MCache.RemoveCache(_keyname);
+
+        }
         
+
+
 
         /// <summary>
         /// 将数据库类型转成HiSql的类型
@@ -165,6 +186,8 @@ namespace HiSql
                     hiColumn.IsRequire = column.IsRequire;
                     hiColumn.IsShow = column.IsShow;
                     hiColumn.IsSearch = column.IsSearch;
+
+                    //如果有扩展信息需要在此处赋值
                     
                 }
                 newColumns.Add(hiColumn);

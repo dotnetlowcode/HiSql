@@ -878,6 +878,37 @@ namespace HiSql
             else return "";
         }
         /// <summary>
+        /// 生成修改表结构字段语句
+        /// </summary>
+        /// <param name="hiTable"></param>
+        /// <param name="hiColumn"></param>
+        /// <returns></returns>
+        public string BuildChangeFieldStatement(HiTable hiTable, HiColumn hiColumn, TabFieldAction tabFieldAction)
+        {
+            string _fieldsql = BuildFieldStatement(hiTable, hiColumn);
+
+            var rtn = Tool.RegexGrpOrReplace(@",{1}\s*$", _fieldsql);
+            if (rtn.Item1)
+            {
+                _fieldsql = rtn.Item2["0"];
+            }
+
+
+            string _changesql = string.Empty;
+            if (tabFieldAction == TabFieldAction.ADD)
+                _changesql = dbConfig.Add_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$TempColumn$]", _fieldsql);
+            else if (tabFieldAction == TabFieldAction.DELETE)
+                _changesql = dbConfig.Del_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$FieldName$]", hiColumn.FieldName);
+            else if (tabFieldAction == TabFieldAction.MODI)
+                _changesql = dbConfig.Add_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$TempColumn$]", _fieldsql);
+            else
+                return "";
+
+
+
+            return _changesql;
+        }
+        /// <summary>
         /// 生成字段语句
         /// </summary>
         /// <param name="hiColumn"></param>
@@ -1116,6 +1147,22 @@ namespace HiSql
                 sb_sql.AppendLine(BuildFieldStatement(hiTable, hiColumn));
             }
             return sb_sql.ToString();
+        }
+
+        public string BuildFieldDefaultValue(HiColumn hiColumn)
+        {
+            string _setsql = "";// dbConfig.Set_Default;
+
+            string _value = GetDbDefault(hiColumn);
+
+            _setsql = _setsql.Replace("[$TabName$]", hiColumn.TabName)
+                .Replace("[$FieldName$]", hiColumn.FieldName)
+                .Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema)
+                .Replace("[$KEY$]", (hiColumn.TabName + hiColumn.FieldName).ToHash())
+                .Replace("[$DefValue$]", _value.Replace("'", "''"))
+                ;
+
+            return _setsql;
         }
 
         /// <summary>
@@ -2310,5 +2357,60 @@ namespace HiSql
         }
 
         #endregion
+
+
+        public DataTable GetTableList()
+        {
+            throw new NotImplementedException();
+        }
+
+        public DataTable GetViewList()
+        {
+            throw new NotImplementedException();
+        }
+
+        public DataTable GetAllTables()
+        {
+            throw new NotImplementedException();
+        }
+
+        public string CreateView(string viewname, string viewsql)
+        {
+            throw new NotImplementedException();
+        }
+        public string ModiView(string viewname, string viewsql)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string DropView(string viewname)
+        {
+            throw new NotImplementedException();
+        }
+
+        public DataTable GetGlobalTables()
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<TabIndex> GetIndexs(string tabname)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<TabIndexDetail> GetIndexDetails(string tabname, string indexname)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string CreateIndex(string tabname, string indexname, List<HiColumn> hiColumns)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string DropIndex(string tabname, string indexname)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

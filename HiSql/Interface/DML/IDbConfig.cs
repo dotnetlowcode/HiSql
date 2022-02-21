@@ -133,6 +133,80 @@ namespace HiSql
         public string Delete_TrunCate { get; }
 
         public string Drop_Table { get; }
+
+
+        public string Add_Column { get; }
+
+        public string Del_Column { get; }
+
+        public string Modi_Column { get; }
+
+        /// <summary>
+        /// 删除列的模版
+        /// </summary>
+        public string Set_Default { get; }
+
+
+        public string Del_Default { get ; }
+
+        public string Get_Tables { get  ; }
+
+        public string Get_Views { get  ; }
+
+        public string Get_AllTables { get ; }
+
+        /// <summary>
+        /// 获取创建视图的模板
+        /// </summary>
+        public string Get_CreateView { get ; }
+
+
+        /// <summary>
+        /// 修改视图
+        /// </summary>
+        public string Get_ModiView { get  ; }
+
+
+        /// <summary>
+        /// 删除视图
+        /// </summary>
+        public string Get_DropView { get  ; }
+
+        /// <summary>
+        /// 获取表或视图是否存在
+        /// </summary>
+        public string Get_CheckTabExists { get  ; }
+
+        /// <summary>
+        /// 获取全局临时表
+        /// </summary>
+        public string Get_GlobalTables { get  ; }
+
+
+        /// <summary>
+        /// 获取索引明细
+        /// </summary>
+        public string Get_IndexDetail { get ; }
+
+        /// <summary>
+        /// 获取指定表的索引
+        /// </summary>
+
+        public string Get_TabIndexs { get  ; }
+
+
+
+        /// <summary>
+        /// 获取创建索引
+        /// </summary>
+        public string Get_CreateIndex { get ; }
+
+
+        /// <summary>
+        /// 删除索引
+        /// </summary>
+        public string Get_DropIndex { get; }
+
         /// <summary>
         /// 表批量更新
         /// </summary>

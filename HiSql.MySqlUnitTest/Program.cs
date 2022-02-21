@@ -17,6 +17,7 @@ namespace HiSql.MySqlUnitTest
             //Demo_Insert.Init(sqlClient);
 
             //Demo_Delete.Init(sqlClient);
+            Demo_DbCode.Init(sqlClient);
         }
     }
 }

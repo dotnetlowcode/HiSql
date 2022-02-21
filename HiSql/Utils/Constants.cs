@@ -278,25 +278,25 @@ namespace HiSql
         //#tabname.field
         /// </summary>
         //public static string REG_FIELDANDRENAME = @"^(?:[\s]*)(?:(?<tab>[\#]?[\w]+)(?:[\.]{1}))?(?<field>[\w]+)\s*(?:(?i)as\s*(?<refield>[\w]+))?\s*$|(?:[\s]*)(?:(?<tab>[\#]?[\w]+)(?:[\.]{1}))(?<field>[\*]{1})\s*$|^(?:[\s]*)(?<field>[\*]{1})\s*$";
-        public static string REG_FIELDANDRENAME = @"^(?:[\s]*)(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w]+)(?:[\.]{1}))?(?<field>[\w]+)\s*(?:(?i)as\s*(?<refield>[\w]+))?\s*$|(?:[\s]*)(?:(?<tab>[\#]?[\w]+)(?:[\.]{1}))(?<field>[\*]{1})\s*$|^(?:[\s]*)(?<field>[\*]{1})\s*$";
+        public static string REG_FIELDANDRENAME = @"^(?:[\s]*)(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w-_]+)(?:[\.]{1}))?(?<field>[\w]+)\s*(?:(?i)as\s*(?<refield>[\w-_]+))?\s*$|(?:[\s]*)(?:(?<tab>[\#]?[\w-_]+)(?:[\.]{1}))(?<field>[\*]{1})\s*$|^(?:[\s]*)(?<field>[\*]{1})\s*$";
 
 
         /// <summary>
         /// 字段名 不带 as 重命名
         /// </summary>
-        public static string REG_FIELDNOASNAME = @"^(?:[\s]*)(?<left>(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w]+)(?:[\.]{1}))?(?<field>[\w]+))\s*";
+        public static string REG_FIELDNOASNAME = @"^(?:[\s]*)(?<left>(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w-_]+)(?:[\.]{1}))?(?<field>[\w-_]+))\s*";
 
         
         /// <summary>
         /// 解析表或字段的名称
         /// </summary>
-        public static string REG_NAME = @"^(?:[\s]*)(?<name>[\w]+)\s*$";
+        public static string REG_NAME = @"^(?:[\s]*)(?<name>[\w-_]+)\s*$";
 
 
         /// <summary>
         /// 解析表的名称
         /// </summary>
-        public static string REG_TABNAME = @"^(?:[\s]*)(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w]+)\s*$";
+        public static string REG_TABNAME = @"^(?:[\s]*)(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w-_]+)\s*$";
 
         /// <summary>
         /// 解析字段名称
@@ -305,7 +305,7 @@ namespace HiSql
         //TabName
         /// </summary>
         //public static string REG_FIELDNAME = @"^(?:[\s]*)(?:(?<tab>[\#]?[\w]+)(?:[\.]{1}))?(?<field>[\w]+)\s*$";
-        public static string REG_FIELDNAME = @"^(?:[\s]*)(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w]+)(?:[\.]{1}))?(?<field>[\w]+)\s*$";
+        public static string REG_FIELDNAME = @"^(?:[\s]*)(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w-_]+)(?:[\.]{1}))?(?<field>[\w-_]+)\s*$";
 
 
         /// <summary>
@@ -316,18 +316,18 @@ namespace HiSql
         /// '123'
         /// </summary>
         //public static string REG_FIELDEXPRESSION = @"^(?:[\s]*)(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w]+)(?:[\.]{1}))?(?<field>[\w]+)\s*(?<oper>\<\>|[\>\<=]{1}|\!=)\s*(?:(?<value>[-]?\d+(?:[\.]?)[\d]*)|[\']{1}(?<value>[\w\W0-9\s]*)[\']{1})";
-        public static string REG_FIELDEXPRESSION = @"^(?:(?:[\s]*)(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w]+)(?:[\.]{1}))?(?<field>[\w]+)\s*(?<oper>\<\>|[\>\<=]{1}|\!=|\>=|\<=))?\s*(?:(?<value>[-]?\d+(?:[\.]?)[\d]*)|[\']{1}(?<value>[\w\W0-9\s]*)[\']{1})";
+        public static string REG_FIELDEXPRESSION = @"^(?:(?:[\s]*)(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w-_]+)(?:[\.]{1}))?(?<field>[\w-_]+)\s*(?<oper>\<\>|[\>\<=]{1}|\!=|\>=|\<=))?\s*(?:(?<value>[-]?\d+(?:[\.]?)[\d]*)|[\']{1}(?<value>[\w\W0-9\s]*)[\']{1})";
 
 
 
-        public static string REG_SORT = @"^(?:[\s]*)(?<field>(?:(?:[\#]{1,2}|[\@]{1})?(?:[\w]+)(?:[\.]{1}))?(?:[\w]+))?\s*(?<sort>asc|desc)?\s*$";
+        public static string REG_SORT = @"^(?:[\s]*)(?<field>(?:(?:[\#]{1,2}|[\@]{1})?(?:[\w-_]+)(?:[\.]{1}))?(?:[\w]+))?\s*(?<sort>asc|desc)?\s*$";
 
 
 
         /// <summary>
         /// 表过式字段更新
         /// </summary>
-        public static string REG_UPDATE = @"[`](?:[\s]*)(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w]+)(?:[\.]{1}))?(?<field>[\w]+)[`]";
+        public static string REG_UPDATE = @"[`](?:[\s]*)(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w-_]+)(?:[\.]{1}))?(?<field>[\w-_]+)[`]";
 
         /// <summary>
         /// 解析表字段关联关系
@@ -335,7 +335,7 @@ namespace HiSql
         //UserName.Id    =    ulist.ddd
         /// </summary>
         //public static string REG_JOINON = @"^(?<left>(?:[\s]*)(?:(?<tab>[\#]?[\w]+)(?:[\.]{1}))?(?<field>[\w]+)\s*)=(?<right>(?:[\s]*)(?:(?<rtab>[\#]?[\w]+)(?:[\.]{1}))?(?<rfield>[\w]+)\s*)$";
-        public static string REG_JOINON = @"^(?<left>(?:[\s]*)(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w]+)(?:[\.]{1}))?(?<field>[\w]+)\s*)=(?<right>(?:[\s]*)(?:(?<rflag>[\#]{1,2}|[\@]{1})?(?<rtab>[\w]+)(?:[\.]{1}))?(?<rfield>[\w]+)\s*)";
+        public static string REG_JOINON = @"^(?<left>(?:[\s]*)(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w-_]+)(?:[\.]{1}))?(?<field>[\w-_]+)\s*)=(?<right>(?:[\s]*)(?:(?<rflag>[\#]{1,2}|[\@]{1})?(?<rtab>[\w-_]+)(?:[\.]{1}))?(?<rfield>[\w-_]+)\s*)";
 
 
         /// <summary>
@@ -345,12 +345,12 @@ namespace HiSql
         /// avg(a.fieldlen) as avgFieldLen   
         /// </summary>
         //public static string REG_FUNCTION = @"^(?:[\s]*)(?<fun>max|min|avg|sum|count)\s*[\(]\s*(?:(?<tab>[\#]?[\w]+)(?:[\.]{1}))?(?<field>[\w]+|[\*]{1})\s*[\)]\s*(?:as)\s*(?<refield>[\w]+)\s*$";
-        public static string REG_FUNCTION = @"^(?:[\s]*)(?<fun>max|min|avg|sum|count)\s*[\(]\s*(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w]+)(?:[\.]{1}))?(?<field>[\w]+|[\*]{1})\s*[\)]\s*(?:as)\s*(?<refield>[\w]+)\s*$";
+        public static string REG_FUNCTION = @"^(?:[\s]*)(?<fun>max|min|avg|sum|count)\s*[\(]\s*(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w-_]+)(?:[\.]{1}))?(?<field>[\w-_]+|[\*]{1})\s*[\)]\s*(?:as)\s*(?<refield>[\w-_]+)\s*$";
 
         /// <summary>
         /// 解析聚合函数 且无重命名 在having中专用
         /// </summary>
-        public static string REG_FUNCTIONNORENAME = @"^(?:[\s]*)(?<left>(?<fun>max|min|avg|sum|count)\s*[\(]\s*(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w]+)(?:[\.]{1}))?(?<field>[\w]+|[\*]{1})\s*[\)])\s*";
+        public static string REG_FUNCTIONNORENAME = @"^(?:[\s]*)(?<left>(?<fun>max|min|avg|sum|count)\s*[\(]\s*(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w-_]+)(?:[\.]{1}))?(?<field>[\w-_]+|[\*]{1})\s*[\)])\s*";
 
 
         public static string REG_SERVER = "";

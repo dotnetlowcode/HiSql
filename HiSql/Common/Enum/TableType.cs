@@ -16,6 +16,18 @@ namespace HiSql
         /// </summary>
         Entity = 0,
 
+        //202202新增
+        /// <summary>
+        /// 视图
+        /// </summary>
+        View=20,
+
+        //202202新增
+        /// <summary>
+        /// 存储过程
+        /// </summary>
+        //Procdure=21,
+
         /// <summary>
         /// 本地临时表
         /// </summary>
