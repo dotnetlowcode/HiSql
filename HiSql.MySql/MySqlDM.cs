@@ -878,12 +878,11 @@ namespace HiSql
         {
             string _fieldsql = BuildFieldStatement(hiTable, hiColumn);
 
-            var rtn = Tool.RegexGrpOrReplace(@",{1}\s*$", _fieldsql);
+            var rtn = Tool.RegexGrpOrReplace(@"" + dbConfig.Field_Split + @"{1}\s*$", _fieldsql);
             if (rtn.Item1)
             {
-                _fieldsql = rtn.Item2["0"];
+                _fieldsql = rtn.Item3;
             }
-
 
             string _changesql = string.Empty;
             if (tabFieldAction == TabFieldAction.ADD)
@@ -989,6 +988,9 @@ namespace HiSql
             }
             else
                 throw new Exception($"字段[{hiColumn.FieldName}] 对应的字段类型在SqlServer中没有做实现,帮该库不支持该类型");
+
+
+            
 
             return _str_temp_field;
         }
