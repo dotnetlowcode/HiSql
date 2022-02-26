@@ -2459,6 +2459,60 @@ namespace HiSql
 
             return _value;
         }
+
+        public DataTable GetTableList()
+        {
+            throw new NotImplementedException();
+        }
+
+        public DataTable GetViewList()
+        {
+            throw new NotImplementedException();
+        }
+
+        public DataTable GetAllTables()
+        {
+            throw new NotImplementedException();
+        }
+
+        public string CreateView(string viewname, string viewsql)
+        {
+            throw new NotImplementedException();
+        }
+        public string ModiView(string viewname, string viewsql)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string DropView(string viewname)
+        {
+            throw new NotImplementedException();
+        }
+
+        public DataTable GetGlobalTables()
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<TabIndex> GetIndexs(string tabname)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<TabIndexDetail> GetIndexDetails(string tabname, string indexname)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string CreateIndex(string tabname, string indexname, List<HiColumn> hiColumns)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string DropIndex(string tabname, string indexname)
+        {
+            throw new NotImplementedException();
+        }
         #endregion
     }
 }

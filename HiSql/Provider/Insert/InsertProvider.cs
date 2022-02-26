@@ -1107,8 +1107,8 @@ namespace HiSql
                 {
                     //中文按1个字符计算
                     //_value = "test";
-
-                    if (_value.Length > hiColumn.FieldLen)
+                    //当为max 时hiColumn.FieldLen == -1
+                    if (_value.Length > hiColumn.FieldLen && hiColumn.FieldLen>0)
                     {
                         throw new Exception($"字段[{hiColumn.FieldName}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
                     }
@@ -1125,9 +1125,9 @@ namespace HiSql
                 else if (hiColumn.FieldType.IsIn<HiType>(HiType.VARCHAR, HiType.CHAR, HiType.TEXT))
                 {
                     //中文按两个字符计算
-
+                    //当为max 时hiColumn.FieldLen == -1
                     //_value = "test";
-                    if (_value.LengthZH() > hiColumn.FieldLen)
+                    if (_value.LengthZH() > hiColumn.FieldLen && hiColumn.FieldLen > 0)
                     {
                         throw new Exception($"字段[{hiColumn.FieldName}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
                     }
@@ -1262,7 +1262,7 @@ namespace HiSql
                             //_value = "test";
 
                             _value = (string)objprop.GetValue(objdata);
-                            if (_value.Length > hiColumn.FieldLen)
+                            if (_value.Length > hiColumn.FieldLen && hiColumn.FieldLen>0)
                             {
                                 //sqlserver 的类型定义为varchar(max)
                                 if (hiColumn.FieldLen >= 0)
@@ -1283,7 +1283,7 @@ namespace HiSql
                             //中文按两个字符计算
                             _value = (string)objprop.GetValue(objdata);
                             //_value = "test";
-                            if (_value.LengthZH() > hiColumn.FieldLen)
+                            if (_value.LengthZH() > hiColumn.FieldLen &&  hiColumn.FieldLen > 0)
                             {
                                 throw new Exception($"字段[{objprop.Name}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
                             }

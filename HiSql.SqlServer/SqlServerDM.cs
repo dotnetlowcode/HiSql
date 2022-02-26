@@ -13,7 +13,7 @@ namespace HiSql
     /// <summary>
     /// 数据库的基础操作类
     /// </summary>
-    public class SqlServerDM : IDM
+    public partial class SqlServerDM : IDM
     {
         StringBuilder _Sql = new StringBuilder();
         public virtual HiSqlProvider Context { get; set; }
@@ -977,7 +977,7 @@ namespace HiSql
                         case "nchar":
                         case "char":
                             _str_temp_field = _str_temp_field.Replace("[$FieldName$]", hiColumn.FieldName)
-                                .Replace("[$FieldLen$]", hiColumn.FieldLen.ToString())
+                                .Replace("[$FieldLen$]", hiColumn.FieldLen<0?"max": hiColumn.FieldLen.ToString())
                                 .Replace("[$IsNull$]", hiColumn.IsPrimary ? "NOT NULL" : hiColumn.IsNull == true ? "NULL" : "NOT NULL")
                                 .Replace("[$Default$]", hiColumn.IsPrimary ? "" : GetDbDefault(hiColumn))
                                 .Replace("[$EXTEND$]", hiTable.TableType == TableType.Var && hiColumn.IsPrimary ? "primary key" : "")
@@ -1070,6 +1070,88 @@ namespace HiSql
             if (dt.Rows.Count == 0)
                 throw new Exception($"表[{tabname}]不存在");
             return dt;
+        }
+
+
+        public DataTable GetTableList()
+        {
+            return Context.DBO.GetDataTable(dbConfig.Get_Tables);
+        }
+        public DataTable GetViewList()
+        {
+            return Context.DBO.GetDataTable(dbConfig.Get_Views);
+        }
+
+        /// <summary>
+        /// 创建视图
+        /// </summary>
+        /// <param name="viewname"></param>
+        /// <param name="viewsql"></param>
+        /// <returns></returns>
+        public string CreateView(string viewname, string viewsql)
+        {
+            DataTable dt = Context.DBO.GetDataTable(dbConfig.Get_CheckTabExists.Replace("[$TabName$]", viewname));
+            if (dt.Rows.Count == 0)
+            {
+                //视图名称没有被占用
+
+                string _tempsql = dbConfig.Get_CreateView
+                    .Replace("[$Schema$]",$"{dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}")
+                    .Replace("[$TabName$]",$"{dbConfig.Table_Pre}{viewname}{dbConfig.Table_After}")
+                    .Replace("[$ViewSql$]", viewsql)
+                    ;
+                return _tempsql;
+            }
+            else
+            {
+                throw new Exception($"视图名称[{viewname}]已经被使用");
+            }
+        }
+
+        /// <summary>
+        /// 修改视图
+        /// </summary>
+        /// <param name="viewname"></param>
+        /// <param name="viewsql"></param>
+        /// <returns></returns>
+        public string ModiView(string viewname, string viewsql)
+        {
+            DataTable dt = Context.DBO.GetDataTable(dbConfig.Get_CheckTabExists.Replace("[$TabName$]", viewname));
+            if (dt.Rows.Count > 0)
+            {
+                string _tempsql = dbConfig.Get_ModiView
+                    .Replace("[$Schema$]", $"{dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}")
+                    .Replace("[$TabName$]", $"{dbConfig.Table_Pre}{viewname}{dbConfig.Table_After}")
+                    .Replace("[$ViewSql$]", viewsql)
+                    ;
+                return _tempsql;
+            }else
+                throw new Exception($"视图名称[{viewname}]不存在无法修改");
+        }
+
+        /// <summary>
+        /// 删除视图
+        /// </summary>
+        /// <param name="viewname"></param>
+        /// <returns></returns>
+        public string DropView(string viewname)
+        {
+            DataTable dt = Context.DBO.GetDataTable(dbConfig.Get_CheckTabExists.Replace("[$TabName$]", viewname));
+            if (dt.Rows.Count > 0)
+            {
+                string _tempsql = dbConfig.Get_DropView
+                    .Replace("[$Schema$]", $"{dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}")
+                    .Replace("[$TabName$]", $"{dbConfig.Table_Pre}{viewname}{dbConfig.Table_After}");
+                return _tempsql;
+            }
+            else
+                throw new Exception($"视图名称[{viewname}]不存在无法删除");
+        }
+
+
+        public DataTable GetAllTables()
+        {
+            return Context.DBO.GetDataTable(dbConfig.Get_AllTables);
         }
 
         /// <summary>
@@ -2396,6 +2478,138 @@ namespace HiSql
             return _value;
         }
 
+        /// <summary>
+        /// 获取全局表清单
+        /// </summary>
+        /// <returns></returns>
+        public DataTable GetGlobalTables()
+        {
+            return Context.DBO.GetDataTable(dbConfig.Get_GlobalTables);
+            
+        }
+
+
+        /// <summary>
+        /// 获取指定表的索引清单
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <returns></returns>
+        public List<TabIndex> GetIndexs(string tabname)
+        {
+            string _sql = dbConfig.Get_TabIndexs.Replace("[$TabName$]", tabname);
+
+            List<TabIndex> lstindex = new List<TabIndex>();
+            DataTable dt = Context.DBO.GetDataTable(_sql);
+            if (dt.Rows.Count > 0)
+            {
+                foreach (DataRow dr in dt.Rows)
+                {
+                    TabIndex tabIndex = new TabIndex();
+                    tabIndex.TabName = tabname;
+                    tabIndex.IndexName = dr["IndexName"].ToString();
+                    tabIndex.IndexType = dr["IndexType"].ToString();
+                    lstindex.Add(tabIndex);
+                }
+                return lstindex;
+            }
+            else
+                return new List<TabIndex>();
+
+        }
+
+        /// <summary>
+        /// 获取索引明细
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <param name="indexname"></param>
+        /// <returns></returns>
+        public List<TabIndexDetail> GetIndexDetails(string tabname, string indexname)
+        {
+            string _sql = dbConfig.Get_IndexDetail.Replace("[$TabName$]", tabname).Replace("[$IndexName$]", indexname);
+            List<TabIndexDetail> lstindex = new List<TabIndexDetail>();
+            DataTable dt = Context.DBO.GetDataTable(_sql);
+            if (dt.Rows.Count > 0)
+            {
+                foreach (DataRow dr in dt.Rows)
+                {
+                    TabIndexDetail tabIndex = new TabIndexDetail();
+                    tabIndex.TabName = tabname;
+                    tabIndex.ColumnName = dr["ColumnName"].ToString();
+                    tabIndex.IndexName = dr["IndexName"].ToString();
+                    tabIndex.IndexType = dr["IndexType"].ToString();
+                    tabIndex.ColumnIdx = Convert.ToInt32(dr["ColumnIdx"].ToString());
+                    tabIndex.ColumnId = Convert.ToInt32(dr["ColumnID"].ToString());
+                    tabIndex.SortType = dr["Sort"].ToString().ToLower() == "asc" ? SortType.ASC : SortType.DESC;
+                    tabIndex.IsPrimary = dr["IPrimary"].ToString() == "Y" ? true : false;
+                    tabIndex.IsUnique = dr["IsUnique"].ToString() == "Y" ? true : false;
+
+
+                    lstindex.Add(tabIndex);
+                }
+                return lstindex;
+            }
+            else
+                return new List<TabIndexDetail>();
+        }
+
+        /// <summary>
+        /// 创建索引
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <param name="indexname"></param>
+        /// <param name="hiColumns"></param>
+        /// <returns></returns>
+        public string CreateIndex(string tabname,string indexname, List<HiColumn> hiColumns)
+        {
+
+            //注未判断索引是否重复，由底层库抛出
+            string _sql = dbConfig.Get_CreateIndex.Replace("[$TabName$]", tabname).Replace("[$IndexName$]", indexname).Replace("[$Schema$]",Context.CurrentConnectionConfig.Schema);
+            DataTable dt = GetTableDefinition(tabname);
+            string _fields = string.Empty;
+
+            if (dt.Rows.Count > 0)
+            {
+                if (hiColumns.Count > 0)
+                {
+                    int i = 0;
+                    StringBuilder keys = new StringBuilder();
+                    foreach (HiColumn hiColumn in hiColumns)
+                    {
+                        if (!dt.AsEnumerable().Any(t => t.Field<string>("FieldName").ToLower() == hiColumn.FieldName.ToLower()))
+                            throw new Exception($"为表[{tabname}]创建的索引指的字段[{hiColumn.FieldName}]不存在于表[{tabname}]中");
+
+                        string _tempkey = dbConfig.Table_Key2.Replace("[$FieldName$]", hiColumn.FieldName);
+                        if (i < hiColumns.Count - 1)
+                            keys.AppendLine($"{_tempkey}{dbConfig.Field_Split}");
+                        else
+                            keys.AppendLine($"{_tempkey}");
+                        i++;
+                    }
+                    _sql = _sql.Replace("[$Key$]", keys.ToString());
+                    return _sql;
+                }
+                else
+                    throw new Exception("索引创建必须指定字段");
+            }
+            else
+                throw new Exception($"表[{tabname}]不存在,无法创建索引");
+        }
+
+        /// <summary>
+        /// 删除索引
+        /// </summary>
+        /// <param name="indexname"></param>
+        /// <returns></returns>
+        public string DropIndex(string tabname, string indexname)
+        {
+            //暂未校验索引是否存在 由底层数据库抛出
+            string _sql = dbConfig.Get_DropIndex.Replace("[$IndexName$]", indexname).Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema)
+                .Replace("[$TabName$]",tabname)
+                ;
+
+
+            return _sql;
+        }
         #endregion
     }
 }

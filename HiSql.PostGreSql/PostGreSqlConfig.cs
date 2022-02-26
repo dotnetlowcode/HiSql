@@ -97,11 +97,84 @@ namespace HiSql
         /// </summary>
         string _temp_sequence_temp = "";
 
+
         string _temp_addcolumn = "alter table [$TabName$] add [$TempColumn$] ";
 
         string _temp_delcolumn = "alter table [$TabName$] drop column [$FieldName$]";
 
         string _temp_modicolumn = "alter table [$TabName$] alter column [$TempColumn$]";
+
+        string _temp_setdefalut = "";
+
+        string _temp_deldefalut = "";
+
+        /// <summary>
+        /// 所有物理实体表
+        /// </summary>
+        string _temp_gettables = "";
+
+        /// <summary>
+        /// 获取所有视图
+        /// </summary>
+        string _temp_getviews = "";
+
+        /// <summary>
+        /// 获取表和视图
+        /// </summary>
+        string _temp_getalltables = "";
+
+
+        /// <summary>
+        /// 检测表或视图是否存在
+        /// </summary>
+        string _temp_check_table_exists = "";
+
+        /// <summary>
+        /// 创建视图
+        /// </summary>
+        string _temp_create_view = "";
+
+
+        /// <summary>
+        /// 修改视图
+        /// </summary>
+        string _temp_modi_view = "";
+
+
+        /// <summary>
+        /// 删除视图
+        /// </summary>
+        string _temp_drop_view = "";
+
+
+        /// <summary>
+        /// 临时表查询
+        /// </summary>
+        string _temp_globaltempdb_query = "";
+
+
+        /// <summary>
+        /// 获取索引明细
+        /// </summary>
+        string _temp_get_indexdetail = "";
+
+
+        /// <summary>
+        /// 获取指定表的索引
+        /// </summary>
+        string _temp_get_tabindex = "";
+
+
+        /// <summary>
+        /// 索引创建模板
+        /// </summary>
+        string _temp_create_index = "";
+
+
+        /// <summary>
+        /// 删除索引
+        /// </summary>
+        string _temp_drop_index = "";
 
 
         /// <summary>
@@ -189,6 +262,7 @@ namespace HiSql
 
 
 
+
         /// <summary>
         /// 新添加列的模板
         /// </summary>
@@ -204,7 +278,70 @@ namespace HiSql
         /// <summary>
         /// 修改列的模板
         /// </summary>
-        public string Modi_Column { get => _temp_delcolumn; }
+        public string Modi_Column { get => _temp_modicolumn; }
+
+
+        public string Set_Default { get => _temp_setdefalut; }
+
+        public string Del_Default { get => _temp_deldefalut; }
+
+        public string Get_Tables { get => _temp_gettables; }
+
+        public string Get_Views { get => _temp_getviews; }
+
+        public string Get_AllTables { get => _temp_getalltables; }
+
+        /// <summary>
+        /// 获取创建视图的模板
+        /// </summary>
+        public string Get_CreateView { get => _temp_create_view; }
+
+
+        /// <summary>
+        /// 修改视图
+        /// </summary>
+        public string Get_ModiView { get => _temp_modi_view; }
+
+
+        /// <summary>
+        /// 删除视图
+        /// </summary>
+        public string Get_DropView { get => _temp_drop_view; }
+
+        /// <summary>
+        /// 获取表或视图是否存在
+        /// </summary>
+        public string Get_CheckTabExists { get => _temp_check_table_exists; }
+
+        /// <summary>
+        /// 获取全局临时表
+        /// </summary>
+        public string Get_GlobalTables { get => _temp_globaltempdb_query; }
+
+
+        /// <summary>
+        /// 获取索引明细
+        /// </summary>
+        public string Get_IndexDetail { get => _temp_get_indexdetail; }
+
+        /// <summary>
+        /// 获取指定表的索引
+        /// </summary>
+
+        public string Get_TabIndexs { get => _temp_get_tabindex; }
+
+
+
+        /// <summary>
+        /// 获取创建索引
+        /// </summary>
+        public string Get_CreateIndex { get => _temp_create_index; }
+
+
+        /// <summary>
+        /// 删除索引
+        /// </summary>
+        public string Get_DropIndex { get => _temp_drop_index; }
 
         /// <summary>
         /// 根据表的类型生成对应数据库的名称
