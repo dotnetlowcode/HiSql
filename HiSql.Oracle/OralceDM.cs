@@ -2335,17 +2335,17 @@ namespace HiSql
             return _value;
         }
 
-        public DataTable GetTableList()
+        public DataTable GetTableList(string tabname = "")
         {
             throw new NotImplementedException();
         }
 
-        public DataTable GetViewList()
+        public DataTable GetViewList(string viewname="")
         {
             throw new NotImplementedException();
         }
 
-        public DataTable GetAllTables()
+        public DataTable GetAllTables(string tabname = "")
         {
             throw new NotImplementedException();
         }
@@ -2385,6 +2385,11 @@ namespace HiSql
         }
 
         public string DropIndex(string tabname, string indexname)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string BuildReTableStatement(string tabname, string newtabname)
         {
             throw new NotImplementedException();
         }

@@ -63,7 +63,7 @@ namespace HiSql
             (
 
                  p.Name.ToLower().IsIn("FieldDesc".ToLower(), "IsIdentity".ToLower(), "IsPrimary".ToLower(), "FieldName".ToLower(),
-                "FieldType".ToLower(), "DefaultValue".ToLower(), "FieldLen".ToLower(), "FieldDec".ToLower(), "IsNull".ToLower())
+                "FieldType".ToLower(), "DefaultValue".ToLower(), "FieldLen".ToLower(), "FieldDec".ToLower(), "IsNull".ToLower(), "ReFieldName".ToLower())
             )
             && p.MemberType == MemberTypes.Property).ToArray();
             foreach (var po in props)
