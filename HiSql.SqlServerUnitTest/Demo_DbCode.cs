@@ -10,13 +10,18 @@ namespace HiSql
     {
         public static void Init(HiSqlClient sqlClient)
         {
+
+            Console.WriteLine("表操作测试");
             //Demo_AddColumn(sqlClient);
 
             //Demo_ModiColumn(sqlClient);
+            //Demo_ReColumn(sqlClient);
+            //Demo_ModiTable(sqlClient);
+            //Demo_ReTable(sqlClient);
             //Demo_DelColumn(sqlClient);
             //Demo_Tables(sqlClient);
             //Demo_View(sqlClient);
-            //Demo_AllTables(sqlClient);
+            Demo_AllTables(sqlClient);
             //Demo_GlobalTables(sqlClient);
             //Demo_DropView(sqlClient);
             //Demo_CreateView(sqlClient);
@@ -28,7 +33,20 @@ namespace HiSql
 
         }
 
-
+        static void Demo_ReTable(HiSqlClient sqlClient)
+        {
+            //OpLevel.Execute  表示执行并返回生成的SQL
+            //OpLevel.Check 表示仅做检测失败时返回消息且检测成功时返因生成的SQL
+            var rtn = sqlClient.DbFirst.ReTable("H_Test5_1", "H_Test5",OpLevel.Execute);
+            if (rtn.Item1)
+            {
+                Console.WriteLine(rtn.Item2);//输出成功消息
+                Console.WriteLine(rtn.Item3);//输出重命名表 生成的SQL
+            }
+            else
+                Console.WriteLine(rtn.Item2);//输出重命名失败原因
+            
+        }
         static void Demo_Index_Create(HiSqlClient sqlClient)
         {
 
@@ -104,38 +122,59 @@ namespace HiSql
 
         static void Demo_CreateView(HiSqlClient sqlClient)
         {
+            //OpLevel.Execute  表示执行并返回生成的SQL
+            //OpLevel.Check 表示仅做检测失败时返回消息且检测成功时返因生成的SQL
             var rtn = sqlClient.DbFirst.CreateView("vw_FModel", 
                 sqlClient.HiSql("select a.TabName,b.TabReName,b.TabDescript,a.FieldName,a.SortNum,a.FieldType from Hi_FieldModel as a inner join Hi_TabModel as b on a.TabName=b.TabName").ToSql(), 
-                
                 OpLevel.Execute);
 
-            Console.WriteLine(rtn.Item2);
-            Console.WriteLine(rtn.Item3);
+            if (rtn.Item1)
+            {
+                Console.WriteLine(rtn.Item2);//输出成功消息
+                Console.WriteLine(rtn.Item3);//输出 生成的SQL
+            }
+            else
+                Console.WriteLine(rtn.Item2);//输出失败原因
         }
 
         static void Demo_ModiView(HiSqlClient sqlClient)
         {
+            //OpLevel.Execute  表示执行并返回生成的SQL
+            //OpLevel.Check 表示仅做检测失败时返回消息且检测成功时返因生成的SQL
             var rtn = sqlClient.DbFirst.ModiView("vw_FModel",
                 sqlClient.HiSql("select a.TabName,b.TabReName,b.TabDescript,a.FieldName,a.SortNum,a.FieldType from Hi_FieldModel as a inner join Hi_TabModel as b on a.TabName=b.TabName where b.TabType in (0,1)").ToSql(),
-
                 OpLevel.Execute);
 
-            Console.WriteLine(rtn.Item2);
-            Console.WriteLine(rtn.Item3);
+            if (rtn.Item1)
+            {
+                Console.WriteLine(rtn.Item2);//输出成功消息
+                Console.WriteLine(rtn.Item3);//输出 生成的SQL
+            }
+            else
+                Console.WriteLine(rtn.Item2);//输出失败原因
         }
 
         static void Demo_DropView(HiSqlClient sqlClient)
         {
+            //OpLevel.Execute  表示执行并返回生成的SQL
+            //OpLevel.Check 表示仅做检测失败时返回消息且检测成功时返因生成的SQL
             var rtn = sqlClient.DbFirst.DropView("vw_FModel",
             
                 OpLevel.Execute);
 
-            Console.WriteLine(rtn.Item2);
-            Console.WriteLine(rtn.Item3);
+            if (rtn.Item1)
+            {
+                Console.WriteLine(rtn.Item2);//输出成功消息
+                Console.WriteLine(rtn.Item3);//输出 生成的SQL
+            }
+            else
+                Console.WriteLine(rtn.Item2);//输出失败原因
         }
 
         static void Demo_AddColumn(HiSqlClient sqlClient)
         {
+            //OpLevel.Execute  表示执行并返回生成的SQL
+            //OpLevel.Check 表示仅做检测失败时返回消息且检测成功时返因生成的SQL
             HiColumn column = new HiColumn()
             {
                 TabName = "H_Test5",
@@ -148,9 +187,15 @@ namespace HiSql
 
             };
 
-             var rtn= sqlClient.DbFirst.AddColumn("H_Test5", column, OpLevel.Execute);
+            var rtn= sqlClient.DbFirst.AddColumn("H_Test5", column, OpLevel.Execute);
 
-            Console.WriteLine(rtn.Item2);
+            if (rtn.Item1)
+            {
+                Console.WriteLine(rtn.Item2);//输出成功消息
+                Console.WriteLine(rtn.Item3);//输出 生成的SQL
+            }
+            else
+                Console.WriteLine(rtn.Item2);//输出失败原因
         }
 
         static void Demo_DelColumn(HiSqlClient sqlClient)
@@ -172,28 +217,77 @@ namespace HiSql
             Console.WriteLine(rtn.Item2);
         }
 
+
+        static void Demo_ReColumn(HiSqlClient sqlClient)
+        {
+            //OpLevel.Execute  表示执行并返回生成的SQL
+            //OpLevel.Check 表示仅做检测失败时返回消息且检测成功时返因生成的SQL
+            HiColumn column = new HiColumn()
+            {
+                TabName = "H_Test5",
+                FieldName = "Testname3",
+                ReFieldName = "Testname2",
+                FieldType = HiType.VARCHAR,
+                FieldLen = 50,
+                DBDefault = HiTypeDBDefault.VALUE,
+                DefaultValue = "TGM",
+                FieldDesc = "测试字段变更"
+
+            };
+
+            var rtn = sqlClient.DbFirst.ReColumn("H_Test5", column, OpLevel.Execute);
+            if (rtn.Item1)
+            {
+                Console.WriteLine(rtn.Item2);//输出成功消息
+                Console.WriteLine(rtn.Item3);//输出 生成的SQL
+            }
+            else
+                Console.WriteLine(rtn.Item2);//输出失败原因
+        }
+
+        static void Demo_ModiTable(HiSqlClient sqlClient)
+        {
+            //OpLevel.Execute  表示执行并返回生成的SQL
+            //OpLevel.Check 表示仅做检测失败时返回消息且检测成功时返因生成的SQL
+            var tabinfo = sqlClient.Context.DMInitalize.GetTabStruct("H_Test5");
+
+            TabInfo _tabcopy = ClassExtensions.DeepCopy<TabInfo>(tabinfo);
+            _tabcopy.Columns[2].ReFieldName = "Testname3";
+            var rtn= sqlClient.DbFirst.ModiTable(_tabcopy, OpLevel.Execute);
+            if (rtn.Item1)
+            {
+                Console.WriteLine(rtn.Item2);//输出成功消息
+                Console.WriteLine(rtn.Item3);//输出 生成的SQL
+            }
+            else
+                Console.WriteLine(rtn.Item2);//输出失败原因
+
+        }
+
         static void Demo_ModiColumn(HiSqlClient sqlClient)
         {
+            //OpLevel.Execute  表示执行并返回生成的SQL
+            //OpLevel.Check 表示仅做检测失败时返回消息且检测成功时返因生成的SQL
             HiColumn column = new HiColumn()
             {
                 TabName = "H_Test5",
                 FieldName = "TestAdd",
                 FieldType = HiType.VARCHAR,
-                FieldLen = 50,
+                FieldLen = 51,
                 DBDefault = HiTypeDBDefault.VALUE,
                 DefaultValue = "TGM",
-                FieldDesc = "测试字段添加"
+                FieldDesc = "测试字段变更"
 
             };
 
             var rtn = sqlClient.DbFirst.ModiColumn("H_Test5", column, OpLevel.Execute);
-
-            Console.WriteLine(rtn.Item2);
-            Console.WriteLine(rtn.Item3);
-            
-
-
-            Console.WriteLine(rtn.Item2);
+            if (rtn.Item1)
+            {
+                Console.WriteLine(rtn.Item2);//输出成功消息
+                Console.WriteLine(rtn.Item3);//输出 生成的SQL
+            }
+            else
+                Console.WriteLine(rtn.Item2);//输出失败原因
         }
     }
 }

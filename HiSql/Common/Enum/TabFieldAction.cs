@@ -13,5 +13,7 @@ namespace HiSql
         ADD = 1,//新增字段
         MODI=2,//修改字段
         DELETE=3,//删除字段
+
+        RENAME=4,//重命名
     }
 }

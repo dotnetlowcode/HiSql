@@ -52,13 +52,13 @@ namespace HiSql
         /// 获取当前库所有物理表清单
         /// </summary>
         /// <returns></returns>
-        DataTable GetTableList();
+        DataTable GetTableList(string tabname = "");
 
         /// <summary>
         /// 获取当前库所有视图清单
         /// </summary>
         /// <returns></returns>
-        DataTable GetViewList();
+        DataTable GetViewList(string viewname = "");
 
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace HiSql
         /// 获取所有表和视图
         /// </summary>
         /// <returns></returns>
-        DataTable GetAllTables();
+        DataTable GetAllTables(string tabname="");
 
 
         /// <summary>
@@ -152,6 +152,7 @@ namespace HiSql
 
         string BuildChangeFieldStatement(HiTable hiTable, HiColumn hiColumn, TabFieldAction tabFieldAction);
 
+        string BuildReTableStatement(string tabname, string newtabname);
 
         //string BuildChangeFieldStatement(TabInfo tabInfo,)
 

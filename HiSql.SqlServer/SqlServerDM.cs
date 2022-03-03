@@ -934,20 +934,32 @@ namespace HiSql
                 .Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema);
                 _changesql = new StringBuilder()
                     .AppendLine(_delsql)
-                    .AppendLine( dbConfig.Del_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$FieldName$]", $"{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}")).ToString();
-            
-                
+                    .AppendLine(dbConfig.Del_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$FieldName$]", $"{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}")).ToString();
+
+
             }
             else if (tabFieldAction == TabFieldAction.MODI)
             {
 
-                var rtn1= Tool.RegexGrpOrReplace(@"\s*default\s*.*$", _fieldsql);
+                var rtn1 = Tool.RegexGrpOrReplace(@"\s*default\s*.*$", _fieldsql);
                 if (rtn1.Item1)
                     _fieldsql = rtn1.Item3;
                 _changesql = new StringBuilder().AppendLine(dbConfig.Modi_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$TempColumn$]", _fieldsql))
                     //.AppendLine(";go")
                     .AppendLine(BuildFieldDefaultValue(hiColumn))
                     .ToString();
+            }
+            else if (tabFieldAction == TabFieldAction.RENAME)
+            {
+                //字段重命名
+
+
+                _changesql = new StringBuilder().AppendLine(dbConfig.Re_Column.Replace("[$TabName$]", hiTable.TabName)
+                    .Replace("[$ReFieldName$]", hiColumn.ReFieldName)
+                    .Replace("[$FieldName$]",hiColumn.FieldName)
+                    ).ToString();
+
+
             }
             else
                 return "";
@@ -1073,13 +1085,23 @@ namespace HiSql
         }
 
 
-        public DataTable GetTableList()
+        public DataTable GetTableList(string tabname="")
         {
-            return Context.DBO.GetDataTable(dbConfig.Get_Tables);
+            string _tempsql = dbConfig.Get_Tables;
+            if (string.IsNullOrEmpty(tabname))
+                _tempsql = _tempsql.Replace("[$Where$]", "");
+            else
+                _tempsql = _tempsql.Replace("[$Where$]", $" and [name]='{tabname.ToSqlInject()}'");
+            return Context.DBO.GetDataTable(_tempsql);
         }
-        public DataTable GetViewList()
+        public DataTable GetViewList(string viewname="")
         {
-            return Context.DBO.GetDataTable(dbConfig.Get_Views);
+            string _tempsql = dbConfig.Get_Views;
+            if (string.IsNullOrEmpty(viewname))
+                _tempsql = _tempsql.Replace("[$Where$]", "");
+            else
+                _tempsql = _tempsql.Replace("[$Where$]", $" and [name]='{viewname.ToSqlInject()}'");
+            return Context.DBO.GetDataTable(_tempsql);
         }
 
         /// <summary>
@@ -1149,9 +1171,19 @@ namespace HiSql
         }
 
 
-        public DataTable GetAllTables()
+        /// <summary>
+        /// 获取所有表或指定表
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <returns></returns>
+        public DataTable GetAllTables(string tabname="")
         {
-            return Context.DBO.GetDataTable(dbConfig.Get_AllTables);
+            string _tempsql = dbConfig.Get_AllTables;
+            if(string.IsNullOrEmpty(tabname))
+                _tempsql = _tempsql.Replace("[$Where$]", "");
+            else
+                _tempsql = _tempsql.Replace("[$Where$]", $" and [name]='{tabname.ToSqlInject()}'");
+            return Context.DBO.GetDataTable(_tempsql);
         }
 
         /// <summary>
@@ -2607,6 +2639,19 @@ namespace HiSql
                 .Replace("[$TabName$]",tabname)
                 ;
 
+
+            return _sql;
+        }
+
+        /// <summary>
+        /// 生成重命名表的sql语句
+        /// </summary>
+        /// <param name="tabInfo"></param>
+        /// <param name="newtabname"></param>
+        /// <returns></returns>
+        public string BuildReTableStatement(string tabname, string newtabname)
+        {
+            string _sql = dbConfig.Re_Table.Replace("[$TabName$]", $"[{this.Context.CurrentConnectionConfig.Schema}].[{tabname}]").Replace("[$ReTabName$]", newtabname);
 
             return _sql;
         }

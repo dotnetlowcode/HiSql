@@ -104,6 +104,10 @@ namespace HiSql
 
         string _temp_modicolumn = "alter table [$TabName$] alter column [$TempColumn$]";
 
+        string _temp_recolumn = "EXECUTE sp_rename N'[$TabName$].[$FieldName$]', N'[$ReFieldName$]', 'COLUMN' ";
+
+        string _temp_retable = "EXECUTE sp_rename '[$TabName$].[$TabName$]', '[$ReTabName$]'";
+
         string _temp_setdefalut = "";
 
         string _temp_deldefalut = "";
@@ -302,6 +306,17 @@ namespace HiSql
         /// </summary>
         public string Get_ModiView { get => _temp_modi_view; }
 
+
+        /// <summary>
+        /// 字段重命名
+        /// </summary>
+        public string Re_Column { get => _temp_recolumn; }
+
+
+        /// <summary>
+        /// 对表进行重命名
+        /// </summary>
+        public string Re_Table { get => _temp_retable; }
 
         /// <summary>
         /// 删除视图

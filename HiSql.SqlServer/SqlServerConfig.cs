@@ -95,6 +95,10 @@ namespace HiSql
 
         string _temp_modicolumn = "alter table [$TabName$] alter column [$TempColumn$]";
 
+        string _temp_recolumn = "EXECUTE sp_rename N'[$TabName$].[$FieldName$]', N'[$ReFieldName$]', 'COLUMN' ";
+
+        string _temp_retable = "EXECUTE sp_rename '[$TabName$]', '[$ReTabName$]'";
+
         string _temp_setdefalut = "";
 
         string _temp_deldefalut = "";
@@ -262,6 +266,17 @@ namespace HiSql
         /// 修改列的模板
         /// </summary>
         public string Modi_Column { get => _temp_modicolumn; }
+
+        /// <summary>
+        /// 字段重命名
+        /// </summary>
+        public string Re_Column { get => _temp_recolumn; }
+
+
+        /// <summary>
+        /// 对表进行重命名
+        /// </summary>
+        public string Re_Table { get => _temp_retable; }
 
 
         public string Set_Default { get => _temp_setdefalut; }
@@ -627,19 +642,19 @@ UNION ALL
 
             
             _temp_setdefalut = new StringBuilder()
-                .AppendLine("declare @_constname varchar(200)")
+                .AppendLine("declare @_constname_[$FieldName$] varchar(200)")
                 .AppendLine("if exists(select a.name as fieldname, b.name as consname from syscolumns as a inner join sysobjects as b on a.cdefault=b.id where a.id=object_id('[$TabName$]') and a.name='[$FieldName$]')")
                 .AppendLine("   begin   ")
-                .AppendLine("       select @_constname = b.name from syscolumns as a ")
+                .AppendLine("       select @_constname_[$FieldName$] = b.name from syscolumns as a ")
                 .AppendLine("       inner join sysobjects as b on a.cdefault=b.id")
                 .AppendLine("       where a.id=object_id('[$TabName$]') and a.name='[$FieldName$]'")
-                .AppendLine("       exec('ALTER TABLE [$Schema$].[$TabName$] DROP CONSTRAINT '+@_constname)")
-                .AppendLine("       exec('ALTER TABLE [$Schema$].[$TabName$] ADD CONSTRAINT '+@_constname+ ' [$DefValue$] ' + ' FOR [$FieldName$]' )")
+                .AppendLine("       exec('ALTER TABLE [$Schema$].[$TabName$] DROP CONSTRAINT '+@_constname_[$FieldName$])")
+                .AppendLine("       exec('ALTER TABLE [$Schema$].[$TabName$] ADD CONSTRAINT '+@_constname_[$FieldName$]+ ' [$DefValue$] ' + ' FOR [$FieldName$]' )")
                 .AppendLine("   end")
                 .AppendLine("else")
                 .AppendLine("   begin")
-                .AppendLine("       set @_constname ='DF_H_[$TabName$]_[$FieldName$]_[$KEY$]'")
-                .AppendLine("       exec('ALTER TABLE [$Schema$].[$TabName$] ADD CONSTRAINT '+@_constname + ' [$DefValue$] FOR [$FieldName$]')")
+                .AppendLine("       set @_constname_[$FieldName$] ='DF_H_[$TabName$]_[$FieldName$]_[$KEY$]'")
+                .AppendLine("       exec('ALTER TABLE [$Schema$].[$TabName$] ADD CONSTRAINT '+@_constname_[$FieldName$] + ' [$DefValue$] FOR [$FieldName$]')")
                 .AppendLine("   end")
                 .ToString();
 
@@ -647,19 +662,25 @@ UNION ALL
             //获取当前库中所有的表
             _temp_gettables = new StringBuilder()
                 .AppendLine("select [name] as TabName,(case when xtype='U' then 'Table' else 'View' end ) as TabType,crdate as CreateTime")
-                .AppendLine("from sysobjects where xtype='U' order by crdate desc ")
+                .AppendLine("from sysobjects where xtype='U' ")
+                .AppendLine("[$Where$]")
+                .AppendLine("order by crdate desc ")
                 .ToString();
 
             //获取所有视图
             _temp_getviews = new StringBuilder()
                 .AppendLine("select [name] as TabName,(case when xtype='U' then 'Table' else 'View' end ) as TabType,crdate as CreateTime")
-                .AppendLine("from sysobjects where xtype='V' order by crdate desc ")
+                .AppendLine("from sysobjects where xtype='V' ")
+                .AppendLine("[$Where$]")
+                .AppendLine("order by crdate desc ")
                 .ToString();
 
             //获取表和视图
             _temp_getalltables= new StringBuilder()
                 .AppendLine("select [name] as TabName,(case when xtype='U' then 'Table' else 'View' end ) as TabType,crdate as CreateTime ")
-                .AppendLine("from sysobjects where (xtype='U' or xtype='V')  order by xtype ASC, crdate desc ")
+                .AppendLine("from sysobjects where (xtype='U' or xtype='V')   ")
+                .AppendLine("[$Where$]")
+                .AppendLine("order by xtype ASC, crdate desc ")
                 .ToString();
 
             //删除字段默认值

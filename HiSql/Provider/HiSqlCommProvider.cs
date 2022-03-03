@@ -213,8 +213,9 @@ namespace HiSql
             foreach (HiColumn column in phycolumns)
             {
                 var _column = columns.Where(h => h.FieldName.ToLower() == column.FieldName.ToLower()).FirstOrDefault();
-                if (_column!=null)
+                if (_column!=null && column.FieldName.ToLower().Equals(column.ReFieldName.ToLower()))
                 {
+                    
                     //可能变更也可能没有变更
 
                     if (string.IsNullOrEmpty(column.TabName))
@@ -243,7 +244,13 @@ namespace HiSql
                 else
                 {
                     //说明是有新增字段或重命名字段
-                    fieldChanges.Add(new FieldChange { IsTabChange=true, NewColumn=column, FieldName = column.FieldName, Action = TabFieldAction.ADD });
+
+                    if (!column.FieldName.ToLower().Equals(column.ReFieldName.ToLower()) && !string.IsNullOrEmpty(column.ReFieldName))
+                    {
+                        //重命名字段
+                        fieldChanges.Add(new FieldChange { IsTabChange = true, NewColumn = column, FieldName = column.FieldName, Action = TabFieldAction.RENAME });
+                    }else
+                        fieldChanges.Add(new FieldChange { IsTabChange=true, NewColumn=column, FieldName = column.FieldName, Action = TabFieldAction.ADD });
                 }
             }
 

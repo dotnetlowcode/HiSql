@@ -240,9 +240,11 @@ namespace HiSql
 
         int _sortnum = 0;
 
+        /// <summary>
+        /// 字段重命名标识
+        /// </summary>
+        string _refieldname = "";
 
-        [JsonIgnore]
-        public override object TypeId { get; }
         
         /// <summary>
         /// 表名
@@ -259,7 +261,21 @@ namespace HiSql
         public string FieldName
         {
             get { return _ColumnName; }
-            set { _ColumnName = value; }
+            set { _ColumnName = value;
+                if (string.IsNullOrEmpty(_refieldname))
+                    _refieldname = _ColumnName;
+            }
+        }
+
+        /// <summary>
+        /// 字段重命名（在修改表结构时用）
+        /// </summary>
+        public string ReFieldName
+        {
+            get { return _refieldname; }
+            set {
+                _refieldname = value;
+            }
         }
 
         /// <summary>

@@ -141,6 +141,21 @@ namespace HiSql
 
         public string Modi_Column { get; }
 
+
+
+        /// <summary>
+        /// 字段重命名
+        /// </summary>
+        public string Re_Column { get ; }
+
+
+        /// <summary>
+        /// 对表进行重命名
+        /// </summary>
+        public string Re_Table { get; }
+
+
+
         /// <summary>
         /// 删除列的模版
         /// </summary>
