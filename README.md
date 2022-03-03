@@ -34,6 +34,252 @@
 处理，开发人员只要关注于业务开发
 
 
+### 2022.3.3 更新
+HiSql新增对表的操作（暂时仅支持`SqlServer`，陆续会加上对其它数据库的实现）
+
+可能有人会疑问作为ORM框架为什么会加这些功能？HiSql是致力于低代码平台的ORM框架,如果有了解过低代码平台的原理你就会明白这些功能有多有用！
+
+HiSql提供以下对表及视图的操作
+1.  表的重命名
+```c#
+//OpLevel.Execute  表示执行并返回生成的SQL
+//OpLevel.Check 表示仅做检测失败时返回消息且检测成功时返因生成的SQL
+var rtn = sqlClient.DbFirst.ReTable("H_Test5_1", "H_Test5",OpLevel.Execute);
+if (rtn.Item1)
+{
+    Console.WriteLine(rtn.Item2);//输出成功消息
+    Console.WriteLine(rtn.Item3);//输出重命名表 生成的SQL
+}
+else
+    Console.WriteLine(rtn.Item2);//输出重命名失败原因
+```
+2.  向表中新增字段
+```c#
+//OpLevel.Execute  表示执行并返回生成的SQL
+//OpLevel.Check 表示仅做检测失败时返回消息且检测成功时返因生成的SQL
+HiColumn column = new HiColumn()
+{
+    TabName = "H_Test5",
+    FieldName = "TestAdd",
+    FieldType = HiType.VARCHAR,
+    FieldLen = 50,
+    DBDefault = HiTypeDBDefault.EMPTY,
+    DefaultValue = "",
+    FieldDesc = "测试字段添加"
+
+};
+
+var rtn= sqlClient.DbFirst.AddColumn("H_Test5", column, OpLevel.Execute);
+
+if (rtn.Item1)
+{
+    Console.WriteLine(rtn.Item2);//输出成功消息
+    Console.WriteLine(rtn.Item3);//输出 生成的SQL
+}
+else
+    Console.WriteLine(rtn.Item2);//输出失败原因
+```
+3.  对表中已有的字段进行变更
+```c#
+//OpLevel.Execute  表示执行并返回生成的SQL
+//OpLevel.Check 表示仅做检测失败时返回消息且检测成功时返因生成的SQL
+HiColumn column = new HiColumn()
+{
+    TabName = "H_Test5",
+    FieldName = "TestAdd",
+    FieldType = HiType.VARCHAR,
+    FieldLen = 51,
+    DBDefault = HiTypeDBDefault.VALUE,
+    DefaultValue = "TGM",
+    FieldDesc = "测试字段变更"
+
+};
+
+var rtn = sqlClient.DbFirst.ModiColumn("H_Test5", column, OpLevel.Execute);
+if (rtn.Item1)
+{
+    Console.WriteLine(rtn.Item2);//输出成功消息
+    Console.WriteLine(rtn.Item3);//输出 生成的SQL
+}
+else
+    Console.WriteLine(rtn.Item2);//输出失败原因
+```
+
+4.  对表中已经字段进行重命名
+```c#
+//OpLevel.Execute  表示执行并返回生成的SQL
+//OpLevel.Check 表示仅做检测失败时返回消息且检测成功时返因生成的SQL
+HiColumn column = new HiColumn()
+{
+    TabName = "H_Test5",
+    FieldName = "Testname3",
+    ReFieldName = "Testname2",
+    FieldType = HiType.VARCHAR,
+    FieldLen = 50,
+    DBDefault = HiTypeDBDefault.VALUE,
+    DefaultValue = "TGM",
+    FieldDesc = "测试字段重命名"
+
+};
+
+var rtn = sqlClient.DbFirst.ReColumn("H_Test5", column, OpLevel.Execute);
+if (rtn.Item1)
+{
+    Console.WriteLine(rtn.Item2);//输出成功消息
+    Console.WriteLine(rtn.Item3);//输出 生成的SQL
+}
+else
+    Console.WriteLine(rtn.Item2);//输出失败原因
+```
+5.  对表中字段进行修改
+```c#
+//OpLevel.Execute  表示执行并返回生成的SQL
+//OpLevel.Check 表示仅做检测失败时返回消息且检测成功时返因生成的SQL
+HiColumn column = new HiColumn()
+{
+    TabName = "H_Test5",
+    FieldName = "TestAdd",
+    FieldType = HiType.VARCHAR,
+    FieldLen = 51,
+    DBDefault = HiTypeDBDefault.VALUE,
+    DefaultValue = "TGM",
+    FieldDesc = "测试字段变更"
+
+};
+
+var rtn = sqlClient.DbFirst.ModiColumn("H_Test5", column, OpLevel.Execute);
+if (rtn.Item1)
+{
+    Console.WriteLine(rtn.Item2);//输出成功消息
+    Console.WriteLine(rtn.Item3);//输出 生成的SQL
+}
+else
+    Console.WriteLine(rtn.Item2);//输出失败原因
+```
+6.  
+
+7.  自定义表结构TabInfo 自动同步变更物理表结构信息
+```c#
+//OpLevel.Execute  表示执行并返回生成的SQL
+//OpLevel.Check 表示仅做检测失败时返回消息且检测成功时返因生成的SQL
+var tabinfo = sqlClient.Context.DMInitalize.GetTabStruct("H_Test5");
+
+TabInfo _tabcopy = ClassExtensions.DeepCopy<TabInfo>(tabinfo);
+_tabcopy.Columns[2].ReFieldName = "Testname3";
+var rtn= sqlClient.DbFirst.ModiTable(_tabcopy, OpLevel.Execute);
+if (rtn.Item1)
+{
+    Console.WriteLine(rtn.Item2);//输出成功消息
+    Console.WriteLine(rtn.Item3);//输出 生成的SQL
+}
+else
+    Console.WriteLine(rtn.Item2);//输出失败原因
+```
+8.  获取数据库所表表和视图清单
+```c#
+//获取当前数据库中的所有物理表和视图
+List<TableInfo> lsttales = sqlClient.DbFirst.GetAllTables();
+foreach (TableInfo tableInfo in lsttales)
+{
+    Console.WriteLine($"{tableInfo.TabName}  {tableInfo.TabReName}  {tableInfo.TabDescript}  {tableInfo.TableType} 表结构:{tableInfo.HasTabStruct}");
+}
+```
+9.  获取数据库所有全局临时表
+```c#
+//获取当前数据库中的所有的全局临时表
+List<TableInfo> lsttales = sqlClient.DbFirst.GetGlobalTempTables();
+foreach (TableInfo tableInfo in lsttales)
+{
+    Console.WriteLine($"{tableInfo.TabName}  {tableInfo.TabReName}  {tableInfo.TabDescript}  {tableInfo.TableType} 表结构:{tableInfo.HasTabStruct}");
+}
+```
+10.  根据HiSql语句创建视图
+```c#
+//OpLevel.Execute  表示执行并返回生成的SQL
+//OpLevel.Check 表示仅做检测失败时返回消息且检测成功时返因生成的SQL
+var rtn = sqlClient.DbFirst.CreateView("vw_FModel", 
+    sqlClient.HiSql("select a.TabName,b.TabReName,b.TabDescript,a.FieldName,a.SortNum,a.FieldType from Hi_FieldModel as a inner join Hi_TabModel as b on a.TabName=b.TabName").ToSql(), 
+    OpLevel.Execute);
+
+if (rtn.Item1)
+{
+    Console.WriteLine(rtn.Item2);//输出成功消息
+    Console.WriteLine(rtn.Item3);//输出 生成的SQL
+}
+else
+    Console.WriteLine(rtn.Item2);//输出失败原因
+```
+11. 删除指定视图
+```c#
+//OpLevel.Execute  表示执行并返回生成的SQL
+//OpLevel.Check 表示仅做检测失败时返回消息且检测成功时返因生成的SQL
+var rtn = sqlClient.DbFirst.DropView("vw_FModel",
+
+    OpLevel.Execute);
+
+if (rtn.Item1)
+{
+    Console.WriteLine(rtn.Item2);//输出成功消息
+    Console.WriteLine(rtn.Item3);//输出 生成的SQL
+}
+else
+    Console.WriteLine(rtn.Item2);//输出失败原因
+```
+12. 修改指定视图
+```c#
+//OpLevel.Execute  表示执行并返回生成的SQL
+//OpLevel.Check 表示仅做检测失败时返回消息且检测成功时返因生成的SQL
+var rtn = sqlClient.DbFirst.ModiView("vw_FModel",
+    sqlClient.HiSql("select a.TabName,b.TabReName,b.TabDescript,a.FieldName,a.SortNum,a.FieldType from Hi_FieldModel as a inner join Hi_TabModel as b on a.TabName=b.TabName where b.TabType in (0,1)").ToSql(),
+    OpLevel.Execute);
+
+if (rtn.Item1)
+{
+    Console.WriteLine(rtn.Item2);//输出成功消息
+    Console.WriteLine(rtn.Item3);//输出 生成的SQL
+}
+else
+    Console.WriteLine(rtn.Item2);//输出失败原因
+```
+13. 列出指定表的索引清单
+```c#
+List<TabIndex> lstindex = sqlClient.DbFirst.GetTabIndexs("Hi_FieldModel");
+foreach (TabIndex tabIndex in lstindex)
+{
+    Console.WriteLine($"TabName:{tabIndex.TabName} IndexName:{tabIndex.IndexName} IndexType:{tabIndex.IndexType}");
+}
+
+```
+14. 对指定表创建指定字段索引
+```c#
+TabInfo tabInfo = sqlClient.Context.DMInitalize.GetTabStruct("H04_OrderInfo");
+List<HiColumn> hiColumns = tabInfo.Columns.Where(c => c.FieldName == "POSOrderID").ToList();
+var rtn = sqlClient.DbFirst.CreateIndex("H04_OrderInfo", "H04_OrderInfo_POSOrderID", hiColumns, OpLevel.Execute);
+if (rtn.Item1)
+    Console.WriteLine(rtn.Item3);
+else
+    Console.WriteLine(rtn.Item2);
+
+```
+15. 查看指定索引的字段明细
+```c#
+List<TabIndexDetail> lstindexdetails = sqlClient.DbFirst.GetTabIndexDetail("Hi_FieldModel","PK_Hi_FieldModel_ed721f6b-296a-447e-ac67-7d02fd8e338c");
+foreach (TabIndexDetail tabIndexDetail in lstindexdetails)
+{
+    Console.WriteLine($"TabName:{tabIndexDetail.TabName} IndexName:{tabIndexDetail.IndexName} IndexType:{tabIndexDetail.IndexType} ColumnName:{tabIndexDetail.ColumnName}");
+    
+}
+```
+16. 删除指定索引
+```c#
+rtn = sqlClient.DbFirst.DelIndex("H04_OrderInfo", "H04_OrderInfo_POSOrderID",OpLevel.Execute);
+
+if (rtn.Item1)
+    Console.WriteLine(rtn.Item3);
+else
+    Console.WriteLine(rtn.Item2);
+```
+
 
 ### 2022.2.7 更新
 新增bulkcopy功能

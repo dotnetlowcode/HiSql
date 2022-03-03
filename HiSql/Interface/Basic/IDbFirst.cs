@@ -41,6 +41,27 @@ namespace HiSql
 
 
         /// <summary>
+        /// 字段重命名
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <param name="hiColumn"></param>
+        /// <param name="opLevel"></param>
+        /// <returns></returns>
+        Tuple<bool,string,string> ReColumn(string tabname, HiColumn hiColumn, OpLevel opLevel);
+
+
+
+        /// <summary>
+        /// 表重命名
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <param name="newtabname"></param>
+        /// <param name="opLevel"></param>
+        /// <returns></returns>
+        Tuple<bool, string, string> ReTable(string tabname, string newtabname, OpLevel opLevel);
+
+
+        /// <summary>
         /// 不存在表则创建，有则修改表结构
         /// </summary>
         /// <param name="tabInfo"></param>
