@@ -10,13 +10,18 @@ namespace HiSql
     {
         public static void Init(HiSqlClient sqlClient)
         {
+
+            Console.WriteLine("表操作测试");
             //Demo_AddColumn(sqlClient);
 
             //Demo_ModiColumn(sqlClient);
+            //Demo_ReColumn(sqlClient);
+            //Demo_ModiTable(sqlClient);
+            //Demo_ReTable(sqlClient);
             //Demo_DelColumn(sqlClient);
             //Demo_Tables(sqlClient);
             //Demo_View(sqlClient);
-            //Demo_AllTables(sqlClient);
+            Demo_AllTables(sqlClient);
             //Demo_GlobalTables(sqlClient);
             //Demo_DropView(sqlClient);
             //Demo_CreateView(sqlClient);
@@ -28,7 +33,11 @@ namespace HiSql
 
         }
 
-
+        static void Demo_ReTable(HiSqlClient sqlClient)
+        {
+            var rtn = sqlClient.DbFirst.ReTable("H_Test5_1", "H_Test5",OpLevel.Check);
+            Console.WriteLine(rtn.Item3);
+        }
         static void Demo_Index_Create(HiSqlClient sqlClient)
         {
 
@@ -170,6 +179,36 @@ namespace HiSql
             var rtn = sqlClient.DbFirst.DelColumn("H_Test5", column, OpLevel.Execute);
 
             Console.WriteLine(rtn.Item2);
+        }
+
+
+        static void Demo_ReColumn(HiSqlClient sqlClient)
+        {
+            HiColumn column = new HiColumn()
+            {
+                TabName = "H_Test5",
+                FieldName = "Testname3",
+                ReFieldName = "Testname2",
+                FieldType = HiType.VARCHAR,
+                FieldLen = 50,
+                DBDefault = HiTypeDBDefault.VALUE,
+                DefaultValue = "TGM",
+                FieldDesc = "测试字段添加"
+
+            };
+
+            var rtn = sqlClient.DbFirst.ReColumn("H_Test5", column, OpLevel.Execute);
+            Console.WriteLine(rtn.Item2);
+        }
+
+        static void Demo_ModiTable(HiSqlClient sqlClient)
+        {
+            var tabinfo= sqlClient.Context.DMInitalize.GetTabStruct("H_Test5");
+
+            TabInfo _tabcopy = ClassExtensions.DeepCopy<TabInfo>(tabinfo);
+            _tabcopy.Columns[2].ReFieldName = "Testname3";
+            var rtn= sqlClient.DbFirst.ModiTable(_tabcopy, OpLevel.Check);
+
         }
 
         static void Demo_ModiColumn(HiSqlClient sqlClient)
