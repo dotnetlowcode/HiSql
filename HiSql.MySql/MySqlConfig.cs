@@ -94,7 +94,7 @@ namespace HiSql
 
         string _temp_recolumn = "EXECUTE sp_rename N'[$TabName$].[$FieldName$]', N'[$ReFieldName$]', 'COLUMN' ";
 
-        string _temp_retable = "EXECUTE sp_rename '[$TabName$].[$TabName$]', '[$ReTabName$]'";
+        string _temp_retable = "ALTER TABLE [$TabName$]  rename to [$ReTabName$]";
 
         string _temp_setdefalut = "";
 
@@ -630,6 +630,88 @@ UNION ALL
 
                 .ToString();
 
+
+
+
+            //创建视图
+            _temp_create_view = new StringBuilder()
+                .AppendLine("CREATE VIEW [$Schema$].[$TabName$]")
+                .AppendLine("AS")
+                .AppendLine("[$ViewSql$]")
+                .ToString();
+
+
+            //修改视图
+            _temp_modi_view = new StringBuilder()
+                .AppendLine("CREATE  OR REPLACE VIEW [$Schema$].[$TabName$]")
+                .AppendLine("AS")
+                .AppendLine("[$ViewSql$]")
+                .ToString();
+
+            //删除视图
+            _temp_drop_view = "DROP VIEW  [$Schema$].[$TabName$]";
+
+            //获取当前库所有的表
+            _temp_gettables = new StringBuilder()
+                .AppendLine("SELECT   table_name  as `TabName`, ")
+                .AppendLine("case   table_type")
+                .AppendLine("when 'BASE TABLE' then 'Table'")
+                .AppendLine("when 'VIEW' then 'View'")
+                .AppendLine("else 'NONE'")
+                .AppendLine("END `TabType`,")
+                .AppendLine("create_time as `CreateTime`")
+                .AppendLine("from   `INFORMATION_SCHEMA`.`TABLES` ")
+                .AppendLine("where    table_type in ('BASE TABLE') and  table_schema = '[$Schema$]'")
+                .AppendLine("[$Where$]")
+                .AppendLine("order by table_type ASC,   create_time desc ")
+                .ToString();
+
+            // 获取所有视图
+            _temp_getviews = new StringBuilder()
+                .AppendLine("SELECT   table_name  as `TabName`, ")
+                .AppendLine("case   table_type")
+                .AppendLine("when 'BASE TABLE' then 'Table'")
+                .AppendLine("when 'VIEW' then 'View'")
+                .AppendLine("else 'NONE'")
+                .AppendLine("END `TabType`,")
+                .AppendLine("create_time as `CreateTime`")
+                .AppendLine("from   `INFORMATION_SCHEMA`.`TABLES` ")
+                .AppendLine("where    table_type in ('VIEW') and  table_schema = '[$Schema$]'")
+                .AppendLine("[$Where$]")
+                .AppendLine("order by table_type ASC,   create_time desc ")
+                .ToString();
+
+
+            _temp_check_table_exists= new StringBuilder()
+                .AppendLine("SELECT   table_name  as `TabName`, ")
+                .AppendLine("case   table_type")
+                .AppendLine("when 'BASE TABLE' then 'Table'")
+                .AppendLine("when 'VIEW' then 'View'")
+                .AppendLine("else 'NONE'")
+                .AppendLine("END `TabType`,")
+                .AppendLine("create_time as `CreateTime`")
+                .AppendLine("from   `INFORMATION_SCHEMA`.`TABLES` ")
+                .AppendLine("where    table_type in ('BASE TABLE','VIEW') and  table_schema = '[$Schema$]'")
+                .AppendLine("and table_name='[$TabName$]'")
+                .AppendLine("order by table_type ASC,   create_time desc ")
+
+                .ToString();
+
+            //获取所有表和视图
+            _temp_getalltables = new StringBuilder()
+                .AppendLine("SELECT   table_name  as `TabName`, ")
+                .AppendLine("case   table_type")
+                .AppendLine("when 'BASE TABLE' then 'Table'")
+                .AppendLine("when 'VIEW' then 'View'")
+                .AppendLine("else 'NONE'")
+                .AppendLine("END `TabType`,")
+                .AppendLine("create_time as `CreateTime`")
+                .AppendLine("from   `INFORMATION_SCHEMA`.`TABLES` ")
+                .AppendLine("where    table_type in ('BASE TABLE','VIEW') and  table_schema = '[$Schema$]'")
+                .AppendLine("[$Where$]")
+                .AppendLine("order by table_type ASC,   create_time desc ")
+
+                .ToString();
 
             //批量MERGE更新模版
             //_temp_merge_into = new StringBuilder()

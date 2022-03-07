@@ -2651,7 +2651,7 @@ namespace HiSql
         /// <returns></returns>
         public string BuildReTableStatement(string tabname, string newtabname)
         {
-            string _sql = dbConfig.Re_Table.Replace("[$TabName$]", $"[{this.Context.CurrentConnectionConfig.Schema}].[{tabname}]").Replace("[$ReTabName$]", newtabname);
+            string _sql = dbConfig.Re_Table.Replace("[$TabName$]", $"{dbConfig.Schema_Pre}{this.Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{tabname}{dbConfig.Table_After}").Replace("[$ReTabName$]",$"{newtabname}");
 
             return _sql;
         }

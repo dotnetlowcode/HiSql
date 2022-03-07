@@ -2335,31 +2335,93 @@ namespace HiSql
 
         public DataTable GetTableList(string tabname = "")
         {
-            throw new NotImplementedException();
+            string _tempsql = dbConfig.Get_Tables.Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema);
+            if (string.IsNullOrEmpty(tabname))
+                _tempsql = _tempsql.Replace("[$Where$]", "");
+            else
+                _tempsql = _tempsql.Replace("[$Where$]", $" and table_name='{tabname.ToSqlInject()}'");
+            return Context.DBO.GetDataTable(_tempsql);
         }
 
         public DataTable GetViewList(string viewname="")
         {
-            throw new NotImplementedException();
+            string _tempsql = dbConfig.Get_Views.Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema);
+            if (string.IsNullOrEmpty(viewname))
+                _tempsql = _tempsql.Replace("[$Where$]", "");
+            else
+                _tempsql = _tempsql.Replace("[$Where$]", $" and table_name='{viewname.ToSqlInject()}'");
+            return Context.DBO.GetDataTable(_tempsql);
+            
         }
 
         public DataTable GetAllTables(string tabname = "")
         {
-            throw new NotImplementedException();
+
+            string _tempsql = dbConfig.Get_AllTables.Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema);
+            if (string.IsNullOrEmpty(tabname))
+                _tempsql = _tempsql.Replace("[$Where$]", "");
+            else
+                _tempsql = _tempsql.Replace("[$Where$]", $" and table_name='{tabname.ToSqlInject()}'");
+            return Context.DBO.GetDataTable(_tempsql);
+            
         }
 
         public string CreateView(string viewname, string viewsql)
         {
-            throw new NotImplementedException();
+            DataTable dt = Context.DBO.GetDataTable(dbConfig.Get_CheckTabExists
+                .Replace("[$TabName$]", $"{viewname}")
+                .Replace("[$Schema$]", $"{this.Context.CurrentConnectionConfig.Schema}")
+                );
+            if (dt.Rows.Count == 0)
+            {
+                //视图名称没有被占用
+
+                string _tempsql = dbConfig.Get_CreateView
+                    .Replace("[$Schema$]", $"{dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}")
+                    .Replace("[$TabName$]", $"{dbConfig.Table_Pre}{viewname}{dbConfig.Table_After}")
+                    .Replace("[$ViewSql$]", viewsql)
+                    ;
+                return _tempsql;
+            }
+            else
+            {
+                throw new Exception($"视图名称[{viewname}]已经被使用");
+            }
         }
         public string ModiView(string viewname, string viewsql)
         {
-            throw new NotImplementedException();
+            DataTable dt = Context.DBO.GetDataTable(dbConfig.Get_CheckTabExists
+                .Replace("[$TabName$]", $"{viewname}")
+                .Replace("[$Schema$]", $"{this.Context.CurrentConnectionConfig.Schema}")
+                );
+            if (dt.Rows.Count > 0)
+            {
+                string _tempsql = dbConfig.Get_ModiView
+                    .Replace("[$Schema$]", $"{dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}")
+                    .Replace("[$TabName$]", $"{dbConfig.Table_Pre}{viewname}{dbConfig.Table_After}")
+                    .Replace("[$ViewSql$]", viewsql)
+                    ;
+                return _tempsql;
+            }
+            else
+                throw new Exception($"视图名称[{viewname}]不存在无法修改");
         }
 
         public string DropView(string viewname)
         {
-            throw new NotImplementedException();
+            DataTable dt = Context.DBO.GetDataTable(dbConfig.Get_CheckTabExists
+                .Replace("[$TabName$]", $"{viewname}")
+                .Replace("[$Schema$]", $"{this.Context.CurrentConnectionConfig.Schema}")
+                );
+            if (dt.Rows.Count > 0)
+            {
+                string _tempsql = dbConfig.Get_DropView
+                    .Replace("[$Schema$]", $"{dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}")
+                    .Replace("[$TabName$]", $"{dbConfig.Table_Pre}{viewname}{dbConfig.Table_After}");
+                return _tempsql;
+            }
+            else
+                throw new Exception($"视图名称[{viewname}]不存在无法删除");
         }
 
         public DataTable GetGlobalTables()
@@ -2386,9 +2448,17 @@ namespace HiSql
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// 生成表重命名语句
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <param name="newtabname"></param>
+        /// <returns></returns>
         public string BuildReTableStatement(string tabname, string newtabname)
         {
-            throw new NotImplementedException();
+            string _sql = dbConfig.Re_Table.Replace("[$TabName$]", $"{dbConfig.Schema_Pre}{this.Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{tabname}{dbConfig.Table_After}").Replace("[$ReTabName$]",$"{dbConfig.Table_Pre}{newtabname}{dbConfig.Table_After}");
+            return _sql;
+            
         }
     }
 }
