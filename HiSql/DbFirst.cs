@@ -761,32 +761,37 @@ namespace HiSql
                 lst.Add(dr["TabName"].ToString());
             }
 
-            //根据获取的物理表信息获取虚拟表结构信息
-            DataTable dataTable = _sqlClient.Query("Hi_TabModel").Field("*").Where(new Filter {
+            if (lst.Count > 0)
+            {
+
+
+                //根据获取的物理表信息获取虚拟表结构信息
+                DataTable dataTable = _sqlClient.Query("Hi_TabModel").Field("*").Where(new Filter {
                 {"TabName",OperType.IN, lst }
             }).Sort("TabName asc").ToTable();
 
-            foreach (DataRow dr in dt.Rows)
-            {
-                TableInfo tableInfo = new TableInfo();
-
-                tableInfo.TabName = dr["TabName"].ToString();
-                var _dr = dataTable.AsEnumerable().Where(p => p.Field<string>("TabName") == tableInfo.TabName).FirstOrDefault();
-                if (_dr != null)
+                foreach (DataRow dr in dt.Rows)
                 {
-                    tableInfo.TabReName = _dr["TabReName"].ToString();
-                    tableInfo.TabDescript = _dr["TabDescript"].ToString();
-                    tableInfo.HasTabStruct = true;
+                    TableInfo tableInfo = new TableInfo();
 
+                    tableInfo.TabName = dr["TabName"].ToString();
+                    var _dr = dataTable.AsEnumerable().Where(p => p.Field<string>("TabName") == tableInfo.TabName).FirstOrDefault();
+                    if (_dr != null)
+                    {
+                        tableInfo.TabReName = _dr["TabReName"].ToString();
+                        tableInfo.TabDescript = _dr["TabDescript"].ToString();
+                        tableInfo.HasTabStruct = true;
+
+                    }
+                    else
+                    {
+                        tableInfo.TabReName = tableInfo.TabName;
+                        tableInfo.TabDescript = tableInfo.TabName;
+                    }
+                    tableInfo.Schema = _sqlClient.Context.CurrentConnectionConfig.Schema;
+                    tableInfo.TableType = TableType.View;
+                    lsttabinfo.Add(tableInfo);
                 }
-                else
-                {
-                    tableInfo.TabReName = tableInfo.TabName;
-                    tableInfo.TabDescript = tableInfo.TabName;
-                }
-                tableInfo.Schema = _sqlClient.Context.CurrentConnectionConfig.Schema;
-                tableInfo.TableType = TableType.View;
-                lsttabinfo.Add(tableInfo);
             }
             return lsttabinfo;
         }
@@ -975,7 +980,7 @@ namespace HiSql
                 {
                     if (field.Action == TabFieldAction.ADD)
                     {
-                        var addrtn = addColumn(idm, tabInfo, hicol, OpLevel.Check);
+                        var addrtn = addColumn(idm, tab, hicol, OpLevel.Check);
                         if (addrtn.Item1)
                             sb_sql.AppendLine(addrtn.Item3);
                         else
@@ -997,7 +1002,7 @@ namespace HiSql
                     }
                     else if (field.Action == TabFieldAction.DELETE)
                     {
-                        var delrtn = modiColumn(idm, tabInfo, hicol, OpLevel.Check);
+                        var delrtn = delColumn(idm, tabInfo, hicol, OpLevel.Check);
                         if (delrtn.Item1)
                             sb_sql.AppendLine(delrtn.Item3);
                         else
@@ -1026,8 +1031,34 @@ namespace HiSql
                 }
                 else
                 {
-                    _msg = $"未能匹配字段[{field.FieldName}]";
-                    _isok = false;
+
+                    if (field.Action == TabFieldAction.DELETE)
+                    {
+                        var _hicol = tab.Columns.Where(c => c.FieldName.ToLower().Equals(field.FieldName.ToLower())).FirstOrDefault();
+                        if (_hicol != null)
+                        {
+
+
+                            var delrtn = delColumn(idm, tab, _hicol, OpLevel.Check);
+                            if (delrtn.Item1)
+                                sb_sql.AppendLine(delrtn.Item3);
+                            else
+                            {
+                                _msg = delrtn.Item2;
+                                _isok = false;
+                            }
+                        }
+                        else
+                        {
+                            _msg = $"未能匹配字段[{field.FieldName}]";
+                            _isok = false;
+                        }
+                    }
+                    else
+                    {
+                        _msg = $"字段[{field.FieldName}] 未能识别动作[{field.Action}]";
+                        _isok = false;
+                    }
                 }
                         
             }
