@@ -142,6 +142,7 @@ D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\net461\System.Xml.XPath.d
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\net461\System.Xml.XPath.XDocument.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\net461\HiSql.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\net461\HiSql.pdb
+D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\net461\HiSql.PostGreSql.csproj.AssemblyReference.cache
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\net461\HiSql.PostGreSql.Properties.Resources.resources
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\net461\HiSql.PostGreSql.csproj.GenerateResource.cache
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\net461\HiSql.PostGreSql.GeneratedMSBuildEditorConfig.editorconfig
@@ -151,4 +152,3 @@ D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\net461\HiSql.PostGreSql.c
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\net461\HiSql.PostGreSql.csproj.CopyComplete
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\net461\HiSql.PostGreSql.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\net461\HiSql.PostGreSql.pdb
-D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\net461\HiSql.PostGreSql.csproj.AssemblyReference.cache

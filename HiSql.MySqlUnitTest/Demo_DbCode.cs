@@ -10,24 +10,38 @@ namespace HiSql.MySqlUnitTest
     {
         public static void Init(HiSqlClient sqlClient)
         {
-            Demo_AddColumn(sqlClient);
+            //Demo_AddColumn(sqlClient);
 
-            Demo_ModiColumn(sqlClient);
-            Demo_DelColumn(sqlClient);//
+            //Demo_ModiColumn(sqlClient);
+            //Demo_DelColumn(sqlClient);//
             //Demo_Tables(sqlClient);
             //Demo_View(sqlClient);
             //Demo_AllTables(sqlClient);
             //Demo_GlobalTables(sqlClient);
-            //Demo_DropView(sqlClient);
-            //Demo_CreateView(sqlClient);
-            //Demo_ModiView(sqlClient);
+            Demo_DropView(sqlClient);
+            Demo_CreateView(sqlClient);
+            Demo_ModiView(sqlClient);
 
             //Demo_IndexList(sqlClient);
             //Demo_Index_Create(sqlClient);
+            //Demo_ReTable(sqlClient);
 
 
         }
+        static void Demo_ReTable(HiSqlClient sqlClient)
+        {
+            //OpLevel.Execute  表示执行并返回生成的SQL
+            //OpLevel.Check 表示仅做检测失败时返回消息且检测成功时返因生成的SQL
+            var rtn = sqlClient.DbFirst.ReTable("htest03", "htest03_1", OpLevel.Execute);
+            if (rtn.Item1)
+            {
+                Console.WriteLine(rtn.Item2);//输出成功消息
+                Console.WriteLine(rtn.Item3);//输出重命名表 生成的SQL
+            }
+            else
+                Console.WriteLine(rtn.Item2);//输出重命名失败原因
 
+        }
 
         static void Demo_Index_Create(HiSqlClient sqlClient)
         {

@@ -100,6 +100,7 @@ namespace HiSql
         string _temp_retable = "EXECUTE sp_rename '[$TabName$]', '[$ReTabName$]'";
 
         string _temp_setdefalut = "";
+        string _temp_setdefalut1 = "";
 
         string _temp_deldefalut = "";
 
@@ -280,6 +281,12 @@ namespace HiSql
 
 
         public string Set_Default { get => _temp_setdefalut; }
+
+
+        /// <summary>
+        /// sqlserver 专用
+        /// </summary>
+        public string Set_Default1 { get => _temp_setdefalut1; }
 
         public string Del_Default { get => _temp_deldefalut; }
 
@@ -640,7 +647,9 @@ UNION ALL
                 .AppendLine("	order by a.id,a.colorder")
                 .ToString();
 
-            
+
+            _temp_setdefalut1 = " exec('ALTER TABLE [$Schema$].[$TabName$] ADD CONSTRAINT '+@_constname_[$FieldName$] + ' [$DefValue$] FOR [$FieldName$]')";
+
             _temp_setdefalut = new StringBuilder()
                 .AppendLine("declare @_constname_[$FieldName$] varchar(200)")
                 .AppendLine("if exists(select a.name as fieldname, b.name as consname from syscolumns as a inner join sysobjects as b on a.cdefault=b.id where a.id=object_id('[$TabName$]') and a.name='[$FieldName$]')")
@@ -649,12 +658,13 @@ UNION ALL
                 .AppendLine("       inner join sysobjects as b on a.cdefault=b.id")
                 .AppendLine("       where a.id=object_id('[$TabName$]') and a.name='[$FieldName$]'")
                 .AppendLine("       exec('ALTER TABLE [$Schema$].[$TabName$] DROP CONSTRAINT '+@_constname_[$FieldName$])")
-                .AppendLine("       exec('ALTER TABLE [$Schema$].[$TabName$] ADD CONSTRAINT '+@_constname_[$FieldName$]+ ' [$DefValue$] ' + ' FOR [$FieldName$]' )")
+                .AppendLine("       [$AddDefault$]")
+                //.AppendLine("       exec('ALTER TABLE [$Schema$].[$TabName$] ADD CONSTRAINT '+@_constname_[$FieldName$]+ ' [$DefValue$] ' + ' FOR [$FieldName$]' )")
                 .AppendLine("   end")
                 .AppendLine("else")
                 .AppendLine("   begin")
                 .AppendLine("       set @_constname_[$FieldName$] ='DF_H_[$TabName$]_[$FieldName$]_[$KEY$]'")
-                .AppendLine("       exec('ALTER TABLE [$Schema$].[$TabName$] ADD CONSTRAINT '+@_constname_[$FieldName$] + ' [$DefValue$] FOR [$FieldName$]')")
+                .AppendLine("       [$AddDefault$]")
                 .AppendLine("   end")
                 .ToString();
 

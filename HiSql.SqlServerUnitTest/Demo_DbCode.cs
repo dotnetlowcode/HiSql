@@ -16,12 +16,12 @@ namespace HiSql
 
             //Demo_ModiColumn(sqlClient);
             //Demo_ReColumn(sqlClient);
-            //Demo_ModiTable(sqlClient);
+            Demo_ModiTable(sqlClient);
             //Demo_ReTable(sqlClient);
             //Demo_DelColumn(sqlClient);
             //Demo_Tables(sqlClient);
             //Demo_View(sqlClient);
-            Demo_AllTables(sqlClient);
+            //Demo_AllTables(sqlClient);
             //Demo_GlobalTables(sqlClient);
             //Demo_DropView(sqlClient);
             //Demo_CreateView(sqlClient);
@@ -37,7 +37,7 @@ namespace HiSql
         {
             //OpLevel.Execute  表示执行并返回生成的SQL
             //OpLevel.Check 表示仅做检测失败时返回消息且检测成功时返因生成的SQL
-            var rtn = sqlClient.DbFirst.ReTable("H_Test5_1", "H_Test5",OpLevel.Execute);
+            var rtn = sqlClient.DbFirst.ReTable("H_Test5", "H_Test5_1", OpLevel.Execute);
             if (rtn.Item1)
             {
                 Console.WriteLine(rtn.Item2);//输出成功消息
@@ -249,10 +249,16 @@ namespace HiSql
         {
             //OpLevel.Execute  表示执行并返回生成的SQL
             //OpLevel.Check 表示仅做检测失败时返回消息且检测成功时返因生成的SQL
-            var tabinfo = sqlClient.Context.DMInitalize.GetTabStruct("H_Test5");
+            var tabinfo = sqlClient.Context.DMInitalize.GetTabStruct("H_Test5_1");
 
             TabInfo _tabcopy = ClassExtensions.DeepCopy<TabInfo>(tabinfo);
-            _tabcopy.Columns[2].ReFieldName = "Testname3";
+            //_tabcopy.Columns.RemoveAt(4);
+
+            //HiColumn newcol = ClassExtensions.DeepCopy<HiColumn>(_tabcopy.Columns[1]);
+            //newcol.FieldName = "Testname3";
+            //newcol.ReFieldName = "Testname3";
+            //_tabcopy.Columns.Add(newcol);
+            _tabcopy.Columns[4].ReFieldName = "Testname3_1";
             var rtn= sqlClient.DbFirst.ModiTable(_tabcopy, OpLevel.Execute);
             if (rtn.Item1)
             {
