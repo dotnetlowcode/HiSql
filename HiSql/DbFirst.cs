@@ -72,7 +72,7 @@ namespace HiSql
                     _msg = $"向表[{tabInfo.TabModel.TabName}]添加新字段[{hiColumn.FieldName}]检测成功";
                 }
             }
-            _sql = idm.BuildChangeFieldStatement(tabInfo.TabModel, hiColumn, TabFieldAction.ADD);
+            //_sql = idm.BuildChangeFieldStatement(tabInfo.TabModel, hiColumn, TabFieldAction.ADD);
             return new Tuple<bool, string, string>(_isok, _msg, _sql);
         }
         /// <summary>
