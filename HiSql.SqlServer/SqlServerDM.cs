@@ -304,7 +304,7 @@ namespace HiSql
                     _default = $"default ({_default})";
             }
             return _default;
-        }
+     }
         /// <summary>
         /// 获取表结构信息并缓存
         /// </summary>
@@ -1312,12 +1312,34 @@ namespace HiSql
 
             string _value = GetDbDefault(hiColumn);
 
-            _setsql = _setsql.Replace("[$TabName$]", hiColumn.TabName)
+            if (string.IsNullOrEmpty(_value))
+            {
+                _setsql = _setsql.Replace("[$TabName$]", hiColumn.TabName)
                 .Replace("[$FieldName$]", hiColumn.FieldName)
                 .Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema)
                 .Replace("[$KEY$]", (hiColumn.TabName + hiColumn.FieldName).ToHash())
-                .Replace("[$DefValue$]", _value.Replace("'","''"))
+                .Replace("[$AddDefault$]", "")// _value.Replace("'", "''")
                 ;
+            }
+            else
+            {
+
+                string _adddefault = dbConfig.Set_Default1;
+                _adddefault = _adddefault.Replace("[$TabName$]", hiColumn.TabName)
+                .Replace("[$FieldName$]", hiColumn.FieldName)
+                .Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema)
+                .Replace("[$DefValue$]", _value.Replace("'", "''"));
+
+                _setsql = _setsql.Replace("[$TabName$]", hiColumn.TabName)
+                .Replace("[$FieldName$]", hiColumn.FieldName)
+                .Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema)
+                .Replace("[$KEY$]", (hiColumn.TabName + hiColumn.FieldName).ToHash())
+                .Replace("[$AddDefault$]", _adddefault)
+                ;
+
+            }
+
+            
 
             return _setsql;
         }
