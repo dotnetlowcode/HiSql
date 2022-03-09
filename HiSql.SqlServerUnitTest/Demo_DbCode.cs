@@ -16,7 +16,7 @@ namespace HiSql
 
             //Demo_ModiColumn(sqlClient);
             //Demo_ReColumn(sqlClient);
-            //Demo_ModiTable(sqlClient);
+            Demo_ModiTable(sqlClient);
             //Demo_ReTable(sqlClient);
             //Demo_DelColumn(sqlClient);
             //Demo_Tables(sqlClient);
@@ -252,13 +252,16 @@ namespace HiSql
             var tabinfo = sqlClient.Context.DMInitalize.GetTabStruct("H_Test5_1");
 
             TabInfo _tabcopy = ClassExtensions.DeepCopy<TabInfo>(tabinfo);
-            //_tabcopy.Columns.RemoveAt(2);
+            //_tabcopy.Columns.RemoveAt(4);
 
-            HiColumn newcol = ClassExtensions.DeepCopy<HiColumn>(_tabcopy.Columns[1]);
-            newcol.FieldName = "Testname3";
-            newcol.ReFieldName = "Testname3";
-            _tabcopy.Columns.Add(newcol);
-            //_tabcopy.Columns[2].ReFieldName = "Testname3";
+            //HiColumn newcol = ClassExtensions.DeepCopy<HiColumn>(_tabcopy.Columns[1]);
+            //newcol.FieldName = "Testname3";
+            //newcol.ReFieldName = "Testname3";
+            //_tabcopy.Columns.Add(newcol);
+            _tabcopy.Columns[4].ReFieldName = "Testname3_1";
+
+            //_tabcopy.Columns[4].IsRequire = true;
+
             var rtn= sqlClient.DbFirst.ModiTable(_tabcopy, OpLevel.Execute);
             if (rtn.Item1)
             {

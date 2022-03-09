@@ -27,10 +27,10 @@ namespace HiSql.AST
                     //识别字段
                     SType = StatementType.FieldValue,
                     Reg = new StringBuilder()
-                    //[`]? 2021.12.3 修改允许不带`
+                    //[`]? 2021.12.3 修改允许不带` 增加like支持
                     //.Append(@"^(?:[\s]*)[`]?(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w]+)(?:[\.]{1}))?(?<field>[\w]+)\s*[`]?[\s]*")
                     .Append(@"^(?:[\s]*)[`]?(?<fields>(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w]+)(?:[\.]{1}))?(?<field>[\w]+))\s*[`]?[\s]*")
-                    .Append(@"(?<op>=|\>(?![\=\>\<\!])|\<(?![\=\>\<\!])|\!\=|\<\>|[\>\<]{1}[=]{1})[\s]*")
+                    .Append(@"(?<op>=|\>(?![\=\>\<\!])|like|\<(?![\=\>\<\!])|\!\=|\<\>|[\>\<]{1}[=]{1})[\s]*")
                     .Append(@"(?:(?<value>[-]?\d+(?:[\.]?)[\d]*)|[\'](?<value>[^\']*)[\']")
                     .Append(")").ToString()
 
@@ -44,6 +44,16 @@ namespace HiSql.AST
                     .ToString()
 
                 },
+                new WhereGrp()
+                { 
+                    //识别解析 between 
+                    SType=StatementType.FieldBetweenValue,
+                    Reg=new StringBuilder()
+                    .Append(@"^(?:[\s]*)[`]?(?<fields>(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w]+)(?:[\.]{1}))?(?<field>[\w]+))\s*[`]?[\s]+")
+                    .Append(@"(?<op>between)[\s]+(?:(?<value>[-]?\d+(?:[\.]?)[\d]*)|[\'](?<value>[^\']*)[\'])\s+and\s+(?:(?<value2>[-]?\d+(?:[\.]?)[\d]*)|[\'](?<value2>[^\']*)[\'])")
+                    .ToString()
+                }
+                ,
                 new WhereGrp()
                 {
                     //识别运算符
@@ -123,10 +133,10 @@ namespace HiSql.AST
                         var result = Tool. RegexGrpOrReplace(_expr.Reg, wherestr);
                         if (result.Item1)
                         {
-                            //暂时不支持in语句 下一版本会支持
-                            if (!_expr.SType .IsIn<StatementType>(StatementType.FieldBetweenValue))
-                            {
-                                _ismatch = result.Item1;
+                            //已经全面支持 in,not in ,between and  （20220309增加 ）语法
+                            //if (!_expr.SType .IsIn<StatementType>(StatementType.FieldBetweenValue))
+                            //{
+                            _ismatch = result.Item1;
                                 WhereResult whereResult = new WhereResult();
                                 whereResult.SType = _expr.SType;
                                 whereResult.Result = result.Item2;
@@ -138,13 +148,13 @@ namespace HiSql.AST
                                
                                 wherestr = result.Item3;
                                 break;
-                            }
-                            else
-                            {
-                                _checkok = false;
-                                throw new Exception($"{HiSql.Constants.HiSqlSyntaxError}语句{wherestr} 暂时不支持 in 或not in 及between and语法");
-                                //Console.WriteLine($"语句{wherestr} 暂时不支持 in 语法");
-                            }
+                            //}
+                            //else
+                            //{
+                            //    _checkok = false;
+                            //    throw new Exception($"{HiSql.Constants.HiSqlSyntaxError}语句{wherestr} 暂时不支持 in 或not in 及between and语法");
+                            //    //Console.WriteLine($"语句{wherestr} 暂时不支持 in 语法");
+                            //}
                         }
 
                     }

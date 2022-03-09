@@ -304,7 +304,7 @@ namespace HiSql
                     _default = $"default ({_default})";
             }
             return _default;
-        }
+     }
         /// <summary>
         /// 获取表结构信息并缓存
         /// </summary>
@@ -1312,12 +1312,34 @@ namespace HiSql
 
             string _value = GetDbDefault(hiColumn);
 
-            _setsql = _setsql.Replace("[$TabName$]", hiColumn.TabName)
+            if (string.IsNullOrEmpty(_value))
+            {
+                _setsql = _setsql.Replace("[$TabName$]", hiColumn.TabName)
                 .Replace("[$FieldName$]", hiColumn.FieldName)
                 .Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema)
                 .Replace("[$KEY$]", (hiColumn.TabName + hiColumn.FieldName).ToHash())
-                .Replace("[$DefValue$]", _value.Replace("'","''"))
+                .Replace("[$AddDefault$]", "")// _value.Replace("'", "''")
                 ;
+            }
+            else
+            {
+
+                string _adddefault = dbConfig.Set_Default1;
+                _adddefault = _adddefault.Replace("[$TabName$]", hiColumn.TabName)
+                .Replace("[$FieldName$]", hiColumn.FieldName)
+                .Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema)
+                .Replace("[$DefValue$]", _value.Replace("'", "''"));
+
+                _setsql = _setsql.Replace("[$TabName$]", hiColumn.TabName)
+                .Replace("[$FieldName$]", hiColumn.FieldName)
+                .Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema)
+                .Replace("[$KEY$]", (hiColumn.TabName + hiColumn.FieldName).ToHash())
+                .Replace("[$AddDefault$]", _adddefault)
+                ;
+
+            }
+
+            
 
             return _setsql;
         }
@@ -1374,6 +1396,40 @@ namespace HiSql
                             WhereParse whereParse = new WhereParse(whereResult.Result["content"].ToString());
                             sb_sql.Append($" ({BuilderWhereSql(TableList, dictabinfo, Fields, whereParse.Result, issubquery)})");
                         }
+                    }
+                    else if (whereResult.SType == StatementType.FieldBetweenValue)
+                    {
+                        if (whereResult.Result.ContainsKey("fields"))
+                        {
+                            if (!whereResult.Result.ContainsKey("value") || !whereResult.Result.ContainsKey("value2"))
+                                throw new Exception($"未能识别的语法 between  and 的值");
+
+
+                            FieldDefinition field = new FieldDefinition(whereResult.Result["fields"].ToString());
+                            HiColumn hiColumn = CheckField(TableList, dictabinfo, Fields, field);
+                            sb_sql.Append($"{dbConfig.Table_Pre}{field.AsTabName}{dbConfig.Table_After}.{dbConfig.Table_Pre}{field.AsFieldName}{dbConfig.Table_After}");
+
+                            if (hiColumn != null)
+                            {
+                                string _value = whereResult.Result["value"].ToString();
+                                string _value2 = whereResult.Result["value2"].ToString();
+                                if (hiColumn != null)
+                                {
+                                    sb_sql.Append($" {whereResult.Result["op"].ToString()} ");
+                                    sb_sql.Append(getSingleValue(issubquery, hiColumn, _value));
+                                    sb_sql.Append(" and ");
+                                    sb_sql.Append(getSingleValue(issubquery, hiColumn, _value2));
+                                }
+                            }
+                            else
+                                throw new Exception($"字段[{whereResult.Result["fields"].ToString()}]出现错误");
+                        }
+                        else
+                        {
+                            throw new Exception($"未能识别的解析结果");
+                        }
+
+
                     }
                     else if (whereResult.SType == StatementType.Symbol)
                     {
