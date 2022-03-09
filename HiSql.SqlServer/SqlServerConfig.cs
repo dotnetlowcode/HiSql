@@ -99,6 +99,9 @@ namespace HiSql
 
         string _temp_retable = "EXECUTE sp_rename '[$TabName$]', '[$ReTabName$]'";
 
+
+   
+
         string _temp_setdefalut = "";
         string _temp_setdefalut1 = "";
 
@@ -282,7 +285,7 @@ namespace HiSql
 
         public string Set_Default { get => _temp_setdefalut; }
 
-
+        
         /// <summary>
         /// sqlserver 专用
         /// </summary>
@@ -564,8 +567,20 @@ namespace HiSql
 
 
             _temp_field_comment = new StringBuilder()
+
+                .AppendLine("if exists(select a.name as TabName,b.name as FieldName,c.value as FieldDesc")
+                .AppendLine("from sys.tables as a")
+                .AppendLine("inner join sys.columns as b on b.object_id=a.object_id")
+                .AppendLine("left join sys.extended_properties as c on c.major_id=b.object_id and c.minor_id = b.column_id")
+                .AppendLine("where a.name='[$TabName$]' and b.name = '[$FieldName$]' and c.value is not null)")
+                .AppendLine("begin")
+                .AppendLine("EXECUTE sp_updateextendedproperty N'MS_Description', N'[$FieldDesc$]', N'SCHEMA', N'[$Schema$]', N'TABLE', N'[$TabName$]', N'COLUMN', N'[$FieldName$]'")
+                .AppendLine("end")
+                .AppendLine("else")
+                .AppendLine("begin")
                 .AppendLine("EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'[$FieldDesc$]' , @level0type=N'SCHEMA',@level0name=N'[$Schema$]', @level1type=N'TABLE',@level1name=N'[$TabName$]', @level2type=N'COLUMN',@level2name=N'[$FieldName$]'")
-                // .AppendLine("GO")
+                .AppendLine("end")
+
                 .ToString();
 
   
@@ -704,6 +719,9 @@ UNION ALL
                 .AppendLine("       exec('ALTER TABLE [$Schema$].[$TabName$] DROP CONSTRAINT '+@_constname)")
                 .AppendLine("   end")
                 .ToString();
+
+            
+
 
             //判断表或视图存不存在
             _temp_check_table_exists = new StringBuilder()

@@ -305,7 +305,11 @@ namespace HiSql
             if (!hiColumns.Any(h => h.IsBllKey))
                 throw new Exception($"该表无主键无法用指定数据删除请在Delete方法后用Where的方式进行操作");
 
-            foreach (HiColumn hiColumn in hiColumns)
+
+            //仅对字段进行条件删除
+            var bllcols = hiColumns.Where(c => c.IsBllKey).ToList();
+
+            foreach (HiColumn hiColumn in bllcols)
             {
                 if (!isDic)
                 {
