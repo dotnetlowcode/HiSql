@@ -36,7 +36,7 @@ namespace HiSql.UnitTest
             //Query_Demo7(sqlClient);
             //Query_Demo8(sqlClient);
             //Query_Demo9(sqlClient);
-            //Query_Demo10(sqlClient);
+            Query_Demo10(sqlClient);
             var s = Console.ReadLine();
         }
 
@@ -44,6 +44,9 @@ namespace HiSql.UnitTest
 
         static void Query_Demo10(HiSqlClient sqlClient)
         {
+
+            var _sql2=sqlClient.HiSql("select * from Hi_FieldModel where FieldType between  10 and 50").ToSql();
+
             var _sql = sqlClient.HiSql("select * from Hi_FieldModel where TabName like 'H_D%'").ToSql();
         }
 

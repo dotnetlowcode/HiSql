@@ -1397,6 +1397,40 @@ namespace HiSql
                             sb_sql.Append($" ({BuilderWhereSql(TableList, dictabinfo, Fields, whereParse.Result, issubquery)})");
                         }
                     }
+                    else if (whereResult.SType == StatementType.FieldBetweenValue)
+                    {
+                        if (whereResult.Result.ContainsKey("fields"))
+                        {
+                            if (!whereResult.Result.ContainsKey("value") || !whereResult.Result.ContainsKey("value2"))
+                                throw new Exception($"未能识别的语法 between  and 的值");
+
+
+                            FieldDefinition field = new FieldDefinition(whereResult.Result["fields"].ToString());
+                            HiColumn hiColumn = CheckField(TableList, dictabinfo, Fields, field);
+                            sb_sql.Append($"{dbConfig.Table_Pre}{field.AsTabName}{dbConfig.Table_After}.{dbConfig.Table_Pre}{field.AsFieldName}{dbConfig.Table_After}");
+
+                            if (hiColumn != null)
+                            {
+                                string _value = whereResult.Result["value"].ToString();
+                                string _value2 = whereResult.Result["value2"].ToString();
+                                if (hiColumn != null)
+                                {
+                                    sb_sql.Append($" {whereResult.Result["op"].ToString()} ");
+                                    sb_sql.Append(getSingleValue(issubquery, hiColumn, _value));
+                                    sb_sql.Append(" and ");
+                                    sb_sql.Append(getSingleValue(issubquery, hiColumn, _value2));
+                                }
+                            }
+                            else
+                                throw new Exception($"字段[{whereResult.Result["fields"].ToString()}]出现错误");
+                        }
+                        else
+                        {
+                            throw new Exception($"未能识别的解析结果");
+                        }
+
+
+                    }
                     else if (whereResult.SType == StatementType.Symbol)
                     {
                         sb_sql.Append($" {whereResult.Result["mode"].ToString()} ");
