@@ -880,6 +880,7 @@ namespace HiSql
                         _sql = idm.BuildChangeFieldStatement(tabInfo.TabModel, hiColumn, TabFieldAction.RENAME);
 
                         hiColumn.FieldName = hiColumn.ReFieldName;
+                        hiColumn.FieldDesc = hiColumn.FieldName;
 
                         _sql += System.Environment.NewLine + idm.BuildChangeFieldStatement(tabInfo.TabModel, hiColumn, TabFieldAction.MODI);
                         _isok = true;
@@ -969,100 +970,152 @@ namespace HiSql
 
             StringBuilder sb_sql = new StringBuilder();
 
-            
+            bool _tabchange = false;
             var changes = fieldChanges.Where(f => f.Action != TabFieldAction.NONE);
+
+
+            List<HiColumn> lstchg = new List<HiColumn>();
+            List<HiColumn> lstdel = new List<HiColumn>();
 
             foreach (FieldChange field in changes)
             {
                 if (!_isok) break;
+
                 var hicol = tabInfo.Columns.Where(c => c.FieldName.ToLower().Equals(field.FieldName.ToLower())).FirstOrDefault();
-                if (hicol != null)
+                if (field.IsTabChange)
                 {
-                    if (field.Action == TabFieldAction.ADD)
-                    {
-                        var addrtn = addColumn(idm, tab, hicol, OpLevel.Check);
-                        if (addrtn.Item1)
-                            sb_sql.AppendLine(addrtn.Item3);
-                        else
-                        {
-                            _msg = addrtn.Item2;
-                            _isok = false;
-                        }
-                    }
-                    else if (field.Action == TabFieldAction.MODI)
-                    {
-                        var modirtn = modiColumn(idm, tabInfo, hicol, OpLevel.Check);
-                        if (modirtn.Item1)
-                            sb_sql.AppendLine(modirtn.Item3);
-                        else
-                        {
-                            _msg = modirtn.Item2;
-                            _isok = false;
-                        }
-                    }
-                    else if (field.Action == TabFieldAction.DELETE)
-                    {
-                        var delrtn = delColumn(idm, tabInfo, hicol, OpLevel.Check);
-                        if (delrtn.Item1)
-                            sb_sql.AppendLine(delrtn.Item3);
-                        else
-                        {
-                            _msg = delrtn.Item2;
-                            _isok = false;
-                        }
-                    }
-                    else if (field.Action == TabFieldAction.RENAME)
-                    {
-                        var rertn = reColumn(idm, tabInfo, hicol, OpLevel.Check);
-                        if (rertn.Item1)
-                            sb_sql.AppendLine(rertn.Item3);
-                        else
-                        {
-                            _msg = rertn.Item2;
-                            _isok = false;
-                        }
+                    #region 涉及物理表变更
 
-                    }
-                    else
+                    
+                    if (hicol != null)
                     {
-                        _isok = false;
-                        _msg = $"不支持{field.Action}";
-                    }
-                }
-                else
-                {
-
-                    if (field.Action == TabFieldAction.DELETE)
-                    {
-                        var _hicol = tab.Columns.Where(c => c.FieldName.ToLower().Equals(field.FieldName.ToLower())).FirstOrDefault();
-                        if (_hicol != null)
+                        if (field.Action == TabFieldAction.ADD)
                         {
-
-
-                            var delrtn = delColumn(idm, tab, _hicol, OpLevel.Check);
+                            var addrtn = addColumn(idm, tab, hicol, OpLevel.Check);
+                            if (addrtn.Item1)
+                            {
+                                sb_sql.AppendLine(addrtn.Item3);
+                                lstchg.Add(hicol);
+                                _tabchange = true;
+                            }
+                            else
+                            {
+                                _msg = addrtn.Item2;
+                                _isok = false;
+                            }
+                        }
+                        else if (field.Action == TabFieldAction.MODI)
+                        {
+                            var modirtn = modiColumn(idm, tabInfo, hicol, OpLevel.Check);
+                            if (modirtn.Item1)
+                            {
+                                sb_sql.AppendLine(modirtn.Item3);
+                                lstchg.Add(hicol);
+                                _tabchange = true;
+                            }
+                            else
+                            {
+                                _msg = modirtn.Item2;
+                                _isok = false;
+                            }
+                        }
+                        else if (field.Action == TabFieldAction.DELETE)
+                        {
+                            var delrtn = delColumn(idm, tabInfo, hicol, OpLevel.Check);
                             if (delrtn.Item1)
+                            {
                                 sb_sql.AppendLine(delrtn.Item3);
+                                lstdel.Add(hicol);
+                                _tabchange = true;
+                            }
                             else
                             {
                                 _msg = delrtn.Item2;
                                 _isok = false;
                             }
                         }
+                        else if (field.Action == TabFieldAction.RENAME)
+                        {
+                            var rertn = reColumn(idm, tabInfo, hicol, OpLevel.Check);
+                            if (rertn.Item1)
+                            {
+                                sb_sql.AppendLine(rertn.Item3);
+                                //var _tmpcol = ClassExtensions.DeepCopy<HiColumn>(hicol);
+                                //lstdel.Add(hicol);
+                                //_tmpcol.FieldName = _tmpcol.ReFieldName;
+                                lstchg.Add(hicol);
+                                _tabchange = true;
+
+
+                            }
+                                
+                            else
+                            {
+                                _msg = rertn.Item2;
+                                _isok = false;
+                            }
+
+                        }
                         else
                         {
-                            _msg = $"未能匹配字段[{field.FieldName}]";
                             _isok = false;
+                            _msg = $"不支持{field.Action}";
                         }
                     }
                     else
                     {
-                        _msg = $"字段[{field.FieldName}] 未能识别动作[{field.Action}]";
-                        _isok = false;
-                    }
-                }
-                        
-            }
 
+                        if (field.Action == TabFieldAction.DELETE)
+                        {
+                            var _hicol = tab.Columns.Where(c => c.FieldName.ToLower().Equals(field.FieldName.ToLower())).FirstOrDefault();
+                            if (_hicol != null)
+                            {
+
+
+                                var delrtn = delColumn(idm, tab, _hicol, OpLevel.Check);
+                                if (delrtn.Item1)
+                                {
+                                    sb_sql.AppendLine(delrtn.Item3);
+                                    lstdel.Add(_hicol);
+                                    _tabchange = true;
+                                }
+                                else
+                                {
+                                    _msg = delrtn.Item2;
+                                    _isok = false;
+                                }
+                            }
+                            else
+                            {
+                                _msg = $"未能匹配字段[{field.FieldName}]";
+                                _isok = false;
+                            }
+                        }
+                        else
+                        {
+                            _msg = $"字段[{field.FieldName}] 未能识别动作[{field.Action}]";
+                            _isok = false;
+                        }
+                    }
+
+                    _tabchange = true;//说明物理表结构有变更
+                    #endregion
+                }
+                else
+                {
+                    #region 配置信息变更
+
+                    if (hicol != null)
+                    {
+                        lstchg.Add(hicol);
+                    }
+
+
+
+                    #endregion
+                }
+            }
+            
             if (changes.Count() > 0)
             {
                 if (_isok)
@@ -1072,7 +1125,18 @@ namespace HiSql
                         _sqlClient.BeginTran();
                         try
                         {
-                            _sqlClient.Context.DBO.ExecCommand(sb_sql.ToString(), null);
+                            if(_tabchange)
+                                _sqlClient.Context.DBO.ExecCommand(sb_sql.ToString(), null);
+                            
+                            
+
+                            if (lstdel.Count > 0)
+                                _sqlClient.Delete(Constants.HiSysTable["Hi_FieldModel"].ToString(), lstdel).ExecCommand();
+
+                            if (lstchg.Count > 0)
+                                _sqlClient.Modi(Constants.HiSysTable["Hi_FieldModel"].ToString(), lstchg).ExecCommand();
+
+                            
                             _sqlClient.CommitTran();
                             _isok = true;
                             _msg = $"保存表[{tabInfo.TabModel.TabName}]的结构成功";
@@ -1098,9 +1162,10 @@ namespace HiSql
                 _isok = false;
                 _msg = "表结构无变更";
             }
-            
 
-
+            //刷新表结构缓存
+            HiSqlCommProvider.RemoveTabInfoCache(tabInfo.TabModel.TabName);
+            TabInfo _temptabinfo = idm.GetTabStruct(tabInfo.TabModel.TabName);
 
             return new Tuple<bool, string, string>(_isok, _msg, sb_sql.ToString());
         }
