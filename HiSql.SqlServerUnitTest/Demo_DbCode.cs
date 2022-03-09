@@ -259,6 +259,9 @@ namespace HiSql
             //newcol.ReFieldName = "Testname3";
             //_tabcopy.Columns.Add(newcol);
             _tabcopy.Columns[4].ReFieldName = "Testname3_1";
+
+            //_tabcopy.Columns[4].IsRequire = true;
+
             var rtn= sqlClient.DbFirst.ModiTable(_tabcopy, OpLevel.Execute);
             if (rtn.Item1)
             {
