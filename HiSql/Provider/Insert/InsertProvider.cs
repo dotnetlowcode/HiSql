@@ -380,7 +380,7 @@ namespace HiSql
             _queue.Add("insert");
             return this;
         }
-        
+
         public virtual string ToSql()
         {
 
@@ -733,9 +733,13 @@ namespace HiSql
                                         else
                                             _value = "0";
                                     }
-                                    else
+                                    else if (_o.ContainsKey(hiColumn.FieldName))
                                     {
                                         _value = _o[hiColumn.FieldName].ToString();
+                                    }
+                                    else
+                                    {
+                                        _value = string.Empty;
                                     }
                                     #endregion
 

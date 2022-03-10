@@ -26,21 +26,26 @@ namespace HiSql
             {
                 lock (DbAssembly)
                 {
-                    Assembly _assembly=null;
-                    try
+                    if (DbAssembly.ContainsKey(dbtype.ToString()))
                     {
-                        _assembly = Assembly.Load($"{Constants.NameSpace}.{dbtype.ToString()}");
-                        //_assembly = Assembly.Load($"{Constants.NameSpace}");
-                        DbAssembly.Add(dbtype.ToString(), _assembly);
-                        return _assembly;
+                        return DbAssembly[dbtype.ToString()];
                     }
-                    catch(Exception E)
+                    else
                     {
-                        return null;
+                        Assembly _assembly = null;
+                        try
+                        {
+                            _assembly = Assembly.Load($"{Constants.NameSpace}.{dbtype.ToString()}");
+                            //_assembly = Assembly.Load($"{Constants.NameSpace}");
+                            DbAssembly.Add(dbtype.ToString(), _assembly);
+                            return _assembly;
+                        }
+                        catch (Exception E)
+                        {
+                            return null;
 
+                        }
                     }
-                    
-                    
                 }
             }
         }
@@ -160,13 +165,19 @@ namespace HiSql
             {
                 lock (typeCache)
                 {
-                    
-                    type = GetAssembly(getDbTypeName(className)).GetType(className);
-                    if (type == null)
-                        throw new Exception($"类[{className}]不存在");
-                    if (!typeCache.ContainsKey(className))
+                    if (typeCache.ContainsKey(className))
                     {
-                        typeCache.Add(className, type);
+                        type = typeCache[className];
+                    }
+                    else
+                    {
+                        type = GetAssembly(getDbTypeName(className)).GetType(className);
+                        if (type == null)
+                            throw new Exception($"类[{className}]不存在");
+                        if (!typeCache.ContainsKey(className))
+                        {
+                            typeCache.Add(className, type);
+                        }
                     }
                 }
             }
