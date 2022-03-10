@@ -318,7 +318,7 @@ namespace HiSql
                 }
                 #endregion
                 DbCommand sqlCommand = GetCommand(sql, parameters);
-                count = await  sqlCommand.ExecuteNonQueryAsync();
+                count = await sqlCommand.ExecuteNonQueryAsync();
                 sqlCommand.Dispose();
 
                 #region 执行后操作
@@ -383,7 +383,8 @@ namespace HiSql
             {
                 if (OnTimeOut != null)
                 {
-                    Task.Run(() => { 
+                    Task.Run(() =>
+                    {
                         OnTimeOut(this.Context.CurrentConnectionConfig.SqlExecTimeOut);
                     });
                 }
@@ -484,11 +485,7 @@ namespace HiSql
             {
                 if (OnTimeOut != null)
                 {
-                    OnTimeOut.BeginInvoke(this.Context.CurrentConnectionConfig.SqlExecTimeOut, (o) =>
-                    {
-                        //OnTimeOut 回调
-                    }, null);
-                    //Task.Run(() => { OnTimeOut(this.Context.CurrentConnectionConfig.SqlExecTimeOut); });
+                    Task.Run(() => { OnTimeOut(this.Context.CurrentConnectionConfig.SqlExecTimeOut); });
                 }
             }
             return workTask;
