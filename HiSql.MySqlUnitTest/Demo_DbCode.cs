@@ -18,9 +18,10 @@ namespace HiSql.MySqlUnitTest
             //Demo_View(sqlClient);
             //Demo_AllTables(sqlClient);
             //Demo_GlobalTables(sqlClient);
-            Demo_DropView(sqlClient);
-            Demo_CreateView(sqlClient);
-            Demo_ModiView(sqlClient);
+
+            //Demo_DropView(sqlClient); //ok
+            //Demo_CreateView(sqlClient);//ok
+            //Demo_ModiView(sqlClient);//ok
 
             //Demo_IndexList(sqlClient);
             //Demo_Index_Create(sqlClient);
