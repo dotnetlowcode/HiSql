@@ -35,7 +35,15 @@ namespace HiSql.MySqlUnitTest
             //Query_Demo6(sqlClient);
             //Query_Demo7(sqlClient);
             //Query_Demo8(sqlClient);
-            Query_Demo9(sqlClient);
+            //Query_Demo9(sqlClient);
+            //Query_Demo10(sqlClient);
+        }
+        static void Query_Demo10(HiSqlClient sqlClient)
+        {
+
+            var data= sqlClient.HiSql("select * from Hi_FieldModel where FieldType between  10 and 50").ToTable();
+
+            var _sql = sqlClient.HiSql("select * from Hi_FieldModel where TabName like 'H_D%'").ToSql();
         }
         static void Query_Demo9(HiSqlClient sqlClient)
         {

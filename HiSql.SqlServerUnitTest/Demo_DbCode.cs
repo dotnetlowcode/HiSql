@@ -254,11 +254,14 @@ namespace HiSql
             TabInfo _tabcopy = ClassExtensions.DeepCopy<TabInfo>(tabinfo);
             //_tabcopy.Columns.RemoveAt(4);
 
-            //HiColumn newcol = ClassExtensions.DeepCopy<HiColumn>(_tabcopy.Columns[1]);
-            //newcol.FieldName = "Testname3";
-            //newcol.ReFieldName = "Testname3";
-            //_tabcopy.Columns.Add(newcol);
-            _tabcopy.Columns[4].ReFieldName = "Testname3_1";
+            HiColumn newcol = ClassExtensions.DeepCopy<HiColumn>(_tabcopy.Columns[1]);
+            newcol.FieldName = "Testname3";
+            newcol.ReFieldName = "Testname3";
+            _tabcopy.Columns.Add(newcol);
+            //_tabcopy.Columns[4].ReFieldName = "Testname3";
+            //_tabcopy.Columns[4].FieldDesc = "Testname3";
+            //_tabcopy.Columns[4].IsRequire = true;
+
             var rtn= sqlClient.DbFirst.ModiTable(_tabcopy, OpLevel.Execute);
             if (rtn.Item1)
             {
