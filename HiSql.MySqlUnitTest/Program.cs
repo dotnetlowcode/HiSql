@@ -18,6 +18,8 @@ namespace HiSql.MySqlUnitTest
 
             //Demo_Delete.Init(sqlClient);
            Demo_DbCode.Init(sqlClient);
+
+           Console.ReadKey();
         }
     }
 }
