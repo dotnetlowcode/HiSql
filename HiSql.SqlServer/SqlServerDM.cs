@@ -925,7 +925,18 @@ namespace HiSql
 
             string _changesql = string.Empty;
             if (tabFieldAction == TabFieldAction.ADD)
-                _changesql = dbConfig.Add_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$TempColumn$]", _fieldsql);
+            {
+                _changesql = new StringBuilder()
+                    .AppendLine( dbConfig.Add_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$TempColumn$]", _fieldsql))
+                    .AppendLine(dbConfig.Field_Comment.Replace("[$Schema$]",Context.CurrentConnectionConfig.Schema)
+                        .Replace("[$TabName$]", hiTable.TabName)
+                        .Replace("[$FieldName$]", hiColumn.FieldName)
+                        .Replace("[$FieldDesc$]",hiColumn.FieldDesc)
+                    )
+                    .ToString()
+                    ;
+
+            }
             else if (tabFieldAction == TabFieldAction.DELETE)
             {
                 var _delsql = dbConfig.Del_Default;
@@ -947,6 +958,10 @@ namespace HiSql
                 _changesql = new StringBuilder().AppendLine(dbConfig.Modi_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$TempColumn$]", _fieldsql))
                     //.AppendLine(";go")
                     .AppendLine(BuildFieldDefaultValue(hiColumn))
+                    .AppendLine(dbConfig.Field_Comment.Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema)
+                        .Replace("[$TabName$]", hiTable.TabName)
+                        .Replace("[$FieldName$]", hiColumn.FieldName)
+                        .Replace("[$FieldDesc$]", hiColumn.FieldDesc))
                     .ToString();
             }
             else if (tabFieldAction == TabFieldAction.RENAME)
@@ -956,8 +971,13 @@ namespace HiSql
 
                 _changesql = new StringBuilder().AppendLine(dbConfig.Re_Column.Replace("[$TabName$]", hiTable.TabName)
                     .Replace("[$ReFieldName$]", hiColumn.ReFieldName)
-                    .Replace("[$FieldName$]",hiColumn.FieldName)
-                    ).ToString();
+                    .Replace("[$FieldName$]", hiColumn.FieldName)
+                    )
+                    .AppendLine(dbConfig.Field_Comment.Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema)
+                        .Replace("[$TabName$]", hiTable.TabName)
+                        .Replace("[$FieldName$]", hiColumn.ReFieldName)
+                        .Replace("[$FieldDesc$]", hiColumn.FieldDesc))
+                    .ToString();
 
 
             }
