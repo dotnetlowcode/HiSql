@@ -886,14 +886,21 @@ namespace HiSql
 
             string _changesql = string.Empty;
             if (tabFieldAction == TabFieldAction.ADD)
-                _changesql = dbConfig.Add_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$TempColumn$]", _fieldsql);
+                _changesql = dbConfig.Add_Column.Replace("[$TabName$]", $"{dbConfig.Table_Pre}{hiTable.TabName}{dbConfig.Table_After}").Replace("[$TempColumn$]", _fieldsql);
             else if (tabFieldAction == TabFieldAction.DELETE)
-                _changesql = dbConfig.Del_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$FieldName$]", hiColumn.FieldName);
+                _changesql = dbConfig.Del_Column.Replace("[$TabName$]", $"{dbConfig.Table_Pre}{hiTable.TabName}{dbConfig.Table_After}").Replace("[$FieldName$]", hiColumn.FieldName);
             else if (tabFieldAction == TabFieldAction.MODI)
-                _changesql = dbConfig.Add_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$TempColumn$]", _fieldsql);
+                _changesql = dbConfig.Modi_Column.Replace("[$TabName$]", $"{dbConfig.Table_Pre}{hiTable.TabName}{dbConfig.Table_After}").Replace("[$TempColumn$]", _fieldsql);
+            else if (tabFieldAction == TabFieldAction.RENAME)
+            {
+                var fieldNameFind = dbConfig.Field_Pre + hiColumn.FieldName + dbConfig.Field_After;
+                var fieldIndex = _fieldsql.IndexOf(fieldNameFind) + fieldNameFind.Length;
+                _fieldsql = _fieldsql.Substring(0, fieldIndex) + $"     {dbConfig.Field_Pre}{hiColumn.ReFieldName}{dbConfig.Field_After} " + _fieldsql.Substring(fieldIndex);
+                //字段重命名
+                _changesql = dbConfig.Re_Column.Replace("[$TabName$]", $"{dbConfig.Table_Pre}{hiTable.TabName}{dbConfig.Table_After}").Replace("[$TempColumn$]", _fieldsql);
+            }
             else
                 return "";
-
 
 
             return _changesql;
@@ -2465,20 +2472,104 @@ namespace HiSql
 
         public List<TabIndex> GetIndexs(string tabname)
         {
+
+            string _sql = dbConfig.Get_TabIndexs.Replace("[$TabName$]", tabname);
+
+            List<TabIndex> lstindex = new List<TabIndex>();
+            DataTable dt = Context.DBO.GetDataTable(_sql);
+            if (dt.Rows.Count > 0)
+            {
+                foreach (DataRow dr in dt.Rows)
+                {
+                    TabIndex tabIndex = new TabIndex();
+                    tabIndex.TabName = tabname;
+                    tabIndex.IndexName = dr["IndexName"].ToString();
+                    tabIndex.IndexType = dr["IndexType"].ToString();
+                    lstindex.Add(tabIndex);
+                }
+                return lstindex;
+            }
+            else
+                return new List<TabIndex>();
+
             throw new NotImplementedException();
         }
 
         public List<TabIndexDetail> GetIndexDetails(string tabname, string indexname)
         {
+            string _sql = dbConfig.Get_IndexDetail.Replace("[$TabName$]", tabname).Replace("[$IndexName$]", indexname);
+            List<TabIndexDetail> lstindex = new List<TabIndexDetail>();
+            DataTable dt = Context.DBO.GetDataTable(_sql);
+            if (dt.Rows.Count > 0)
+            {
+                foreach (DataRow dr in dt.Rows)
+                {
+                    TabIndexDetail tabIndex = new TabIndexDetail();
+                    tabIndex.TabName = tabname;
+                    tabIndex.ColumnName = dr["ColumnName"].ToString();
+                    tabIndex.IndexName = dr["IndexName"].ToString();
+                    tabIndex.IndexType = dr["IndexType"].ToString();
+                    tabIndex.ColumnIdx = Convert.ToInt32(dr["ColumnIdx"].ToString());
+                    tabIndex.ColumnId = Convert.ToInt32(dr["ColumnID"].ToString());
+                    tabIndex.SortType = dr["Sort"].ToString().ToLower() == "asc" ? SortType.ASC : SortType.DESC;
+                    tabIndex.IsPrimary = dr["IPrimary"].ToString() == "Y" ? true : false;
+                    tabIndex.IsUnique = dr["IsUnique"].ToString() == "Y" ? true : false;
+
+                    lstindex.Add(tabIndex);
+                }
+                return lstindex;
+            }
+            else
+                return new List<TabIndexDetail>();
             throw new NotImplementedException();
         }
         public string CreateIndex(string tabname, string indexname, List<HiColumn> hiColumns)
         {
+            //注未判断索引是否重复，由底层库抛出
+            string _sql = dbConfig.Get_CreateIndex.Replace("[$TabName$]", tabname).Replace("[$IndexName$]", indexname).Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema);
+            DataTable dt = GetTableDefinition(tabname);
+            string _fields = string.Empty;
+
+            if (dt.Rows.Count > 0)
+            {
+                if (hiColumns.Count > 0)
+                {
+                    int i = 0;
+                    StringBuilder keys = new StringBuilder();
+                    foreach (HiColumn hiColumn in hiColumns)
+                    {
+                        if (!dt.AsEnumerable().Any(t => t.Field<string>("FieldName").ToLower() == hiColumn.FieldName.ToLower()))
+                            throw new Exception($"为表[{tabname}]创建的索引指的字段[{hiColumn.FieldName}]不存在于表[{tabname}]中");
+
+                        string _tempkey = dbConfig.Table_Key2.Replace("[$FieldName$]", hiColumn.FieldName);
+                        if (i < hiColumns.Count - 1)
+                            keys.AppendLine($"{_tempkey}{dbConfig.Field_Split}");
+                        else
+                            keys.AppendLine($"{_tempkey}");
+                        i++;
+                    }
+                    _sql = _sql.Replace("[$Key$]", keys.ToString());
+                    return _sql;
+                }
+                else
+                    throw new Exception("索引创建必须指定字段");
+            }
+            else
+                throw new Exception($"表[{tabname}]不存在,无法创建索引");
+
             throw new NotImplementedException();
         }
 
         public string DropIndex(string tabname, string indexname)
         {
+            
+            //暂未校验索引是否存在 由底层数据库抛出
+            string _sql = dbConfig.Get_DropIndex.Replace("[$IndexName$]", indexname).Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema)
+                .Replace("[$TabName$]", tabname)
+                ;
+
+
+            return _sql;
             throw new NotImplementedException();
         }
 

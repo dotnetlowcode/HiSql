@@ -90,10 +90,9 @@ namespace HiSql
 
         string _temp_delcolumn = "alter table [$TabName$] drop column [$FieldName$]";
 
-        string _temp_modicolumn = "alter table [$TabName$] alter column [$TempColumn$]";
+        string _temp_modicolumn = "alter table [$TabName$] MODIFY column [$TempColumn$];";
 
-        string _temp_recolumn = "EXECUTE sp_rename N'[$TabName$].[$FieldName$]', N'[$ReFieldName$]', 'COLUMN' ";
-
+        string _temp_recolumn = "alter table [$TabName$] CHANGE column [$TempColumn$];";
         string _temp_retable = "ALTER TABLE [$TabName$]  rename to [$ReTabName$]";
 
         string _temp_setdefalut = "";
@@ -630,8 +629,30 @@ UNION ALL
 
                 .ToString();
 
+           //表索引
+            _temp_get_tabindex = @"SELECT distinct TABLE_NAME as TableName , INDEX_NAME as IndexName,  case when INDEX_NAME='PRIMARY' then 'Key_Index' ELSE 'Index' end as IndexType
+                                    , case when is_visible = 'YES' then '' ELSE 'Y' end as Disabled
+                                    FROM INFORMATION_SCHEMA.STATISTICS
+                                    WHERE TABLE_NAME = '[$TabName$]'; ";
+            //表索引明细
+            _temp_get_indexdetail = @"SELECT 1 as TableId, TABLE_NAME as TableName, 1 as IndexId , INDEX_NAME as IndexName,  case when INDEX_NAME='PRIMARY' then 'Key_Index' ELSE 'Index' end as IndexType
+                                        , SEQ_IN_INDEX AS ColumnIdx, SEQ_IN_INDEX AS ColumnID, COLUMN_NAME as ColumnName, 'asc' as Sort, case when INDEX_NAME='PRIMARY' then 'Y' ELSE 'Y' end as  IPrimary 
+                                        , case when NON_UNIQUE ='1' then '' ELSE 'Y' end as IsUnique
+                                         , '' AS Ignore_dup_key
+                                        , case when is_visible = 'YES' then '' ELSE 'Y' end as Disabled 
+                                        , '' AS Fill_factor
+                                        , '' AS Padded
+                                        FROM INFORMATION_SCHEMA.STATISTICS
+                                        WHERE TABLE_NAME='[$TabName$]' AND INDEX_NAME='[$IndexName$]';";
 
-
+            //创建索引
+            _temp_create_index = @"ALTER TABLE [$Schema$].[$TabName$]
+                                    ADD INDEX `[$IndexName$]` ([$Key$]) USING BTREE ;
+                                    ";
+            //删除索引
+            _temp_drop_index = new StringBuilder()
+                .AppendLine("DROP INDEX [$IndexName$] ON [$Schema$].[$TabName$]")
+                .ToString();
 
             //创建视图
             _temp_create_view = new StringBuilder()
@@ -712,6 +733,7 @@ UNION ALL
                 .AppendLine("order by table_type ASC,   create_time desc ")
 
                 .ToString();
+
 
             //批量MERGE更新模版
             //_temp_merge_into = new StringBuilder()

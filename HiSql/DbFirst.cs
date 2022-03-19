@@ -874,14 +874,13 @@ namespace HiSql
                 }
                 else
                 {
+
                     //重命名字段不在表中才可以进行重命名
                     if (!tabInfo.Columns.Any(c => c.FieldName.ToLower() == hiColumn.ReFieldName.ToLower()))
                     {
+                        hiColumn.FieldDesc = hiColumn.FieldDesc.IsNullOrEmpty()?  hiColumn.FieldName: hiColumn.FieldDesc;
                         _sql = idm.BuildChangeFieldStatement(tabInfo.TabModel, hiColumn, TabFieldAction.RENAME);
-
                         hiColumn.FieldName = hiColumn.ReFieldName;
-                        hiColumn.FieldDesc = hiColumn.FieldName;
-
                         _sql += System.Environment.NewLine + idm.BuildChangeFieldStatement(tabInfo.TabModel, hiColumn, TabFieldAction.MODI);
                         _isok = true;
                         if (opLevel == OpLevel.Execute)
