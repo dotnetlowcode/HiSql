@@ -301,3 +301,5 @@ __pycache__/
 .vs/HiSq.lFull/v17/.futdcache.v1
 .vs/HiSq.lFull/v17/.suo
 *.v1
+*.v2
+*.suo
