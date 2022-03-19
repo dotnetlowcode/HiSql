@@ -18,15 +18,15 @@ namespace HiSql.MySqlUnitTest
             //Demo_View(sqlClient);//ok
             //Demo_AllTables(sqlClient);//ok
             //Demo_GlobalTables(sqlClient);//  delay
-            Demo_ModiTable(sqlClient);//ok
+            //Demo_ModiTable(sqlClient);//ok
 
             //Demo_DropView(sqlClient); //ok
-            // Demo_CreateView(sqlClient);//ok
+            //Demo_CreateView(sqlClient);//ok
             //Demo_ModiView(sqlClient);//ok
 
             //Demo_IndexList(sqlClient);//ok
             //Demo_Index_Create(sqlClient);//ok
-            // Demo_ReTable(sqlClient);//ok
+            //Demo_ReTable(sqlClient);//ok
 
         }
 
@@ -40,13 +40,13 @@ namespace HiSql.MySqlUnitTest
             TabInfo _tabcopy = ClassExtensions.DeepCopy<TabInfo>(tabinfo);
             //_tabcopy.Columns.RemoveAt(4);
 
-            //HiColumn newcol = ClassExtensions.DeepCopy<HiColumn>(_tabcopy.Columns[1]);
-            //newcol.FieldName = "Testname3";
-            //newcol.ReFieldName = "Testname3";
-            //_tabcopy.Columns.Add(newcol);
+            HiColumn newcol = ClassExtensions.DeepCopy<HiColumn>(_tabcopy.Columns[1]);
+            newcol.FieldName = "Testname3";
+            newcol.ReFieldName = "Testname3";
+            _tabcopy.Columns.Add(newcol);
             _tabcopy.Columns[1].ReFieldName = "UName_04";
 
-            //_tabcopy.Columns[4].IsRequire = true;
+            _tabcopy.Columns[4].IsRequire = true;
 
             var rtn = sqlClient.DbFirst.ModiTable(_tabcopy, OpLevel.Execute);
             if (rtn.Item1)
@@ -63,7 +63,7 @@ namespace HiSql.MySqlUnitTest
         {
             //OpLevel.Execute  表示执行并返回生成的SQL
             //OpLevel.Check 表示仅做检测失败时返回消息且检测成功时返因生成的SQL
-            var rtn = sqlClient.DbFirst.ReTable("htest02", "htest02_01", OpLevel.Execute);
+            var rtn = sqlClient.DbFirst.ReTable("htest03_1", "htest03", OpLevel.Execute);
             if (rtn.Item1)
             {
                 Console.WriteLine(rtn.Item2);//输出成功消息
@@ -103,7 +103,7 @@ namespace HiSql.MySqlUnitTest
                 Console.WriteLine($"TabName:{tabIndex.TabName} IndexName:{tabIndex.IndexName} IndexType:{tabIndex.IndexType}");
             }
 
-            List<TabIndexDetail> lstindexdetails = sqlClient.DbFirst.GetTabIndexDetail("Hi_FieldModel", "PK_Hi_FieldModel_ed721f6b-296a-447e-ac67-7d02fd8e338c");
+            List<TabIndexDetail> lstindexdetails = sqlClient.DbFirst.GetTabIndexDetail("Hi_FieldModel", "primary");
             foreach (TabIndexDetail tabIndexDetail in lstindexdetails)
             {
                 Console.WriteLine($"TabName:{tabIndexDetail.TabName} IndexName:{tabIndexDetail.IndexName} IndexType:{tabIndexDetail.IndexType} ColumnName:{tabIndexDetail.ColumnName}");
@@ -170,7 +170,7 @@ namespace HiSql.MySqlUnitTest
 
         static void Demo_DropView(HiSqlClient sqlClient)
         {
-            var rtn = sqlClient.DbFirst.DropView("vw_FModel",
+            var rtn = sqlClient.DbFirst.DropView("vw_FModel_11",
 
                 OpLevel.Execute);
 
@@ -245,10 +245,10 @@ namespace HiSql.MySqlUnitTest
             HiColumn column = new HiColumn()
             {
                 TabName = "htest02",
-                FieldName = "UName",
-                ReFieldName = "UName_01",
+                FieldName = "UName",//UName
+                ReFieldName = "UName_01",//UName_01
                 FieldType = HiType.VARCHAR,
-                FieldLen = 500,
+                FieldLen = 50,
                 DBDefault = HiTypeDBDefault.VALUE,
                 DefaultValue = "TGM",
                 FieldDesc = "测试字段变更"

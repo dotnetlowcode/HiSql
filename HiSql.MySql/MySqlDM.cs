@@ -886,18 +886,18 @@ namespace HiSql
 
             string _changesql = string.Empty;
             if (tabFieldAction == TabFieldAction.ADD)
-                _changesql = dbConfig.Add_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$TempColumn$]", _fieldsql);
+                _changesql = dbConfig.Add_Column.Replace("[$TabName$]", $"{dbConfig.Table_Pre}{hiTable.TabName}{dbConfig.Table_After}").Replace("[$TempColumn$]", _fieldsql);
             else if (tabFieldAction == TabFieldAction.DELETE)
-                _changesql = dbConfig.Del_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$FieldName$]", hiColumn.FieldName);
+                _changesql = dbConfig.Del_Column.Replace("[$TabName$]", $"{dbConfig.Table_Pre}{hiTable.TabName}{dbConfig.Table_After}").Replace("[$FieldName$]", hiColumn.FieldName);
             else if (tabFieldAction == TabFieldAction.MODI)
-                _changesql = dbConfig.Modi_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$TempColumn$]", _fieldsql);
+                _changesql = dbConfig.Modi_Column.Replace("[$TabName$]", $"{dbConfig.Table_Pre}{hiTable.TabName}{dbConfig.Table_After}").Replace("[$TempColumn$]", _fieldsql);
             else if (tabFieldAction == TabFieldAction.RENAME)
             {
                 var fieldNameFind = dbConfig.Field_Pre + hiColumn.FieldName + dbConfig.Field_After;
                 var fieldIndex = _fieldsql.IndexOf(fieldNameFind) + fieldNameFind.Length;
                 _fieldsql = _fieldsql.Substring(0, fieldIndex) + $"     {dbConfig.Field_Pre}{hiColumn.ReFieldName}{dbConfig.Field_After} " + _fieldsql.Substring(fieldIndex);
                 //字段重命名
-                _changesql = dbConfig.Re_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$TempColumn$]", _fieldsql);
+                _changesql = dbConfig.Re_Column.Replace("[$TabName$]", $"{dbConfig.Table_Pre}{hiTable.TabName}{dbConfig.Table_After}").Replace("[$TempColumn$]", _fieldsql);
             }
             else
                 return "";
