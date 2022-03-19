@@ -88,13 +88,13 @@ namespace HiSql
 
 
 
-        string _temp_addcolumn = "alter table [$TabName$] add [$TempColumn$] ";
+        string _temp_addcolumn = "alter table [$TabName$] add ([$TempColumn$]) ";//ALTER TABLE t ADD (c NVARCHAR(10) DEFAULT 'NCHAR');
 
-        string _temp_delcolumn = "alter table [$TabName$] drop column [$FieldName$]";
+        string _temp_delcolumn = "alter table [$TabName$] drop column [$FieldName$];";
 
-        string _temp_modicolumn = "alter table [$TabName$] alter column [$TempColumn$]";
+        string _temp_modicolumn = "alter table [$TabName$] alter ([$TempColumn$]);";
 
-        string _temp_recolumn = "EXECUTE sp_rename N'[$TabName$].[$FieldName$]', N'[$ReFieldName$]', 'COLUMN' ";
+        string _temp_recolumn = "RENAME COLUMN [$TabName$].[$FieldName$] TO [$ReFieldName$];";
 
         string _temp_retable = "EXECUTE sp_rename '[$TabName$].[$TabName$]', '[$ReTabName$]'";
 

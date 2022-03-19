@@ -886,13 +886,11 @@ namespace HiSql
         public string BuildChangeFieldStatement(HiTable hiTable, HiColumn hiColumn, TabFieldAction tabFieldAction)
         {
             string _fieldsql = BuildFieldStatement(hiTable, hiColumn);
-
-            var rtn = Tool.RegexGrpOrReplace(@",{1}\s*$", _fieldsql);
+            var rtn = Tool.RegexGrpOrReplace(@"" + dbConfig.Field_Split + @"{1}\s*$", _fieldsql);
             if (rtn.Item1)
             {
-                _fieldsql = rtn.Item2["0"];
+                _fieldsql = rtn.Item3;
             }
-
 
             string _changesql = string.Empty;
             if (tabFieldAction == TabFieldAction.ADD)
@@ -900,7 +898,11 @@ namespace HiSql
             else if (tabFieldAction == TabFieldAction.DELETE)
                 _changesql = dbConfig.Del_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$FieldName$]", hiColumn.FieldName);
             else if (tabFieldAction == TabFieldAction.MODI)
-                _changesql = dbConfig.Add_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$TempColumn$]", _fieldsql);
+                _changesql = dbConfig.Modi_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$TempColumn$]", _fieldsql);
+            else if (tabFieldAction == TabFieldAction.RENAME)
+                _changesql = dbConfig.Re_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$ReFieldName$]", hiColumn.ReFieldName).Replace("[$FieldName$]", hiColumn.FieldName);
+
+
             else
                 return "";
 
