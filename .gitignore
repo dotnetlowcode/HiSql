@@ -303,3 +303,4 @@ __pycache__/
 *.v1
 *.v2
 *.suo
+.vs
