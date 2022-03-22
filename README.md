@@ -34,6 +34,20 @@
 处理，开发人员只要关注于业务开发
 
 
+### 2022.3.22 更新
+
+增加 in(select *...) 子查询语法
+注意：子查询中的字段只允许一个
+
+```c#
+var _sql = sqlClient.HiSql("select * from Hi_FieldModel where TabName in (select TabName from Hi_TabModel where TabName='h_test' )").ToSql();
+```
+
+### 2022.3.19 更新
+HiSql新增对mysql表的操作（目前支持`SqlServer`,`mysql`，陆续会加上对其它数据库的实现）
+
+操作写法请参照 2022.3.3 更新
+
 ### 2022.3.3 更新
 HiSql新增对表的操作（暂时仅支持`SqlServer`，陆续会加上对其它数据库的实现）
 

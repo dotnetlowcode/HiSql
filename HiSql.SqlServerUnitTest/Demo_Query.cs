@@ -36,12 +36,18 @@ namespace HiSql.UnitTest
             //Query_Demo7(sqlClient);
             //Query_Demo8(sqlClient);
             //Query_Demo9(sqlClient);
-            Query_Demo10(sqlClient);
+            //Query_Demo10(sqlClient);
+            Query_Demo11(sqlClient);
             var s = Console.ReadLine();
         }
 
 
 
+
+        static void Query_Demo11(HiSqlClient sqlClient)
+        {
+            var _sql = sqlClient.HiSql("select * from Hi_FieldModel where TabName in (select TabName from Hi_TabModel where TabName='h_test' order by fieldname)").ToSql();
+        }
         static void Query_Demo10(HiSqlClient sqlClient)
         {
 
