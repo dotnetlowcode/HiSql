@@ -1267,6 +1267,10 @@ namespace HiSql
 
                                 //检测出是select 语句
                                 SelectParse selectParse = new SelectParse(_content, Context, true);
+                                if (!Tool.CheckQueryField(selectParse.Fields).Item1)
+                                {
+                                    throw new Exception($"语句[{_content}] 附近语法错误 select in 中的子查询仅允许查询一个字段");
+                                }
                                 string _sql = selectParse.Query.ToSql();
 
 
