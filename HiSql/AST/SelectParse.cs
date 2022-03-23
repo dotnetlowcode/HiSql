@@ -97,6 +97,14 @@ namespace HiSql.AST
         string _fromtable = "";
         IQuery _query = null;
 
+
+        /// <summary>
+        /// 字段
+        /// </summary>
+        public string Fields
+        {
+            get { return _field; }
+        }
         public IQuery Query
         {
             get
