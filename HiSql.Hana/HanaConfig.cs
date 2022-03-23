@@ -90,13 +90,13 @@ namespace HiSql
 
         string _temp_addcolumn = "alter table [$TabName$] add ([$TempColumn$]) ";//ALTER TABLE t ADD (c NVARCHAR(10) DEFAULT 'NCHAR');
 
-        string _temp_delcolumn = "alter table [$TabName$] drop column [$FieldName$];";
+        string _temp_delcolumn = "";
 
         string _temp_modicolumn = "alter table [$TabName$] alter ([$TempColumn$]);";
 
         string _temp_recolumn = "RENAME COLUMN [$TabName$].[$FieldName$] TO [$ReFieldName$];";
 
-        string _temp_retable = "EXECUTE sp_rename '[$TabName$].[$TabName$]', '[$ReTabName$]'";
+        string _temp_retable = "RENAME TABLE [$TabName$] to [$ReTabName$]";
 
         string _temp_setdefalut = "";
 
@@ -533,6 +533,7 @@ namespace HiSql
 
                 .ToString();
 
+            _temp_delcolumn = $"alter table {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_schema_after} drop({_temp_schema_pre}[$FieldName$]{_temp_schema_after});";
 
             //变量表模版
             _temp_declare_table = new StringBuilder()
@@ -658,6 +659,82 @@ UNION ALL
             _temp_truncate = $"TRUNCATE TABLE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after};";
 
             _temp_droptable = $"DROP TABLE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after};";
+
+
+            //获取当前库所有的表
+            _temp_gettables = new StringBuilder()
+                .AppendLine("select * from ( ")
+                 .AppendLine("select \"TABLE_NAME\"  as \"TabName\", 'Table' AS \"TabType\", \"CREATE_TIME\" as \"CreateTime\" FROM \"SYS\".\"TABLES\" where \"SCHEMA_NAME\" = '[$Schema$]' and \"TABLE_NAME\" not like '/%' [$Where$]")
+               
+                .AppendLine(")as temp")
+                .AppendLine("ORDER BY \"TabName\" ASC, \"CreateTime\" desc ")
+                .ToString();
+            _temp_getviews = new StringBuilder()
+               .AppendLine("select * from ( ")
+                .AppendLine("select \"VIEW_NAME\"  as \"TabName\", 'View' AS \"TabType\", \"CREATE_TIME\" as \"CreateTime\" FROM \"SYS\".\"VIEWS\" where \"SCHEMA_NAME\" = '[$Schema$]' and \"VIEW_NAME\" not like '/%' [$Where$]")
+              
+               .AppendLine(")as temp")
+               .AppendLine("ORDER BY \"TabName\" ASC, \"CreateTime\" desc ")
+               .ToString();
+
+
+            _temp_getalltables = new StringBuilder()
+               .AppendLine("select * from ( ")
+                .AppendLine("select \"TABLE_NAME\"  as \"TabName\", 'Table' AS \"TabType\", \"CREATE_TIME\" as \"CreateTime\" FROM \"SYS\".\"TABLES\" where \"SCHEMA_NAME\" = '[$Schema$]' and \"TABLE_NAME\" not like '/%' ")
+                .AppendLine("union all")
+                .AppendLine("select \"VIEW_NAME\"  as \"TabName\", 'View' AS \"TabType\", \"CREATE_TIME\" as \"CreateTime\" FROM \"SYS\".\"VIEWS\" where \"SCHEMA_NAME\" = '[$Schema$]' and \"VIEW_NAME\" not like '/%' ")
+              
+               .AppendLine(")as temp [$Where$]")
+               .AppendLine("ORDER BY \"TabName\" ASC, \"CreateTime\" desc ")
+               .ToString();
+
+            _temp_check_table_exists =
+                new StringBuilder()
+               .AppendLine("select * from ( ")
+                .AppendLine("select \"TABLE_NAME\"  as \"TabName\", 'Table' AS \"TabType\", \"CREATE_TIME\" as \"CreateTime\" FROM \"SYS\".\"TABLES\" where \"SCHEMA_NAME\" = '[$Schema$]' and \"TABLE_NAME\" not like '/%' ")
+                .AppendLine("union all")
+                .AppendLine("select \"VIEW_NAME\"  as \"TabName\", 'View' AS \"TabType\", \"CREATE_TIME\" as \"CreateTime\" FROM \"SYS\".\"VIEWS\" where \"SCHEMA_NAME\" = '[$Schema$]' and \"VIEW_NAME\" not like '/%' ")
+
+               .AppendLine(")as temp WHERE \"TabName\" = '[$TabName$]'")
+               .AppendLine("ORDER BY \"TabName\" ASC, \"CreateTime\" desc ")
+               .ToString();
+
+            //删除视图
+            _temp_drop_view = $"DROP VIEW  [$Schema$].[$TabName$];";
+
+            //创建视图
+            _temp_create_view = new StringBuilder()
+                .AppendLine($"CREATE VIEW [$Schema$].[$TabName$] ")
+                .AppendLine("AS")
+                .AppendLine("[$ViewSql$];")
+                .ToString();
+            //修改视图
+            _temp_modi_view = new StringBuilder()
+                .AppendLine(_temp_drop_view)
+                .AppendLine(_temp_create_view)
+                .ToString();
+
+
+
+            //表索引
+            _temp_get_tabindex = "SELECT distinct \"TABLE_NAME\" as TableName , \"INDEX_NAME\" as IndexName,  case when \"CONSTRAINT\"='PRIMARY KEY' then 'Key_Index' ELSE 'Index' end as IndexType , '' as Disabled   FROM \"SYS\".\"INDEXES\" WHERE  \"SCHEMA_NAME\" = '[$Schema$]' and \"TABLE_NAME\" = '[$TabName$]'; ";
+
+
+            //表索引明细
+            _temp_get_indexdetail = "select 1 as TableId,  \"TABLE_NAME\" as TableName, 1 as IndexId , \"INDEX_NAME\" as IndexName,  CASE WHEN \"CONSTRAINT\"='PRIMARY KEY' THEN 'KEY_INDEX' ELSE 'INDEX' END AS INDEXTYPE"
+                + "    , \"POSITION\" AS ColumnIdx, \"POSITION\" AS ColumnID, \"COLUMN_NAME\" as ColumnName, case when \"ASCENDING_ORDER\" ='TRUE' then 'asc' ELSE 'desc' end as Sort"
+                            + "             , case when \"CONSTRAINT\"='PRIMARY KEY' then 'Y' ELSE 'N' end as  IPrimary "
+                             + "            , case when \"CONSTRAINT\" ='NOT NULL UNIQUE' then 'Y' ELSE '' end as IsUnique   , '' AS Ignore_dup_key   , '' as Disabled  , '' AS Fill_factor  , '' AS Padded"
+
+
+                             + " from   \"SYS\".\"INDEX_COLUMNS\" WHERE  \"SCHEMA_NAME\" = '[$TabName$]' AND \"TABLE_NAME\" = '[$TabName$]' AND \"INDEX_NAME\"='[$IndexName$]';";
+            //创建索引
+            _temp_create_index = $@"CREATE INDEX {_temp_schema_pre}[$IndexName$]{_temp_schema_after} ON {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} ([$Key$]); ";
+
+            //删除索引
+            _temp_drop_index = new StringBuilder()
+                .AppendLine($@"DROP INDEX  {_temp_schema_pre}[$IndexName$]{_temp_schema_after}")
+                .ToString();
         }
     }
 }

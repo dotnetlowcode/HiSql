@@ -12,22 +12,22 @@ namespace HiSql.HanaUnitTest
         {
             //Create_Table(sqlClient); //ok
             //Demo_AddColumn(sqlClient); //ok
-             Demo_ReColumn(sqlClient);//
-            //Demo_ModiColumn(sqlClient); //
-            //Demo_DelColumn(sqlClient);////
-            //Demo_Tables(sqlClient);//
-            //Demo_View(sqlClient);//
-            //Demo_AllTables(sqlClient);//
+            // Demo_ReColumn(sqlClient);//ok
+            //Demo_ModiColumn(sqlClient); //ok
+            //Demo_DelColumn(sqlClient);// //ok
+            //Demo_Tables(sqlClient);// ok
+            //Demo_View(sqlClient);// ok
+            //Demo_AllTables(sqlClient);//ok
             //Demo_GlobalTables(sqlClient);//  delay
-            //Demo_ModiTable(sqlClient);//
+            //Demo_ModiTable(sqlClient);///ok
 
-            //Demo_DropView(sqlClient); //
-            // Demo_CreateView(sqlClient);//
-            //Demo_ModiView(sqlClient);//
+            //Demo_DropView(sqlClient); //ok
+            //Demo_CreateView(sqlClient);//ok
+            //Demo_ModiView(sqlClient);//ok
 
-            //Demo_IndexList(sqlClient);//
-            //Demo_Index_Create(sqlClient);//
-            // Demo_ReTable(sqlClient);//
+            //Demo_IndexList(sqlClient);///ok
+            //Demo_Index_Create(sqlClient);///ok
+            //Demo_ReTable(sqlClient);//ok
 
         }
         static void Create_Table(HiSqlClient sqlClient)
@@ -39,7 +39,7 @@ namespace HiSql.HanaUnitTest
         {
             //OpLevel.Execute  表示执行并返回生成的SQL
             //OpLevel.Check 表示仅做检测失败时返回消息且检测成功时返因生成的SQL
-            var tabinfo = sqlClient.Context.DMInitalize.GetTabStruct("hi_test03");
+            var tabinfo = sqlClient.Context.DMInitalize.GetTabStruct("HI_TEST06");
 
             TabInfo _tabcopy = ClassExtensions.DeepCopy<TabInfo>(tabinfo);
             //_tabcopy.Columns.RemoveAt(4);
@@ -48,7 +48,7 @@ namespace HiSql.HanaUnitTest
             //newcol.FieldName = "Testname3";
             //newcol.ReFieldName = "Testname3";
             //_tabcopy.Columns.Add(newcol);
-            _tabcopy.Columns[1].ReFieldName = "UName_04";
+            _tabcopy.Columns[1].ReFieldName = "UNAME_03";
 
             //_tabcopy.Columns[4].IsRequire = true;
 
@@ -82,15 +82,15 @@ namespace HiSql.HanaUnitTest
         {
 
 
-            TabInfo tabInfo = sqlClient.Context.DMInitalize.GetTabStruct("hi_test01");
-            List<HiColumn> hiColumns = tabInfo.Columns.Where(c => c.FieldName == "ModiTime" || c.FieldName == "ModiName").ToList();
-            var rtn = sqlClient.DbFirst.CreateIndex("hi_test01", "idx_hi_test01_ModiTime123", hiColumns, OpLevel.Execute);
+            TabInfo tabInfo = sqlClient.Context.DMInitalize.GetTabStruct("HI_TEST01");
+            List<HiColumn> hiColumns = tabInfo.Columns.Where(c => string.Compare(c.FieldName,"ModiTime", true) == 0 || string.Compare(c.FieldName, "ModiName", true) == 0).ToList();
+            var rtn = sqlClient.DbFirst.CreateIndex("HI_TEST01", "idx_hi_test01_ModiTime123", hiColumns, OpLevel.Execute);
             if (rtn.Item1)
                 Console.WriteLine(rtn.Item3);
             else
                 Console.WriteLine(rtn.Item2);
 
-            rtn = sqlClient.DbFirst.DelIndex("hi_test01", "idx_hi_test01_ModiTime123", OpLevel.Execute);
+            rtn = sqlClient.DbFirst.DelIndex("HI_TEST01", "idx_hi_test01_ModiTime123", OpLevel.Execute);
 
             if (rtn.Item1)
                 Console.WriteLine(rtn.Item3);
@@ -100,14 +100,14 @@ namespace HiSql.HanaUnitTest
 
         static void Demo_IndexList(HiSqlClient sqlClient)
         {
-            List<TabIndex> lstindex = sqlClient.DbFirst.GetTabIndexs("Hi_FieldModel");
+            List<TabIndex> lstindex = sqlClient.DbFirst.GetTabIndexs("HI_TEST01");
 
             foreach (TabIndex tabIndex in lstindex)
             {
                 Console.WriteLine($"TabName:{tabIndex.TabName} IndexName:{tabIndex.IndexName} IndexType:{tabIndex.IndexType}");
             }
 
-            List<TabIndexDetail> lstindexdetails = sqlClient.DbFirst.GetTabIndexDetail("Hi_FieldModel", "PK_Hi_FieldModel_ed721f6b-296a-447e-ac67-7d02fd8e338c");
+            List<TabIndexDetail> lstindexdetails = sqlClient.DbFirst.GetTabIndexDetail("HI_TEST01", "PK_Hi_FieldModel_ed721f6b-296a-447e-ac67-7d02fd8e338c");
             foreach (TabIndexDetail tabIndexDetail in lstindexdetails)
             {
                 Console.WriteLine($"TabName:{tabIndexDetail.TabName} IndexName:{tabIndexDetail.IndexName} IndexType:{tabIndexDetail.IndexType} ColumnName:{tabIndexDetail.ColumnName}");
@@ -152,7 +152,7 @@ namespace HiSql.HanaUnitTest
 
         static void Demo_CreateView(HiSqlClient sqlClient)
         {
-            var rtn = sqlClient.DbFirst.CreateView("vw_FModel_11",
+            var rtn = sqlClient.DbFirst.CreateView("vw_Hi_FieldModel_11",
                 sqlClient.HiSql("select a.TabName,b.TabReName,b.TabDescript,a.FieldName,a.SortNum,a.FieldType from Hi_FieldModel as a inner join Hi_TabModel as b on a.TabName=b.TabName").ToSql(),
 
                 OpLevel.Execute);
@@ -163,8 +163,8 @@ namespace HiSql.HanaUnitTest
 
         static void Demo_ModiView(HiSqlClient sqlClient)
         {
-            var rtn = sqlClient.DbFirst.ModiView("vw_FModel",
-                sqlClient.HiSql("select a.TabName,b.TabReName,b.TabDescript,a.FieldName,a.SortNum,a.FieldType from Hi_FieldModel as a inner join Hi_TabModel as b on a.TabName=b.TabName where b.TabType in (0,1)").ToSql(),
+            var rtn = sqlClient.DbFirst.ModiView("vw_Hi_FieldModel_11",
+                sqlClient.HiSql("select a.FieldName,a.SortNum,a.FieldType from Hi_FieldModel as a inner join Hi_TabModel as b on a.TabName=b.TabName where b.TabType in (0,1)").ToSql(),
 
                 OpLevel.Execute);
 
@@ -174,7 +174,7 @@ namespace HiSql.HanaUnitTest
 
         static void Demo_DropView(HiSqlClient sqlClient)
         {
-            var rtn = sqlClient.DbFirst.DropView("vw_FModel",
+            var rtn = sqlClient.DbFirst.DropView("VW_HI_TABLEMODEL3",
 
                 OpLevel.Execute);
 
@@ -222,17 +222,30 @@ namespace HiSql.HanaUnitTest
         {
             HiColumn column = new HiColumn()
             {
-                TabName = "hi_test01",
-                FieldName = "TestAdd",
+                TabName = "HI_TABMODEL",
+                FieldName = "TABNAME",
                 FieldType = HiType.VARCHAR,
                 FieldLen = 500,
                 DBDefault = HiTypeDBDefault.VALUE,
-                DefaultValue = "TGM",
-                FieldDesc = "测试字段修改"
+                DefaultValue = "",
+                FieldDesc = "表名称"
 
             };
 
             var rtn = sqlClient.DbFirst.ModiColumn(column.TabName, column, OpLevel.Execute);
+             column = new HiColumn()
+            {
+                TabName = "HI_TABMODEL",
+                FieldName = "TABRENAME",
+                FieldType = HiType.VARCHAR,
+                FieldLen = 500,
+                DBDefault = HiTypeDBDefault.VALUE,
+                DefaultValue = "",
+                FieldDesc = "表别名"
+
+            };
+
+             rtn = sqlClient.DbFirst.ModiColumn(column.TabName, column, OpLevel.Execute);
 
             Console.WriteLine(rtn.Item2);
             Console.WriteLine(rtn.Item3);
