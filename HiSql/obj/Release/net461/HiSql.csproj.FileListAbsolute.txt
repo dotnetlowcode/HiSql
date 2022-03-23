@@ -20,7 +20,6 @@ D:\Project\OpenSource\HiSql\HiSql\obj\Release\net461\HiSql.csproj.CoreCompileInp
 D:\Project\OpenSource\HiSql\HiSql\obj\Release\net461\HiSql.csproj.CopyComplete
 D:\Project\OpenSource\HiSql\HiSql\obj\Release\net461\HiSql.dll
 D:\Project\OpenSource\HiSql\HiSql\obj\Release\net461\HiSql.pdb
-D:\Project\OpenSource\HiSql\HiSql\obj\Release\net461\HiSql.csproj.AssemblyReference.cache
 D:\Project\OpenSource\HiSql\HiSql\bin\Release\net461\Azure.Core.dll
 D:\Project\OpenSource\HiSql\HiSql\bin\Release\net461\Azure.Identity.dll
 D:\Project\OpenSource\HiSql\HiSql\bin\Release\net461\Microsoft.Data.SqlClient.dll
@@ -146,3 +145,4 @@ D:\Project\OpenSource\HiSql\HiSql\bin\Release\net461\System.Xml.XmlDocument.dll
 D:\Project\OpenSource\HiSql\HiSql\bin\Release\net461\System.Xml.XmlSerializer.dll
 D:\Project\OpenSource\HiSql\HiSql\bin\Release\net461\System.Xml.XPath.dll
 D:\Project\OpenSource\HiSql\HiSql\bin\Release\net461\System.Xml.XPath.XDocument.dll
+D:\Project\OpenSource\HiSql\HiSql\obj\Release\net461\HiSql.csproj.AssemblyReference.cache

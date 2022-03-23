@@ -228,29 +228,94 @@ namespace HiSql.AST
                     {
 
 
-                        var rtndic = Tool.RegexGrp(Constants.REG_SELECT_WHERE1, sql);
-                        if (rtndic.Count>0 && rtndic.ContainsKey("where"))
+                        int _pos_idx = 0;
+                        
+                        List<int> lstnum = new List<int> { sql.LastIndexOf(" order "), sql.LastIndexOf(" group "), sql.LastIndexOf(" having "), sql.LastIndexOf(" union ") };
+
+                        lstnum.Sort((a,b)=> {
+                            return b.CompareTo(a);
+                        });
+                        _pos_idx = lstnum[0];
+
+
+
+                        if (sql.LastIndexOf(')') > _pos_idx)
                         {
-                            _query.Where(rtndic["where"].ToString());
-                            rtn= Tool.RegexGrpOrReplace(Constants.REG_SELECT_WHERE1, sql);
-                            if (rtn.Item1)
-                                sql = rtn.Item3;
-                        }
-                        else
-                        {
-                            rtndic = Tool.RegexGrp(Constants.REG_SELECT_WHERE2, sql);
-                            if (rtndic.Count > 0 && rtndic.ContainsKey("where"))
+                            //说明都是子语语句
+                            var rtndic = Tool.RegexGrp(Constants.REG_SELECT_WHERE2, sql);
+                            if (rtndic.Count > 0)
                             {
-                                _query.Where(rtndic["where"].ToString());
-                                rtn = Tool.RegexGrpOrReplace(Constants.REG_SELECT_WHERE2, sql);
-                                if (rtn.Item1)
-                                    sql = rtn.Item3;
+                                if (rtndic["where"].LastIndexOf(" order ") > 0)
+                                {
+                                    throw new Exception($"{HiSql.Constants.HiSqlSyntaxError} 子查询语句[{rtndic["where"]}]不允许[order by]排序 ");
+                                }
+                                else
+                                {
+                                    _query.Where(rtndic["where"]);
+                                    sql = "";
+                                }
                             }
                             else
                             {
                                 throw new Exception($"{HiSql.Constants.HiSqlSyntaxError}语句[{sql}]附近出现错误");
                             }
+                            
                         }
+                        else
+                        {
+                            string _wheresql = sql;
+
+                            if(_pos_idx>0)
+                                _wheresql = sql.Substring(0, _pos_idx);
+                            var rtndic = Tool.RegexGrp(Constants.REG_SELECT_WHERE2, _wheresql);
+                            if (rtndic.Count > 0)
+                            {
+                                if (rtndic["where"].LastIndexOf(" order ") > 0)
+                                {
+                                    throw new Exception($"{HiSql.Constants.HiSqlSyntaxError} 子查询语句[{rtndic["where"]}]不允许[order by]排序 ");
+                                }
+                                else
+                                {
+                                    _query.Where(rtndic["where"]);
+                                    if (_pos_idx > 0)
+                                        sql = sql.Substring(_pos_idx);
+                                    else sql = "";
+                                }
+                            }
+                            else
+                            {
+                                throw new Exception($"{HiSql.Constants.HiSqlSyntaxError}语句[{sql}]附近出现错误");
+                            }
+
+
+                            
+                            
+                        }
+
+
+                        //var rtndic = Tool.RegexGrp(Constants.REG_SELECT_WHERE1, sql);
+                        //if (rtndic.Count>0 && rtndic.ContainsKey("where"))
+                        //{
+                        //    _query.Where(rtndic["where"].ToString());
+                        //    rtn= Tool.RegexGrpOrReplace(Constants.REG_SELECT_WHERE1, sql);
+                        //    if (rtn.Item1)
+                        //        sql = rtn.Item3;
+                        //}
+                        //else
+                        //{
+                        //    rtndic = Tool.RegexGrp(Constants.REG_SELECT_WHERE2, sql);
+                        //    if (rtndic.Count > 0 && rtndic.ContainsKey("where"))
+                        //    {
+                        //        _query.Where(rtndic["where"].ToString());
+                        //        rtn = Tool.RegexGrpOrReplace(Constants.REG_SELECT_WHERE2, sql);
+                        //        if (rtn.Item1)
+                        //            sql = rtn.Item3;
+                        //    }
+                        //    else
+                        //    {
+                        //        throw new Exception($"{HiSql.Constants.HiSqlSyntaxError}语句[{sql}]附近出现错误");
+                        //    }
+                        //}
                         // 说明后面接着是where语句
                         
                         
