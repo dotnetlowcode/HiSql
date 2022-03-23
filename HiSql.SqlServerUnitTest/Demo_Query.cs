@@ -46,7 +46,14 @@ namespace HiSql.UnitTest
 
         static void Query_Demo11(HiSqlClient sqlClient)
         {
-            var _sql = sqlClient.HiSql("select * from Hi_FieldModel where TabName in (select TabName from Hi_TabModel where TabName='h_test' order by fieldname)").ToSql();
+            var _sql = sqlClient.HiSql("select * from Hi_FieldModel where TabName in (select TabName from Hi_TabModel where TabName='h_test' group by tabname ) order by fieldname").ToSql();
+            var _sql1 = sqlClient.HiSql("select * from Hi_FieldModel where TabName in (select TabName from Hi_TabModel where TabName='h_test' group by tabname )  ").ToSql();
+
+            if (string.IsNullOrEmpty(_sql1))
+            { 
+                
+            }
+
         }
         static void Query_Demo10(HiSqlClient sqlClient)
         {
