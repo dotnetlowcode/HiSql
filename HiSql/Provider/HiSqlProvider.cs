@@ -267,6 +267,91 @@ namespace HiSql
             result.HiSql(hisql,result);
             return result;
         }
+
+        /// <summary>
+        /// hisql 语句防注入参数化
+        /// </summary>
+        /// <param name="hisql"></param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public IQuery HiSql(string hisql, Dictionary<string, object> dicparma, DbMasterSlave dbMasterSlave = DbMasterSlave.Default)
+        {
+            //[$name$]=tgm
+            //[$age$]=21
+            //select * from useradmin where username='[$name$]' and age>[$age$]
+
+            string _sql = hisql;
+
+            if (!Tool.RegexMatch("[\'\\\"]+", _sql))
+            {
+                if (dicparma.Count > 0)
+                {
+                    foreach (string n in dicparma.Keys)
+                    {
+                        if (Tool.RegexMatch(Constants.REG_HISQL_PARAM, n))
+                        {
+                            if (_sql.IndexOf(n) >= 0)
+                            {
+                                Type type = dicparma[n].GetType();
+                                if (type.IsIn<Type>(Constants.ShortType, Constants.LongType, Constants.DecType, Constants.IntType, Constants.FloatType, Constants.DobType))
+                                {
+                                    _sql = _sql.Replace(n, dicparma[n].ToString());
+                                }
+                                else if (type == Constants.BoolType)
+                                {
+                                    if (dicparma[n].ToString().ToLower().Trim() == "true")
+                                        _sql = _sql.Replace(n, "1");
+                                    else
+                                        _sql = _sql.Replace(n, "1");
+                                }
+                                else if (type.IsIn<Type>(Constants.DateType, Constants.DateTimeOffsetType))
+                                {
+                                    DateTime dtime = Convert.ToDateTime(dicparma[n]);
+                                    _sql = _sql.Replace(n, $"'{dtime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                                }
+                                else if (type.IsIn<Type>(Constants.StringType, Constants.GuidType))
+                                {
+                                    _sql = _sql.Replace(n, $"'{dicparma[n].ToString().ToSqlInject().ToSqlEnChar()}'");
+                                }
+                                else if (type.IsIn<Type>(Constants.ObjType))
+                                {
+                                    _sql = _sql.Replace(n, $"'{dicparma[n].ToString().ToSqlInject().ToSqlEnChar()}'");
+                                }
+                                else
+                                {
+                                    _sql = _sql.Replace(n, $"'{dicparma[n].ToString().ToSqlInject().ToSqlEnChar()}'");
+                                }
+                            }
+                            else
+                                throw new Exception($"参数 {n} 设置多余在参数化hisql中未使用");
+
+                        }
+                        else
+                        {
+                            throw new Exception($"参数 {n} 不符合参数规则 规则为[$参数名$]");
+                        }
+                    }
+                }
+                else
+                {
+                    throw new Exception($"模版参数为不能为空");
+                }
+            }
+            else
+            {
+                throw new Exception($"参数化SQL语句中不能出现[\'\"]单引号和又引号这种特殊字段");
+            }
+            IQuery result = null;
+            result = Instance.GetQuery(this.Context.CurrentConnectionConfig);
+
+
+
+            result.Context = this.Context;
+            result.HiSql(_sql, result);
+            return result;
+
+        }
+        
         #endregion
 
 
@@ -611,6 +696,8 @@ namespace HiSql
         {
             this.Context.RollBackTran();
         }
+
+        
 
 
 

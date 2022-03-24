@@ -373,5 +373,12 @@ namespace HiSql
         /// 匹配一个右括号
         /// </summary>
         public static string REG_BRACKET_RIGHT = @"^\s*\)\s*$";
+
+
+        /// <summary>
+        /// HISQL的参数变更量格式
+        /// </summary>
+
+        public static string  REG_HISQL_PARAM = @"^\[\$(?<param>\w+)\$\]$";
     }
 }

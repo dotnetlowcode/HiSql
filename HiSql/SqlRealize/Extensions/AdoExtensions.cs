@@ -75,10 +75,39 @@ namespace HiSql
         {
             if (!value.IsNullOrEmpty())
             {
-                value = value.Replace("'", "''");
+                value = value.Replace("'", "''").ToSqlDeChar();
             }
             return value;
         }
+
+        /// <summary>
+        /// 将单引号转成 ``
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string ToSqlEnChar(this string value)
+        {
+            if (!value.IsNullOrEmpty())
+            {
+                value = value.Replace("''", "``");
+            }
+            return value;
+        }
+
+        /// <summary>
+        /// 将 `` 转成 ''
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string ToSqlDeChar(this string value)
+        {
+            if (!value.IsNullOrEmpty())
+            {
+                value = value.Replace("``", "''");
+            }
+            return value;
+        }
+
         public static string ToFieldString(this List<string> thisValue)
         {
             StringBuilder _sb_temp = new StringBuilder();

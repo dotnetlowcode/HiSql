@@ -39,6 +39,14 @@ namespace HiSql
         /// <returns></returns>
         IQuery HiSql(string hisql, DbMasterSlave dbMasterSlave = DbMasterSlave.Default);
 
+        /// <summary>
+        /// 执行sql 防注入模板
+        /// </summary>
+        /// <param name="hisql"></param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        IQuery HiSql(string hisql, Dictionary<string,object> dicparma, DbMasterSlave dbMasterSlave = DbMasterSlave.Default);
+
 
         /// <summary>
         /// 表数据插入
