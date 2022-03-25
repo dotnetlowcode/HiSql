@@ -33,6 +33,8 @@ namespace HiSql
         StringBuilder sb_group = new StringBuilder();
         StringBuilder sb_having = new StringBuilder();
 
+        StringBuilder sb_distinct = new StringBuilder();
+
 
        
 
@@ -69,16 +71,18 @@ namespace HiSql
             StringBuilder sb = new StringBuilder();
 
             StringBuilder sb_total = new StringBuilder();
-
+            
 
             if (!this.IsMultiSubQuery)
             {
                 if (this.IsPage)
                 {
+                    if (this.IsDistinct)
+                        throw new Exception("不允许分页情况下使用distinct");
                     sb_total.AppendLine($"declare @_hisqltotal INT;");
                     if (!string.IsNullOrEmpty(sb_group.ToString().Trim()))
                     {
-                        sb_total.AppendLine($"select @_hisqltotal= count(*) from ( select {sb_field.ToString()} from {sb_table.ToString()}");
+                        sb_total.AppendLine($"select @_hisqltotal= count(*) from ( select  {sb_field.ToString()} from {sb_table.ToString()}");
                     }else
                         sb_total.AppendLine($"select @_hisqltotal= count(*) from {sb_table.ToString()}");
                     if (!string.IsNullOrEmpty(sb_join.ToString()))
@@ -110,7 +114,7 @@ namespace HiSql
                     if (this.CurrentPage == 1)
                     {
                         //表示第一页
-                        sb.AppendLine($"select top {this.PageSize} {sb_field.ToString()} from {sb_table.ToString()}");
+                        sb.AppendLine($"select  top {this.PageSize} {sb_field.ToString()} from {sb_table.ToString()}");
                         
                         if (!string.IsNullOrEmpty(sb_join.ToString()))
                             sb.AppendLine($" {sb_join.ToString()}");
@@ -132,9 +136,11 @@ namespace HiSql
                     }
                     else
                     {
+
+                        
                         if (string.IsNullOrEmpty(sb_sort.ToString()))
                             throw new Exception($"有分页查询时必须指定排序条件");
-                        sb.AppendLine($"select {sb_field_result.ToString()} from ( ");
+                        sb.AppendLine($"select  {sb_field_result.ToString()} from ( ");
                         sb.AppendLine($"select ROW_NUMBER() OVER(Order by {sb_sort.ToString()}) AS _hi_rownum_, {sb_field.ToString()} from {sb_table.ToString()}");
                         if (!string.IsNullOrEmpty(sb_join.ToString()))
                             sb.AppendLine($" {sb_join.ToString()}");
@@ -157,7 +163,7 @@ namespace HiSql
                 }
                 else
                 {
-                    sb.AppendLine($"select {sb_field.ToString()} from {sb_table.ToString()}");
+                    sb.AppendLine($"select {sb_distinct.ToString()} {sb_field.ToString()} from {sb_table.ToString()}");
                     if (!string.IsNullOrEmpty(sb_join.ToString()))
                         sb.AppendLine($" {sb_join.ToString()}");
                     if (!string.IsNullOrEmpty(sb_where.ToString()))
@@ -177,7 +183,7 @@ namespace HiSql
             else
             {
 
-                sb.Append($"select {sb_field_result.ToString()} from (");
+                sb.Append($"select {sb_distinct.ToString()} {sb_field_result.ToString()} from (");
                 sb.AppendLine($"{sb_subquery.ToString()}");
                 sb.Append(") as  hi_sql");
                 if(!string.IsNullOrEmpty(sb_where.ToString()))
@@ -342,6 +348,12 @@ namespace HiSql
             //检测字段信息
 
 
+            if (this.IsDistinct)
+            {
+                sb_distinct = new StringBuilder().Append(sqlServerDM.BuilderDistinct());
+            }
+            else
+                sb_distinct = new StringBuilder();
 
 
             //检测返回结果字段

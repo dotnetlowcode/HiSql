@@ -59,20 +59,27 @@ namespace HiSql
                 _tabName = value;
 
                 Dictionary<string, string> _dic = Tool.RegexGrp(Constants.REG_TABNAME, _tabName);
-                switch (_dic["flag"].ToString())
+                if (_dic.Count > 0)
                 {
-                    case "#":
-                        tableType = TableType.Local;
-                        //_tabReName = _dic["tab"].ToString();
-                        break;
-                    case "##":
-                        tableType = TableType.Global;
-                        //_tabReName = $"_tmp_global_{_dic["tab"].ToString()}_{Thread.CurrentThread.ManagedThreadId.ToString() }_{_tabName.GetHashCode().ToString().Substring(1)}".ToUpper();
-                        break;
-                    case "@":
-                        tableType = TableType.Var;
-                        break;
+                    switch (_dic["flag"].ToString())
+                    {
+                        case "#":
+                            tableType = TableType.Local;
+                            //_tabReName = _dic["tab"].ToString();
+                            break;
+                        case "##":
+                            tableType = TableType.Global;
+                            //_tabReName = $"_tmp_global_{_dic["tab"].ToString()}_{Thread.CurrentThread.ManagedThreadId.ToString() }_{_tabName.GetHashCode().ToString().Substring(1)}".ToUpper();
+                            break;
+                        case "@":
+                            tableType = TableType.Var;
+                            break;
+                    }
                 }
+                else {
+                    tableType = TableType.Var;
+                }
+                
 
 
             }

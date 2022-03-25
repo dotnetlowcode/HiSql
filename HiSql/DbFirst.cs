@@ -156,6 +156,8 @@ namespace HiSql
                 if (columns.Count == 0)
                 {
                     _msg = $"创建索引必须要指定列";
+
+                    return new Tuple<bool, string, string>(_isok, _msg, _sql);
                 }
                 else {
                     _sql = idm.CreateIndex(tabname, indexname, columns);
@@ -281,6 +283,9 @@ namespace HiSql
             if (_sqlClient != null)
             {
                 _sql = idm.ModiView(viewname, viewsql);
+                if (idm.Context.CurrentConnectionConfig.UpperCase)
+                    _sql = _sql.ToUpper();
+
                 if (opLevel == OpLevel.Execute)
                 {
                     _sqlClient.BeginTran();
@@ -324,6 +329,8 @@ namespace HiSql
             if (_sqlClient != null)
             {
                 _sql = idm.DropView(viewname);
+                if (idm.Context.CurrentConnectionConfig.UpperCase)
+                    _sql = _sql.ToUpper();
                 if (opLevel == OpLevel.Execute)
                 {
                     _sqlClient.BeginTran();
@@ -367,6 +374,8 @@ namespace HiSql
             else
             {
                 _sql = idm.BuildChangeFieldStatement(tabInfo.TabModel, hiColumn, TabFieldAction.DELETE);
+                if (idm.Context.CurrentConnectionConfig.UpperCase)
+                    _sql = _sql.ToUpper();
                 if (opLevel == OpLevel.Execute)
                 {
                     //执行数据库命令
@@ -878,10 +887,14 @@ namespace HiSql
                     //重命名字段不在表中才可以进行重命名
                     if (!tabInfo.Columns.Any(c => c.FieldName.ToLower() == hiColumn.ReFieldName.ToLower()))
                     {
-                        hiColumn.FieldDesc = hiColumn.FieldDesc.IsNullOrEmpty()?  hiColumn.FieldName: hiColumn.FieldDesc;
+                        hiColumn.FieldDesc = hiColumn.FieldDesc.IsNullOrEmpty() ? hiColumn.FieldName : hiColumn.FieldDesc;
                         _sql = idm.BuildChangeFieldStatement(tabInfo.TabModel, hiColumn, TabFieldAction.RENAME);
-                        hiColumn.FieldName = hiColumn.ReFieldName;
-                        _sql += System.Environment.NewLine + idm.BuildChangeFieldStatement(tabInfo.TabModel, hiColumn, TabFieldAction.MODI);
+                        // 在 BuildChangeFieldStatement 中处理 by pengxy on 20220321
+                        //{
+                        //    hiColumn.FieldName = hiColumn.ReFieldName;
+                        //    _sql += System.Environment.NewLine + idm.BuildChangeFieldStatement(tabInfo.TabModel, hiColumn, TabFieldAction.MODI);
+                        //}
+
                         _isok = true;
                         if (opLevel == OpLevel.Execute)
                         {

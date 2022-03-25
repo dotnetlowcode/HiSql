@@ -16,6 +16,13 @@ namespace HiSql
     {
         HiSqlProvider Context { get; set; }
 
+
+        /// <summary>
+        /// 是否去重
+        /// </summary>
+        bool IsDistinct { get; set; }
+
+
         IQuery Query(string tabname, string rename);
         IQuery Query(string tabname);
         IQuery HiSql(string hisql, IQuery query);

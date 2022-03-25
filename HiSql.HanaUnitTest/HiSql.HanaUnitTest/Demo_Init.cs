@@ -5,6 +5,9 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Configuration;
+using Microsoft.Extensions.Configuration;
+using System.IO;
 
 namespace HiSql.HanaUnitTest
 {
@@ -13,8 +16,15 @@ namespace HiSql.HanaUnitTest
 
         public static HanaBulkCopy GetNativeClient()
         {
-            HanaConnection hdbconn = new HanaConnection("DRIVER=HDBODBC;UID=HONEBI;PWD=tt@2021;SERVERNODE =192.168.1.1:32015;DATABASENAME =HBI");
+            var configuration = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json").Build();
+
+            string dbStr = configuration.GetConnectionString("db");
+
+            Console.WriteLine($"ConnectionString is \"{dbStr}\"");
+
+            HanaConnection hdbconn = new HanaConnection(dbStr);
           
+    
             hdbconn.Open();
             HanaBulkCopy mybuild = new HanaBulkCopy(hdbconn);
             return mybuild;
@@ -163,15 +173,17 @@ namespace HiSql.HanaUnitTest
         }
         public static HiSqlClient GetSqlClient()
         {
+            var configuration = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json").Build();
+            string dbStr = configuration.GetConnectionString("db");
+
+            Console.WriteLine($"ConnectionString is \"{dbStr}\"");
+
             HiSqlClient sqlclient = new HiSqlClient(
                      new ConnectionConfig()
                      {
                          DbType = DBType.Hana,
-                         DbServer = "local-HoneBI",
-                         //ConnectionString = "server=192.168.1.90,8433;uid=sa;pwd=Hone@123;database=HoneBI",
-                         
-                         ConnectionString = "DRIVER=HDBODBC;UID=SAPHANADB;PWD=Hone@crd@2019;SERVERNODE =192.168.10.243:31013;DATABASENAME =QAS",//; MultipleActiveResultSets = true;
-                         //ConnectionString = "DRIVER=HDBODBC;UID=HONEBI;PWD=Hone@2021;SERVERNODE =192.168.10.96:32015;DATABASENAME =HBI",//; MultipleActiveResultSets = true;
+                         DbServer = "local-HoneBI",                         
+                         ConnectionString = dbStr,//; MultipleActiveResultSets = true;
                          Schema = "SAPHANADB",
                          IsEncrypt = true,
                          IsAutoClose = false,

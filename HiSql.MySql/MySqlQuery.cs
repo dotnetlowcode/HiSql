@@ -28,6 +28,8 @@ namespace HiSql
         StringBuilder sb_group = new StringBuilder();
         StringBuilder sb_having = new StringBuilder();
         StringBuilder sb_subquery = new StringBuilder();
+
+        StringBuilder sb_distinct = new StringBuilder();
         IDbConfig dbConfig = new MySqlConfig();
         public override IDbConfig DbConfig
         {
@@ -63,9 +65,11 @@ namespace HiSql
             {
                 if (this.IsPage)
                 {
+                    if (this.IsDistinct)
+                        throw new Exception("不允许分页情况下使用distinct");
                     if (!string.IsNullOrEmpty(sb_group.ToString().Trim()))
                     {
-                        sb_total.AppendLine($"select  COUNT(*)   from ( select {sb_field.ToString()} from {sb_table.ToString()}");
+                        sb_total.AppendLine($"select  COUNT(*)   from ( select  {sb_field.ToString()} from {sb_table.ToString()}");
                     }
                     else
                     {
@@ -145,7 +149,7 @@ namespace HiSql
                 }
                 else
                 {
-                    sb.AppendLine($"select {sb_field.ToString()} from {sb_table.ToString()}");
+                    sb.AppendLine($"select  {sb_distinct.ToString()} {sb_field.ToString()} from {sb_table.ToString()}");
                     if (!string.IsNullOrEmpty(sb_join.ToString()))
                         sb.AppendLine($" {sb_join.ToString()}");
                     if (!string.IsNullOrEmpty(sb_where.ToString()))
@@ -167,7 +171,7 @@ namespace HiSql
             {
                 
 
-                sb.Append($"select {sb_field_result.ToString()} from (");
+                sb.Append($"select  {sb_distinct.ToString()} {sb_field_result.ToString()} from (");
                 sb.AppendLine($"{sb_subquery.ToString()}");
                 sb.Append(") as  hi_sql");
                 if (!string.IsNullOrEmpty(sb_where.ToString()))
@@ -345,7 +349,13 @@ namespace HiSql
 
             //检测字段信息
 
-
+            //检测是否有去重关键字
+            if (this.IsDistinct)
+            {
+                sb_distinct = new StringBuilder().Append(mysqlDM.BuilderDistinct());
+            }
+            else
+                sb_distinct = new StringBuilder();
 
 
             //检测返回结果字段

@@ -222,6 +222,12 @@ namespace HiSql
 
         string BuilderWhereSql(List<TableDefinition> TableList, Dictionary<string, TabInfo> dictabinfo, List<FieldDefinition> Fields, List<FilterDefinition> Wheres, bool issubquery);
 
+        /// <summary>
+        /// 生成去重命令
+        /// </summary>
+        /// <returns></returns>
+        string BuilderDistinct();
+
         string BuilderWhereSql(List<TableDefinition> TableList, Dictionary<string, TabInfo> dictabinfo, List<FieldDefinition> Fields, List<WhereResult> lstresult, bool issubquery);
 
         /// <summary>
