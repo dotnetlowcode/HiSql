@@ -366,7 +366,10 @@ namespace HiSql
         {
             return _context.HiSql(hisql, dbMasterSlave);
         }
-
+        public IQuery HiSql(string hisql, Dictionary<string, object> dicparma, DbMasterSlave dbMasterSlave = DbMasterSlave.Default)
+        {
+            return _context.HiSql(hisql, dicparma, dbMasterSlave);
+        }
         #endregion
 
         #region 数据插入操作

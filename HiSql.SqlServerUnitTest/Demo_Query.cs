@@ -37,16 +37,59 @@ namespace HiSql.UnitTest
             //Query_Demo8(sqlClient);
             //Query_Demo9(sqlClient);
             //Query_Demo10(sqlClient);
-            Query_Demo11(sqlClient);
+            //Query_Demo11(sqlClient);
+            Query_Demo12(sqlClient);
             var s = Console.ReadLine();
         }
 
 
 
+        /// <summary>
+        /// distinct 
+        /// </summary>
+        /// <param name="sqlClient"></param>
+        static void Query_Demo13(HiSqlClient sqlClient)
+        {
+            var _sql = sqlClient.HiSql("select distinct * from Hi_FieldModel where TabName=[$name$] and IsRequire=[$IsRequire$]",
+                new Dictionary<string, object> { { "[$name$]", "Hi_FieldModel ' or (1=1)" }, { "[$IsRequire$]", 1 } }
+                ).ToSql();
 
+
+            var _sql2 = sqlClient.HiSql("select distinct TabName  from Hi_FieldModel where TabName='Hi_FieldModel' order by TabName ").Take(10).Skip(2).ToSql();
+
+
+        }
+
+        /// <summary>
+        /// 防注入参数
+        /// </summary>
+        /// <param name="sqlClient"></param>
+        static void Query_Demo12(HiSqlClient sqlClient)
+        {
+            var _sql = sqlClient.HiSql("select  * from Hi_FieldModel where TabName=[$name$] and IsRequire=[$IsRequire$]",
+                new Dictionary<string, object> { { "[$name$]", "Hi_FieldModel ' or (1=1)" }, { "[$IsRequire$]",1 }  }
+                ).ToSql();
+
+
+            var _sql2 = sqlClient.HiSql("select   TabName  from Hi_FieldModel where TabName='Hi_FieldModel' order by TabName ").Take(10).Skip(2).ToSql();
+
+
+            if (!string.IsNullOrEmpty(_sql))
+            { 
+                
+            }
+
+        }
         static void Query_Demo11(HiSqlClient sqlClient)
         {
-            var _sql = sqlClient.HiSql("select * from Hi_FieldModel where TabName in (select TabName from Hi_TabModel where TabName='h_test' order by fieldname)").ToSql();
+            var _sql = sqlClient.HiSql("select * from Hi_FieldModel where TabName in (select TabName from Hi_TabModel where TabName='h_test' group by tabname ) order by fieldname").ToSql();
+            var _sql1 = sqlClient.HiSql("select * from Hi_FieldModel where TabName in (select TabName from Hi_TabModel where TabName='h_test' group by tabname )  ").ToSql();
+
+            if (string.IsNullOrEmpty(_sql1))
+            { 
+                
+            }
+
         }
         static void Query_Demo10(HiSqlClient sqlClient)
         {

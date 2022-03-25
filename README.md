@@ -23,8 +23,11 @@
 
 
 
-
-
+### 初始安装 
+注：只需要执行一次即可
+```c#
+sqlclient.CodeFirst.InstallHisql();
+```
 
 
  目前流行的ORM框架如果需要动态的拼接查询语句，只能用原生的sql进行拼接，无法跨不同数据库执行。hisql推出新的语法一套语句可以在不同的数据库执行
@@ -32,6 +35,24 @@
 传统ORM框架最大的弊端就是完全要依赖于实体用lambda表达式写查询语句，但最大的问题就是如果业务场景需要动态拼接条件时只能又切换到原生数据库的sql语句进行完成，如果自行拼接开发人员还要解决防注入的问题,hisql 刚才完美的解决这些问题,Hisql底层已经对sql注入进行了
 
 处理，开发人员只要关注于业务开发
+
+
+### 2022.3.25 更新
+
+1. HiSql语句新增 distinct 支持(注意在分页情况下不支持)
+```c#
+var _sql2 = sqlClient.HiSql("select distinct TabName  from Hi_FieldModel where TabName='Hi_FieldModel' order by TabName ").ToSql();
+
+```
+2. HiSql新增对hana表的操作（目前支持`SqlServer`,`mysql`，`Hana` 陆续会加上对其它数据库的实现）
+   操作写法请参照 2022.3.3 更新
+### 2022.3.24 更新
+新增hisql语句参数化，防止注入风险
+```c#
+var _sql = sqlClient.HiSql("select * from Hi_FieldModel where TabName=[$name$] and IsRequire=[$IsRequire$]",
+                new Dictionary<string, object> { { "[$name$]", "Hi_FieldModel ' or (1=1)" }, { "[$IsRequire$]",1 }  }
+                ).ToSql();
+```
 
 
 ### 2022.3.22 更新

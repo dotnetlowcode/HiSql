@@ -1655,6 +1655,16 @@ namespace HiSql
 
 
         /// <summary>
+        /// 生成查询去重命令
+        /// </summary>
+        /// <returns></returns>
+        public string BuilderDistinct()
+        {
+            return $"distinct";
+            //return $"{dbConfig.Field_Pre}distinct{dbConfig.Field_After}";
+        }
+
+        /// <summary>
         /// 生成join语句
         /// </summary>
         /// <param name="TableList"></param>
