@@ -316,11 +316,11 @@ namespace HiSql
             {
                 tabname = tabname.ToSqlInject();
                 DataSet ds = new DataSet();
-                DataTable dt_model = this.Context.DBO.GetDataTable($"select * from {dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{dbConfig.Table_After} where TabName='{tabname}'", new HiParameter("@TabName", tabname));
+                DataTable dt_model = this.Context.DBO.GetDataTable($"select * from {dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{dbConfig.Table_After} where {dbConfig.Field_Pre}TabName{dbConfig.Field_After}='{tabname}'", new HiParameter("@TabName", tabname));
                 dt_model.TableName = Constants.HiSysTable["Hi_TabModel"].ToString();
                 ds.Tables.Add(dt_model);
 
-                DataTable dt_struct = Context.DBO.GetDataTable($"select * from {dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{dbConfig.Table_After} where TabName='{tabname}' order by sortnum asc", new HiParameter("@TabName", tabname));
+                DataTable dt_struct = Context.DBO.GetDataTable($"select * from {dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{dbConfig.Table_After} where  {dbConfig.Field_Pre}TabName{dbConfig.Field_After}='{tabname}' order by {dbConfig.Field_Pre}SortNum{dbConfig.Field_After} asc", new HiParameter("@TabName", tabname));
                 dt_struct.TableName = Constants.HiSysTable["Hi_FieldModel"].ToString();
                 ds.Tables.Add(dt_struct);
 
