@@ -37,7 +37,16 @@ sqlclient.CodeFirst.InstallHisql();
 处理，开发人员只要关注于业务开发
 
 
-### 2022.3.24
+### 2022.3.25 更新
+
+1. HiSql语句新增 distinct 支持(注意在分页情况下不支持)
+```c#
+var _sql2 = sqlClient.HiSql("select distinct TabName  from Hi_FieldModel where TabName='Hi_FieldModel' order by TabName ").ToSql();
+
+```
+2. HiSql新增对hana表的操作（目前支持`SqlServer`,`mysql`，`Hana` 陆续会加上对其它数据库的实现）
+   操作写法请参照 2022.3.3 更新
+### 2022.3.24 更新
 新增hisql语句参数化，防止注入风险
 ```c#
 var _sql = sqlClient.HiSql("select * from Hi_FieldModel where TabName=[$name$] and IsRequire=[$IsRequire$]",
