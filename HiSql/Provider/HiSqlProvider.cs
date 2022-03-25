@@ -313,6 +313,51 @@ namespace HiSql
                                 {
                                     _sql = _sql.Replace(n, $"'{dicparma[n].ToString().ToSqlInject().ToSqlEnChar()}'");
                                 }
+                                else if (type.FullName.IndexOf("List") > 0)
+                                {
+
+                                    var _dic_p1 = Tool.RegexGrps(Constants.REG_HISQL_PARAM2, _sql);
+                                    var _dic_p2 = Tool.RegexGrps(Constants.REG_HISQL_IN_PARAM, _sql);
+                                    string _insql = "";
+                                    if (_dic_p1.Count > 0 && _dic_p1.Count == _dic_p2.Count)
+                                    {
+                                        //foreach(var _o in )
+
+                                        var _typ_string = typeof(List<string>);
+                                        var _typ_int = typeof(List<int>);
+                                        var _typ_decimal = typeof(List<decimal>);
+
+                                        if (type == _typ_string)
+                                        {
+                                            var list = dicparma[n] as List<string>;
+                                            _insql=AdoExtensions.ToSqlIn<string>(list.ToArray(), true);
+                                        }
+                                        else if (type == _typ_int)
+                                        {
+                                            var list = dicparma[n] as List<int>;
+                                            _insql = AdoExtensions.ToSqlIn<int>(list.ToArray(), false);
+                                        }
+                                        else if (type == _typ_decimal)
+                                        {
+                                            var list = dicparma[n] as List<decimal>;
+                                            _insql = AdoExtensions.ToSqlIn<decimal>(list.ToArray(), false);
+                                        }
+                                        else
+                                        {
+                                            throw new Exception($"类型[{type.FullName}]不在允许的in集合内,仅允许List<string>,List<int>,List<decimal> 三种类型");
+                                        }
+
+
+                                        _sql = _sql.Replace(n, $"{_insql}");
+                                    }
+                                    else
+                                    {
+                                        throw new Exception($"参数 {n} 是集合 中能放在in ({n})中");
+                                    }
+
+
+
+                                }
                                 else if (type.IsIn<Type>(Constants.ObjType))
                                 {
                                     _sql = _sql.Replace(n, $"'{dicparma[n].ToString().ToSqlInject().ToSqlEnChar()}'");
