@@ -68,6 +68,10 @@ namespace HiSql
 
         bool _isMultiSubQuery = false;
 
+        bool _isdistinct = false;
+
+
+
         IDbConfig dbConfig;
 
         /// <summary>
@@ -102,6 +106,14 @@ namespace HiSql
             set { dbConfig = value; }
         }
 
+        /// <summary>
+        /// 是否去重
+        /// </summary>
+        public bool IsDistinct
+        {
+            get { return _isdistinct; }
+            set { _isdistinct = value; }
+        }
 
         /// <summary>
         /// 是否是多表子查询

@@ -636,7 +636,7 @@ UNION ALL
                                     WHERE TABLE_NAME = '[$TabName$]'; ";
             //表索引明细
             _temp_get_indexdetail = @"SELECT 1 as TableId, TABLE_NAME as TableName, 1 as IndexId , INDEX_NAME as IndexName,  case when INDEX_NAME='PRIMARY' then 'Key_Index' ELSE 'Index' end as IndexType
-                                        , SEQ_IN_INDEX AS ColumnIdx, SEQ_IN_INDEX AS ColumnID, COLUMN_NAME as ColumnName, 'asc' as Sort, case when INDEX_NAME='PRIMARY' then 'Y' ELSE 'Y' end as  IPrimary 
+                                        , SEQ_IN_INDEX AS ColumnIdx, SEQ_IN_INDEX AS ColumnID, COLUMN_NAME as ColumnName, 'asc' as Sort, case when INDEX_NAME='PRIMARY' then 'Y' ELSE 'N' end as  IPrimary 
                                         , case when NON_UNIQUE ='1' then '' ELSE 'Y' end as IsUnique
                                          , '' AS Ignore_dup_key
                                         , case when is_visible = 'YES' then '' ELSE 'Y' end as Disabled 

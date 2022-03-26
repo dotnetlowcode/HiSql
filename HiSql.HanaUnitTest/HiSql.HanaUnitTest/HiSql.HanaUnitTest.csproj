@@ -6,14 +6,25 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\HiSql.Hana\HiSql.Hana.csproj" />
     <ProjectReference Include="..\..\HiSql\HiSql.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="Sap.Data.Hana.Core.v2.1">
-      <HintPath>C:\Users\admin\Downloads\hanaclient-latest-windows-x64\client\DOTNETCORE\dotnetcore\v2.1\Sap.Data.Hana.Core.v2.1.dll</HintPath>
+      <HintPath>..\..\HanaDLL\Sap.Data.Hana.Core.v2.1.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

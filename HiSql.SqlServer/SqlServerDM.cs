@@ -967,24 +967,31 @@ namespace HiSql
             else if (tabFieldAction == TabFieldAction.RENAME)
             {
                 //字段重命名
+                var _delsql = dbConfig.Del_Default;
+                _delsql = _delsql.Replace("[$TabName$]", hiColumn.TabName)
+                .Replace("[$FieldName$]", hiColumn.FieldName)
+                .Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema);
 
-
-                _changesql = new StringBuilder().AppendLine(dbConfig.Re_Column.Replace("[$TabName$]", hiTable.TabName)
+                _changesql = new StringBuilder()
+                    .AppendLine(_delsql)
+                    .AppendLine(dbConfig.Re_Column.Replace("[$TabName$]", hiTable.TabName)
                     .Replace("[$ReFieldName$]", hiColumn.ReFieldName)
                     .Replace("[$FieldName$]", hiColumn.FieldName)
                     )
-                    .AppendLine(dbConfig.Field_Comment.Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema)
-                        .Replace("[$TabName$]", hiTable.TabName)
-                        .Replace("[$FieldName$]", hiColumn.ReFieldName)
-                        .Replace("[$FieldDesc$]", hiColumn.FieldDesc))
+                    //BuildChangeFieldStatement 构建 modi时候再生成 Comment信息
+                    //.AppendLine(dbConfig.Field_Comment.Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema)
+                    //    .Replace("[$TabName$]", hiTable.TabName)
+                    //    .Replace("[$FieldName$]", hiColumn.ReFieldName)
+                    //    .Replace("[$FieldDesc$]", hiColumn.FieldDesc))
                     .ToString();
 
 
+                hiColumn.FieldName = hiColumn.ReFieldName;
+                var _changesqlUpdate = BuildChangeFieldStatement(hiTable, hiColumn, TabFieldAction.MODI);
+                _changesql += System.Environment.NewLine + _changesqlUpdate;
             }
             else
                 return "";
-
-            
 
             return _changesql;
         }
@@ -1646,6 +1653,16 @@ namespace HiSql
             return sb_where.ToString();
         }
 
+
+        /// <summary>
+        /// 生成查询去重命令
+        /// </summary>
+        /// <returns></returns>
+        public string BuilderDistinct()
+        {
+            return $"distinct";
+            //return $"{dbConfig.Field_Pre}distinct{dbConfig.Field_After}";
+        }
 
         /// <summary>
         /// 生成join语句

@@ -36,6 +36,9 @@ namespace HiSql.AST
 
             public static string REG_SELECT_CMD = @"^\s*(?<cmd>select)\s+";
 
+
+            public static string REG_DISTINCT = @"^\s*\b(?<cmd>distinct)\b";
+
             public static string REG_SELECT_FIELD = @"^\s*(?<field>[\w\s\S]*?(?=\bfrom\b))";
 
             public static string REG_SELECT_FROM = @"^\s*(?:\bfrom\b)(?<from>(?:[\s]+)(?<table>(?:[\s]*)(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w]+))\s*(?:\bas\b\s*(?<asname>[\w]+))?\s*)";
@@ -94,6 +97,10 @@ namespace HiSql.AST
 
         string _field = "";
         string _cmd = "";
+
+        //是否去重
+        bool _isdistinct = false;
+
         string _fromtable = "";
         IQuery _query = null;
 
@@ -154,6 +161,22 @@ namespace HiSql.AST
                 #endregion
 
 
+
+                #region 拆解distinct
+                //add by tgm date:2022.3.24
+                rtn = Tool.RegexGrpOrReplace(Constants.REG_DISTINCT, sql);
+                if (rtn.Item1 && rtn.Item2.ContainsKey("cmd"))
+                {
+                    // 说明设置了distinct 去重关键词
+                    _isdistinct = true;
+                    sql = rtn.Item3;
+                }
+                else
+                    _isdistinct = false;
+                #endregion
+
+
+
                 #region 拆解field
                 rtn = Tool.RegexGrpOrReplace(Constants.REG_SELECT_FIELD, sql);
                 if (rtn.Item1 && rtn.Item2.ContainsKey("field"))
@@ -189,6 +212,8 @@ namespace HiSql.AST
                     }
 
                     _query.Field(_field.Split(','));
+
+                    _query.IsDistinct = _isdistinct;
                 }
                 else
                     throw new Exception($"{HiSql.Constants.HiSqlSyntaxError}语句[{sql}]附近有语法错误,未能识别[from]关键词");
