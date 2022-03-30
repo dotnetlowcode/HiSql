@@ -46,6 +46,23 @@ var _sql2 = sqlClient.HiSql("select distinct TabName  from Hi_FieldModel where T
 ```
 2. HiSql新增对hana表的操作（目前支持`SqlServer`,`mysql`，`Hana` 陆续会加上对其它数据库的实现）
    操作写法请参照 2022.3.3 更新
+
+3. 参数增加in 参数如下所示
+    当参数为List集合参数时 只能用于in()中
+    注：不同的数据Hisql的语法是一样的
+```c#
+var _sql1 = sqlClient.HiSql("select   TabName  from Hi_FieldModel where  FieldType in( [$list$]) order by TabName ",
+    new Dictionary<string, object> { { "[$list$]",new List<int> { 1,2,3,4} } }).ToSql();
+```
+生成的sql如下所示 hisql会根据不同的数据库的特性解析成不同的原生sql语句
+```sql
+select  [Hi_FieldModel].[TabName] from [Hi_FieldModel] as [Hi_FieldModel]
+ where [Hi_FieldModel].[FieldType] in (1,2,3,4)
+ order by  [Hi_FieldModel].[TabName] ASC
+
+```
+
+
 ### 2022.3.24 更新
 新增hisql语句参数化，防止注入风险
 ```c#

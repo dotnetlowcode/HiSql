@@ -380,5 +380,12 @@ namespace HiSql
         /// </summary>
 
         public static string  REG_HISQL_PARAM = @"^\[\$(?<param>\w+)\$\]$";
+
+        public static string REG_HISQL_PARAM2 = @"\[\$(?<param>\w+)\$\]";
+
+        /// <summary>
+        /// 参数模版是否在in()中
+        /// </summary>
+        public static string REG_HISQL_IN_PARAM = @"\bin\s*[\(]\s*\[\$(?<param>\w+)\$\]\s*[\)]";
     }
 }
