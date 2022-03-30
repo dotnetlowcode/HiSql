@@ -168,6 +168,8 @@ namespace HiSql
 
         public ICodeFirst CodeFirst => throw new NotImplementedException();
 
+        public IDbFirst DbFirst => throw new NotImplementedException();
+
 
         /// <summary>
         /// 根据当前配置 克隆一个新的连接

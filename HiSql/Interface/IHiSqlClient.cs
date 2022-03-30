@@ -88,6 +88,7 @@ namespace HiSql
         /// </summary>
         ICodeFirst CodeFirst { get; }
 
+        IDbFirst DbFirst { get; }
 
         //int BulkCopyExecCommand(TabInfo tabInfo, List<object> lstdata);
 

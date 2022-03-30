@@ -56,7 +56,7 @@ namespace HiSql.AST
 
             public static string REG_SELECT_ORDER = @"^\s*order\s+by\s+(?<order>[\s\S]*)";
 
-            public static string REG_SELECT_ORDER_FIELD = @"^(?:[\s]*)(?<field>(?:(?:[\#]{1,2}|[\@]{1})?(?:[\w]+)(?:[\.]{1}))?(?:[\w]+))?\s*(?<sort>asc|desc)?\s*";
+            public static string REG_SELECT_ORDER_FIELD = @"^(?:[\s]*)(?<field>(?:(?:[\#]{1,2}|[\@]{1})?(?:[\w]+)(?:[\.]{1}))?(?:[\w]+))?\s*(?<sort>asc|desc)?\s*[\,]?\s*";
 
             public static string REG_SELECT_GROUP = @"^\s*group\s+by\s+(?<group>[\s\S]*?)(?=\bhaving\b|\border\s+\bby\b)|^\s*group\s+by\s+(?<group>[\s\S]*)";
 
@@ -522,10 +522,10 @@ namespace HiSql.AST
                             sorts.Add(rtn.Item2["field"].ToString());
 
 
-                        if (!_isandor)
-                            throw new Exception($"{HiSql.Constants.HiSqlSyntaxError}语句[{sql}]附近有语法错误");
+                        //if (!_isandor)
+                        //    throw new Exception($"{HiSql.Constants.HiSqlSyntaxError}语句[{sql}]附近有语法错误");
 
-                        _isandor = !_isandor;
+                        //_isandor = !_isandor;
 
                         sql = rtn.Item3;
                     }
@@ -534,9 +534,9 @@ namespace HiSql.AST
                         rtn = Tool.RegexGrpOrReplace(Constants.REG_SELECT_SPLIT, sql);
                         if (rtn.Item1)
                         {
-                            if (_isandor)
-                                throw new Exception($"{HiSql.Constants.HiSqlSyntaxError}语句[{sql}]附近有语法错误");
-                            _isandor = !_isandor;
+                            //if (_isandor)
+                            //    throw new Exception($"{HiSql.Constants.HiSqlSyntaxError}语句[{sql}]附近有语法错误");
+                            //_isandor = !_isandor;
 
                             sql = rtn.Item3;
                         }
