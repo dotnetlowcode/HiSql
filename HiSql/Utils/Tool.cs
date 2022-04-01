@@ -26,7 +26,8 @@ namespace HiSql
             {
                 foreach (string name in _regex.GetGroupNames())
                 {
-                    _dic.Add(name, _match.Groups[_regex.GroupNumberFromName(name)].Value);
+                    if(!_dic.ContainsKey(name))
+                        _dic.Add(name, _match.Groups[_regex.GroupNumberFromName(name)].Value);
                 }
                 _match = _match.NextMatch();
             }
@@ -58,6 +59,21 @@ namespace HiSql
             }
             return new Tuple<bool, Dictionary<string, string>, string>(_match.Success, _dic, text);
         }
+
+        /// <summary>
+        /// 正则替换
+        /// </summary>
+        /// <param name="regex">正则表达式</param>
+        /// <param name="text">文本</param>
+        /// <param name="repstr">替换值</param>
+        /// <returns></returns>
+        public static string RegexReplace(string regex, string text, string repstr)
+        {
+            Regex _regex = new Regex(regex, RegexOptions.IgnoreCase | RegexOptions.Multiline);
+
+            return _regex.Replace(text, repstr);
+        }
+
         /// <summary>
         /// 获取多个组合匹配
         /// </summary>
