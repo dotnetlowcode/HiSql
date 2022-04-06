@@ -39,6 +39,7 @@ namespace HiSql.UnitTest
             //Query_Demo10(sqlClient);
             //Query_Demo11(sqlClient);
             Query_Demo12(sqlClient);
+            //Query_Demo13(sqlClient);
             var s = Console.ReadLine();
         }
 
@@ -71,7 +72,14 @@ namespace HiSql.UnitTest
                 ).ToSql();
 
 
-            var _sql2 = sqlClient.HiSql("select   TabName  from Hi_FieldModel where TabName='Hi_FieldModel' order by TabName ").Take(10).Skip(2).ToSql();
+            //var _sql1 = sqlClient.HiSql("").ToSql();
+
+
+
+            var _sql1 = sqlClient.HiSql("select   TabName  from Hi_FieldModel where  FieldType in( [$list$]) order by TabName ",
+                new Dictionary<string, object> { { "[$list$]",new List<int> { 1,2,3,4} } }).ToSql();
+
+            var _sql2 = sqlClient.HiSql("select * from Hi_FieldModel where TabName='``Hi_FieldModel' ").ToSql();
 
 
             if (!string.IsNullOrEmpty(_sql))
