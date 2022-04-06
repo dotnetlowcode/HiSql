@@ -16,7 +16,7 @@ namespace HiSql
 
             //Demo_ModiColumn(sqlClient);
             //Demo_ReColumn(sqlClient);
-            Demo_ModiTable(sqlClient);
+            //Demo_ModiTable(sqlClient);
             //Demo_ReTable(sqlClient);
             //Demo_DelColumn(sqlClient);
             //Demo_Tables(sqlClient);
@@ -27,7 +27,7 @@ namespace HiSql
             //Demo_CreateView(sqlClient);
             //Demo_ModiView(sqlClient);
 
-            //Demo_IndexList(sqlClient);
+            Demo_IndexList(sqlClient);
             //Demo_Index_Create(sqlClient);
 
 
