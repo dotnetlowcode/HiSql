@@ -2437,7 +2437,7 @@ namespace HiSql
             if (string.IsNullOrEmpty(tabname))
                 _tempsql = _tempsql.Replace("[$Where$]", "");
             else
-                _tempsql = _tempsql.Replace("[$Where$]", $" and \"TABLE_NAME\"='{tabname.ToSqlInject()}'");
+                _tempsql = _tempsql.Replace("[$Where$]", $" and {dbConfig.Field_Pre}TABLE_NAME{dbConfig.Field_After}='{tabname.ToSqlInject()}'");
             return Context.DBO.GetDataTable(_tempsql);
             throw new NotImplementedException();
         }
@@ -2448,7 +2448,7 @@ namespace HiSql
             if (string.IsNullOrEmpty(viewname))
                 _tempsql = _tempsql.Replace("[$Where$]", "");
             else
-                _tempsql = _tempsql.Replace("[$Where$]", $" and \"VIEW_NAME\"='{viewname.ToSqlInject()}'");
+                _tempsql = _tempsql.Replace("[$Where$]", $" and {dbConfig.Field_Pre}VIEW_NAME{dbConfig.Field_After}='{viewname.ToSqlInject()}'");
             return Context.DBO.GetDataTable(_tempsql);
 
         }
@@ -2459,7 +2459,7 @@ namespace HiSql
             if (string.IsNullOrEmpty(tabname))
                 _tempsql = _tempsql.Replace("[$Where$]", "");
             else
-                _tempsql = _tempsql.Replace("[$Where$]", $" where \"TabName\"='{tabname.ToSqlInject()}'");
+                _tempsql = _tempsql.Replace("[$Where$]", $" where {dbConfig.Field_Pre}TabName{dbConfig.Field_After}='{tabname.ToSqlInject()}'");
             return Context.DBO.GetDataTable(_tempsql);
 
             throw new NotImplementedException();
@@ -2517,7 +2517,6 @@ namespace HiSql
 
                 return sb.ToString().ToUpper();
 
-                return _tempsql;
             }
             else
                 throw new Exception($"视图名称[{viewname}]不存在无法修改");
@@ -2633,7 +2632,6 @@ namespace HiSql
             }
             else
                 throw new Exception($"表[{tabname}]不存在,无法创建索引");
-            throw new NotImplementedException();
         }
 
         public string DropIndex(string tabname, string indexname)
@@ -2641,16 +2639,13 @@ namespace HiSql
             
             //暂未校验索引是否存在 由底层数据库抛出
             string _sql = dbConfig.Get_DropIndex.Replace("[$IndexName$]", indexname);
-
             return _sql;
-            throw new NotImplementedException();
         }
 
         public string BuildReTableStatement(string tabname, string newtabname)
         {
             string _sql = dbConfig.Re_Table.Replace("[$TabName$]", $"{dbConfig.Schema_Pre}{this.Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{tabname}{dbConfig.Table_After}").Replace("[$ReTabName$]", $"{dbConfig.Table_Pre}{newtabname}{dbConfig.Table_After}");
             return _sql;
-            throw new NotImplementedException();
         }
     }
 }

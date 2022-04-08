@@ -641,7 +641,7 @@ UNION ALL
                                          , '' AS Ignore_dup_key
                                         , case when is_visible = 'YES' then '' ELSE 'Y' end as Disabled 
                                         , '' AS Fill_factor
-                                        , '' AS Padded
+                                        , '' AS Padded ,'' as IsIncludedColumn
                                         FROM INFORMATION_SCHEMA.STATISTICS
                                         WHERE TABLE_NAME='[$TabName$]' AND INDEX_NAME='[$IndexName$]';";
 
