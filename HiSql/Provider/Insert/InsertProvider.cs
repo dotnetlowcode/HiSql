@@ -259,8 +259,9 @@ namespace HiSql
                         {
                             if (tabinfo.IsAllowMergeInto)
                             {
+                                List<string> lstcol = rtnlst[0].Keys.ToList();
                                 TabInfo _tabtarget = sqldm.GetTabStruct(this.Table.TabName);
-                                string _mergesql = sqldm.BuildMergeIntoSqlSequence(_tabtarget);
+                                string _mergesql = sqldm.BuildMergeIntoSqlSequence(_tabtarget, lstcol);
                                 _mergesql = _mergesql.Replace("[$Insert$]", sb_sql.ToString());
                                 sb_sql = new StringBuilder().AppendLine(_mergesql);
                             }
@@ -293,7 +294,9 @@ namespace HiSql
                     TabInfo _tabtarget = sqldm.GetTabStruct(this.Table.TabName);
                     TabInfo _tabsource = sqldm.Context.MCache.GetCache<TabInfo>(_cacheinsertTabName);
 
-                    string _mergesql = sqldm.BuildMergeIntoSql(_tabtarget, _tabsource);
+                    List<string> lstcol = rtnlst[0].Keys.ToList();
+
+                    string _mergesql = sqldm.BuildMergeIntoSql(_tabtarget, _tabsource, lstcol);
                     if (this.Context.CurrentConnectionConfig.DbType == DBType.Hana || this.Context.CurrentConnectionConfig.DbType == DBType.Oracle)
                     {
                         string _truncate = DbConfig.Delete_TrunCate.Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema).Replace("[$TabName$]", _insertTabName);
