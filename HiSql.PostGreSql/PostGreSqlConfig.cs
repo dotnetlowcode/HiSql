@@ -98,19 +98,24 @@ namespace HiSql
         string _temp_sequence_temp = "";
 
 
-        string _temp_addcolumn = "alter table [$TabName$] add [$TempColumn$] ";
+        string _temp_addcolumn = "";
 
-        string _temp_delcolumn = "alter table [$TabName$] drop column [$FieldName$]";
+        string _temp_delcolumn = "";
 
-        string _temp_modicolumn = "alter table [$TabName$] alter column [$TempColumn$]";
+        string _temp_modicolumn = "";
 
-        string _temp_recolumn = "EXECUTE sp_rename N'[$TabName$].[$FieldName$]', N'[$ReFieldName$]', 'COLUMN' ";
+        string _temp_recolumn = "";
 
-        string _temp_retable = "EXECUTE sp_rename '[$TabName$].[$TabName$]', '[$ReTabName$]'";
+        string _temp_retable = "";
 
         string _temp_setdefalut = "";
 
         string _temp_deldefalut = "";
+
+
+        string _temp_setNotNull = "";
+
+        string _temp_delNotNull = "";
 
         /// <summary>
         /// 所有物理实体表
@@ -185,6 +190,10 @@ namespace HiSql
         /// 字段创建时的模板[$FieldName$]  这是一个可替换的字符串ColumnName是在HiColumn中的属性名
         /// </summary>
         Dictionary<string, string> _fieldtempmapping = new Dictionary<string, string> { };
+
+        Dictionary<string, string> _fieldtempmappingForModiType = new Dictionary<string, string> { };
+        Dictionary<string, string> _fieldtempmappingForModiDEFAULT = new Dictionary<string, string> { };
+        Dictionary<string, string> _fieldtempmappingForModiCONSTRAINT = new Dictionary<string, string> { };
         Dictionary<HiType, string> _dbmapping = new Dictionary<HiType, string>();
 
         List<DefMapping> _lstdefmapping = new List<DefMapping>();
@@ -254,6 +263,7 @@ namespace HiSql
 
         public Dictionary<string, string> FieldTempMapping => _fieldtempmapping;
 
+        public Dictionary<string, string> FieldTempMappingForModi => _fieldtempmappingForModiType;
         public Dictionary<HiType, string> DbMapping => _dbmapping;
 
         public string Table_MergeInto { get => _temp_merge_into; }
@@ -288,6 +298,12 @@ namespace HiSql
         public string Set_Default { get => _temp_setdefalut; }
 
         public string Del_Default { get => _temp_deldefalut; }
+
+        public string Set_NotNull { get => _temp_setNotNull; }
+
+        public string Del_NotNull { get => _temp_delNotNull; }
+
+
 
         public string Get_Tables { get => _temp_gettables; }
 
@@ -402,6 +418,22 @@ namespace HiSql
         public void Init()
         {
 
+            _temp_addcolumn = $"alter table {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} add COLUMN [$TempColumn$] ;";
+
+            _temp_modicolumn = $"alter table  {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} alter column [$TempColumn$];";
+            
+            _temp_delcolumn = $"ALTER TABLE  {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after}  DROP COLUMN {_temp_field_pre}[$FieldName$]{_temp_field_after} CASCADE;";
+
+            _temp_recolumn = $"ALTER TABLE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} RENAME COLUMN {_temp_field_pre}[$FieldName$]{_temp_field_after} TO {_temp_field_pre}[$ReFieldName$]{_temp_field_after};";
+
+            _temp_setdefalut = $"alter table  {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} alter column {_temp_field_pre}[$FieldName$]{_temp_field_after} set [$DEFAULT$];";
+            _temp_deldefalut = $"alter table  {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} alter column {_temp_field_pre}[$FieldName$]{_temp_field_after} DROP DEFAULT;";
+
+
+            _temp_setNotNull = $"alter table  {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} alter column {_temp_field_pre}[$FieldName$]{_temp_field_after} set NOT NULL;";
+            _temp_delNotNull = $"alter table  {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} alter column {_temp_field_pre}[$FieldName$]{_temp_field_after} DROP NOT NULL;";
+
+
             _temp_fun_date = "CURRENT_TIMESTAMP";
 
             _lstdefmapping.Add(new DefMapping { IsRegex = false, DbValue = @"", DBDefault = HiTypeDBDefault.NONE });
@@ -464,6 +496,72 @@ namespace HiSql
                 { "uniqueidentifier",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} varchar(36)   [$IsNull$] [$Default$]  [$EXTEND$] "},
             };
 
+            _fieldtempmappingForModiType = new Dictionary<string, string> {
+                //样例：[TabName] [varchar](50) NOT NULL,
+                { "nvarchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} TYPE varchar([$FieldLen$])"},
+                { "varchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} TYPE varchar([$FieldLen$])"},
+                { "nchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} TYPE char([$FieldLen$])"},
+                { "char",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} TYPE char([$FieldLen$])"},
+                //样例：[udescript] [text] NULL,
+                { "text",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} TYPE text"},
+
+                { "int",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} TYPE integer"},
+                { "bigint",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} TYPE bigint" },
+                { "smallint",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} TYPE smallint  "},
+                { "decimal",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} TYPE decimal([$FieldLen$],[$FieldDec$])"},
+
+                { "bit",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} TYPE bool"},
+
+                { "datetime",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} TYPE TIMESTAMP"},
+                { "date",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} TYPE date" },
+
+                { "binary",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} TYPE bytea"},
+                { "uniqueidentifier",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} TYPE varchar(36)"},
+            };
+            //_fieldtempmappingForModiDEFAULT = new Dictionary<string, string> {
+            //    //样例：[TabName] [varchar](50) NOT NULL,
+            //    { "nvarchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} "},
+            //    { "varchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} set [$Default$]"},
+            //    { "nchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} set [$Default$]"},
+            //    { "char",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} set [$Default$]"},
+            //    //样例：[udescript] [text] NULL,
+            //    { "text",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} set [$Default$]"},
+
+            //    { "int",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} set [$Default$]"},
+            //    { "bigint",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} set [$Default$]" },
+            //    { "smallint",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} set [$Default$]"},
+            //    { "decimal",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} set [$Default$]"},
+
+            //    { "bit",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} set [$Default$]"},
+
+            //    { "datetime",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} set [$Default$]"},
+            //    { "date",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} set [$Default$]" },
+
+            //    { "binary",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} set [$Default$]"},
+            //    { "uniqueidentifier",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} set [$Default$]"},
+            //};
+           //_fieldtempmappingForModiCONSTRAINT = new Dictionary<string, string> {
+           //     //样例：[TabName] [varchar](50) NOT NULL,
+           //     { "nvarchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  varchar([$FieldLen$])  [$IsNull$]  [$Default$]  [$EXTEND$]  "},
+           //     { "varchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} varchar([$FieldLen$])   [$IsNull$] [$Default$] [$EXTEND$] "},
+           //     { "nchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} char([$FieldLen$])   [$IsNull$] [$Default$]  [$EXTEND$] "},
+           //     { "char",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} char([$FieldLen$])   [$IsNull$] [$Default$]  [$EXTEND$] "},
+           //     //样例：[udescript] [text] NULL,
+           //     { "text",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} text   [$IsNull$] [$Default$] [$EXTEND$] "},
+
+           //     { "int",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} integer [$IsIdentity$] [$IsNull$] [$Default$] [$EXTEND$] "},
+           //     { "bigint",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} bigint [$IsIdentity$] [$IsNull$] [$Default$]  [$EXTEND$] " },
+           //     { "smallint",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} smallint [$IsNull$] [$Default$]  [$EXTEND$] "},
+           //     { "decimal",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} decimal([$FieldLen$],[$FieldDec$])  [$IsNull$] [$Default$] [$EXTEND$] "},
+
+           //     { "bit",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} bool  [$IsNull$] [$Default$]  [$EXTEND$] "},
+
+           //     { "datetime",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} TIMESTAMP  [$IsNull$] [$Default$]  [$EXTEND$] "},
+           //     { "date",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} date  [$IsNull$] [$Default$]  [$EXTEND$] " },
+
+           //     { "binary",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} bytea  [$IsNull$]  [$EXTEND$] "},
+           //     { "uniqueidentifier",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} varchar(36)   [$IsNull$] [$Default$]  [$EXTEND$] "},
+           // };
 
             //
             _temp_sequence = new StringBuilder()
@@ -652,12 +750,12 @@ UNION ALL
                 .AppendLine("   case when(select count(pc.conname) from pg_constraint  pc where a.attnum = pc.conkey [ 1 ] and pc.conrelid = c.oid) = '1' then 'True' else 'False' end as \"IsPrimary\",")
                 .AppendLine("   case when   A .attnotnull = 't' and (select count(column_default) from information_schema.columns where table_schema='[$Schema$]' and  table_name = C .relname and column_name =A .attname and column_default like 'nextval(%' )='1'  and (select count(pc.conname) from pg_constraint  pc where a.attnum = pc.conkey [ 1 ] and pc.conrelid = c.oid) = '1' then 'True' else 'Fasle' end as \"IsIdentity\"")
                 .AppendLine("FROM")
-                .AppendLine("   pg_class C,")
-                .AppendLine("   pg_attribute A")
+                .AppendLine("   pg_class C, pg_namespace as ns,")
+                .AppendLine("   pg_attribute A ")
                 .AppendLine("   LEFT OUTER JOIN pg_description b ON A .attrelid = b.objoid")
                 .AppendLine("       AND A .attnum = b.objsubid,")
                 .AppendLine("   pg_type T")
-                .AppendLine("WHERE")
+                .AppendLine("WHERE ns.oid = C.relnamespace and ns.nspname='[$Schema$]' and ")
                 .AppendLine("   C .relname in(select pt.tablename from pg_tables pt where pt.schemaname = '[$Schema$]' UNION all select pv.viewname as tablename from pg_views as pv where pv.schemaname = '[$Schema$]') AND A.attnum > 0")
                 .AppendLine("   AND A .attrelid = C .oid AND A .atttypid = T .oid and c.relname='[$TabName$]'")
                 .AppendLine("ORDER BY C .relname,A .attnum;")
@@ -693,6 +791,119 @@ SET "DomainDesc" = excluded."DomainDesc";
             _temp_truncate = $"TRUNCATE TABLE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after};";
 
             _temp_droptable = $"drop table {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after};";
+
+            _temp_gettables = new StringBuilder()
+               .AppendLine("select * from ( ")
+                .AppendLine($@"SELECT tablename as {_temp_field_pre}TabName{_temp_field_after}, 'Table' as {_temp_field_pre}TabType{ _temp_field_after},'' as {_temp_field_pre}CreateTime{_temp_field_after} FROM pg_tables where schemaname='[$Schema$]' [$Where$]")
+               .AppendLine(")as temp")
+               .AppendLine("ORDER BY \"TabName\" ASC, \"CreateTime\" desc ")
+               .ToString();
+            _temp_getviews = new StringBuilder()
+               .AppendLine("select * from ( ")
+                .AppendLine($@"SELECT viewname as {_temp_field_pre}TabName{_temp_field_after}, 'View' as {_temp_field_pre}TabType{ _temp_field_after}
+                        ,'' as {_temp_field_pre}CreateTime{_temp_field_after} FROM pg_views where schemaname='[$Schema$]' [$Where$]")
+               .AppendLine(")as temp  ")
+               .AppendLine("ORDER BY \"TabName\" ASC, \"CreateTime\" desc ")
+               .ToString();
+
+            _temp_getalltables = new StringBuilder()
+              .AppendLine("select * from ( ")
+                .AppendLine($@"SELECT tablename as {_temp_field_pre}TabName{_temp_field_after}, 'Table' as {_temp_field_pre}TabType{ _temp_field_after},'' as {_temp_field_pre}CreateTime{_temp_field_after} FROM pg_tables where schemaname='[$Schema$]'")
+               .AppendLine("union all")
+                .AppendLine($@"SELECT viewname as {_temp_field_pre}TabName{_temp_field_after}, 'View' as {_temp_field_pre}TabType{ _temp_field_after}
+                        ,'' as {_temp_field_pre}CreateTime{_temp_field_after} FROM pg_views where schemaname='[$Schema$]'")
+              .AppendLine(")as temp [$Where$]")
+              .AppendLine("ORDER BY \"TabName\" ASC, \"CreateTime\" desc ")
+              .ToString();
+
+            _temp_check_table_exists = new StringBuilder()
+                .AppendLine("select * from ( ")
+                .AppendLine($@"SELECT tablename as {_temp_field_pre}TabName{_temp_field_after}, 'Table' as {_temp_field_pre}TabType{ _temp_field_after},'' as {_temp_field_pre}CreateTime{_temp_field_after} FROM pg_tables where schemaname='[$Schema$]'")
+               .AppendLine("union all")
+                .AppendLine($@"SELECT viewname as {_temp_field_pre}TabName{_temp_field_after}, 'View' as {_temp_field_pre}TabType{ _temp_field_after}
+                        ,'' as {_temp_field_pre}CreateTime{_temp_field_after} FROM pg_views where schemaname='[$Schema$]'")
+              .AppendLine(")as temp  WHERE \"TabName\" = '[$TabName$]'")
+              .AppendLine("ORDER BY \"TabName\" ASC, \"CreateTime\" desc ")
+              .ToString();
+
+
+
+            //删除视图
+            _temp_drop_view = $"DROP VIEW [$Schema$].[$TabName$];";
+
+            //创建视图
+            _temp_create_view = new StringBuilder()
+                .AppendLine($"CREATE VIEW [$Schema$].[$TabName$] ")
+                .AppendLine("AS")
+                .AppendLine("[$ViewSql$];")
+                .ToString();
+
+            //修改视图
+            _temp_modi_view = new StringBuilder()
+                .AppendLine($"CREATE OR REPLACE VIEW [$Schema$].[$TabName$] ")
+                .AppendLine("AS")
+                .AppendLine("[$ViewSql$];")
+                .ToString();
+
+            //获取表索引
+            _temp_get_tabindex = $"SELECT distinct A.TABLENAME as \"TableName\",A.INDEXNAME as \"IndexName\", case when INDISPRIMARY= true then 'Key_Index' ELSE 'Index' end as IndexType , '' as Disabled " +
+              
+                $@"FROM
+                    PG_AM B
+                    LEFT JOIN PG_CLASS F ON B.OID = F.RELAM
+                    LEFT JOIN PG_STAT_ALL_INDEXES E ON F.OID = E.INDEXRELID
+                    LEFT JOIN PG_INDEX C ON E.INDEXRELID = C.INDEXRELID
+                    LEFT OUTER JOIN PG_DESCRIPTION D ON C.INDEXRELID = D.OBJOID,
+                    PG_INDEXES A
+                    WHERE
+                    A.SCHEMANAME = E.SCHEMANAME AND A.TABLENAME = E.RELNAME AND A.INDEXNAME = E.INDEXRELNAME
+                    and A.SCHEMANAME='[$Schema$]' and A.TABLENAME='[$TabName$]' ";
+
+           //表索引明细
+            _temp_get_indexdetail = @"
+                                        select t.oid as ""TableId"" ,  
+                                            t.relname as ""TableName"", 
+                                            i.relname as ""IndexName"", case when INDISPRIMARY = true then 'Key_Index' ELSE 'Index' end as IndexType
+                                            ,a.attnum as ""ColumnIdx"",a.attnum as ""ColumnID"", a.attname as ""ColumnName"", 
+	                                        case when position(a.attname in substring(pg_get_indexdef(ix.indexrelid), 'INCLUDE \((.*?)\)')) > 0 then '' else 'Y' end as ""IsIncludedColumn""
+	                                        , case position(a.attname || '"" DESC' in substring(pg_get_indexdef(ix.indexrelid), '\((.*?)\)'))  when 0 then 'asc' else 'desc' end as ""Sort""
+	                                        , case when indisprimary = 'true' then 'Y' ELSE 'N' end as  ""IPrimary""
+	                                        ,case when indisunique = 'true' then 'Y' ELSE 'N' end as  ""IsUnique""
+	                                        , '' AS ""Ignore_dup_key""   , '' as ""Disabled""  , '' AS ""Fill_factor""  , '' AS ""Padded""
+                                        from
+                                            pg_class t,
+                                            pg_class i,
+                                            pg_index ix,
+                                            pg_attribute a
+                                        where
+                                            t.oid = ix.indrelid
+                                            and i.oid = ix.indexrelid
+                                            and a.attrelid = t.oid
+                                            and a.attnum = ANY(ix.indkey)
+                                            and t.relname = '[$TabName$]'  and i.relname = '[$IndexName$]'
+                                        order by
+                                            t.relname,
+                                            i.relname,a.attnum;
+            ";
+
+
+            //创建索引
+            _temp_create_index = $@"
+CREATE INDEX {_temp_schema_pre}[$IndexName$]{_temp_schema_after}
+    ON {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} ([$Key$]); ";
+
+            //删除索引
+            _temp_drop_index = new StringBuilder()
+                .AppendLine($@"DROP INDEX {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_schema_pre}[$IndexName$]{_temp_schema_after};")
+                .ToString();
+
+            //重命名表
+            _temp_retable = new StringBuilder()
+                .AppendLine($@"ALTER TABLE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} RENAME TO {_temp_table_pre}[$ReTabName$]{_temp_table_after}; ")
+                .ToString();
+
+            
+
         }
     }
 }

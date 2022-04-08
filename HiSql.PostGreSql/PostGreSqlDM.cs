@@ -626,7 +626,7 @@ namespace HiSql
         /// </summary>
         /// <param name=""></param>
         /// <returns></returns>
-        public string BuildMergeIntoSqlSequence(TabInfo targetinfo)
+        public string BuildMergeIntoSqlSequence(TabInfo targetinfo,List<string> dataColLst= null)
         {
             string _merge_temp = dbConfig.Table_MergeInto;
             List<string> _filer = new List<string>();
@@ -652,7 +652,16 @@ namespace HiSql
                 //非业务KEY，非自增长ID，且非创建时的标准字段
                 if (!hiColumn.IsBllKey && !hiColumn.IsIdentity && !hiColumn.IsCreateField())
                 {
-                    _lstupdate.Add($"{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}=excluded.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}");
+                    //_lstupdate.Add($"{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}=excluded.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}");
+                    //add by tgm date:2022.4.8 
+                    if (dataColLst != null && dataColLst.Count > 0)
+                    {
+                        if (dataColLst.Any(c => c.ToLower().Equals(hiColumn.FieldName.ToLower())))
+                            _lstupdate.Add($"{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}=excluded.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}");
+                    }
+                    else
+                        _lstupdate.Add($"{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}=excluded.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}");
+
                 }
 
                 
@@ -667,7 +676,7 @@ namespace HiSql
                 ;
         }
 
-        public string BuildMergeIntoSql(TabInfo targetinfo, TabInfo sourceinfo)
+        public string BuildMergeIntoSql(TabInfo targetinfo, TabInfo sourceinfo, List<string> dataColLst = null)
         {
 
             string _merge_temp = dbConfig.Table_MergeInto;
@@ -696,7 +705,16 @@ namespace HiSql
                 //非业务KEY，非自增长ID，且非创建时的标准字段
                 if (!hiColumn.IsBllKey && !hiColumn.IsIdentity && !hiColumn.IsCreateField())
                 {
-                    _lstupdate.Add($"{dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{targetinfo.TabModel.TabReName}{dbConfig.Table_After}.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}=values({dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After})");
+                    //_lstupdate.Add($"{dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{targetinfo.TabModel.TabReName}{dbConfig.Table_After}.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}=values({dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After})");
+
+                    //add by tgm date:2022.4.8 
+                    if (dataColLst != null && dataColLst.Count > 0)
+                    {
+                        if (dataColLst.Any(c => c.ToLower().Equals(hiColumn.FieldName.ToLower())))
+                            _lstupdate.Add($"{dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{targetinfo.TabModel.TabReName}{dbConfig.Table_After}.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}=values({dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After})");
+                    }
+                    else
+                        _lstupdate.Add($"{dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{targetinfo.TabModel.TabReName}{dbConfig.Table_After}.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}=values({dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After})");
                 }
 
                 if (!hiColumn.IsIdentity)
@@ -947,25 +965,69 @@ namespace HiSql
         public string BuildChangeFieldStatement(HiTable hiTable, HiColumn hiColumn, TabFieldAction tabFieldAction)
         {
             string _fieldsql = BuildFieldStatement(hiTable, hiColumn);
-
+            if (tabFieldAction == TabFieldAction.MODI)
+            {
+                _fieldsql = BuildFieldStatementForModi(hiTable, hiColumn);
+            }
             var rtn = Tool.RegexGrpOrReplace(@",{1}\s*$", _fieldsql);
             if (rtn.Item1)
             {
                 _fieldsql = rtn.Item2["0"];
             }
-
+            string _schema = string.IsNullOrEmpty(Context.CurrentConnectionConfig.Schema) ? "public" : Context.CurrentConnectionConfig.Schema;
 
             string _changesql = string.Empty;
             if (tabFieldAction == TabFieldAction.ADD)
-                _changesql = dbConfig.Add_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$TempColumn$]", _fieldsql);
+                _changesql = dbConfig.Add_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$Schema$]", _schema).Replace("[$TempColumn$]", _fieldsql);
             else if (tabFieldAction == TabFieldAction.DELETE)
-                _changesql = dbConfig.Del_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$FieldName$]", hiColumn.FieldName);
+                _changesql = dbConfig.Del_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$Schema$]", _schema).Replace("[$FieldName$]", hiColumn.FieldName);
             else if (tabFieldAction == TabFieldAction.MODI)
-                _changesql = dbConfig.Add_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$TempColumn$]", _fieldsql);
+            {
+                //修改字段类型
+                _changesql = dbConfig.Modi_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$Schema$]", _schema).Replace("[$TempColumn$]", _fieldsql);
+                //设置默认值
+                if (hiColumn.DefaultValue == null || hiColumn.DefaultValue.IsNullOrEmpty())
+                {
+                    _changesql += dbConfig.Del_Default.Replace("[$TabName$]", hiTable.TabName).Replace("[$Schema$]", _schema).Replace("[$FieldName$]", hiColumn.FieldName);
+                }
+                else {
+                    if (hiColumn.IsIdentity)
+                    {
+                        string _sequence_str = buildSequence(hiTable.TabName, new List<HiColumn> { hiColumn }, dbConfig.Sequence_Temp);
+                        _changesql += _sequence_str;
+                    }
+
+                    _changesql += dbConfig.Set_Default.Replace("[$TabName$]", hiTable.TabName).Replace("[$Schema$]", _schema).Replace("[$FieldName$]", hiColumn.FieldName).Replace("[$DEFAULT$]", GetDbDefault(hiColumn, hiTable.TabName));
+                }
+                //设置是否为空约束
+                if (hiColumn.IsNull )
+                {
+                    _changesql += dbConfig.Del_NotNull.Replace("[$TabName$]", hiTable.TabName).Replace("[$Schema$]", _schema).Replace("[$FieldName$]", hiColumn.FieldName);
+                }
+                else
+                {
+                    _changesql += dbConfig.Set_NotNull.Replace("[$TabName$]", hiTable.TabName).Replace("[$Schema$]", _schema).Replace("[$FieldName$]", hiColumn.FieldName);
+                }
+
+                if (!hiColumn.FieldDesc.IsNullOrEmpty())
+                {
+                    _changesql += dbConfig.Field_Comment.Replace("[$TabName$]", hiTable.TabName).Replace("[$Schema$]", _schema).Replace("[$FieldName$]", hiColumn.FieldName).Replace("[$FieldDesc$]", hiColumn.FieldDesc);
+                }
+
+            }
+             
+            else if (tabFieldAction == TabFieldAction.RENAME)
+            {
+                _changesql = dbConfig.Re_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$Schema$]", _schema).Replace("[$ReFieldName$]", hiColumn.ReFieldName).Replace("[$FieldName$]", hiColumn.FieldName);
+
+                hiColumn.FieldName = hiColumn.ReFieldName;
+                var _changesqlUpdate = BuildChangeFieldStatement(hiTable, hiColumn, TabFieldAction.MODI);
+
+                return _changesql + _changesqlUpdate;
+            }
+           
             else
                 return "";
-
-
 
             return _changesql;
         }
@@ -1069,7 +1131,71 @@ namespace HiSql
             return _str_temp_field;
         }
 
-        
+        public string BuildFieldStatementForModi(HiTable hiTable, HiColumn hiColumn)
+        {
+            string _str_temp_field = "";
+            if (dbConfig.DbMapping.ContainsKey(hiColumn.FieldType))
+            {
+                if (dbConfig.FieldTempMappingForModi.ContainsKey(dbConfig.DbMapping[hiColumn.FieldType].ToString()))
+                {
+                    _str_temp_field = dbConfig.FieldTempMappingForModi[dbConfig.DbMapping[hiColumn.FieldType].ToString()].ToString();
+
+                    string _postgre_identity = string.Empty;
+
+                    switch (dbConfig.DbMapping[hiColumn.FieldType].ToString().ToLower())
+                    {
+                        case "nvarchar":
+                        case "varchar":
+                        case "nchar":
+                        case "char":
+                            _str_temp_field = _str_temp_field.Replace("[$FieldName$]", hiColumn.FieldName)
+                                .Replace("[$FieldLen$]", hiColumn.FieldLen.ToString());
+                            break;
+                        case "int":
+                        case "bigint":
+                            
+                            _str_temp_field = _str_temp_field.Replace("[$FieldName$]", hiColumn.FieldName)
+                                ;
+                            break;
+                        case "smallint":
+                            _str_temp_field = _str_temp_field.Replace("[$FieldName$]", hiColumn.FieldName)
+                                ;
+                            break;
+                        case "decimal":
+                            _str_temp_field = _str_temp_field.Replace("[$FieldName$]", hiColumn.FieldName)
+                                .Replace("[$FieldLen$]", hiColumn.FieldLen.ToString())
+                                .Replace("[$FieldDec$]", hiColumn.FieldDec.ToString())
+                                ;
+                            break;
+                        case "date":
+                        case "datetime":
+                            _str_temp_field = _str_temp_field.Replace("[$FieldName$]", hiColumn.FieldName)
+                                ;
+                            break;
+                        case "image":
+                            _str_temp_field = _str_temp_field.Replace("[$FieldName$]", hiColumn.FieldName)
+                               ;
+                            break;
+                        case "uniqueidentifier":
+                            _str_temp_field = _str_temp_field.Replace("[$FieldName$]", hiColumn.FieldName)
+                               ;
+                            break;
+                        case "bit":
+                            _str_temp_field = _str_temp_field.Replace("[$FieldName$]", hiColumn.FieldName);
+                            break;
+                        default:
+                            throw new Exception($"字段类型[{dbConfig.DbMapping[hiColumn.FieldType].ToString()}]没有作处理");
+                    }
+
+                }
+                else
+                    throw new Exception($"字段类型[{dbConfig.DbMapping[hiColumn.FieldType].ToString()} 在SqlServer中没有配置字段模版");
+            }
+            else
+                throw new Exception($"字段[{hiColumn.FieldName}] 对应的字段类型在SqlServer中没有做实现,帮该库不支持该类型");
+
+            return _str_temp_field;
+        }
 
 
         /// <summary>
@@ -2510,31 +2636,94 @@ namespace HiSql
 
         public DataTable GetTableList(string tabname="")
         {
+            string _tempsql = dbConfig.Get_Tables.Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema);
+            if (string.IsNullOrEmpty(tabname))
+                _tempsql = _tempsql.Replace("[$Where$]", "");
+            else
+                _tempsql = _tempsql.Replace("[$Where$]", $" and tablename='{tabname.ToSqlInject()}'");
+            return Context.DBO.GetDataTable(_tempsql);
             throw new NotImplementedException();
         }
 
         public DataTable GetViewList(string viewname="")
         {
+            string _tempsql = dbConfig.Get_Views.Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema);
+            if (string.IsNullOrEmpty(viewname))
+                _tempsql = _tempsql.Replace("[$Where$]", "");
+            else
+                _tempsql = _tempsql.Replace("[$Where$]", $" and viewname='{viewname.ToSqlInject()}'");
+            return Context.DBO.GetDataTable(_tempsql);
             throw new NotImplementedException();
         }
 
         public DataTable GetAllTables(string tabname="")
         {
+            string _tempsql = dbConfig.Get_AllTables.Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema);
+            if (string.IsNullOrEmpty(tabname))
+                _tempsql = _tempsql.Replace("[$Where$]", "");
+            else
+                _tempsql = _tempsql.Replace("[$Where$]", $"where {dbConfig.Field_Pre}TabName{dbConfig.Field_After}='{tabname.ToSqlInject()}'");
+            return Context.DBO.GetDataTable(_tempsql);
             throw new NotImplementedException();
         }
 
         public string CreateView(string viewname, string viewsql)
         {
-            throw new NotImplementedException();
+            DataTable dt = Context.DBO.GetDataTable(dbConfig.Get_CheckTabExists
+                   .Replace("[$TabName$]", $"{viewname}")
+                   .Replace("[$Schema$]", $"{this.Context.CurrentConnectionConfig.Schema}")
+                   );
+            if (dt.Rows.Count == 0)
+            {
+                //视图名称没有被占用
+                string _tempsql = dbConfig.Get_CreateView
+                    .Replace("[$Schema$]", $"{dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}")
+                    .Replace("[$TabName$]", $"{dbConfig.Table_Pre}{viewname}{dbConfig.Table_After}")
+                    .Replace("[$ViewSql$]", viewsql)
+                    ;
+                return _tempsql;
+            }
+            else
+            {
+                throw new Exception($"视图名称[{viewname}]已经被使用");
+            }
         }
         public string ModiView(string viewname, string viewsql)
         {
-            throw new NotImplementedException();
+            DataTable dt = Context.DBO.GetDataTable(dbConfig.Get_CheckTabExists
+                 .Replace("[$TabName$]", $"{viewname}")
+                 .Replace("[$Schema$]", $"{this.Context.CurrentConnectionConfig.Schema}")
+                 );
+            if (dt.Rows.Count > 0)
+            {
+                //视图名称没有被占用
+                string _tempsql = dbConfig.Get_ModiView
+                    .Replace("[$Schema$]", $"{dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}")
+                    .Replace("[$TabName$]", $"{dbConfig.Table_Pre}{viewname}{dbConfig.Table_After}")
+                    .Replace("[$ViewSql$]", viewsql)
+                    ;
+                return _tempsql;
+            }
+            else
+                throw new Exception($"视图名称[{viewname}]不存在无法修改");
+           
         }
 
         public string DropView(string viewname)
         {
-            throw new NotImplementedException();
+            DataTable dt = Context.DBO.GetDataTable(dbConfig.Get_CheckTabExists
+                  .Replace("[$TabName$]", $"{viewname}")
+                  .Replace("[$Schema$]", $"{this.Context.CurrentConnectionConfig.Schema}")
+                  );
+            if (dt.Rows.Count > 0)
+            {
+                string _tempsql = dbConfig.Get_DropView
+                    .Replace("[$Schema$]", $"{dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}")
+                    .Replace("[$TabName$]", $"{dbConfig.Table_Pre}{viewname}{dbConfig.Table_After}");
+                return _tempsql;
+            }
+            else
+                throw new Exception($"视图名称[{viewname}]不存在无法删除");
         }
 
         public DataTable GetGlobalTables()
@@ -2544,27 +2733,101 @@ namespace HiSql
 
         public List<TabIndex> GetIndexs(string tabname)
         {
-            throw new NotImplementedException();
+            string _sql = dbConfig.Get_TabIndexs.Replace("[$Schema$]", $"{Context.CurrentConnectionConfig.Schema}")
+                   .Replace("[$TabName$]", $"{tabname}"); ;
+
+            List<TabIndex> lstindex = new List<TabIndex>();
+            DataTable dt = Context.DBO.GetDataTable(_sql);
+            if (dt.Rows.Count > 0)
+            {
+                foreach (DataRow dr in dt.Rows)
+                {
+                    TabIndex tabIndex = new TabIndex();
+                    tabIndex.TabName = tabname;
+                    tabIndex.IndexName = dr["IndexName"].ToString();
+                    tabIndex.IndexType = dr["IndexType"].ToString();
+                    lstindex.Add(tabIndex);
+                }
+                return lstindex;
+            }
+            else
+                return new List<TabIndex>();
         }
 
         public List<TabIndexDetail> GetIndexDetails(string tabname, string indexname)
         {
-            throw new NotImplementedException();
+            string _sql = dbConfig.Get_IndexDetail.Replace("[$TabName$]", tabname).Replace("[$IndexName$]", indexname);
+            List<TabIndexDetail> lstindex = new List<TabIndexDetail>();
+            DataTable dt = Context.DBO.GetDataTable(_sql);
+            if (dt.Rows.Count > 0)
+            {
+                foreach (DataRow dr in dt.Rows)
+                {
+                    TabIndexDetail tabIndex = new TabIndexDetail();
+                    tabIndex.TabName = tabname;
+                    tabIndex.ColumnName = dr["ColumnName"].ToString();
+                    tabIndex.IndexName = dr["IndexName"].ToString();
+                    tabIndex.IndexType = dr["IndexType"].ToString();
+                    tabIndex.ColumnIdx = Convert.ToInt32(dr["ColumnIdx"].ToString());
+                    tabIndex.ColumnId = Convert.ToInt32(dr["ColumnID"].ToString());
+                    tabIndex.SortType = dr["Sort"].ToString().ToLower() == "asc" ? SortType.ASC : SortType.DESC;
+                    tabIndex.IsPrimary = dr["IPrimary"].ToString() == "Y" ? true : false;
+                    tabIndex.IsUnique = dr["IsUnique"].ToString() == "Y" ? true : false;
+
+                    lstindex.Add(tabIndex);
+                }
+                return lstindex;
+            }
+            else
+                return new List<TabIndexDetail>();
         }
 
         public string CreateIndex(string tabname, string indexname, List<HiColumn> hiColumns)
         {
-            throw new NotImplementedException();
+            //注未判断索引是否重复，由底层库抛出
+            string _sql = dbConfig.Get_CreateIndex.Replace("[$TabName$]", tabname).Replace("[$IndexName$]", indexname).Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema);
+            DataTable dt = GetTableDefinition(tabname);
+            string _fields = string.Empty;
+
+            if (dt.Rows.Count > 0)
+            {
+                if (hiColumns.Count > 0)
+                {
+                    int i = 0;
+                    StringBuilder keys = new StringBuilder();
+                    foreach (HiColumn hiColumn in hiColumns)
+                    {
+                        if (!dt.AsEnumerable().Any(t => t.Field<string>("FieldName").ToLower() == hiColumn.FieldName.ToLower()))
+                            throw new Exception($"为表[{tabname}]创建的索引指的字段[{hiColumn.FieldName}]不存在于表[{tabname}]中");
+
+                        string _tempkey = dbConfig.Table_Key2.Replace("[$FieldName$]",dbConfig.Field_Pre+ hiColumn.FieldName+dbConfig.Field_After);
+                        if (i < hiColumns.Count - 1)
+                            keys.AppendLine($"{_tempkey}{dbConfig.Field_Split}");
+                        else
+                            keys.AppendLine($"{_tempkey}");
+                        i++;
+                    }
+                    _sql = _sql.Replace("[$Key$]", keys.ToString());
+                    return _sql;
+                }
+                else
+                    throw new Exception("索引创建必须指定字段");
+            }
+            else
+                throw new Exception($"表[{tabname}]不存在,无法创建索引");
         }
 
         public string DropIndex(string tabname, string indexname)
         {
-            throw new NotImplementedException();
+            //暂未校验索引是否存在 由底层数据库抛出
+            string _sql = dbConfig.Get_DropIndex.Replace("[$IndexName$]", indexname).Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema);
+            return _sql;
         }
 
         public string BuildReTableStatement(string tabname, string newtabname)
         {
-            throw new NotImplementedException();
+            string _sql = dbConfig.Re_Table.Replace("[$TabName$]", $"{tabname}").Replace("[$ReTabName$]", $"{newtabname}").Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema); ;
+            return _sql;
         }
         #endregion
     }

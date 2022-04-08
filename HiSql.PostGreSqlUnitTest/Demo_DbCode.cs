@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HiSql.MySqlUnitTest
+namespace HiSql.PostGreSqlUnitTest
 {
     class Demo_DbCode
     {
@@ -12,21 +12,23 @@ namespace HiSql.MySqlUnitTest
         {
             //Demo_AddColumn(sqlClient); //ok
             //Demo_ReColumn(sqlClient);//ok
-            //Demo_ModiColumn(sqlClient); //ok
-            //Demo_DelColumn(sqlClient);////ok
+            // Demo_ModiColumn(sqlClient); //ok
+            // Demo_DelColumn(sqlClient);////ok
             //Demo_Tables(sqlClient);//ok
-            //Demo_View(sqlClient);//ok
+            //   Demo_View(sqlClient);//ok
             //Demo_AllTables(sqlClient);//ok
             //Demo_GlobalTables(sqlClient);//  delay
-            //Demo_ModiTable(sqlClient);//ok
+            // Demo_ModiTable(sqlClient);//ok
 
+
+            // Demo_CreateView(sqlClient);//ok
+            //     Demo_ModiView(sqlClient);//ok
             //Demo_DropView(sqlClient); //ok
-            //Demo_CreateView(sqlClient);//ok
-            //Demo_ModiView(sqlClient);//ok
+
 
             Demo_IndexList(sqlClient);//ok
             //Demo_Index_Create(sqlClient);//ok
-            //Demo_ReTable(sqlClient);//ok
+            //Demo_ReTable(sqlClient);//
 
         }
 
@@ -35,18 +37,19 @@ namespace HiSql.MySqlUnitTest
         {
             //OpLevel.Execute  表示执行并返回生成的SQL
             //OpLevel.Check 表示仅做检测失败时返回消息且检测成功时返因生成的SQL
-            var tabinfo = sqlClient.Context.DMInitalize.GetTabStruct("htest03");
+            var tabinfo = sqlClient.Context.DMInitalize.GetTabStruct("HTest02");
 
             TabInfo _tabcopy = ClassExtensions.DeepCopy<TabInfo>(tabinfo);
-            //_tabcopy.Columns.RemoveAt(4);
+            _tabcopy.Columns.RemoveAt(4);
 
             HiColumn newcol = ClassExtensions.DeepCopy<HiColumn>(_tabcopy.Columns[1]);
             newcol.FieldName = "Testname3";
             newcol.ReFieldName = "Testname3";
             _tabcopy.Columns.Add(newcol);
-            _tabcopy.Columns[1].ReFieldName = "UName_04";
 
+            _tabcopy.Columns[1].ReFieldName = "UName_04";
             _tabcopy.Columns[4].IsRequire = true;
+            _tabcopy.Columns[4].FieldDesc = "asdfasdf";
 
             var rtn = sqlClient.DbFirst.ModiTable(_tabcopy, OpLevel.Execute);
             if (rtn.Item1)
@@ -63,7 +66,7 @@ namespace HiSql.MySqlUnitTest
         {
             //OpLevel.Execute  表示执行并返回生成的SQL
             //OpLevel.Check 表示仅做检测失败时返回消息且检测成功时返因生成的SQL
-            var rtn = sqlClient.DbFirst.ReTable("htest03_1", "htest03", OpLevel.Execute);
+            var rtn = sqlClient.DbFirst.ReTable("HTest03", "HTest02", OpLevel.Execute);
             if (rtn.Item1)
             {
                 Console.WriteLine(rtn.Item2);//输出成功消息
@@ -78,15 +81,15 @@ namespace HiSql.MySqlUnitTest
         {
 
 
-            TabInfo tabInfo = sqlClient.Context.DMInitalize.GetTabStruct("htest01");
+            TabInfo tabInfo = sqlClient.Context.DMInitalize.GetTabStruct("HTest02");
             List<HiColumn> hiColumns = tabInfo.Columns.Where(c => c.FieldName == "ModiTime" || c.FieldName == "ModiName").ToList();
-            var rtn = sqlClient.DbFirst.CreateIndex("htest01", "idx_htest01_ModiTime123", hiColumns, OpLevel.Execute);
+            var rtn = sqlClient.DbFirst.CreateIndex("HTest02", "indx_htest06", hiColumns, OpLevel.Execute);
             if (rtn.Item1)
                 Console.WriteLine(rtn.Item3);
             else
                 Console.WriteLine(rtn.Item2);
 
-            rtn = sqlClient.DbFirst.DelIndex("htest01", "idx_htest01_ModiTime123", OpLevel.Execute);
+            rtn = sqlClient.DbFirst.DelIndex("HTest02", "indx_htest06", OpLevel.Execute);
 
             if (rtn.Item1)
                 Console.WriteLine(rtn.Item3);
@@ -96,7 +99,7 @@ namespace HiSql.MySqlUnitTest
 
         static void Demo_IndexList(HiSqlClient sqlClient)
         {
-            List<TabIndex> lstindex = sqlClient.DbFirst.GetTabIndexs("Hi_FieldModel");
+            List<TabIndex> lstindex = sqlClient.DbFirst.GetTabIndexs("HTest02");
 
             foreach (TabIndex tabIndex in lstindex)
             {
@@ -148,7 +151,7 @@ namespace HiSql.MySqlUnitTest
 
         static void Demo_CreateView(HiSqlClient sqlClient)
         {
-            var rtn = sqlClient.DbFirst.CreateView("vw_FModel_11",
+            var rtn = sqlClient.DbFirst.CreateView("vw_FModel_12",
                 sqlClient.HiSql("select a.TabName,b.TabReName,b.TabDescript,a.FieldName,a.SortNum,a.FieldType from Hi_FieldModel as a inner join Hi_TabModel as b on a.TabName=b.TabName").ToSql(),
 
                 OpLevel.Execute);
@@ -159,8 +162,8 @@ namespace HiSql.MySqlUnitTest
 
         static void Demo_ModiView(HiSqlClient sqlClient)
         {
-            var rtn = sqlClient.DbFirst.ModiView("vw_FModel",
-                sqlClient.HiSql("select a.TabName,b.TabReName,b.TabDescript,a.FieldName,a.SortNum,a.FieldType from Hi_FieldModel as a inner join Hi_TabModel as b on a.TabName=b.TabName where b.TabType in (0,1)").ToSql(),
+            var rtn = sqlClient.DbFirst.ModiView("vw_FModel_12",
+                sqlClient.HiSql("select a.TabName,b.TabReName,b.TabDescript,a.FieldName,a.SortNum,a.FieldType from Hi_FieldModel as a inner join Hi_TabModel as b on a.TabName=b.TabName where b.TabType in (0,1) and a.FieldType = 11").ToSql(),
 
                 OpLevel.Execute);
 
@@ -170,7 +173,7 @@ namespace HiSql.MySqlUnitTest
 
         static void Demo_DropView(HiSqlClient sqlClient)
         {
-            var rtn = sqlClient.DbFirst.DropView("vw_FModel_11",
+            var rtn = sqlClient.DbFirst.DropView("vw_FModel_12",
 
                 OpLevel.Execute);
 
@@ -182,7 +185,7 @@ namespace HiSql.MySqlUnitTest
         {
             HiColumn column = new HiColumn()
             {
-                TabName = "htest01",
+                TabName = "HTest02",
                 FieldName = "TestAdd",
                 FieldType = HiType.VARCHAR,
                 FieldLen = 50,
@@ -192,7 +195,7 @@ namespace HiSql.MySqlUnitTest
 
             };
 
-            var rtn = sqlClient.DbFirst.AddColumn("htest01", column, OpLevel.Execute);
+            var rtn = sqlClient.DbFirst.AddColumn("HTest02", column, OpLevel.Execute);
 
             Console.WriteLine(rtn.Item2);
         }
@@ -201,7 +204,7 @@ namespace HiSql.MySqlUnitTest
         {
             HiColumn column = new HiColumn()
             {
-                TabName = "htest01",
+                TabName = "HTest02",
                 FieldName = "TestAdd",
                 FieldType = HiType.VARCHAR,
                 FieldLen = 50,
@@ -209,7 +212,7 @@ namespace HiSql.MySqlUnitTest
 
             };
 
-            var rtn = sqlClient.DbFirst.DelColumn("htest01", column, OpLevel.Execute);
+            var rtn = sqlClient.DbFirst.DelColumn("HTest02", column, OpLevel.Execute);
 
             Console.WriteLine(rtn.Item2);
         }
@@ -218,13 +221,13 @@ namespace HiSql.MySqlUnitTest
         {
             HiColumn column = new HiColumn()
             {
-                TabName = "htest01",
+                TabName = "HTest02",
                 FieldName = "TestAdd",
                 FieldType = HiType.VARCHAR,
                 FieldLen = 500,
                 DBDefault = HiTypeDBDefault.VALUE,
                 DefaultValue = "TGM",
-                FieldDesc = "测试字段修改"
+                FieldDesc = "测试字段sdf 修改"
 
             };
 
@@ -244,14 +247,14 @@ namespace HiSql.MySqlUnitTest
             //OpLevel.Check 表示仅做检测失败时返回消息且检测成功时返因生成的SQL
             HiColumn column = new HiColumn()
             {
-                TabName = "htest02",
+                TabName = "HTest02",
                 FieldName = "UName",//UName
                 ReFieldName = "UName_01",//UName_01
                 FieldType = HiType.VARCHAR,
                 FieldLen = 50,
                 DBDefault = HiTypeDBDefault.VALUE,
                 DefaultValue = "TGM",
-                FieldDesc = "测试字段变更"
+                FieldDesc = "测试字段asdf 变更"
 
             };
 

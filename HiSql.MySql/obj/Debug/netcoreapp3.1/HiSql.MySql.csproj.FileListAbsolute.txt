@@ -3,7 +3,6 @@ D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Debug\netcoreapp3.1\HiSql.MySql.dll
 D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Debug\netcoreapp3.1\HiSql.MySql.pdb
 D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Debug\netcoreapp3.1\HiSql.dll
 D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Debug\netcoreapp3.1\HiSql.pdb
-D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Debug\netcoreapp3.1\HiSql.MySql.csproj.AssemblyReference.cache
 D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Debug\netcoreapp3.1\HiSql.MySql.Properties.Resources.resources
 D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Debug\netcoreapp3.1\HiSql.MySql.csproj.GenerateResource.cache
 D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Debug\netcoreapp3.1\HiSql.MySql.GeneratedMSBuildEditorConfig.editorconfig
@@ -13,3 +12,4 @@ D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Debug\netcoreapp3.1\HiSql.MySql.cspr
 D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Debug\netcoreapp3.1\HiSql.MySql.csproj.CopyComplete
 D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Debug\netcoreapp3.1\HiSql.MySql.dll
 D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Debug\netcoreapp3.1\HiSql.MySql.pdb
+D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Debug\netcoreapp3.1\HiSql.MySql.csproj.AssemblyReference.cache

@@ -138,7 +138,6 @@ D:\Project\OpenSource\HiSql\HiSql\bin\Debug\net461\System.Xml.XmlDocument.dll
 D:\Project\OpenSource\HiSql\HiSql\bin\Debug\net461\System.Xml.XmlSerializer.dll
 D:\Project\OpenSource\HiSql\HiSql\bin\Debug\net461\System.Xml.XPath.dll
 D:\Project\OpenSource\HiSql\HiSql\bin\Debug\net461\System.Xml.XPath.XDocument.dll
-D:\Project\OpenSource\HiSql\HiSql\obj\Debug\net461\HiSql.csproj.AssemblyReference.cache
 D:\Project\OpenSource\HiSql\HiSql\obj\Debug\net461\HiSql.GeneratedMSBuildEditorConfig.editorconfig
 D:\Project\OpenSource\HiSql\HiSql\obj\Debug\net461\HiSql.AssemblyInfoInputs.cache
 D:\Project\OpenSource\HiSql\HiSql\obj\Debug\net461\HiSql.AssemblyInfo.cs
@@ -146,3 +145,4 @@ D:\Project\OpenSource\HiSql\HiSql\obj\Debug\net461\HiSql.csproj.CoreCompileInput
 D:\Project\OpenSource\HiSql\HiSql\obj\Debug\net461\HiSql.csproj.CopyComplete
 D:\Project\OpenSource\HiSql\HiSql\obj\Debug\net461\HiSql.dll
 D:\Project\OpenSource\HiSql\HiSql\obj\Debug\net461\HiSql.pdb
+D:\Project\OpenSource\HiSql\HiSql\obj\Debug\net461\HiSql.csproj.AssemblyReference.cache

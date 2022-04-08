@@ -723,7 +723,7 @@ UNION ALL
             //表索引明细
             _temp_get_indexdetail = "select 1 as TableId,  \"TABLE_NAME\" as TableName, 1 as IndexId , \"INDEX_NAME\" as IndexName,  CASE WHEN \"CONSTRAINT\"='PRIMARY KEY' THEN 'KEY_INDEX' ELSE 'INDEX' END AS INDEXTYPE"
                 + "    , \"POSITION\" AS ColumnIdx, \"POSITION\" AS ColumnID, \"COLUMN_NAME\" as ColumnName, case when \"ASCENDING_ORDER\" ='TRUE' then 'asc' ELSE 'desc' end as Sort"
-                            + "             , case when \"CONSTRAINT\"='PRIMARY KEY' then 'Y' ELSE 'N' end as  IPrimary "
+                            + "             , case when \"CONSTRAINT\"='PRIMARY KEY' then 'Y' ELSE 'N' end as  IPrimary ,'' as IsIncludedColumn"
                              + "            , case when \"CONSTRAINT\" ='NOT NULL UNIQUE' then 'Y' ELSE '' end as IsUnique   , '' AS Ignore_dup_key   , '' as Disabled  , '' AS Fill_factor  , '' AS Padded"
 
 
