@@ -13,6 +13,13 @@ namespace HiSql
     /// </summary>
     public class TabInfo
     {
+        public TabInfo() { }
+
+        public TabInfo(HiTable table, List<HiColumn> columns)
+        {
+            this.TabModel = table;
+            this.Columns = columns;
+        }
 
         private List<HiColumn> _columns = new List<HiColumn>();
         private string _tabName;
@@ -124,7 +131,8 @@ namespace HiSql
         [JsonIgnore]
         public List<HiColumn> StandKey
         {
-            get {
+            get
+            {
                 return Columns.Where(it => it.FieldName.ToLower().IsIn<string>("createtime", "createname", "moditime", "modiname") == true).ToList();
             }
         }

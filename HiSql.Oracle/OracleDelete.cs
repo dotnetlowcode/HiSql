@@ -19,7 +19,17 @@ namespace HiSql
 
             dictabinfo = new Dictionary<string, TabInfo>();
             sb = new StringBuilder();
+            if (this.Data.Count > 1)
+            {
+                sb.AppendLine("begin");
+            }
             checkData();
+
+            if (this.Data.Count > 1)
+            {
+                sb.AppendLine("end;");
+            }
+
             return sb.ToString();
         }
         #region 私有方法
@@ -62,7 +72,15 @@ namespace HiSql
                         Dictionary<string, string> result = this.CheckData(_isdic,this.Table, obj, Context.DMInitalize, tabinfo);
                         if (result.Count > 0)
                         {
-                            sb.AppendLine(Context.DMTab.BuildDeleteSql(this.Table, result, sql_where, false));
+                            string _del_sql = Context.DMTab.BuildDeleteSql(this.Table, result, sql_where, false);
+                            if (!string.IsNullOrEmpty(_del_sql) && this.Data.Count > 1)
+                            {
+                                sb.AppendLine($"    execute immediate '{_del_sql.Replace("'", "''")}';");
+                            }
+                            else
+                            {
+                                sb.AppendLine(_del_sql);
+                            }
                         }
                     }
                 }

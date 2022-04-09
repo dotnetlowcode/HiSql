@@ -10,7 +10,7 @@
 根据此包可以自定义开发编号服务</description>
     <dependencies>
       <group targetFramework="net5.0">
-        <dependency id="HiSql" version="1.0.3.2" exclude="Build,Analyzers" />
+        <dependency id="HiSql" version="1.0.3.4" exclude="Build,Analyzers" />
         <dependency id="Microsoft.Extensions.Caching.Memory" version="6.0.0" exclude="Build,Analyzers" />
       </group>
     </dependencies>

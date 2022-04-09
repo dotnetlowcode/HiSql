@@ -86,14 +86,14 @@ namespace HiSql
         string _temp_fun_date = "";
 
 
-        string _temp_addcolumn = "alter table [$TabName$] add [$TempColumn$] ";
+        string _temp_addcolumn = "alter table [$TabName$] add [$TempColumn$] ;";
 
-        string _temp_delcolumn = "alter table [$TabName$] drop column [$FieldName$]";
+        string _temp_delcolumn = "alter table [$TabName$] drop column [$FieldName$] ;";
 
-        string _temp_modicolumn = "alter table [$TabName$] MODIFY column [$TempColumn$];";
+        string _temp_modicolumn = "alter table [$TabName$] MODIFY column [$TempColumn$] ;";
 
-        string _temp_recolumn = "alter table [$TabName$] CHANGE column [$TempColumn$];";
-        string _temp_retable = "ALTER TABLE [$TabName$]  rename to [$ReTabName$]";
+        string _temp_recolumn = "alter table [$TabName$] CHANGE column [$TempColumn$] ;";
+        string _temp_retable = "ALTER TABLE [$TabName$]  rename to [$ReTabName$] ;";
 
         string _temp_setdefalut = "";
 

@@ -36,8 +36,13 @@ sqlclient.CodeFirst.InstallHisql();
 
 处理，开发人员只要关注于业务开发
 
+### 2022.4.9 更新
+HiSql新增对oracle表的操作（目前支持`SqlServer`,`mysql`，`HANA`,`POSTGRESQL`，`oracle`） 目前已经对HIsql所表支持的数据都新增了 表结构管理的适配
+
+操作写法请参照 2022.3.3 更新
+
 ### 2022.4.8 更新
-HiSql新增对mysql表的操作（目前支持`SqlServer`,`mysql`，`HANA`,`POSTGRESQL`，陆续会加上对其它数据库的实现）
+HiSql新增对postgresql表的操作（目前支持`SqlServer`,`mysql`，`HANA`,`POSTGRESQL`，陆续会加上对其它数据库的实现）
 
 操作写法请参照 2022.3.3 更新
 

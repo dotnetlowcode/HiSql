@@ -145,4 +145,3 @@ D:\Project\OpenSource\HiSql\HiSql\bin\Release\net461\System.Xml.XmlDocument.dll
 D:\Project\OpenSource\HiSql\HiSql\bin\Release\net461\System.Xml.XmlSerializer.dll
 D:\Project\OpenSource\HiSql\HiSql\bin\Release\net461\System.Xml.XPath.dll
 D:\Project\OpenSource\HiSql\HiSql\bin\Release\net461\System.Xml.XPath.XDocument.dll
-D:\Project\OpenSource\HiSql\HiSql\obj\Release\net461\HiSql.csproj.AssemblyReference.cache
