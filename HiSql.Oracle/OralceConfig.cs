@@ -100,13 +100,11 @@ namespace HiSql
 
         string _temp_delcolumn = "alter table [$TabName$] drop column [$FieldName$]";
 
-        string _temp_modicolumn = "alter table [$TabName$] alter column [$TempColumn$]";
+        string _temp_modicolumn = "alter table [$TabName$] MODIFY [$TempColumn$]";
 
-
-        string _temp_recolumn = "EXECUTE sp_rename N'[$TabName$].[$FieldName$]', N'[$ReFieldName$]', 'COLUMN' ";
-
-        string _temp_retable = "EXECUTE sp_rename '[$TabName$].[$TabName$]', '[$ReTabName$]'";
-
+        string _temp_recolumn = "alter table [$TabName$] RENAME COLUMN [$FieldName$] TO [$ReFieldName$]";
+        
+        string _temp_retable = "alter table [$TabName$] RENAME to [$ReTabName$]";
         string _temp_setdefalut = "";
 
         string _temp_deldefalut = "";
@@ -438,9 +436,9 @@ namespace HiSql
 
             _fieldtempmapping = new Dictionary<string, string> {
                 //样例：[TabName] [varchar](50) NOT NULL,
-                { "nvarchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  nvarchar2 ([$FieldLen$]) [$IsNull$]  [$Default$] [$EXTEND$] "},
-                { "varchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  varchar2 ([$FieldLen$]) [$IsNull$] [$Default$] [$EXTEND$] "},
-                { "nchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  nchar ([$FieldLen$]) [$IsNull$] [$Default$] [$EXTEND$]  "},
+                { "nvarchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  nvarchar2 ([$FieldLen$]) [$IsNull$]  [$Default$] [$EXTEND$]"},
+                { "varchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  varchar2 ([$FieldLen$]) [$IsNull$] [$Default$]  [$EXTEND$] "},
+                { "nchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  nchar ([$FieldLen$]) [$IsNull$] [$Default$] [$EXTEND$] "},
                 { "char",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  char ([$FieldLen$]) [$IsNull$] [$Default$] [$EXTEND$] "},
                 //样例：[udescript] [text] NULL,
                 { "text",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  long  [$IsNull$] [$Default$] [$EXTEND$] "},
@@ -475,7 +473,6 @@ namespace HiSql
                 .AppendLine($"end if;")
                 .AppendLine($"execute immediate 'create sequence [$TabName$]_[$FieldName$]_SEQ increment by 1 start with 1 minvalue 1 maxvalue 999999999999999';")
                 .ToString();
-
 
 
             _temp_create_table = new StringBuilder()
@@ -610,11 +607,9 @@ namespace HiSql
 
 
             _temp_field_comment = new StringBuilder()
-                .Append("comment on column [$TabName$].[$FieldName$]  is '[$FieldDesc$]'")
-                // .AppendLine("GO")
+                .Append($"comment on column {_temp_table_pre}[$TabName$]{_temp_table_after}.{_temp_field_pre}[$FieldName$]{_temp_field_after}  is '[$FieldDesc$]'")
+               
                 .ToString();
-
-
 
             _temp_insert_statement = new StringBuilder()
                 .Append($"insert all into {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after}([$FIELDS$]) values([$VALUES$])")
@@ -695,6 +690,7 @@ UNION ALL
                 .AppendLine("	    when T1.DATA_TYPE = 'NVARCHAR2' then 'nvarchar'")
                 .AppendLine("	    when T1.DATA_TYPE = 'DATE' then 'date'")
                 .AppendLine("	    when T1.DATA_TYPE = 'TIMESTAMP' then 'datetime' ")
+                 .AppendLine("	    when T1.DATA_TYPE = 'TIMESTAMP(6)' then 'datetime' ")
                 .AppendLine("	    when T1.DATA_TYPE = 'LONG' then 'text' ")
                 .AppendLine("	    when T1.DATA_TYPE = 'NCLOB' then 'text'")
                 .AppendLine("	    when T1.DATA_TYPE = 'CLOB' then 'text' ")
@@ -739,14 +735,93 @@ UNION ALL
             //表更新 带条件 
             _temp_update_where = $"update {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} set [$Fields$] where [$Where$]";
 
-            _temp_delete = $"delete {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after}";
+            _temp_delete = $"delete {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} ";
 
-            _temp_delete_where = $"delete {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} where [$Where$]";
+            _temp_delete_where = $"delete {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} where [$Where$] ";
 
             //删除不会留下任何痕迹
             _temp_truncate = $"execute immediate 'TRUNCATE TABLE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after}';";
 
             _temp_droptable = $"execute immediate 'drop table {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after}';";
+
+            //获取当前库所有的表
+            _temp_gettables = new StringBuilder()
+                .AppendLine("select * from ( ")
+                 .AppendLine(@"select table_name as ""TabName"", 'Table' AS ""TabType"",  to_char(cast(LAST_ANALYZED as DATE),'yyyy-mm-dd hh24:mi:ss') as ""CreateTime"" from SYS.user_tables where TABLESPACE_NAME ='[$Schema$]' and table_name not like '/%' [$Where$]")
+
+                .AppendLine(") temp")
+                .AppendLine("ORDER BY \"TabName\" ASC, \"CreateTime\" desc ")
+                .ToString();
+
+            _temp_getviews = new StringBuilder()
+             .AppendLine("select * from ( ")
+                 .AppendLine(@"select VIEW_NAME as ""TabName"", 'View' AS ""TabType"",  '' as ""CreateTime"" from SYS.user_views where 1=1 [$Where$]  ")
+
+                .AppendLine(") temp")
+                .AppendLine("ORDER BY \"TabName\" ASC, \"CreateTime\" desc ")
+                .ToString();
+
+
+            _temp_getalltables = new StringBuilder()
+               .AppendLine("select * from ( ")
+                .AppendLine(@"select table_name as ""TabName"", 'Table' AS ""TabType"",  to_char(cast(LAST_ANALYZED as DATE),'yyyy-mm-dd hh24:mi:ss') as ""CreateTime"" from SYS.user_tables where TABLESPACE_NAME ='[$Schema$]' and table_name not like '/%' ")
+                .AppendLine("union all")
+                .AppendLine(@"select VIEW_NAME as ""TabName"", 'View' AS ""TabType"",  '' as ""CreateTime"" from SYS.user_views  ")
+
+               .AppendLine(") temp [$Where$]")
+               .AppendLine(@"ORDER BY ""TabName"" ASC, ""CreateTime"" desc ")
+               .ToString();
+
+            _temp_check_table_exists =
+               new StringBuilder()
+              .AppendLine("select * from ( ")
+                .AppendLine(@"select table_name as ""TabName"", 'Table' AS ""TabType"",  to_char(cast(LAST_ANALYZED as DATE),'yyyy-mm-dd hh24:mi:ss') as ""CreateTime"" from SYS.user_tables where TABLESPACE_NAME ='[$Schema$]' and table_name not like '/%' ")
+                .AppendLine("union all")
+                .AppendLine(@"select VIEW_NAME as ""TabName"", 'View' AS ""TabType"",  '' as ""CreateTime"" from SYS.user_views  ")
+
+              .AppendLine(") temp WHERE \"TabName\" = '[$TabName$]'")
+              .AppendLine("ORDER BY \"TabName\" ASC, \"CreateTime\" desc ")
+              .ToString();
+
+            //删除视图
+            _temp_drop_view = $"DROP VIEW  [$Schema$].[$TabName$]"; //千万不要加";"
+
+            //创建视图
+            _temp_create_view = new StringBuilder()
+                .AppendLine($"CREATE VIEW [$Schema$].[$TabName$] ")
+                .AppendLine("   AS  ")
+                .AppendLine("[$ViewSql$]")
+                .ToString();
+            //修改视图
+            _temp_modi_view = new StringBuilder()
+                .AppendLine(_temp_create_view)
+                .ToString();
+
+            //表索引
+            _temp_get_tabindex = @"SELECT distinct TABLE_NAME as ""TableName"" , INDEX_NAME as ""IndexName"", 
+        case when UNIQUENESS='UNIQUE' AND  CONSTRAINT_INDEX ='YES' then 'Key_Index' ELSE 'Index' end as IndexType 
+, '' as ""Disabled""   FROM user_indexes WHERE ""TABLE_NAME"" = '[$TabName$]' ";
+
+
+            //表索引明细
+            _temp_get_indexdetail = @"
+select 1 as ""TableId"",  idx.TABLE_NAME as ""TableName"", 1 as IndexId , idx.INDEX_NAME as ""IndexName"",  CASE WHEN UNIQUENESS = 'UNIQUE' AND CONSTRAINT_INDEX = 'YES' then 'Key_Index' ELSE 'Index' end as ""IndexType""
+                    , COLUMN_POSITION AS ""ColumnIdx"", COLUMN_POSITION AS ""ColumnID"", COLUMN_NAME as ""ColumnName""
+                    , case when DESCEND = 'ASC' then 'asc' ELSE 'desc' end as ""Sort""
+                              , case when UNIQUENESS = 'UNIQUE' AND CONSTRAINT_INDEX = 'YES' then 'Y' ELSE 'N' end as  ""IsPrimary"" ,'' as ""IsIncludedColumn""
+                                     , case when UNIQUENESS = 'UNIQUE' then 'Y' ELSE '' end as ""IsUnique""   , '' AS ""Ignore_dup_key""  , '' as ""Disabled""  , '' AS ""Fill_factor""  , '' AS ""Padded""
+                                     from user_indexes idx join user_ind_columns idxc on idx.index_name = idxc.index_name
+where idx.TABLE_NAME = '[$TabName$]' and idxc.INDEX_NAME = '[$IndexName$]' ";
+
+
+            //创建索引
+            _temp_create_index = $@"CREATE INDEX {_temp_schema_pre}[$IndexName$]{_temp_schema_after} ON {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} ([$Key$]) ";
+
+            //删除索引
+            _temp_drop_index = new StringBuilder()
+                .AppendLine($@"DROP INDEX  {_temp_schema_pre}[$IndexName$]{_temp_schema_after}")
+                .ToString();
+
         }
     }
 }

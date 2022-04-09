@@ -150,7 +150,21 @@ namespace HiSql
 
         string BuildFieldStatement(HiTable hiTable, HiColumn hiColumn);
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="hiTable"></param>
+        /// <param name="hiColumn"></param>
+        /// <param name="tabFieldAction"></param>
+        /// <returns></returns>
         string BuildChangeFieldStatement(HiTable hiTable, HiColumn hiColumn, TabFieldAction tabFieldAction);
+
+        /// <summary>
+        /// 生成代码块。部分数据库需要使用 begin end 包一下执行多个sql
+        /// </summary>
+        /// <param name="sbSql"></param>
+        /// <returns></returns>
+        string BuildSqlCodeBlock(string sbSql);
 
         string BuildReTableStatement(string tabname, string newtabname);
 

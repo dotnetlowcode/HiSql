@@ -414,10 +414,40 @@ namespace HiSql
             if (_lstdel.Count > 0 || _lstmodi.Count > 0)
                 _client = this.Context.CloneClient();
 
-            if (_lstdel.Count>0)
-                _client.Delete(Constants.HiSysTable["Hi_FieldModel"].ToString(), _lstdel).ExecCommand();
-            if(_lstmodi.Count>0)
-                _client.Modi(Constants.HiSysTable["Hi_FieldModel"].ToString(), _lstmodi).ExecCommand();
+            if (_lstdel.Count > 0)
+            {
+                try
+                {
+                    _client.Delete(Constants.HiSysTable["Hi_FieldModel"].ToString(), _lstdel).ExecCommand();
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+                finally
+                {
+                    _client.Context.DBO.Close();
+                    _client.Context.DBO.Dispose();
+                }
+
+
+            }
+            if (_lstmodi.Count > 0)
+            {
+                try
+                {
+                    _client.Modi(Constants.HiSysTable["Hi_FieldModel"].ToString(), _lstmodi).ExecCommand();
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+                finally
+                {
+                    _client.Context.DBO.Close();
+                    _client.Context.DBO.Dispose();
+                }
+            }
             return newtabinfo;
 
         }
@@ -2753,6 +2783,10 @@ namespace HiSql
             string _sql = dbConfig.Re_Table.Replace("[$TabName$]", $"{dbConfig.Schema_Pre}{this.Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{tabname}{dbConfig.Table_After}").Replace("[$ReTabName$]",$"{newtabname}");
 
             return _sql;
+        }
+        public string BuildSqlCodeBlock(string sbSql)
+        {
+            return sbSql;
         }
         #endregion
     }

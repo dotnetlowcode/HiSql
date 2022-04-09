@@ -54,6 +54,7 @@ namespace HiSql
                     _sqlClient.BeginTran();
                     try
                     {
+                        _sql = idm.BuildSqlCodeBlock(_sql);
                         _sqlClient.Context.DBO.ExecCommand(_sql, null);
                         _sqlClient.CommitTran();
                         _isok = true;
@@ -75,6 +76,7 @@ namespace HiSql
             //_sql = idm.BuildChangeFieldStatement(tabInfo.TabModel, hiColumn, TabFieldAction.ADD);
             return new Tuple<bool, string, string>(_isok, _msg, _sql);
         }
+
         /// <summary>
         /// 向表中新增一字段列
         /// </summary>
@@ -97,40 +99,6 @@ namespace HiSql
             //获取最新
             TabInfo tabinfo= idm.GetTabStruct(tabname);
             return  addColumn(idm, tabinfo, hiColumn, opLevel);
-            //if (tabinfo.Columns.Any(c => c.FieldName.ToLower() == hiColumn.FieldName.ToLower()))
-            //{
-            //    _msg = $"向表[{tabname}]添加新字段[{hiColumn.FieldName}]失败 原因:该字段[{hiColumn.FieldName}]已经存在于表[{tabname}]中";
-            //}
-            //else
-            //{
-            //    _sql = idm.BuildChangeFieldStatement(tabinfo.TabModel, hiColumn, TabFieldAction.ADD);
-            //    if (opLevel == OpLevel.Execute)
-            //    {
-            //        //执行数据库命令
-    
-            //        _sqlClient.BeginTran();
-            //        try
-            //        {
-            //            _sqlClient.Context.DBO.ExecCommand(_sql, null);
-            //            _sqlClient.CommitTran();
-            //            _isok = true;
-            //            _msg = $"向表[{tabname}]添加字段[{hiColumn.FieldName}]成功";
-            //        }
-            //        catch (Exception E)
-            //        {
-            //            _sqlClient.RollBackTran();
-            //            _isok = false;
-            //            _msg = E.Message.ToString();
-            //        }
-            //    }
-            //    else {
-            //        _isok = true;
-            //        _msg = $"向表[{tabname}]添加新字段[{hiColumn.FieldName}]检测成功";
-            //    }
-            //}
-            //    _sql = idm.BuildChangeFieldStatement(tabinfo.TabModel, hiColumn, TabFieldAction.ADD);
-            //return new Tuple<bool, string, string>(_isok, _msg, _sql);
-            //throw new NotImplementedException();
         }
 
         /// <summary>
@@ -162,7 +130,11 @@ namespace HiSql
                 else {
                     _sql = idm.CreateIndex(tabname, indexname, columns);
                 }
+                if (idm.Context.CurrentConnectionConfig.UpperCase)
+                {
+                    _sql = _sql.ToUpper();
 
+                }
                 if (opLevel == OpLevel.Execute)
                 {
                     _sqlClient.BeginTran();
@@ -243,6 +215,11 @@ namespace HiSql
             if (_sqlClient != null)
             {
                 _sql = idm.CreateView(viewname, viewsql);
+                if (idm.Context.CurrentConnectionConfig.UpperCase)
+                {
+                    _sql = _sql.ToUpper();
+
+                }
                 if (opLevel == OpLevel.Execute)
                 {
                     _sqlClient.BeginTran();
@@ -424,39 +401,6 @@ namespace HiSql
             //获取最新
             TabInfo tabinfo = idm.GetTabStruct(tabname);
             return delColumn(idm, tabinfo, hiColumn, opLevel);
-            //if (!tabinfo.Columns.Any(c => c.FieldName.ToLower() == hiColumn.FieldName.ToLower()))
-            //{
-            //    _msg = $"向表[{tabname}]删除字段[{hiColumn.FieldName}]失败 原因:该字段[{hiColumn.FieldName}]不存在于表[{tabname}]中";
-            //}
-            //else
-            //{
-            //    _sql = idm.BuildChangeFieldStatement(tabinfo.TabModel, hiColumn, TabFieldAction.DELETE);
-            //    if (opLevel == OpLevel.Execute)
-            //    {
-            //        //执行数据库命令
-
-            //        _sqlClient.BeginTran();
-            //        try
-            //        {
-            //            _sqlClient.Context.DBO.ExecCommand(_sql, null);
-            //            _sqlClient.CommitTran();
-            //            _isok = true;
-            //            _msg = $"向表[{tabname}]删除字段[{hiColumn.FieldName}]成功";
-            //        }
-            //        catch (Exception E)
-            //        {
-            //            _sqlClient.RollBackTran();
-            //            _isok = false;
-            //            _msg = E.Message.ToString();
-            //        }
-            //    }
-            //    else
-            //    {
-            //        _isok = true;
-            //        _msg = $"向表[{tabname}]删除字段[{hiColumn.FieldName}]检测成功";
-            //    }
-            //}
-            //return new Tuple<bool, string, string>(_isok, _msg, _sql);
         }
 
 
@@ -474,8 +418,12 @@ namespace HiSql
             IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
             idm.Context = SqlClient.Context;
 
-            List<TabIndex> lst = idm.GetIndexs(tabname);
+            if (idm.Context.CurrentConnectionConfig.UpperCase)
+            {
+                tabname = tabname.ToUpper();
+            }
 
+            List<TabIndex> lst = idm.GetIndexs(tabname);
 
             _sql = idm.DropIndex(tabname, indexname);
             if (!lst.Any(t => t.IndexName.ToLower() == indexname.ToLower()))
@@ -483,6 +431,11 @@ namespace HiSql
                 _msg = $"索引[{indexname}]不存在于表[{tabname}]中";
             }
             else {
+                if (idm.Context.CurrentConnectionConfig.UpperCase)
+                {
+                    _sql = _sql.ToUpper();
+
+                }
                 if (opLevel == OpLevel.Execute)
                 {
                     //执行数据库命令
@@ -823,6 +776,7 @@ namespace HiSql
                     _sqlClient.BeginTran();
                     try
                     {
+                        _sql = idm.BuildSqlCodeBlock(_sql);
                         _sqlClient.Context.DBO.ExecCommand(_sql, null);
                         _sqlClient.CommitTran();
                         _isok = true;
@@ -902,6 +856,7 @@ namespace HiSql
                             _sqlClient.BeginTran();
                             try
                             {
+                                _sql = idm.BuildSqlCodeBlock(_sql);
                                 _sqlClient.Context.DBO.ExecCommand(_sql, null);
                                 _sqlClient.CommitTran();
                                 _isok = true;
@@ -1127,9 +1082,10 @@ namespace HiSql
                     #endregion
                 }
             }
-            
+           
             if (changes.Count() > 0)
             {
+                _sql = sb_sql.ToString();
                 if (_isok)
                 {
                     if (opLevel == OpLevel.Execute)
@@ -1138,17 +1094,23 @@ namespace HiSql
                         try
                         {
                             if(_tabchange)
-                                _sqlClient.Context.DBO.ExecCommand(sb_sql.ToString(), null);
-                            
-                            
+                            {
+                                _sql = idm.BuildSqlCodeBlock(_sql);
 
+                                _sqlClient.Context.DBO.ExecCommand(_sql, null);
+                            }
+
+                            int del_count = 0;
+                            int modi_count = 0;
                             if (lstdel.Count > 0)
-                                _sqlClient.Delete(Constants.HiSysTable["Hi_FieldModel"].ToString(), lstdel).ExecCommand();
+                            {
+                                del_count = _sqlClient.Delete(Constants.HiSysTable["Hi_FieldModel"].ToString(), lstdel).ExecCommand();
+                            }
 
                             if (lstchg.Count > 0)
-                                _sqlClient.Modi(Constants.HiSysTable["Hi_FieldModel"].ToString(), lstchg).ExecCommand();
-
-                            
+                            {
+                                modi_count = _sqlClient.Modi(Constants.HiSysTable["Hi_FieldModel"].ToString(), lstchg).ExecCommand();
+                            } 
                             _sqlClient.CommitTran();
                             _isok = true;
                             _msg = $"保存表[{tabInfo.TabModel.TabName}]的结构成功";
@@ -1167,7 +1129,6 @@ namespace HiSql
                     }
                 }
 
-
             }
             else
             {
@@ -1179,7 +1140,7 @@ namespace HiSql
             HiSqlCommProvider.RemoveTabInfoCache(tabInfo.TabModel.TabName);
             TabInfo _temptabinfo = idm.GetTabStruct(tabInfo.TabModel.TabName);
 
-            return new Tuple<bool, string, string>(_isok, _msg, sb_sql.ToString());
+            return new Tuple<bool, string, string>(_isok, _msg, _sql);
         }
 
         /// <summary>

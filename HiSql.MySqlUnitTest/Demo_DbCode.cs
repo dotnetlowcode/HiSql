@@ -18,13 +18,13 @@ namespace HiSql.MySqlUnitTest
             //Demo_View(sqlClient);//ok
             //Demo_AllTables(sqlClient);//ok
             //Demo_GlobalTables(sqlClient);//  delay
-            //Demo_ModiTable(sqlClient);//ok
+            Demo_ModiTable(sqlClient);//ok
 
             //Demo_DropView(sqlClient); //ok
             //Demo_CreateView(sqlClient);//ok
             //Demo_ModiView(sqlClient);//ok
 
-            Demo_IndexList(sqlClient);//ok
+            //Demo_IndexList(sqlClient);//ok
             //Demo_Index_Create(sqlClient);//ok
             //Demo_ReTable(sqlClient);//ok
 
@@ -38,13 +38,12 @@ namespace HiSql.MySqlUnitTest
             var tabinfo = sqlClient.Context.DMInitalize.GetTabStruct("htest03");
 
             TabInfo _tabcopy = ClassExtensions.DeepCopy<TabInfo>(tabinfo);
-            //_tabcopy.Columns.RemoveAt(4);
-
+            _tabcopy.Columns.RemoveAt(4);
             HiColumn newcol = ClassExtensions.DeepCopy<HiColumn>(_tabcopy.Columns[1]);
-            newcol.FieldName = "Testname3";
-            newcol.ReFieldName = "Testname3";
+            newcol.FieldName = "Testne32";
+            newcol.ReFieldName = "Testne32";
             _tabcopy.Columns.Add(newcol);
-            _tabcopy.Columns[1].ReFieldName = "UName_04";
+            _tabcopy.Columns[1].ReFieldName = "UName_85";
 
             _tabcopy.Columns[4].IsRequire = true;
 
