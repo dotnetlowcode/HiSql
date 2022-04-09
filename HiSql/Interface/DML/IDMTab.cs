@@ -140,10 +140,17 @@ namespace HiSql
         string BuildInsertSql(Dictionary<string, string> _values, bool isbulk = false);
 
 
-        string BuildMergeIntoSql(TabInfo targetinfo, TabInfo sourceinfo);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="targetinfo"></param>
+        /// <param name="sourceinfo"></param>
+        /// <param name="dataColLst">当存在数据时指定更新的字段</param>
+        /// <returns></returns>
+        string BuildMergeIntoSql(TabInfo targetinfo, TabInfo sourceinfo,List<string> dataColLst=null);
         
         //仅限于PostGreSql 其它库不支持
-        string BuildMergeIntoSqlSequence(TabInfo targetinfo);
+        string BuildMergeIntoSqlSequence(TabInfo targetinfo,List<string> dataColLst= null);
 
 
         string BuildKey(List<HiColumn> hiColumn);

@@ -30,9 +30,9 @@ namespace HiSql.PostGreSqlUnitTest
             //Demo1_Insert(sqlClient);
             //Demo2_Insert(sqlClient);
             //Demo1_Insert3(sqlClient);
-            //Demo1_Modi(sqlClient);
+            Demo1_Modi(sqlClient);
             //Demo1_Modi2(sqlClient);
-            Demo4_Insert1(sqlClient);
+            //Demo4_Insert1(sqlClient);
             string s = Console.ReadLine();
         }
         static void Demo4_Insert1(HiSqlClient sqlClient)
@@ -87,7 +87,7 @@ namespace HiSql.PostGreSqlUnitTest
             }
             Stopwatch watch = Stopwatch.StartNew();
             //string _sql = sqlClient.Modi("Hi_Domain", lstobj).ToSql();
-            int _effect =  sqlClient.Modi("H_TEST", lstobj).ExecCommand();
+            int _effect =  sqlClient.Modi("H_Test", lstobj).ExecCommand();
 
             watch.Stop();
             Console.WriteLine($"[{_times}]条数据,耗时：{watch.Elapsed.ToString()}");

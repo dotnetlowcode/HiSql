@@ -641,11 +641,11 @@ namespace HiSql
                 return $" UNION ALL select {_sb_value.ToString()} from dummy";
             }
         }
-        public string BuildMergeIntoSqlSequence(TabInfo targetinfo)
+        public string BuildMergeIntoSqlSequence(TabInfo targetinfo, List<string> dataColLst = null)
         {
             throw new NotSupportedException("该方法仅支持PostGreSql数据库");
         }
-        public string BuildMergeIntoSql(TabInfo targetinfo, TabInfo sourceinfo)
+        public string BuildMergeIntoSql(TabInfo targetinfo, TabInfo sourceinfo, List<string> dataColLst = null)
         {
 
             string _merge_temp = dbConfig.Table_MergeInto;
@@ -676,7 +676,15 @@ namespace HiSql
                 //非业务KEY，非自增长ID，且非创建时的标准字段
                 if (!hiColumn.IsBllKey && !hiColumn.IsIdentity && !hiColumn.IsCreateField())
                 {
-                    _lstupdate.Add($"a.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}=b.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}");
+                    //_lstupdate.Add($"a.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}=b.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}");
+                    //add by tgm date:2022.4.8 
+                    if (dataColLst != null && dataColLst.Count > 0)
+                    {
+                        if (dataColLst.Any(c => c.ToLower().Equals(hiColumn.FieldName.ToLower())))
+                            _lstupdate.Add($"a.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}=b.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}");
+                    }
+                    else
+                        _lstupdate.Add($"a.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}=b.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}");
                 }
 
                 if (!hiColumn.IsIdentity)
