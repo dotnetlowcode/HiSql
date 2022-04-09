@@ -18,7 +18,7 @@ namespace HiSql.PostGreSqlUnitTest
             //   Demo_View(sqlClient);//ok
             //Demo_AllTables(sqlClient);//ok
             //Demo_GlobalTables(sqlClient);//  delay
-            // Demo_ModiTable(sqlClient);//ok
+            //Demo_ModiTable(sqlClient);//ok
 
 
             // Demo_CreateView(sqlClient);//ok
@@ -26,9 +26,9 @@ namespace HiSql.PostGreSqlUnitTest
             //Demo_DropView(sqlClient); //ok
 
 
-            Demo_IndexList(sqlClient);//ok
+            //Demo_IndexList(sqlClient);//ok
             //Demo_Index_Create(sqlClient);//ok
-            //Demo_ReTable(sqlClient);//
+            Demo_ReTable(sqlClient);//
 
         }
 
@@ -43,13 +43,13 @@ namespace HiSql.PostGreSqlUnitTest
             _tabcopy.Columns.RemoveAt(4);
 
             HiColumn newcol = ClassExtensions.DeepCopy<HiColumn>(_tabcopy.Columns[1]);
-            newcol.FieldName = "Testname3";
-            newcol.ReFieldName = "Testname3";
+            newcol.FieldName = "Testnamwe3";
+            newcol.ReFieldName = "Testnamwe3";
             _tabcopy.Columns.Add(newcol);
 
             _tabcopy.Columns[1].ReFieldName = "UName_04";
-            _tabcopy.Columns[4].IsRequire = true;
-            _tabcopy.Columns[4].FieldDesc = "asdfasdf";
+            _tabcopy.Columns[1].IsRequire = true;
+            _tabcopy.Columns[1].FieldDesc = "asdUName_04f";
 
             var rtn = sqlClient.DbFirst.ModiTable(_tabcopy, OpLevel.Execute);
             if (rtn.Item1)
@@ -66,7 +66,7 @@ namespace HiSql.PostGreSqlUnitTest
         {
             //OpLevel.Execute  表示执行并返回生成的SQL
             //OpLevel.Check 表示仅做检测失败时返回消息且检测成功时返因生成的SQL
-            var rtn = sqlClient.DbFirst.ReTable("HTest03", "HTest02", OpLevel.Execute);
+            var rtn = sqlClient.DbFirst.ReTable("HTest022", "HTest02", OpLevel.Execute);
             if (rtn.Item1)
             {
                 Console.WriteLine(rtn.Item2);//输出成功消息

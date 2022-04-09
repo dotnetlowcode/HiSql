@@ -403,9 +403,39 @@ namespace HiSql
                 _client = this.Context.CloneClient();
 
             if (_lstdel.Count > 0)
-                _client.Delete(Constants.HiSysTable["Hi_FieldModel"].ToString(), _lstdel).ExecCommand();
+            {
+                try
+                {
+                    _client.Delete(Constants.HiSysTable["Hi_FieldModel"].ToString(), _lstdel).ExecCommand();
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+                finally
+                {
+                    _client.Context.DBO.Close();
+                    _client.Context.DBO.Dispose();
+                }
+
+
+            }
             if (_lstmodi.Count > 0)
-                _client.Modi(Constants.HiSysTable["Hi_FieldModel"].ToString(), _lstmodi).ExecCommand();
+            {
+                try
+                {
+                    _client.Modi(Constants.HiSysTable["Hi_FieldModel"].ToString(), _lstmodi).ExecCommand();
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+                finally
+                {
+                    _client.Context.DBO.Close();
+                    _client.Context.DBO.Dispose();
+                }
+            }
             return newtabinfo;
         }
         #endregion
@@ -902,11 +932,23 @@ namespace HiSql
 
             string _changesql = string.Empty;
             if (tabFieldAction == TabFieldAction.ADD)
+            {
                 _changesql = dbConfig.Add_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$TempColumn$]", _fieldsql);
+                return  " EXEC  '" + _changesql.Replace("'", "''") + "';";
+            }
+                
             else if (tabFieldAction == TabFieldAction.DELETE)
+            {
                 _changesql = dbConfig.Del_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$FieldName$]", hiColumn.FieldName).Replace("[$Schema$]", string.IsNullOrEmpty(hiTable.Schema) ? this.Context.CurrentConnectionConfig.Schema : hiTable.Schema);
+
+                return  " EXEC  '" + _changesql.Replace("'", "''") + "';";
+            }
             else if (tabFieldAction == TabFieldAction.MODI)
-                _changesql = dbConfig.Modi_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$TempColumn$]", _fieldsql);
+            {
+              
+                return  " EXEC  '" + dbConfig.Modi_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$TempColumn$]", _fieldsql).Replace("'", "''") + "';";
+                
+            }
             else if (tabFieldAction == TabFieldAction.RENAME)
             {
                 _changesql = dbConfig.Re_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$ReFieldName$]", hiColumn.ReFieldName).Replace("[$FieldName$]", hiColumn.FieldName);
@@ -915,11 +957,8 @@ namespace HiSql
                 var _changesqlUpdate = BuildChangeFieldStatement(hiTable, hiColumn, TabFieldAction.MODI);
 
                 StringBuilder sb = new StringBuilder();
-                sb.Append("do begin").AppendLine();
-                sb.Append("EXEC  '"+_changesql.Replace("'", "''")+ "';").AppendLine(); //Replace("\"", "\\\"").
-                sb.Append("EXEC  '" + _changesqlUpdate.Replace("'", "''") + "';").AppendLine();
-                sb.Append("end;");
-
+                sb.AppendLine(" EXEC  '"+_changesql.Replace("'", "''")+ "';"); //Replace("\"", "\\\"").
+                sb.AppendLine( _changesqlUpdate);
                 return sb.ToString();
             }
                 
@@ -2646,6 +2685,12 @@ namespace HiSql
         {
             string _sql = dbConfig.Re_Table.Replace("[$TabName$]", $"{dbConfig.Schema_Pre}{this.Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{tabname}{dbConfig.Table_After}").Replace("[$ReTabName$]", $"{dbConfig.Table_Pre}{newtabname}{dbConfig.Table_After}");
             return _sql;
+        }
+        public string BuildSqlCodeBlock(string sbSql)
+        {
+            sbSql = sbSql.Insert(0, "do begin\r\n");
+            sbSql+= "\r\nend;";
+            return sbSql;
         }
     }
 }
