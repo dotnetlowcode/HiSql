@@ -22,12 +22,13 @@ namespace HiSql
             //Demo_Tables(sqlClient);
             //Demo_View(sqlClient);
             //Demo_AllTables(sqlClient);
+            Demo_TablesPaging(sqlClient);
+            Demo_TableDataCount(sqlClient);
             //Demo_GlobalTables(sqlClient);
             //Demo_DropView(sqlClient);
             //Demo_CreateView(sqlClient);
             //Demo_ModiView(sqlClient);
-
-            Demo_IndexList(sqlClient);
+            //Demo_IndexList(sqlClient);
             //Demo_Index_Create(sqlClient);
 
 
@@ -119,6 +120,24 @@ namespace HiSql
                 Console.WriteLine($"{tableInfo.TabName}  {tableInfo.TabReName}  {tableInfo.TabDescript}  {tableInfo.TableType} 表结构:{tableInfo.HasTabStruct}");
             }
         }
+        static void Demo_TablesPaging(HiSqlClient sqlClient)
+        {
+            int total = 0;
+            List<TableInfo> lsttales = sqlClient.DbFirst.GetTables("HI", 11,1, out total);
+            foreach (TableInfo tableInfo in lsttales)
+            {
+                Console.WriteLine($"{tableInfo.TabName}  {tableInfo.TabReName}  {tableInfo.TabDescript}  {tableInfo.TableType} 表结构:{tableInfo.HasTabStruct}");
+            }
+        }
+        static void Demo_TableDataCount(HiSqlClient sqlClient)
+        {
+            int total = 0;
+             int lsttales = sqlClient.DbFirst.GetTableDataCount("Hi_FieldModel");
+            Console.WriteLine($" {lsttales} ");
+        }
+        
+
+
 
         static void Demo_CreateView(HiSqlClient sqlClient)
         {

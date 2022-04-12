@@ -13,13 +13,13 @@ namespace HiSql.HanaUnitTest
             //Create_Table(sqlClient); //ok
             //Demo_AddColumn(sqlClient); //ok
             //Demo_ReColumn(sqlClient);//ok
-           // Demo_ModiColumn(sqlClient); //ok
+            // Demo_ModiColumn(sqlClient); //ok
             //Demo_DelColumn(sqlClient);// //ok
             //Demo_Tables(sqlClient);// ok
             //Demo_View(sqlClient);// ok
             //Demo_AllTables(sqlClient);//ok
             //Demo_GlobalTables(sqlClient);//  delay
-            Demo_ModiTable(sqlClient);///ok
+            //Demo_ModiTable(sqlClient);///ok
 
             //Demo_DropView(sqlClient); //ok
             //Demo_CreateView(sqlClient);//ok
@@ -29,6 +29,26 @@ namespace HiSql.HanaUnitTest
             //Demo_Index_Create(sqlClient);///ok
             //Demo_ReTable(sqlClient);//ok
 
+            //Demo_TableDataCount(sqlClient);//ok
+
+            Demo_TablesPaging(sqlClient);
+        }
+        static void Demo_TablesPaging(HiSqlClient sqlClient)
+        {
+            int total = 0;
+            List<TableInfo> lsttales = sqlClient.DbFirst.GetTables("HI", 11, 1, out total);
+            foreach (TableInfo tableInfo in lsttales)
+            {
+                Console.WriteLine($" {tableInfo.TabName}  {tableInfo.TabReName}  {tableInfo.TabDescript}  {tableInfo.TableType} 表结构:{tableInfo.HasTabStruct}");
+            }
+            Console.WriteLine($"总数 {total}");
+
+        }
+        static void Demo_TableDataCount(HiSqlClient sqlClient)
+        {
+            int total = 0;
+            int lsttales = sqlClient.DbFirst.GetTableDataCount("Hi_FieldModel");
+            Console.WriteLine($" {lsttales} ");
         }
         static void Create_Table(HiSqlClient sqlClient)
         {

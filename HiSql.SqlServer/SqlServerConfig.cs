@@ -122,7 +122,12 @@ namespace HiSql
         /// </summary>
         string _temp_getalltables = "";
 
+        /// <summary>
+        /// 分页获取表和视图
+        /// </summary>
+        string _temp_gettables_paging = "";
 
+        string _temp_getTableDataCount= "select count(*) from [$TabName$] ";
         /// <summary>
         /// 检测表或视图是否存在
         /// </summary>
@@ -298,6 +303,11 @@ namespace HiSql
         public string Get_Views { get => _temp_getviews; }
 
         public string Get_AllTables { get => _temp_getalltables; }
+
+        public string Get_TablesPaging { get => _temp_gettables_paging; }
+
+        public string Get_TableDataCount { get => _temp_getTableDataCount; }
+
 
         /// <summary>
         /// 获取创建视图的模板
@@ -692,6 +702,15 @@ UNION ALL
                 .AppendLine("order by crdate desc ")
                 .ToString();
 
+
+            _temp_gettables_paging = new StringBuilder()
+               .AppendLine(@"select count(*)   from sysobjects where (xtype='U' )  [$Where$] ;")
+               .AppendLine("SELECT * FROM (select row_seq = ROW_NUMBER()OVER( order by xtype ASC, crdate desc ) , [name] as TabName,(case when xtype='U' then 'Table' else 'View' end ) as TabType,crdate as CreateTime " +
+               "from sysobjects where (xtype='U')   ")
+               .AppendLine("[$Where$] ) AS t WHERE row_seq > [$SeqBegin$] AND row_seq <=[$SeqEnd$]")
+               .AppendLine("order by row_seq")
+               .ToString();
+
             //获取所有视图
             _temp_getviews = new StringBuilder()
                 .AppendLine("select [name] as TabName,(case when xtype='U' then 'Table' else 'View' end ) as TabType,crdate as CreateTime")
@@ -707,6 +726,7 @@ UNION ALL
                 .AppendLine("[$Where$]")
                 .AppendLine("order by xtype ASC, crdate desc ")
                 .ToString();
+
 
             //删除字段默认值
             _temp_deldefalut = new StringBuilder()

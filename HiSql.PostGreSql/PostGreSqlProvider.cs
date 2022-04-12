@@ -103,7 +103,7 @@ namespace HiSql
         
 
 
-        public override IDataAdapter GetAdapter()
+        public override DbDataAdapter GetAdapter()
         {
             return new NpgsqlDataAdapter();
         }

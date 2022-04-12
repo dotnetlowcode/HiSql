@@ -12,7 +12,7 @@ namespace HiSql.OralceUnitTest
         public static void Init(HiSqlClient sqlClient)
         {
             //Create_Table(sqlClient); // ok
-             Demo_AddColumn(sqlClient); //ok
+            //Demo_AddColumn(sqlClient); //ok
             //Demo_ReColumn(sqlClient);//ok
             //Demo_ModiColumn(sqlClient); //ok
             //Demo_DelColumn(sqlClient);//ok
@@ -29,7 +29,26 @@ namespace HiSql.OralceUnitTest
             //Demo_IndexList(sqlClient);///ok
             //Demo_Index_Create(sqlClient);//ok
             //Demo_ReTable(sqlClient);//ok
+            // Demo_AllTables(sqlClient);//ok
+            // Demo_TableDataCount(sqlClient);
+            Demo_TablesPaging(sqlClient);
+        }
+        static void Demo_TablesPaging(HiSqlClient sqlClient)
+        {
+            int total = 0;
+            List<TableInfo> lsttales = sqlClient.DbFirst.GetTables("HI", 11, 1, out total);
+            foreach (TableInfo tableInfo in lsttales)
+            {
+                Console.WriteLine($" {tableInfo.TabName}  {tableInfo.TabReName}  {tableInfo.TabDescript}  {tableInfo.TableType} 表结构:{tableInfo.HasTabStruct}");
+            }
+            Console.WriteLine($"总数 {total}");
 
+        }
+        static void Demo_TableDataCount(HiSqlClient sqlClient)
+        {
+            int total = 0;
+            int lsttales = sqlClient.DbFirst.GetTableDataCount("Hi_FieldModel");
+            Console.WriteLine($" {lsttales} ");
         }
         static void Create_Table(HiSqlClient sqlClient)
         {
@@ -83,7 +102,7 @@ namespace HiSql.OralceUnitTest
 
 
             TabInfo tabInfo = sqlClient.Context.DMInitalize.GetTabStruct("htest01");
-            List<HiColumn> hiColumns = tabInfo.Columns.Where(c => string.Compare(c.FieldName,"ModiTime", true) == 0 || string.Compare(c.FieldName, "ModiName", true) == 0).ToList();
+            List<HiColumn> hiColumns = tabInfo.Columns.Where(c => string.Compare(c.FieldName, "ModiTime", true) == 0 || string.Compare(c.FieldName, "ModiName", true) == 0).ToList();
             var rtn = sqlClient.DbFirst.CreateIndex("htest01", "idx_hi_test01_ModiTime123", hiColumns, OpLevel.Execute);
             if (rtn.Item1)
                 Console.WriteLine(rtn.Item3);
@@ -331,7 +350,7 @@ namespace HiSql.OralceUnitTest
                 DBDefault = HiTypeDBDefault.EMPTY
 
             };
-            
+
             var rtn = sqlClient.DbFirst.DelColumn("htest01", column, OpLevel.Execute);
 
             Console.WriteLine(rtn.Item2);
@@ -391,7 +410,7 @@ namespace HiSql.OralceUnitTest
                 DefaultValue = "TGM",
                 FieldDesc = "测试字段变asdfa sdqq更"
 
-            }; 
+            };
             rtn = sqlClient.DbFirst.ReColumn(column.TabName, column, OpLevel.Execute);
 
             column = new HiColumn()

@@ -2469,7 +2469,33 @@ namespace HiSql
             return Context.DBO.GetDataTable(_tempsql);
             throw new NotImplementedException();
         }
+        public DataTable GetTableList(string tabname, int pageSize, int pageIndex, out int totalCount)
+        {
+            int SeqBegin = (pageIndex - 1) * pageSize;
+            int SeqEnd = (pageIndex) * pageSize;
+            var _where = string.Empty;
+            string _tempsqlcount = dbConfig.Get_TablesPagingCount.Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema);
 
+
+            string _tempsql = dbConfig.Get_TablesPaging.Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema);
+
+            if (!string.IsNullOrEmpty(tabname))
+                _where += $@" and table_name like '%{tabname.ToSqlInject()}%'";
+
+            _tempsql = _tempsql.Replace("[$SeqBegin$]", SeqBegin.ToString()).Replace("[$SeqEnd$]", SeqEnd.ToString());
+            _tempsql = _tempsql.Replace("[$Where$]", _where);
+            _tempsqlcount = _tempsqlcount.Replace("[$Where$]", _where);
+            List<string> sqlList = new List<string>() { _tempsqlcount, _tempsql };
+            List<HiParameter[]> parameters = new List<HiParameter[]>() {
+                new HiParameter[]{},
+                new HiParameter[]{}
+            };
+
+            var dataSet = Context.DBO.GetDataSet(sqlList, parameters);
+
+            totalCount = int.Parse(dataSet.Tables[0].Rows[0][0].ToString());
+            return dataSet.Tables[1];
+        }
         public DataTable GetViewList(string viewname="")
         {
             string _tempsql = dbConfig.Get_Views.Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema);
@@ -2664,6 +2690,16 @@ namespace HiSql
             sbSql+= "\r\nend;";
 
             return sbSql;
+        }
+
+        
+        public int GetTableDataCount(string tabname)
+        {
+            string _sql = dbConfig.Get_TableDataCount.Replace("[$TabName$]", $"{dbConfig.Schema_Pre}{this.Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{tabname}{dbConfig.Table_After}");
+
+            string v = this.Context.DBO.ExecScalar(_sql).ToString();
+            int _effect = Convert.ToInt32(v);
+            return _effect;
         }
         #endregion
     }

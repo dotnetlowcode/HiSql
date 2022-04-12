@@ -103,7 +103,13 @@ namespace HiSql
         /// 所有物理实体表
         /// </summary>
         string _temp_gettables = "";
+        /// <summary>
+        /// 分页获取表和视图
+        /// </summary>
+        string _temp_gettables_paging = "";
+      
 
+        string _temp_getTableDataCount = "select count(*) from [$TabName$] ";
         /// <summary>
         /// 获取所有视图
         /// </summary>
@@ -268,7 +274,9 @@ namespace HiSql
         public string Del_Default { get => _temp_deldefalut; }
 
         public string Get_Tables { get => _temp_gettables; }
+        public string Get_TablesPaging { get => _temp_gettables_paging; }
 
+        public string Get_TableDataCount { get => _temp_getTableDataCount; }
         public string Get_Views { get => _temp_getviews; }
 
         public string Get_AllTables { get => _temp_getalltables; }
@@ -686,6 +694,13 @@ UNION ALL
                 .AppendLine("[$Where$]")
                 .AppendLine("order by table_type ASC,   create_time desc ")
                 .ToString();
+
+            _temp_gettables_paging = new StringBuilder()
+              .AppendLine(@"select count(*)   from  `INFORMATION_SCHEMA`.`TABLES` where    table_type in ('BASE TABLE') and  table_schema = '[$Schema$]'[$Where$]  ; ")
+              .AppendLine(@"select * from ( select ROW_NUMBER()OVER( order by table_type ASC,   create_time desc ) as row_seq , table_name  as `TabName`,
+case   table_type  when 'BASE TABLE' then 'Table' when 'VIEW' then 'View' else 'NONE' END `TabType`,create_time as `CreateTime` from   `INFORMATION_SCHEMA`.`TABLES`
+where    table_type in ('BASE TABLE') and  table_schema = '[$Schema$]' [$Where$] )as temp  WHERE row_seq > [$SeqBegin$] AND row_seq <=[$SeqEnd$] ")
+               .AppendLine("order by row_seq").ToString();
 
             // 获取所有视图
             _temp_getviews = new StringBuilder()

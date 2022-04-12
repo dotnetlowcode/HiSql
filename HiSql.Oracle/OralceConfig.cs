@@ -113,7 +113,14 @@ namespace HiSql
         /// 所有物理实体表
         /// </summary>
         string _temp_gettables = "";
+        /// <summary>
+        /// 分页获取表和视图
+        /// </summary>
+        string _temp_gettables_paging = "";
+        string _temp_gettables_pagingcount = "";
 
+
+        string _temp_getTableDataCount = "select count(*) from [$TabName$] ";
         /// <summary>
         /// 获取所有视图
         /// </summary>
@@ -299,6 +306,11 @@ namespace HiSql
 
         public string Get_Tables { get => _temp_gettables; }
 
+
+        public string Get_TablesPagingCount { get => _temp_gettables_pagingcount; }
+        public string Get_TablesPaging { get => _temp_gettables_paging; }
+
+        public string Get_TableDataCount { get => _temp_getTableDataCount; }
         public string Get_Views { get => _temp_getviews; }
 
         public string Get_AllTables { get => _temp_getalltables; }
@@ -752,6 +764,16 @@ UNION ALL
                 .AppendLine(") temp")
                 .AppendLine("ORDER BY \"TabName\" ASC, \"CreateTime\" desc ")
                 .ToString();
+
+            _temp_gettables_pagingcount = "select count(*) from SYS.user_tables where TABLESPACE_NAME ='[$Schema$]' and table_name not like '/%' [$Where$]";
+            _temp_gettables_paging = new StringBuilder()
+                .AppendLine("select * from ( ")
+                 .AppendLine(@"select ROW_NUMBER()OVER( order by table_name ASC) as row_seq , table_name as ""TabName"", 'Table' AS ""TabType"",  to_char(cast(LAST_ANALYZED as DATE),'yyyy-mm-dd hh24:mi:ss') as ""CreateTime"" 
+            from SYS.user_tables where TABLESPACE_NAME ='[$Schema$]' and table_name not like '/%' [$Where$]")
+                .AppendLine(") temp  WHERE row_seq > [$SeqBegin$] AND row_seq <=[$SeqEnd$] ")
+               .AppendLine(@"  order by row_seq")
+                .ToString();
+
 
             _temp_getviews = new StringBuilder()
              .AppendLine("select * from ( ")

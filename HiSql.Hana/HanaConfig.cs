@@ -106,7 +106,14 @@ namespace HiSql
         /// 所有物理实体表
         /// </summary>
         string _temp_gettables = "";
+        /// <summary>
+        /// 分页获取表和视图
+        /// </summary>
+        string _temp_gettables_paging = "";
+        string _temp_gettables_pagingcount = "";
+        
 
+        string _temp_getTableDataCount = "select count(*) from [$TabName$] ";
         /// <summary>
         /// 获取所有视图
         /// </summary>
@@ -289,7 +296,10 @@ namespace HiSql
         public string Del_Default { get => _temp_deldefalut; }
 
         public string Get_Tables { get => _temp_gettables; }
-
+        public string Get_TablesPaging { get => _temp_gettables_paging; }
+        public string Get_TablesPagingCount { get => _temp_gettables_pagingcount; }
+        
+        public string Get_TableDataCount { get => _temp_getTableDataCount; }
         public string Get_Views { get => _temp_getviews; }
 
         public string Get_AllTables { get => _temp_getalltables; }
@@ -669,10 +679,18 @@ UNION ALL
                 .AppendLine(")as temp")
                 .AppendLine("ORDER BY \"TabName\" ASC, \"CreateTime\" desc ")
                 .ToString();
+            _temp_gettables_pagingcount = "select count(*)   from \"SYS\".\"TABLES\" where \"SCHEMA_NAME\" = '[$Schema$]' and \"TABLE_NAME\" not like '/%'  [$Where$] ;";
+            
+            _temp_gettables_paging = new StringBuilder()
+               //.AppendLine("select count(*)   from \"SYS\".\"TABLES\" where \"SCHEMA_NAME\" = '[$Schema$]' and \"TABLE_NAME\" not like '/%'  [$Where$] ;")
+               .AppendLine("select * from ( ")
+                 .AppendLine("select ROW_NUMBER()OVER( order by \"TABLE_NAME\" ASC, \"CREATE_TIME\" DESC  ) as row_seq ,\"TABLE_NAME\"  as \"TabName\", 'Table' AS \"TabType\", \"CREATE_TIME\" as \"CreateTime\" FROM \"SYS\".\"TABLES\" where \"SCHEMA_NAME\" = '[$Schema$]' and \"TABLE_NAME\" not like '/%' ")
+                .AppendLine("[$Where$] )as temp  WHERE row_seq > [$SeqBegin$] AND row_seq <=[$SeqEnd$] ")
+                .AppendLine("order by row_seq").ToString();
+
             _temp_getviews = new StringBuilder()
                .AppendLine("select * from ( ")
                 .AppendLine("select \"VIEW_NAME\"  as \"TabName\", 'View' AS \"TabType\", \"CREATE_TIME\" as \"CreateTime\" FROM \"SYS\".\"VIEWS\" where \"SCHEMA_NAME\" = '[$Schema$]' and \"VIEW_NAME\" not like '/%' [$Where$]")
-              
                .AppendLine(")as temp")
                .AppendLine("ORDER BY \"TabName\" ASC, \"CreateTime\" desc ")
                .ToString();

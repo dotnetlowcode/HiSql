@@ -172,7 +172,7 @@ namespace HiSql
             return 0;
         }
 
-        public override IDataAdapter GetAdapter()
+        public override DbDataAdapter GetAdapter()
         {
             return new MySqlDataAdapter();
         }

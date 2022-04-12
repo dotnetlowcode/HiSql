@@ -120,7 +120,7 @@ namespace HiSql
 
             return bulkcopy;
         }
-        public override IDataAdapter GetAdapter()
+        public override DbDataAdapter GetAdapter()
         {
             return new HanaDataAdapter();
         }

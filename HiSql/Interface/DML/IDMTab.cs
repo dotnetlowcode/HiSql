@@ -54,6 +54,15 @@ namespace HiSql
         /// <returns></returns>
         DataTable GetTableList(string tabname = "");
 
+
+        DataTable GetTableList(string tabname, int pageSize, int pageIndex, out int totalCount);
+
+        /// <summary>
+        /// 获取当前表数据量
+        /// </summary>
+        /// <returns></returns>
+        int GetTableDataCount(string tabname);
+        
         /// <summary>
         /// 获取当前库所有视图清单
         /// </summary>
