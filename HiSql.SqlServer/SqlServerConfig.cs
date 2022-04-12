@@ -461,7 +461,7 @@ namespace HiSql
             _temp_create_table = new StringBuilder()
                 //样例：CREATE TABLE [dbo].[H_TEST_USER]
                 .AppendLine("declare @_effect int")
-                .AppendLine($"if not Exists(select top 1 * from dbo.sysObjects where Id=OBJECT_ID(N'[$TabName$]') and xtype='U')")
+                .AppendLine($"if not Exists(select top 1 * from dbo.sysObjects where Id=OBJECT_ID(N'[$TabName$]') and ( xtype='U' or xtype='V' )) ")
                 .AppendLine("begin")
                 .AppendLine($"CREATE TABLE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} (")
                 .AppendLine("[$Fields$]")

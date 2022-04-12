@@ -3,6 +3,7 @@ D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Release\netcoreapp3.1\HiSql.Oracle.
 D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Release\netcoreapp3.1\HiSql.Oracle.pdb
 D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Release\netcoreapp3.1\HiSql.dll
 D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Release\netcoreapp3.1\HiSql.pdb
+D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Release\netcoreapp3.1\HiSql.Oracle.csproj.AssemblyReference.cache
 D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Release\netcoreapp3.1\HiSql.Oracle.Properties.Resources.resources
 D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Release\netcoreapp3.1\HiSql.Oracle.csproj.GenerateResource.cache
 D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Release\netcoreapp3.1\HiSql.Oracle.GeneratedMSBuildEditorConfig.editorconfig
@@ -12,4 +13,3 @@ D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Release\netcoreapp3.1\HiSql.Oracle.
 D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Release\netcoreapp3.1\HiSql.Oracle.csproj.CopyComplete
 D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Release\netcoreapp3.1\HiSql.Oracle.dll
 D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Release\netcoreapp3.1\HiSql.Oracle.pdb
-D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Release\netcoreapp3.1\HiSql.Oracle.csproj.AssemblyReference.cache

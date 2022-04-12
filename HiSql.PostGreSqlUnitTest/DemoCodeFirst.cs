@@ -10,9 +10,9 @@ namespace HiSql.PostGreSqlUnitTest
     {
         public static void Init(HiSqlClient sqlClient)
         {
-           // CodeFirst_Demo(sqlClient);
+            CodeFirst_Demo(sqlClient);
             //Snro_Demo(sqlClient);
-            Create_Table(sqlClient);
+            //Create_Table(sqlClient);
             string s = Console.ReadLine();
         }
 

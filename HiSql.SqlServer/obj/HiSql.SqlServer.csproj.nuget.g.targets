@@ -1,8 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup>
-    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
-  </PropertyGroup>
   <ImportGroup Condition=" '$(TargetFramework)' == 'net461' AND '$(ExcludeRestorePackageImports)' != 'true' ">
     <Import Project="$(NuGetPackageRoot)microsoft.data.sqlclient.sni\4.0.0\buildTransitive\net46\Microsoft.Data.SqlClient.SNI.targets" Condition="Exists('$(NuGetPackageRoot)microsoft.data.sqlclient.sni\4.0.0\buildTransitive\net46\Microsoft.Data.SqlClient.SNI.targets')" />
   </ImportGroup>
