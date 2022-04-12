@@ -436,7 +436,7 @@ namespace HiSql
                 .AppendLine("do begin")
                 .AppendLine($"  DECLARE _count int:=0;")
                 .AppendLine($"  DECLARE _status int:=0;")
-                .AppendLine("   select count(*) into _count  from OBJECTS  where OBJECT_TYPE='TABLE' AND OBJECT_NAME='[$TabName$]';")
+                .AppendLine("   select count(*) into _count  from OBJECTS  where ( OBJECT_TYPE='TABLE' or OBJECT_TYPE='TABLE' ) AND OBJECT_NAME='[$TabName$]';")
                 .AppendLine("   if :_count = 0 then")
                 .AppendLine($"      CREATE COLUMN TABLE  {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} (")
                 .AppendLine("           [$Fields$]")
