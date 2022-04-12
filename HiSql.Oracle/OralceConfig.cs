@@ -478,28 +478,33 @@ namespace HiSql
             _temp_create_table = new StringBuilder()
                 .AppendLine("declare ")
                 .AppendLine($"  v_number integer;")
+                .AppendLine($"  v_number2 integer;")
                 .AppendLine("   v_secout integer;")
                 .AppendLine($"begin")
-                //.AppendLine($"   select count(*)  into v_number  from user_tables  where  table_name=upper('[$TabName$]');")
-                //.AppendLine($"   IF v_number > 0 then")
-                //.AppendLine($"        execute immediate 'drop table [$TabName$] ';")
-                //.AppendLine($"   end if;")
+                .AppendLine($"   select count(*)  into v_number  from user_tables  where  table_name=upper('[$TabName$]');")
+                .AppendLine($"   select count(*)  into v_number2  from user_views  where  view_name=upper('[$TabName$]');")
+                .AppendLine($"   IF v_number = 0  and v_number2=0 then")
+                .AppendLine($"      execute immediate  'create table [$TabName$]('")
+                .AppendLine("           [$Fields$]")
+                .AppendLine($"      || ') ';")
+                .AppendLine($"      [$Sequence$]")
 
-                .AppendLine($"   [$Sequence$]")
+                .AppendLine("    [$Primary$]")
+                .AppendLine($"   end if;")
+                //.AppendLine($"        execute immediate 'drop table [$TabName$] ';")
+                
                 //.AppendLine($"   select count(*) into v_secout from user_sequences where SEQUENCE_NAME = upper('[$TabName$]_SEQ');")
                 //.AppendLine($"   IF v_secout > 0 then")
                 //.AppendLine($"       execute immediate 'drop sequence [$TabName$]_SEQ';")
                 //.AppendLine($"   end if;")
                 //.AppendLine($"   execute immediate 'create sequence [$TabName$]_SEQ increment by 1 start with 1 minvalue 1 maxvalue 999999999999';")
 
-                .AppendLine($"   execute immediate  'create table [$TabName$]('")
-                .AppendLine("       [$Fields$]")
-                .AppendLine($"   || ') ';")
+                
 
                 .AppendLine($"   execute immediate 'delete from {Constants.HiSysTable["Hi_TabModel"].ToString()} where TabName=''[$TabName$]''';")
                 .AppendLine($"   execute immediate 'delete from {Constants.HiSysTable["Hi_FieldModel"].ToString()} where TabName=''[$TabName$]''';")
 
-                .AppendLine("    [$Primary$]")
+                
                 .AppendLine("    [$TabStruct$]")
                 .AppendLine("   [$Comment$]")
                 .AppendLine("end;")

@@ -1177,7 +1177,7 @@ namespace HiSql
                     }
 
                     _temp_create = _temp_create.Replace("[$Comment$]", sb_sqlcomment.ToString())
-                        .Replace("[$TabStruct$]", inertTabStruct(hiTable, lstHiTable,false))
+                        .Replace("[$TabStruct$]", inertTabStruct(hiTable, lstHiTable,true))
                         ;
                     //_temp_create = new StringBuilder().AppendLine(_temp_create).AppendLine(sb_sqlcomment.ToString())
                     //    .AppendLine(inertTabStruct(hiTable, lstHiTable))

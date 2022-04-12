@@ -10,8 +10,8 @@ namespace HiSql.OralceUnitTest
     {
         public static void Init(HiSqlClient sqlClient)
         {
-            //CodeFirst_Demo(sqlClient);
-            Create_Table(sqlClient);
+            CodeFirst_Demo(sqlClient);
+            //Create_Table(sqlClient);
             string s = Console.ReadLine();
         }
         static void Create_Table(HiSqlClient sqlClient)
@@ -23,14 +23,14 @@ namespace HiSql.OralceUnitTest
             Tuple<HiTable, List<HiColumn>> tabomdel = sqlClient.Context.DMInitalize.BuildTabStru(typeof(Hi_TabModel));
             Tuple<HiTable, List<HiColumn>> fieldomdel = sqlClient.Context.DMInitalize.BuildTabStru(typeof(Hi_FieldModel));
             TabInfo tabinfo_tab = sqlClient.Context.DMInitalize.BuildTab(typeof(Hi_Domain));
-            TabInfo tabinfo_field = sqlClient.Context.DMInitalize.BuildTab(typeof(Hi_DataElement));
+            TabInfo tabinfo_field = sqlClient.Context.DMInitalize.BuildTab(typeof(Table.HTest01));
 
 
             //tabinfo_tab.TabModel.TabName = "#" + tabinfo_tab.TabModel.TabName;
             //tabinfo_tab.TabModel.TabReName = tabinfo_tab.TabModel.TabName.Substring(2) + "_" + System.Threading.Thread.CurrentThread.ManagedThreadId + "_" + tabinfo_tab.TabModel.TabName.GetHashCode().ToString().Substring(1);
 
-            //string _sql = sqlClient.Context.DMTab.BuildTabCreateSql(tabinfo_field.TabModel, tabinfo_field.GetColumns, true);
-            //int _effect = (int)sqlClient.Context.DBO.ExecCommand(_sql);
+            string _sql = sqlClient.Context.DMTab.BuildTabCreateSql(tabinfo_field.TabModel, tabinfo_field.GetColumns, true);
+            int _effect = (int)sqlClient.Context.DBO.ExecCommand(_sql);
             //int _effect = (int)sqlClient.Context.DBO.ExecScalar(_sql);
 
             sqlClient.CodeFirst.InstallHisql();
