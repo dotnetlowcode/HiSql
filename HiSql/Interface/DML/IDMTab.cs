@@ -68,6 +68,7 @@ namespace HiSql
         /// </summary>
         /// <returns></returns>
         DataTable GetViewList(string viewname = "");
+        DataTable GetViewList(string viewname, int pageSize, int pageIndex, out int totalCount);
 
 
         /// <summary>
@@ -117,6 +118,8 @@ namespace HiSql
         /// </summary>
         /// <returns></returns>
         DataTable GetAllTables(string tabname="");
+
+        DataTable GetAllTables(string tabname, int pageSize, int pageIndex, out int totalCount);
 
 
         /// <summary>

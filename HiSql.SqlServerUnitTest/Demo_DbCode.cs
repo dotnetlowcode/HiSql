@@ -21,9 +21,10 @@ namespace HiSql
             //Demo_DelColumn(sqlClient);
             //Demo_Tables(sqlClient);
             //Demo_View(sqlClient);
+            //Demo_ViewsPaging(sqlClient);
             //Demo_AllTables(sqlClient);
-            Demo_TablesPaging(sqlClient);
-            Demo_TableDataCount(sqlClient);
+            //Demo_TablesPaging(sqlClient);
+            //Demo_TableDataCount(sqlClient);
             //Demo_GlobalTables(sqlClient);
             //Demo_DropView(sqlClient);
             //Demo_CreateView(sqlClient);
@@ -31,9 +32,27 @@ namespace HiSql
             //Demo_IndexList(sqlClient);
             //Demo_Index_Create(sqlClient);
 
+            Demo_AllTablesPaging(sqlClient);
+        }
+        static void Demo_AllTablesPaging(HiSqlClient sqlClient)
+        {
+            int total = 0;
+            List<TableInfo> lsttales = sqlClient.DbFirst.GetAllTables("Hi", 11, 1, out total);
+            foreach (TableInfo tableInfo in lsttales)
+            {
+                Console.WriteLine($"{tableInfo.TabName}  {tableInfo.TabReName}  {tableInfo.TabDescript}  {tableInfo.TableType} 表结构:{tableInfo.HasTabStruct}");
+            }
 
         }
-
+        static void Demo_ViewsPaging(HiSqlClient sqlClient)
+        {
+            int total = 0;
+            List<TableInfo> lsttales = sqlClient.DbFirst.GetViews("FieldModel", 11, 1, out total);
+            foreach (TableInfo tableInfo in lsttales)
+            {
+                Console.WriteLine($"{tableInfo.TabName}  {tableInfo.TabReName}  {tableInfo.TabDescript}  {tableInfo.TableType} 表结构:{tableInfo.HasTabStruct}");
+            }
+        }
         static void Demo_ReTable(HiSqlClient sqlClient)
         {
             //OpLevel.Execute  表示执行并返回生成的SQL
@@ -103,6 +122,9 @@ namespace HiSql
                 Console.WriteLine($"{tableInfo.TabName}  {tableInfo.TabReName}  {tableInfo.TabDescript}  {tableInfo.TableType} 表结构:{tableInfo.HasTabStruct}");
             }
         }
+
+
+
         static void Demo_GlobalTables(HiSqlClient sqlClient)
         {
             List<TableInfo> lsttales = sqlClient.DbFirst.GetGlobalTempTables();

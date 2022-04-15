@@ -115,13 +115,14 @@ namespace HiSql
         /// <summary>
         /// 获取所有视图
         /// </summary>
-        string _temp_getviews = "";
-
+        string _temp_getviews = ""; 
+        string _temp_getviewsPaging = "";
+        
         /// <summary>
         /// 获取表和视图
         /// </summary>
         string _temp_getalltables = "";
-
+        string _temp_getalltables_paging = "";
         /// <summary>
         /// 分页获取表和视图
         /// </summary>
@@ -301,8 +302,15 @@ namespace HiSql
         public string Get_Tables { get => _temp_gettables; }
 
         public string Get_Views { get => _temp_getviews; }
-
+        public string Get_ViewsPaging { get => _temp_getviewsPaging; }
+        
         public string Get_AllTables { get => _temp_getalltables; }
+
+
+        public string Get_AllTablesPaging { get => _temp_getalltables_paging; }
+
+        
+
 
         public string Get_TablesPaging { get => _temp_gettables_paging; }
 
@@ -718,15 +726,30 @@ UNION ALL
                 .AppendLine("[$Where$]")
                 .AppendLine("order by crdate desc ")
                 .ToString();
+            _temp_getviewsPaging = new StringBuilder()
+               .AppendLine(@"select count(*)   from sysobjects where (xtype='V' )  [$Where$] ;")
+               .AppendLine("SELECT * FROM (select row_seq = ROW_NUMBER()OVER( order by xtype ASC, crdate desc ) , [name] as TabName,(case when xtype='U' then 'Table' else 'View' end ) as TabType,crdate as CreateTime " +
+               "from sysobjects where (xtype='V')   ")
+               .AppendLine("[$Where$] ) AS t WHERE row_seq > [$SeqBegin$] AND row_seq <=[$SeqEnd$]")
+               .AppendLine("order by row_seq")
+               .ToString();
 
             //获取表和视图
-            _temp_getalltables= new StringBuilder()
+            _temp_getalltables = new StringBuilder()
                 .AppendLine("select [name] as TabName,(case when xtype='U' then 'Table' else 'View' end ) as TabType,crdate as CreateTime ")
                 .AppendLine("from sysobjects where (xtype='U' or xtype='V')   ")
                 .AppendLine("[$Where$]")
-                .AppendLine("order by xtype ASC, crdate desc ")
+                .AppendLine("order by xtype ASC, [name] ASC, crdate desc ")
                 .ToString();
 
+
+            _temp_getalltables_paging = new StringBuilder()
+               .AppendLine(@"select count(*)   from sysobjects where (xtype='U' or xtype='V')  [$Where$] ;")
+               .AppendLine("SELECT * FROM (select row_seq = ROW_NUMBER()OVER( order by xtype ASC, [name] ASC, crdate desc ) , [name] as TabName,(case when xtype='U' then 'Table' else 'View' end ) as TabType,crdate as CreateTime " +
+               "from sysobjects where (xtype='U' or xtype='V')   ")
+               .AppendLine("[$Where$] ) AS t WHERE row_seq > [$SeqBegin$] AND row_seq <=[$SeqEnd$]")
+               .AppendLine("order by row_seq")
+               .ToString();
 
             //删除字段默认值
             _temp_deldefalut = new StringBuilder()
