@@ -721,7 +721,7 @@
           }
         }
       },
-      "HiSql/1.0.3.4": {
+      "HiSql/1.0.3.5": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v3.1",
         "dependencies": {
@@ -1433,7 +1433,7 @@
           "lib/net461/System.ValueTuple.dll": {}
         }
       },
-      "HiSql/1.0.3.4": {
+      "HiSql/1.0.3.5": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.6.1",
         "dependencies": {
@@ -2168,7 +2168,7 @@
           }
         }
       },
-      "HiSql/1.0.3.4": {
+      "HiSql/1.0.3.5": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
@@ -2899,7 +2899,7 @@
           }
         }
       },
-      "HiSql/1.0.3.4": {
+      "HiSql/1.0.3.5": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v6.0",
         "dependencies": {
@@ -5191,7 +5191,7 @@
         "version.txt"
       ]
     },
-    "HiSql/1.0.3.4": {
+    "HiSql/1.0.3.5": {
       "type": "project",
       "path": "../HiSql/HiSql.csproj",
       "msbuildProject": "../HiSql/HiSql.csproj"
@@ -5199,19 +5199,19 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v3.1": [
-      "HiSql >= 1.0.3.4",
+      "HiSql >= 1.0.3.5",
       "Npgsql >= 5.0.7"
     ],
     ".NETFramework,Version=v4.6.1": [
-      "HiSql >= 1.0.3.4",
+      "HiSql >= 1.0.3.5",
       "Npgsql >= 5.0.7"
     ],
     "net5.0": [
-      "HiSql >= 1.0.3.4",
+      "HiSql >= 1.0.3.5",
       "Npgsql >= 5.0.7"
     ],
     "net6.0": [
-      "HiSql >= 1.0.3.4",
+      "HiSql >= 1.0.3.5",
       "Npgsql >= 5.0.7"
     ]
   },
@@ -5221,7 +5221,7 @@
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
-    "version": "1.0.3.4",
+    "version": "1.0.3.5",
     "restore": {
       "projectUniqueName": "D:\\Project\\OpenSource\\HiSql\\HiSql.PostGreSql\\HiSql.PostGreSql.csproj",
       "projectName": "HiSql.PostGreSql",

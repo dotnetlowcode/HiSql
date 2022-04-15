@@ -1158,6 +1158,29 @@ namespace HiSql
                 _tempsql = _tempsql.Replace("[$Where$]", $" and [name]='{tabname.ToSqlInject()}'");
             return Context.DBO.GetDataTable(_tempsql);
         }
+        public DataTable GetTableList(string tabname, int pageSize, int pageIndex, out int totalCount)
+        {
+            int SeqBegin = (pageIndex - 1) * pageSize;
+            int SeqEnd = (pageIndex) * pageSize;
+            var _where = string.Empty;
+            string _tempsql = dbConfig.Get_TablesPaging;
+
+            if (!string.IsNullOrEmpty(tabname))
+                _where += $" and [name] like '%{tabname.ToSqlInject()}%'";
+            
+            _tempsql = _tempsql.Replace("[$SeqBegin$]", SeqBegin.ToString()).Replace("[$SeqEnd$]", SeqEnd.ToString());
+
+            _tempsql = _tempsql.Replace("[$Where$]", _where);
+
+            List<string> sqlList = new List<string>() { _tempsql };
+            List<HiParameter[]> parameters = new List<HiParameter[]>() {
+                new HiParameter[]{ },
+            };
+            var dataSet = Context.DBO.GetDataSet(sqlList, parameters);
+
+            totalCount = int.Parse(dataSet.Tables[0].Rows[0][0].ToString());
+            return dataSet.Tables[1];
+        }
         public DataTable GetViewList(string viewname="")
         {
             string _tempsql = dbConfig.Get_Views;
@@ -1167,7 +1190,29 @@ namespace HiSql
                 _tempsql = _tempsql.Replace("[$Where$]", $" and [name]='{viewname.ToSqlInject()}'");
             return Context.DBO.GetDataTable(_tempsql);
         }
+        public DataTable GetViewList(string viewname, int pageSize, int pageIndex, out int totalCount)
+        {
+            int SeqBegin = (pageIndex - 1) * pageSize;
+            int SeqEnd = (pageIndex) * pageSize;
+            var _where = string.Empty;
+            string _tempsql = dbConfig.Get_ViewsPaging;
 
+            if (!string.IsNullOrEmpty(viewname))
+                _where += $" and [name] like '%{viewname.ToSqlInject()}%'";
+
+            _tempsql = _tempsql.Replace("[$SeqBegin$]", SeqBegin.ToString()).Replace("[$SeqEnd$]", SeqEnd.ToString());
+
+            _tempsql = _tempsql.Replace("[$Where$]", _where);
+
+            List<string> sqlList = new List<string>() { _tempsql };
+            List<HiParameter[]> parameters = new List<HiParameter[]>() {
+                new HiParameter[]{ },
+            };
+            var dataSet = Context.DBO.GetDataSet(sqlList, parameters);
+
+            totalCount = int.Parse(dataSet.Tables[0].Rows[0][0].ToString());
+            return dataSet.Tables[1];
+        }
         /// <summary>
         /// 创建视图
         /// </summary>
@@ -1248,6 +1293,31 @@ namespace HiSql
             else
                 _tempsql = _tempsql.Replace("[$Where$]", $" and [name]='{tabname.ToSqlInject()}'");
             return Context.DBO.GetDataTable(_tempsql);
+        }
+
+        
+        public DataTable GetAllTables(string tabname, int pageSize, int pageIndex, out int totalCount)
+        {
+            int SeqBegin = (pageIndex - 1) * pageSize;
+            int SeqEnd = (pageIndex) * pageSize;
+            var _where = string.Empty;
+            string _tempsql = dbConfig.Get_AllTablesPaging;
+
+            if (!string.IsNullOrEmpty(tabname))
+                _where += $" and [name] like '%{tabname.ToSqlInject()}%'";
+
+            _tempsql = _tempsql.Replace("[$SeqBegin$]", SeqBegin.ToString()).Replace("[$SeqEnd$]", SeqEnd.ToString());
+
+            _tempsql = _tempsql.Replace("[$Where$]", _where);
+
+            List<string> sqlList = new List<string>() { _tempsql };
+            List<HiParameter[]> parameters = new List<HiParameter[]>() {
+                new HiParameter[]{ },
+            };
+            var dataSet = Context.DBO.GetDataSet(sqlList, parameters);
+
+            totalCount = int.Parse(dataSet.Tables[0].Rows[0][0].ToString());
+            return dataSet.Tables[1];
         }
 
         /// <summary>
@@ -2795,6 +2865,17 @@ namespace HiSql
         {
             return sbSql;
         }
+
+        public int GetTableDataCount(string tabname)
+        {
+            string _sql = dbConfig.Get_TableDataCount.Replace("[$TabName$]", $"{dbConfig.Schema_Pre}{this.Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{tabname}{dbConfig.Table_After}");
+
+            string v = this.Context.DBO.ExecScalar(_sql).ToString();
+            int _effect = Convert.ToInt32(v);
+            return _effect;
+        }
+
+
         #endregion
     }
 }

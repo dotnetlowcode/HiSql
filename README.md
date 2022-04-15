@@ -36,6 +36,26 @@ sqlclient.CodeFirst.InstallHisql();
 
 处理，开发人员只要关注于业务开发
 
+### 2022.4.15 更新
+
+1. 新增获取表记录数 
+```c#
+//返回表Hi_FieldModel 中的记录数
+int lsttales = sqlClient.DbFirst.GetTableDataCount("Hi_FieldModel");
+
+```
+
+2. 分页获取当前库中表清单
+```c#
+//获取表名出现 HI 即（ %HI%）字符串的表列表清单进行分页（每页显示10条）,且返回记录总数
+int total = 0;
+List<TableInfo> lsttales = sqlClient.DbFirst.GetTables("HI", 10,1, out total);
+```
+
+为什么会增加此功能?
+在低代码平台可以查询库中的任意表及数据，及定时统计表中的数据增长量。一般的低代码平台中基本上都会数据库相关管理功能。
+
+
 ### 2022.4.9 更新
 HiSql新增对oracle表的操作（目前支持`SqlServer`,`mysql`，`HANA`,`POSTGRESQL`，`oracle`） 目前已经对HIsql所表支持的数据都新增了 表结构管理的适配
 

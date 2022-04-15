@@ -111,12 +111,19 @@ namespace HiSql
         /// <returns></returns>
         List<TableInfo> GetTables();
 
+        /// <summary>
+        /// 分页获取获取所有物理表
+        /// </summary>
+        /// <returns></returns>
+        List<TableInfo> GetTables(string tableName, int pageSize, int pageIndex, out int totalCount);
 
         /// <summary>
         /// 获取所有视图
         /// </summary>
         /// <returns></returns>
         List<TableInfo> GetViews();
+        List<TableInfo> GetViews(string viewName, int pageSize, int pageIndex, out int totalCount);
+
 
         /// <summary>
         /// 创建视图
@@ -149,13 +156,17 @@ namespace HiSql
         /// </summary>
         /// <returns></returns>
         List<TableInfo> GetAllTables();
+        List<TableInfo> GetAllTables(string viewName, int pageSize, int pageIndex, out int totalCount);
+       
 
+        List<string> GetStoredProc();
+       
 
         /// <summary>
-        /// 获取所有存储过程
+        /// 获取当前表数据量
         /// </summary>
         /// <returns></returns>
-        List<string> GetStoredProc();
+        int  GetTableDataCount(string tabname);
 
 
         /// <summary>

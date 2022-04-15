@@ -18,7 +18,7 @@ namespace HiSql.MySqlUnitTest
             //Demo_View(sqlClient);//ok
             //Demo_AllTables(sqlClient);//ok
             //Demo_GlobalTables(sqlClient);//  delay
-            Demo_ModiTable(sqlClient);//ok
+            //Demo_ModiTable(sqlClient);//ok
 
             //Demo_DropView(sqlClient); //ok
             //Demo_CreateView(sqlClient);//ok
@@ -28,6 +28,46 @@ namespace HiSql.MySqlUnitTest
             //Demo_Index_Create(sqlClient);//ok
             //Demo_ReTable(sqlClient);//ok
 
+            //Demo_TableDataCount(sqlClient);
+            //Demo_TablesPaging(sqlClient);
+            //Demo_ViewsPaging(sqlClient);
+            Demo_AllTablesPaging(sqlClient);
+        }
+        static void Demo_AllTablesPaging(HiSqlClient sqlClient)
+        {
+            int total = 0;
+            List<TableInfo> lsttales = sqlClient.DbFirst.GetAllTables("Hi", 11, 1, out total);
+            foreach (TableInfo tableInfo in lsttales)
+            {
+                Console.WriteLine($"{tableInfo.TabName}  {tableInfo.TabReName}  {tableInfo.TabDescript}  {tableInfo.TableType} 表结构:{tableInfo.HasTabStruct}");
+            }
+
+        }
+        static void Demo_ViewsPaging(HiSqlClient sqlClient)
+        {
+            int total = 0;
+            List<TableInfo> lsttales = sqlClient.DbFirst.GetViews("HI", 11, 1, out total);
+            foreach (TableInfo tableInfo in lsttales)
+            {
+                Console.WriteLine($"{tableInfo.TabName}  {tableInfo.TabReName}  {tableInfo.TabDescript}  {tableInfo.TableType} 表结构:{tableInfo.HasTabStruct}");
+            }
+        }
+        static void Demo_TablesPaging(HiSqlClient sqlClient)
+        {
+            int total = 0;
+            List<TableInfo> lsttales = sqlClient.DbFirst.GetTables("HI", 11, 1, out total);
+            foreach (TableInfo tableInfo in lsttales)
+            {
+                Console.WriteLine($" {tableInfo.TabName}  {tableInfo.TabReName}  {tableInfo.TabDescript}  {tableInfo.TableType} 表结构:{tableInfo.HasTabStruct}");
+            }
+            Console.WriteLine($"总数 {total}");
+
+        }
+        static void Demo_TableDataCount(HiSqlClient sqlClient)
+        {
+            int total = 0;
+            int lsttales = sqlClient.DbFirst.GetTableDataCount("Hi_FieldModel");
+            Console.WriteLine($" {lsttales} ");
         }
 
 

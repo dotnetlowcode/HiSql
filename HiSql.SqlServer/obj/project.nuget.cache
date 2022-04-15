@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "FU3upuG3VQOrKh1AkWkVIs0XYQ8DutoY+NIvifcoDpAc5iuw1nXUTsvW3CAJQObmxkWoOXIo1WKcVKz/cktkIg==",
+  "dgSpecHash": "tynI0MHYVolcMV0dvFffTDehcBmujmH26gsAzZPUrgeRx9QoL3ZDN3F83Rlo1b394iFbV0DS2BN2RzdBgNX6sQ==",
   "success": true,
   "projectFilePath": "D:\\Project\\OpenSource\\HiSql\\HiSql.SqlServer\\HiSql.SqlServer.csproj",
   "expectedPackageFiles": [
@@ -70,8 +70,7 @@
     "C:\\Users\\admin\\.nuget\\packages\\system.threading.tasks.extensions\\4.5.2\\system.threading.tasks.extensions.4.5.2.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\system.threading.tasks.extensions\\4.5.4\\system.threading.tasks.extensions.4.5.4.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\system.valuetuple\\4.5.0\\system.valuetuple.4.5.0.nupkg.sha512",
-    "C:\\Users\\admin\\.nuget\\packages\\system.windows.extensions\\5.0.0\\system.windows.extensions.5.0.0.nupkg.sha512",
-    "C:\\Users\\admin\\.nuget\\packages\\hisql\\1.0.3.4\\hisql.1.0.3.4.nupkg.sha512"
+    "C:\\Users\\admin\\.nuget\\packages\\system.windows.extensions\\5.0.0\\system.windows.extensions.5.0.0.nupkg.sha512"
   ],
   "logs": []
 }

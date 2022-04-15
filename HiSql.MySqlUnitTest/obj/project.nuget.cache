@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "2jwAKkbauw7yuAk6gF6kFfN+oOnJtnO82VIYjiusbwC87eoCl9h20jWDGUfONL/MGqL+j49CB6FllWExIEDX7g==",
+  "dgSpecHash": "5HBj6w4gj4yv9ha3uzqwrdhfAMqXfnh4+j78owrNsVpQOjoFt9fc6fM5wfJqNf+arLZhKt7pHKPYGe02lG4e1w==",
   "success": true,
   "projectFilePath": "D:\\Project\\OpenSource\\HiSql\\HiSql.MySqlUnitTest\\HiSql.MySqlUnitTest.csproj",
   "expectedPackageFiles": [
@@ -71,8 +71,7 @@
     "C:\\Users\\admin\\.nuget\\packages\\system.text.regularexpressions\\4.3.0\\system.text.regularexpressions.4.3.0.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\system.threading.tasks\\4.3.0\\system.threading.tasks.4.3.0.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\system.threading.tasks.extensions\\4.5.2\\system.threading.tasks.extensions.4.5.2.nupkg.sha512",
-    "C:\\Users\\admin\\.nuget\\packages\\system.windows.extensions\\5.0.0\\system.windows.extensions.5.0.0.nupkg.sha512",
-    "C:\\Users\\admin\\.nuget\\packages\\hisql\\1.0.3.4\\hisql.1.0.3.4.nupkg.sha512"
+    "C:\\Users\\admin\\.nuget\\packages\\system.windows.extensions\\5.0.0\\system.windows.extensions.5.0.0.nupkg.sha512"
   ],
   "logs": []
 }

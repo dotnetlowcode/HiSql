@@ -12,6 +12,11 @@ namespace HiSql
     public enum TableType
     {
         /// <summary>
+        /// 不限制
+        /// </summary>
+        All = 99,
+
+        /// <summary>
         /// 实体表
         /// </summary>
         Entity = 0,

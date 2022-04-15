@@ -34,12 +34,12 @@ namespace HiSql.UnitTest
             //Query_Demo5(sqlClient);
             //Query_Demo6(sqlClient);
             //Query_Demo7(sqlClient);
-            //Query_Demo8(sqlClient);
+            Query_Demo8(sqlClient);
             //Query_Demo9(sqlClient);
             //Query_Demo10(sqlClient);
             //Query_Demo11(sqlClient);
-            Query_Demo12(sqlClient);
-            //Query_Demo13(sqlClient);
+            //Query_Demo12(sqlClient);
+           // Query_Demo13(sqlClient);
             var s = Console.ReadLine();
         }
 
@@ -134,6 +134,8 @@ namespace HiSql.UnitTest
 
             DataTable dt = sqlClient.HiSql($"select FieldName,count(*) as scount  from Hi_FieldModel group by FieldName,  Having count(*) > 0   order by fieldname")
                 .Take(2).Skip(2).ToTable(ref _total);
+
+            Console.WriteLine(_total);
         }
 
         static void Query_Demo7(HiSqlClient sqlClient)

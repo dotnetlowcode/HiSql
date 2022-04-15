@@ -20,6 +20,7 @@ namespace HiSql
 
         #region 委托事件
         public delegate Task<DataTable> deleGetTable(string sql, params HiParameter[] parameters);
+        public delegate Task<DataSet> deleGetDataSet(string sql, params HiParameter[] parameters);
         public delegate Task<int> deleExecCommand(string sql, params HiParameter[] parameters);
         public delegate Task<object> deleExecScalar(string sql);
         //public delegate string deleGetTable(string sql, object parameters);
@@ -144,7 +145,7 @@ namespace HiSql
         /// <returns></returns>
         public abstract Task<int> BulkCopy<T>(List<T> lstobj, TabInfo tabInfo, Dictionary<string, string> columnMapping = null);
 
-        public abstract IDataAdapter GetAdapter();
+        public abstract DbDataAdapter GetAdapter();
         public abstract void SetCommandToAdapter(IDataAdapter adapter, DbCommand command);
         #endregion
 
@@ -651,9 +652,78 @@ namespace HiSql
                 ExecuteError(sql, parameters, E);
                 throw E;
             }
+            finally
+            {
+                //if (this.IsAutoClose())
+                {
+                    this.Close();
+                }
+            }
         }
 
+        private async Task<DataSet> getDataSet(string sql, params HiParameter[] parameters)
+        {
+            try
+            {
+                #region  执行前操作
+                ResolveParameter(ref sql, parameters);
+                if (FormatSql != null)
+                {
+                    sql = FormatSql(sql);
+                }
 
+                if (this.IsSqlLog)
+                {
+                    //执行前日志
+                    if (OnLogSqlExecuting != null)
+                    {
+                        Task.Run(() =>
+                        {
+                            OnLogSqlExecuting(sql, parameters);
+                        });
+
+                    }
+                }
+                #endregion
+                DataSet ds = new DataSet();
+                using (DbDataAdapter dataAdapter = this.GetAdapter())
+                {
+                    using (DbCommand sqlCommand = GetCommand(sql, parameters)) {
+                        this.SetCommandToAdapter(dataAdapter, sqlCommand);
+                        dataAdapter.Fill(ds);
+                    }
+                }
+                
+                #region 执行后操作
+                if (this.IsSqlLog)
+                {
+                    //执行后日志记录
+                    if (OnLogSqlExecuted != null)
+                    {
+                        Task.Run(() =>
+                        {
+                            OnLogSqlExecuted(sql, parameters);
+                        });
+
+                    }
+                }
+                #endregion
+                return ds;
+            }
+            catch (Exception E)
+            {
+                CmdTyp = CommandType.Text;
+                ExecuteError(sql, parameters, E);
+                throw E;
+            }
+            finally
+            {
+                //if (this.IsAutoClose())
+                {
+                    this.Close();
+                }
+            }
+        }
         public DataTable GetDataTable(string sql, params HiParameter[] parameters)
         {
             if (Context.CurrentConnectionConfig.UpperCase)
@@ -676,10 +746,93 @@ namespace HiSql
 
             //return getDataTable(sql, parameters);
         }
+        public DataSet GetDataSet(List<string> sqlList, List<HiParameter[]>  parametersList)
+        {
+            for (int i = 0; i < sqlList.Count; i++)
+            {
+                if (Context.CurrentConnectionConfig.UpperCase)
+                    sqlList[i]= sqlList[i].ToUpper();
+            }
+            List<Task<DataTable>> taskList = new List<Task<DataTable>>();
+            DataSet ds = new DataSet();
+
+            //支持返回多个结果集
+            if (this.Context.CurrentConnectionConfig.DbType == DBType.SqlServer 
+                || this.Context.CurrentConnectionConfig.DbType == DBType.MySql
+               || this.Context.CurrentConnectionConfig.DbType == DBType.PostGreSql
+
+                )
+            {
+                var sql = new StringBuilder();
+                var parameters = new List<HiParameter>();
+                foreach (var item in sqlList)
+                {
+                    sql.AppendLine(item);
+                }
+                if(parametersList !=null)
+                foreach (var item in parametersList)
+                {
+                    parameters.AddRange(item);
+                }
+                var parametersGp =  from p in parameters   group p by p.ParameterName into g
+                    select new { ParameterName = g.Key, Count = g.Count() };
+                if (parametersGp.Any(t => t.Count > 1))
+                {
+                    throw new HiSqlException($"执行查询时HiParameter[]存在参数名称{parametersGp.FirstOrDefault(t => t.Count > 1).ParameterName}重复");
+                }
+
+                deleGetDataSet  _deleGetSet = new deleGetDataSet(getDataSet);
+                var workTask = Task.Run(() => _deleGetSet.Invoke(sql.ToString(), parameters.ToArray()));
+                bool flag = workTask.Wait(this.Context.CurrentConnectionConfig.SqlExecTimeOut, new CancellationToken(false));
+                if (flag)
+                {
+                    //在指定的时间内完成
+                }
+                else
+                {
+                    if (OnTimeOut != null)
+                    {
+                        Task.Run(() => { OnTimeOut(this.Context.CurrentConnectionConfig.SqlExecTimeOut); });
+                    }
+                }
+
+                ds = workTask.Result;
+            }
+            else
+            {
+                for (int i = 0; i < sqlList.Count; i++)
+                {
+                    deleGetTable _deleGetTable = new deleGetTable(getDataTable);
+                    var _sql = sqlList[i];
+                    var parameters = parametersList != null && parametersList.Count > 0 && parametersList.Count >= i - 1 ? parametersList[i] : null;
+                    var workTask = Task.Run(() => _deleGetTable.Invoke(_sql, parameters));
+                    taskList.Add(workTask);
+                }
+
+                bool flag = Task.WaitAll(taskList.ToArray(), this.Context.CurrentConnectionConfig.SqlExecTimeOut, new CancellationToken(false));
+                if (flag)
+                {
+                    //在指定的时间内完成
+                }
+                else
+                {
+                    if (OnTimeOut != null)
+                    {
+                        Task.Run(() => { OnTimeOut(this.Context.CurrentConnectionConfig.SqlExecTimeOut); });
+                    }
+                }
+                foreach (var workTask in taskList)
+                {
+                    var datatable = workTask.Result;
+                    datatable.TableName = $"table{taskList.IndexOf(workTask)}";
+                    ds.Tables.Add(datatable);
+                }
+            }
 
 
+            return ds;
 
-
+        }
 
 
         #region 委托事件

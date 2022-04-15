@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "Ryx0cVVZJnTUAUhDhtisXEnhTsXJZ3aCPb+RVl+ixv7ip4L1wZUCZx5xtV40IpTjwiiA/GMmt/irsH0JGNYSHg==",
+  "dgSpecHash": "tuv5vaoEP1upA2Ra3mvRloIJuT3OSgwQbtAYRAstHjgvoYiqT+aLypnR/TCbV1oB8otor03hYBAQ9/qyOb/Llw==",
   "success": true,
   "projectFilePath": "D:\\Project\\OpenSource\\HiSql\\HiSql.SqlServerUnitTest\\HiSql.SqlServerUnitTest.csproj",
   "expectedPackageFiles": [
@@ -61,9 +61,7 @@
     "C:\\Users\\admin\\.nuget\\packages\\system.threading.tasks\\4.3.0\\system.threading.tasks.4.3.0.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\system.threading.tasks.extensions\\4.5.2\\system.threading.tasks.extensions.4.5.2.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\system.windows.extensions\\5.0.0\\system.windows.extensions.5.0.0.nupkg.sha512",
-    "C:\\Users\\admin\\.nuget\\packages\\hisql\\1.0.3.4\\hisql.1.0.3.4.nupkg.sha512",
-    "C:\\Users\\admin\\.nuget\\packages\\hisql.snro\\1.0.0.1\\hisql.snro.1.0.0.1.nupkg.sha512",
-    "C:\\Users\\admin\\.nuget\\packages\\hisql.sqlserver\\1.0.3.4\\hisql.sqlserver.1.0.3.4.nupkg.sha512"
+    "C:\\Users\\admin\\.nuget\\packages\\hisql.snro\\1.0.0.1\\hisql.snro.1.0.0.1.nupkg.sha512"
   ],
   "logs": []
 }

@@ -100,6 +100,8 @@ namespace HiSql
         DataTable GetDataTable(string sql, params HiParameter[] parameters);
 
 
+        DataSet GetDataSet(List<string> sqls, List<HiParameter[]> parameters);
+
         /// <summary>
         /// 执行Sql语句 并返回受影响的行
         /// </summary>
