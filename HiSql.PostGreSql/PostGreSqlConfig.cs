@@ -127,11 +127,14 @@ namespace HiSql
         /// 获取所有视图
         /// </summary>
         string _temp_getviews = "";
-
+        string _temp_getviews_paging = "";
         /// <summary>
         /// 获取表和视图
         /// </summary>
         string _temp_getalltables = "";
+        string _temp_getalltables_paging = "";
+
+        
         /// <summary>
         /// 分页获取表和视图
         /// </summary>
@@ -312,9 +315,11 @@ namespace HiSql
         public string Get_Tables { get => _temp_gettables; }
 
         public string Get_Views { get => _temp_getviews; }
-
+        public string Get_ViewsPaging { get => _temp_getviews_paging; }
+        
         public string Get_AllTables { get => _temp_getalltables; }
-
+        public string Get_AllTablesPaging { get => _temp_getalltables_paging; }
+        
         public string Get_TablesPaging { get => _temp_gettables_paging; }
 
         public string Get_TableDataCount { get => _temp_getTableDataCount; }
@@ -823,6 +828,16 @@ SET "DomainDesc" = excluded."DomainDesc";
                .AppendLine("ORDER BY \"TabName\" ASC, \"CreateTime\" desc ")
                .ToString();
 
+            _temp_getviews_paging = new StringBuilder()
+             .AppendLine(@"select count(*)   FROM pg_views where schemaname='[$Schema$]' [$Where$]; ")
+            .AppendLine("select * from ( ")
+             .AppendLine($@"SELECT ROW_NUMBER()OVER( order by viewname ASC) as row_seq ,viewname as {_temp_field_pre}TabName{_temp_field_after}, 'View' as {_temp_field_pre}TabType{ _temp_field_after}
+                        ,'' as {_temp_field_pre}CreateTime{_temp_field_after} FROM pg_views where schemaname='[$Schema$]' [$Where$]")
+            .AppendLine(")as temp    WHERE row_seq > [$SeqBegin$] AND row_seq <=[$SeqEnd$] ")
+            .AppendLine("ORDER BY row_seq ")
+            .ToString();
+
+            
             _temp_getalltables = new StringBuilder()
               .AppendLine("select * from ( ")
                 .AppendLine($@"SELECT tablename as {_temp_field_pre}TabName{_temp_field_after}, 'Table' as {_temp_field_pre}TabType{ _temp_field_after},'' as {_temp_field_pre}CreateTime{_temp_field_after} FROM pg_tables where schemaname='[$Schema$]'")
@@ -833,9 +848,22 @@ SET "DomainDesc" = excluded."DomainDesc";
               .AppendLine("ORDER BY \"TabName\" ASC, \"CreateTime\" desc ")
               .ToString();
 
+            _temp_getalltables_paging = new StringBuilder()
+                .AppendLine("select count(*) from ( ")
+                .AppendLine($@"SELECT tablename as {_temp_field_pre}TabName{_temp_field_after}, 'Table' as {_temp_field_pre}TabType{ _temp_field_after},'' as {_temp_field_pre}CreateTime{_temp_field_after} FROM pg_tables where schemaname='[$Schema$]'")
+               .AppendLine("union all")
+                .AppendLine($@"SELECT viewname as {_temp_field_pre}TabName{_temp_field_after}, 'View' as {_temp_field_pre}TabType{ _temp_field_after}
+                        ,'' as {_temp_field_pre}CreateTime{_temp_field_after} FROM pg_views where schemaname='[$Schema$]'")
+              .AppendLine(")as temp where 1=1 [$Where$]; ")
+               .AppendLine($@"select * from (select ROW_NUMBER()OVER( order by {_temp_field_pre}TabName{_temp_field_pre} ASC, {_temp_field_pre}TabType{ _temp_field_after} asc,  {_temp_field_pre}CreateTime{_temp_field_pre} desc ) as row_seq ,* from ( ")
+                .AppendLine($@"SELECT tablename as {_temp_field_pre}TabName{_temp_field_after}, 'Table' as {_temp_field_pre}TabType{ _temp_field_after},'' as {_temp_field_pre}CreateTime{_temp_field_after} FROM pg_tables where schemaname='[$Schema$]'")
+               .AppendLine("union all")
+                .AppendLine($@"SELECT viewname as {_temp_field_pre}TabName{_temp_field_after}, 'View' as {_temp_field_pre}TabType{ _temp_field_after}
+                        ,'' as {_temp_field_pre}CreateTime{_temp_field_after} FROM pg_views where schemaname='[$Schema$]'")
+              .AppendLine(")as temp where 1=1 [$Where$] ) as t WHERE row_seq > [$SeqBegin$] AND row_seq <=[$SeqEnd$] ORDER BY row_seq  ")
+                  .ToString();
+
             
-
-
             _temp_check_table_exists = new StringBuilder()
                 .AppendLine("select * from ( ")
                 .AppendLine($@"SELECT tablename as {_temp_field_pre}TabName{_temp_field_after}, 'Table' as {_temp_field_pre}TabType{ _temp_field_after},'' as {_temp_field_pre}CreateTime{_temp_field_after} FROM pg_tables where schemaname='[$Schema$]'")

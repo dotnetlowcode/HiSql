@@ -119,11 +119,18 @@ namespace HiSql
         /// </summary>
         string _temp_getviews = "";
 
+        string _temp_getviews_paging = "";
+
+        string _temp_getviews_pagingcount = "";
+
+
         /// <summary>
         /// 获取表和视图
         /// </summary>
         string _temp_getalltables = "";
+        string _temp_getalltables_paging = "";
 
+        string _temp_getalltables_pagingcount = "";
 
         /// <summary>
         /// 检测表或视图是否存在
@@ -301,8 +308,15 @@ namespace HiSql
         
         public string Get_TableDataCount { get => _temp_getTableDataCount; }
         public string Get_Views { get => _temp_getviews; }
+        public string Get_ViewsPaging { get => _temp_getviews_paging; }
 
+        public string Get_ViewsPagingCount { get => _temp_getviews_pagingcount; }
+
+        
         public string Get_AllTables { get => _temp_getalltables; }
+        public string Get_AllTablesPaging { get => _temp_getalltables_paging; }
+
+        public string Get_AllTablesPagingCount { get => _temp_getalltables_pagingcount; }
 
         /// <summary>
         /// 获取创建视图的模板
@@ -682,7 +696,6 @@ UNION ALL
             _temp_gettables_pagingcount = "select count(*)   from \"SYS\".\"TABLES\" where \"SCHEMA_NAME\" = '[$Schema$]' and \"TABLE_NAME\" not like '/%'  [$Where$] ;";
             
             _temp_gettables_paging = new StringBuilder()
-               //.AppendLine("select count(*)   from \"SYS\".\"TABLES\" where \"SCHEMA_NAME\" = '[$Schema$]' and \"TABLE_NAME\" not like '/%'  [$Where$] ;")
                .AppendLine("select * from ( ")
                  .AppendLine("select ROW_NUMBER()OVER( order by \"TABLE_NAME\" ASC, \"CREATE_TIME\" DESC  ) as row_seq ,\"TABLE_NAME\"  as \"TabName\", 'Table' AS \"TabType\", \"CREATE_TIME\" as \"CreateTime\" FROM \"SYS\".\"TABLES\" where \"SCHEMA_NAME\" = '[$Schema$]' and \"TABLE_NAME\" not like '/%' ")
                 .AppendLine("[$Where$] )as temp  WHERE row_seq > [$SeqBegin$] AND row_seq <=[$SeqEnd$] ")
@@ -694,6 +707,13 @@ UNION ALL
                .AppendLine(")as temp")
                .AppendLine("ORDER BY \"TabName\" ASC, \"CreateTime\" desc ")
                .ToString();
+            _temp_getviews_pagingcount = "select count(*)   from \"SYS\".\"VIEWS\" where \"SCHEMA_NAME\" = '[$Schema$]' and \"VIEW_NAME\" not like '/%' [$Where$] ;";
+
+            _temp_getviews_paging = new StringBuilder()
+               .AppendLine("select * from ( ")
+                 .AppendLine("select ROW_NUMBER()OVER( order by \"VIEW_NAME\" ASC, \"CREATE_TIME\" DESC  ) as row_seq ,\"VIEW_NAME\"  as \"TabName\", 'View' AS \"TabType\", \"CREATE_TIME\" as \"CreateTime\" FROM \"SYS\".\"VIEWS\" where \"SCHEMA_NAME\" = '[$Schema$]' and \"VIEW_NAME\" not like '/%'  ")
+                .AppendLine("[$Where$] )as temp  WHERE row_seq > [$SeqBegin$] AND row_seq <=[$SeqEnd$] ")
+                .AppendLine("order by row_seq").ToString();
 
 
             _temp_getalltables = new StringBuilder()
@@ -704,6 +724,25 @@ UNION ALL
               
                .AppendLine(")as temp [$Where$]")
                .AppendLine("ORDER BY \"TabName\" ASC, \"CreateTime\" desc ")
+               .ToString();
+
+            _temp_getalltables_pagingcount = new StringBuilder()
+               .AppendLine("select count(*)  from ( ")
+                .AppendLine("select \"TABLE_NAME\"  as \"TabName\", 'Table' AS \"TabType\", \"CREATE_TIME\" as \"CreateTime\" FROM \"SYS\".\"TABLES\" where \"SCHEMA_NAME\" = '[$Schema$]' and \"TABLE_NAME\" not like '/%' ")
+                .AppendLine("union all")
+                .AppendLine("select \"VIEW_NAME\"  as \"TabName\", 'View' AS \"TabType\", \"CREATE_TIME\" as \"CreateTime\" FROM \"SYS\".\"VIEWS\" where \"SCHEMA_NAME\" = '[$Schema$]' and \"VIEW_NAME\" not like '/%' ")
+
+               .AppendLine(")as temp  where 1=1 [$Where$]")
+               .ToString();
+
+            _temp_getalltables_paging = new StringBuilder()
+               .AppendLine("select * from ( select ROW_NUMBER()OVER( order by \"TabType\" ASC,\"TabName\" ASC, \"CreateTime\" DESC  ) as row_seq ,* from ( ")
+                .AppendLine("select \"TABLE_NAME\"  as \"TabName\", 'Table' AS \"TabType\", \"CREATE_TIME\" as \"CreateTime\" FROM \"SYS\".\"TABLES\" where \"SCHEMA_NAME\" = '[$Schema$]' and \"TABLE_NAME\" not like '/%' ")
+                .AppendLine("union all")
+                .AppendLine("select \"VIEW_NAME\"  as \"TabName\", 'View' AS \"TabType\", \"CREATE_TIME\" as \"CreateTime\" FROM \"SYS\".\"VIEWS\" where \"SCHEMA_NAME\" = '[$Schema$]' and \"VIEW_NAME\" not like '/%' ")
+
+               .AppendLine(")as temp where 1=1 [$Where$] ) as t WHERE row_seq > [$SeqBegin$] AND row_seq <=[$SeqEnd$] ")
+               .AppendLine("ORDER BY row_seq ")
                .ToString();
 
             _temp_check_table_exists =

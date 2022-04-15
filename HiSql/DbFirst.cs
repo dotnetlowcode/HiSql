@@ -555,6 +555,52 @@ namespace HiSql
             }
             return lsttabinfo;
         }
+        public List<TableInfo> GetAllTables(string viewName, int pageSize, int pageIndex, out int totalCount)
+        {
+            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
+            idm.Context = SqlClient.Context;
+            DataTable dt = idm.GetAllTables(viewName, pageSize, pageIndex, out totalCount);
+            List<string> lst = new List<string>();
+            List<TableInfo> lsttabinfo = new List<TableInfo>();
+            foreach (DataRow dr in dt.Rows)
+            {
+
+                lst.Add(dr["TabName"].ToString());
+            }
+
+            //根据获取的物理表信息获取虚拟表结构信息
+            DataTable dataTable = _sqlClient.Query("Hi_TabModel").Field("*").Where(new Filter {
+                {"TabName",OperType.IN, lst }
+            }).Sort("TabName asc").ToTable();
+
+            foreach (DataRow dr in dt.Rows)
+            {
+                TableInfo tableInfo = new TableInfo();
+
+                tableInfo.TabName = dr["TabName"].ToString();
+                var _dr = dataTable.AsEnumerable().Where(p => p.Field<string>("TabName") == tableInfo.TabName).FirstOrDefault();
+                if (_dr != null)
+                {
+                    tableInfo.TabReName = _dr["TabReName"].ToString();
+                    tableInfo.TabDescript = _dr["TabDescript"].ToString();
+                    tableInfo.HasTabStruct = true;
+
+                }
+                else
+                {
+                    tableInfo.TabReName = tableInfo.TabName;
+                    tableInfo.TabDescript = tableInfo.TabName;
+                }
+                tableInfo.Schema = _sqlClient.Context.CurrentConnectionConfig.Schema;
+
+                if (dr["TabType"].ToString() == "View")
+                    tableInfo.TableType = TableType.View;
+                else
+                    tableInfo.TableType = TableType.Entity;
+                lsttabinfo.Add(tableInfo);
+            }
+            return lsttabinfo;
+        }
         
 
 
@@ -779,7 +825,7 @@ namespace HiSql
         /// 获取所有视图清单
         /// </summary>
         /// <returns></returns>
-        public List<TableInfo> GetViews()
+        public List<TableInfo> GetViews() 
         {
             IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
             idm.Context = SqlClient.Context;
@@ -826,7 +872,57 @@ namespace HiSql
             }
             return lsttabinfo;
         }
+        /// <summary>
+        /// 获取所有视图清单
+        /// </summary>
+        /// <returns></returns>
+        public List<TableInfo> GetViews(string viewName, int pageSize, int pageIndex, out int totalCount)
+        {
+            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
+            idm.Context = SqlClient.Context;
+            DataTable dt = idm.GetViewList(viewName, pageSize, pageIndex, out totalCount);
+            List<string> lst = new List<string>();
+            List<TableInfo> lsttabinfo = new List<TableInfo>();
+            foreach (DataRow dr in dt.Rows)
+            {
 
+                lst.Add(dr["TabName"].ToString());
+            }
+
+            if (lst.Count > 0)
+            {
+
+
+                //根据获取的物理表信息获取虚拟表结构信息
+                DataTable dataTable = _sqlClient.Query("Hi_TabModel").Field("*").Where(new Filter {
+                {"TabName",OperType.IN, lst }
+            }).Sort("TabName asc").ToTable();
+
+                foreach (DataRow dr in dt.Rows)
+                {
+                    TableInfo tableInfo = new TableInfo();
+
+                    tableInfo.TabName = dr["TabName"].ToString();
+                    var _dr = dataTable.AsEnumerable().Where(p => p.Field<string>("TabName") == tableInfo.TabName).FirstOrDefault();
+                    if (_dr != null)
+                    {
+                        tableInfo.TabReName = _dr["TabReName"].ToString();
+                        tableInfo.TabDescript = _dr["TabDescript"].ToString();
+                        tableInfo.HasTabStruct = true;
+
+                    }
+                    else
+                    {
+                        tableInfo.TabReName = tableInfo.TabName;
+                        tableInfo.TabDescript = tableInfo.TabName;
+                    }
+                    tableInfo.Schema = _sqlClient.Context.CurrentConnectionConfig.Schema;
+                    tableInfo.TableType = TableType.View;
+                    lsttabinfo.Add(tableInfo);
+                }
+            }
+            return lsttabinfo;
+        }
         Tuple<bool, string, string> modiColumn(IDM idm,TabInfo tabInfo, HiColumn hiColumn, OpLevel opLevel)
         {
             bool _isok = false;

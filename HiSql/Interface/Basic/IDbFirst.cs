@@ -122,6 +122,8 @@ namespace HiSql
         /// </summary>
         /// <returns></returns>
         List<TableInfo> GetViews();
+        List<TableInfo> GetViews(string viewName, int pageSize, int pageIndex, out int totalCount);
+
 
         /// <summary>
         /// 创建视图
@@ -154,8 +156,8 @@ namespace HiSql
         /// </summary>
         /// <returns></returns>
         List<TableInfo> GetAllTables();
-
-
+        List<TableInfo> GetAllTables(string viewName, int pageSize, int pageIndex, out int totalCount);
+       
 
         List<string> GetStoredProc();
        

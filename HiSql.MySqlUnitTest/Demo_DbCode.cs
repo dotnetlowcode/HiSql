@@ -29,7 +29,28 @@ namespace HiSql.MySqlUnitTest
             //Demo_ReTable(sqlClient);//ok
 
             //Demo_TableDataCount(sqlClient);
-            Demo_TablesPaging(sqlClient);
+            //Demo_TablesPaging(sqlClient);
+            //Demo_ViewsPaging(sqlClient);
+            Demo_AllTablesPaging(sqlClient);
+        }
+        static void Demo_AllTablesPaging(HiSqlClient sqlClient)
+        {
+            int total = 0;
+            List<TableInfo> lsttales = sqlClient.DbFirst.GetAllTables("Hi", 11, 1, out total);
+            foreach (TableInfo tableInfo in lsttales)
+            {
+                Console.WriteLine($"{tableInfo.TabName}  {tableInfo.TabReName}  {tableInfo.TabDescript}  {tableInfo.TableType} 表结构:{tableInfo.HasTabStruct}");
+            }
+
+        }
+        static void Demo_ViewsPaging(HiSqlClient sqlClient)
+        {
+            int total = 0;
+            List<TableInfo> lsttales = sqlClient.DbFirst.GetViews("HI", 11, 1, out total);
+            foreach (TableInfo tableInfo in lsttales)
+            {
+                Console.WriteLine($"{tableInfo.TabName}  {tableInfo.TabReName}  {tableInfo.TabDescript}  {tableInfo.TableType} 表结构:{tableInfo.HasTabStruct}");
+            }
         }
         static void Demo_TablesPaging(HiSqlClient sqlClient)
         {
