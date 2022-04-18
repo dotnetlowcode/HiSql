@@ -1023,30 +1023,41 @@ namespace HiSql
         {
             string _sql = this.ToSql();
             total = 0;
-            if (this.IsPage && !string.IsNullOrEmpty(this.PageTotalSql.ToString().Trim()))
+           
+            lock (this.Context)
             {
-                var obj = this.Context.DBO.ExecScalar(this.PageTotalSql.ToString());
-                total = Convert.ToInt32(obj.ToString());
+                if (this.IsPage && !string.IsNullOrEmpty(this.PageTotalSql.ToString().Trim()))
+                {
+                    var obj = this.Context.DBO.ExecScalar(this.PageTotalSql.ToString());
+                    total = Convert.ToInt32(obj.ToString());
+                }
+                var dr = this.Context.DBO.GetDataReaderAsync(_sql, null);
+                var _result = DataConvert.ToEObjectSync(dr);
+                
+                return _result;
             }
-            var dr =  this.Context.DBO.GetDataReaderAsync(_sql, null);
-            var _result = DataConvert.ToEObjectSync(dr);
-            return _result;
+            
         }
 
 
         public async Task<List<ExpandoObject>> ToEObjectAsync()
         {
             string _sql = this.ToSql();
+     
             IDataReader dr = await this.Context.DBO.GetDataReaderAsync(_sql, null);
             List<ExpandoObject> _result = DataConvert.ToEObject(dr);
             dr.Close();
             return _result;
+            
         }
 
 
         public List<ExpandoObject> ToEObject()
         {
-            return ToEObjectAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+            lock (this.Context)
+            {
+                return ToEObjectAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+            }
         }
 
 
@@ -1054,9 +1065,13 @@ namespace HiSql
         public List<T> ToList<T>()
         {
             string _sql = this.ToSql();
-            IDataReader dr = this.Context.DBO.GetDataReader(_sql, null);
-            List<T> _result = DataConvert.ToList<T>(dr);
-            dr.Close();
+            List<T> _result = null;
+            lock (this.Context)
+            {
+                IDataReader dr = this.Context.DBO.GetDataReader(_sql, null);
+                _result = DataConvert.ToList<T>(dr);
+                dr.Close();
+            }
             return _result;
         }
 
@@ -1067,86 +1082,119 @@ namespace HiSql
         {
             string _sql = this.ToSql();
             total = 0;
+            List<T> _result = null;
+            lock (this.Context)
+            {
             if (this.IsPage && !string.IsNullOrEmpty(this.PageTotalSql.ToString().Trim()))
             {
+                
                 var obj = this.Context.DBO.ExecScalar(this.PageTotalSql.ToString());
 
                 total = Convert.ToInt32(obj.ToString());
-
+                
             }
-            IDataReader dr = this.Context.DBO.GetDataReader(_sql, null);
-            List<T> _result = DataConvert.ToList<T>(dr);
-            dr.Close();
+            
+                IDataReader dr = this.Context.DBO.GetDataReader(_sql, null);
+                _result = DataConvert.ToList<T>(dr);
+                dr.Close();
+            }
+            
             return _result;
         }
         public DataTable ToTable()
         {
             string _sql = this.ToSql();
-            return this.Context.DBO.GetDataTable(_sql, null);
+            lock (this.Context)
+            {
+                return this.Context.DBO.GetDataTable(_sql, null);
+            }
+                
         }
         public DataTable ToTable(ref int total)
         {
             string _sql = this.ToSql();
             total = 0;
-            if (this.IsPage && !string.IsNullOrEmpty(this.PageTotalSql.ToString().Trim()))
+            lock (this.Context)
             {
-                var obj = this.Context.DBO.ExecScalar(this.PageTotalSql.ToString());
+                if (this.IsPage && !string.IsNullOrEmpty(this.PageTotalSql.ToString().Trim()))
+                {
+                    var obj = this.Context.DBO.ExecScalar(this.PageTotalSql.ToString());
 
-                total = Convert.ToInt32(obj.ToString());
+                    total = Convert.ToInt32(obj.ToString());
 
+                }
+
+
+                return this.Context.DBO.GetDataTable(_sql, null);
             }
-
-
-            return this.Context.DBO.GetDataTable(_sql, null);
         }
         public List<TDynamic> ToDynamic()
         {
             string _sql = this.ToSql();
 
-
-            IDataReader dr = this.Context.DBO.GetDataReader(_sql, null);
-            List<TDynamic> result = DataConvert.ToDynamic(dr);
-            dr.Close();
-            return result;
+            lock (this.Context)
+            { 
+                IDataReader dr = this.Context.DBO.GetDataReader(_sql, null);
+                List<TDynamic> result = DataConvert.ToDynamic(dr);
+        
+                dr.Close();
+                return result;
+            }
         }
         public List<TDynamic> ToDynamic(ref int total)
         {
             string _sql = this.ToSql();
             total = 0;
-            if (this.IsPage && !string.IsNullOrEmpty(this.PageTotalSql.ToString().Trim()))
+            lock (this.Context)
             {
-                var obj = this.Context.DBO.ExecScalar(this.PageTotalSql.ToString());
+                if (this.IsPage && !string.IsNullOrEmpty(this.PageTotalSql.ToString().Trim()))
+                {
+                    var obj = this.Context.DBO.ExecScalar(this.PageTotalSql.ToString());
 
-                total = Convert.ToInt32(obj.ToString());
+                    total = Convert.ToInt32(obj.ToString());
 
+                }
+                IDataReader dr = this.Context.DBO.GetDataReader(_sql, null);
+                List<TDynamic> result = DataConvert.ToDynamic(dr);
+                dr.Close();
+                return result;
             }
-            IDataReader dr = this.Context.DBO.GetDataReader(_sql, null);
-            List<TDynamic> result = DataConvert.ToDynamic(dr);
-            dr.Close();
-            return result;
 
         }
         public string ToJson()
         {
             string _sql = this.ToSql();
-            IDataReader dr = this.Context.DBO.GetDataReader(_sql, null);
-            List<ExpandoObject> lstobj = DataConvert.ToEObject(dr);
-            return JsonConvert.SerializeObject(lstobj);
+            List<ExpandoObject> lstobj = null;
+            lock (this.Context)
+            {
+                IDataReader dr = this.Context.DBO.GetDataReader(_sql, null);
+                lstobj = DataConvert.ToEObject(dr);
+                dr.Close();
+            }
+            if (lstobj != null)
+                return JsonConvert.SerializeObject(lstobj);
+            else return string.Empty;
         }
         public string ToJson(ref int total)
         {
             string _sql = this.ToSql();
             total = 0;
-            if (this.IsPage && !string.IsNullOrEmpty(this.PageTotalSql.ToString().Trim()))
+            List<ExpandoObject> lstobj = null;
+            lock (this.Context)
             {
-                var obj = this.Context.DBO.ExecScalar(this.PageTotalSql.ToString());
+                if (this.IsPage && !string.IsNullOrEmpty(this.PageTotalSql.ToString().Trim()))
+                {
+                    var obj = this.Context.DBO.ExecScalar(this.PageTotalSql.ToString());
 
-                total = Convert.ToInt32(obj.ToString());
+                    total = Convert.ToInt32(obj.ToString());
 
+                }
+                IDataReader dr = this.Context.DBO.GetDataReader(_sql, null);
+                lstobj = DataConvert.ToEObject(dr);
             }
-            IDataReader dr = this.Context.DBO.GetDataReader(_sql, null);
-            List<ExpandoObject> lstobj = DataConvert.ToEObject(dr);
-            return JsonConvert.SerializeObject(lstobj);
+            if (lstobj != null)
+                return JsonConvert.SerializeObject(lstobj);
+            else return string.Empty;
         }
 
         /// <summary>
