@@ -1053,7 +1053,7 @@ namespace HiSql
         /// <returns></returns>
         public DataTable GetTableDefinition(string tabname)
         {
-            DataTable dt = Context.DBO.GetDataTable(dbConfig.Get_Table_Schema.Replace("[$TabName$]", tabname));
+            DataTable dt = Context.DBO.GetDataTable(dbConfig.Get_Table_Schema.Replace("[$TabName$]", tabname).Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema));
             if (dt.Rows.Count == 0)
                 throw new Exception($"表[{tabname}]不存在");
             return dt;
