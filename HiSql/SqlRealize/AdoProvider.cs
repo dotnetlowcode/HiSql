@@ -728,21 +728,24 @@ namespace HiSql
         {
             if (Context.CurrentConnectionConfig.UpperCase)
                 sql = sql.ToUpper();
-            deleGetTable _deleGetTable = new deleGetTable(getDataTable);
-            var workTask = Task.Run(() => _deleGetTable.Invoke(sql, parameters));
-            bool flag = workTask.Wait(this.Context.CurrentConnectionConfig.SqlExecTimeOut, new CancellationToken(false));
-            if (flag)
+            lock (this.Context)
             {
-                //在指定的时间内完成
-            }
-            else
-            {
-                if (OnTimeOut != null)
+                deleGetTable _deleGetTable = new deleGetTable(getDataTable);
+                var workTask = Task.Run(() => _deleGetTable.Invoke(sql, parameters));
+                bool flag = workTask.Wait(this.Context.CurrentConnectionConfig.SqlExecTimeOut, new CancellationToken(false));
+                if (flag)
                 {
-                    Task.Run(() => { OnTimeOut(this.Context.CurrentConnectionConfig.SqlExecTimeOut); });
+                    //在指定的时间内完成
                 }
+                else
+                {
+                    if (OnTimeOut != null)
+                    {
+                        Task.Run(() => { OnTimeOut(this.Context.CurrentConnectionConfig.SqlExecTimeOut); });
+                    }
+                }
+                return workTask.Result;
             }
-            return workTask.Result;
 
             //return getDataTable(sql, parameters);
         }
@@ -763,69 +766,76 @@ namespace HiSql
 
                 )
             {
-                var sql = new StringBuilder();
-                var parameters = new List<HiParameter>();
-                foreach (var item in sqlList)
+                lock (this.Context)
                 {
-                    sql.AppendLine(item);
-                }
-                if(parametersList !=null)
-                foreach (var item in parametersList)
-                {
-                    parameters.AddRange(item);
-                }
-                var parametersGp =  from p in parameters   group p by p.ParameterName into g
-                    select new { ParameterName = g.Key, Count = g.Count() };
-                if (parametersGp.Any(t => t.Count > 1))
-                {
-                    throw new HiSqlException($"执行查询时HiParameter[]存在参数名称{parametersGp.FirstOrDefault(t => t.Count > 1).ParameterName}重复");
-                }
-
-                deleGetDataSet  _deleGetSet = new deleGetDataSet(getDataSet);
-                var workTask = Task.Run(() => _deleGetSet.Invoke(sql.ToString(), parameters.ToArray()));
-                bool flag = workTask.Wait(this.Context.CurrentConnectionConfig.SqlExecTimeOut, new CancellationToken(false));
-                if (flag)
-                {
-                    //在指定的时间内完成
-                }
-                else
-                {
-                    if (OnTimeOut != null)
+                    var sql = new StringBuilder();
+                    var parameters = new List<HiParameter>();
+                    foreach (var item in sqlList)
                     {
-                        Task.Run(() => { OnTimeOut(this.Context.CurrentConnectionConfig.SqlExecTimeOut); });
+                        sql.AppendLine(item);
                     }
-                }
+                    if (parametersList != null)
+                        foreach (var item in parametersList)
+                        {
+                            parameters.AddRange(item);
+                        }
+                    var parametersGp = from p in parameters
+                                       group p by p.ParameterName into g
+                                       select new { ParameterName = g.Key, Count = g.Count() };
+                    if (parametersGp.Any(t => t.Count > 1))
+                    {
+                        throw new HiSqlException($"执行查询时HiParameter[]存在参数名称{parametersGp.FirstOrDefault(t => t.Count > 1).ParameterName}重复");
+                    }
 
-                ds = workTask.Result;
+                    deleGetDataSet _deleGetSet = new deleGetDataSet(getDataSet);
+                    var workTask = Task.Run(() => _deleGetSet.Invoke(sql.ToString(), parameters.ToArray()));
+                    bool flag = workTask.Wait(this.Context.CurrentConnectionConfig.SqlExecTimeOut, new CancellationToken(false));
+                    if (flag)
+                    {
+                        //在指定的时间内完成
+                    }
+                    else
+                    {
+                        if (OnTimeOut != null)
+                        {
+                            Task.Run(() => { OnTimeOut(this.Context.CurrentConnectionConfig.SqlExecTimeOut); });
+                        }
+                    }
+
+                    ds = workTask.Result;
+                }
             }
             else
             {
-                for (int i = 0; i < sqlList.Count; i++)
+                lock (this.Context)
                 {
-                    deleGetTable _deleGetTable = new deleGetTable(getDataTable);
-                    var _sql = sqlList[i];
-                    var parameters = parametersList != null && parametersList.Count > 0 && parametersList.Count >= i - 1 ? parametersList[i] : null;
-                    var workTask = Task.Run(() => _deleGetTable.Invoke(_sql, parameters));
-                    taskList.Add(workTask);
-                }
-
-                bool flag = Task.WaitAll(taskList.ToArray(), this.Context.CurrentConnectionConfig.SqlExecTimeOut, new CancellationToken(false));
-                if (flag)
-                {
-                    //在指定的时间内完成
-                }
-                else
-                {
-                    if (OnTimeOut != null)
+                    for (int i = 0; i < sqlList.Count; i++)
                     {
-                        Task.Run(() => { OnTimeOut(this.Context.CurrentConnectionConfig.SqlExecTimeOut); });
+                        deleGetTable _deleGetTable = new deleGetTable(getDataTable);
+                        var _sql = sqlList[i];
+                        var parameters = parametersList != null && parametersList.Count > 0 && parametersList.Count >= i - 1 ? parametersList[i] : null;
+                        var workTask = Task.Run(() => _deleGetTable.Invoke(_sql, parameters));
+                        taskList.Add(workTask);
                     }
-                }
-                foreach (var workTask in taskList)
-                {
-                    var datatable = workTask.Result;
-                    datatable.TableName = $"table{taskList.IndexOf(workTask)}";
-                    ds.Tables.Add(datatable);
+
+                    bool flag = Task.WaitAll(taskList.ToArray(), this.Context.CurrentConnectionConfig.SqlExecTimeOut, new CancellationToken(false));
+                    if (flag)
+                    {
+                        //在指定的时间内完成
+                    }
+                    else
+                    {
+                        if (OnTimeOut != null)
+                        {
+                            Task.Run(() => { OnTimeOut(this.Context.CurrentConnectionConfig.SqlExecTimeOut); });
+                        }
+                    }
+                    foreach (var workTask in taskList)
+                    {
+                        var datatable = workTask.Result;
+                        datatable.TableName = $"table{taskList.IndexOf(workTask)}";
+                        ds.Tables.Add(datatable);
+                    }
                 }
             }
 
