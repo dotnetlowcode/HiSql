@@ -16,7 +16,7 @@ namespace HiSql
 
             //Demo_ModiColumn(sqlClient);
             //Demo_ReColumn(sqlClient);
-            //Demo_ModiTable(sqlClient);
+            Demo_ModiTable(sqlClient);
             //Demo_ReTable(sqlClient);
             //Demo_DelColumn(sqlClient);
             //Demo_Tables(sqlClient);
@@ -32,7 +32,7 @@ namespace HiSql
             //Demo_IndexList(sqlClient);
             //Demo_Index_Create(sqlClient);
 
-            Demo_AllTablesPaging(sqlClient);
+           // Demo_AllTablesPaging(sqlClient);
         }
         static void Demo_AllTablesPaging(HiSqlClient sqlClient)
         {
@@ -218,8 +218,8 @@ namespace HiSql
             //OpLevel.Check 表示仅做检测失败时返回消息且检测成功时返因生成的SQL
             HiColumn column = new HiColumn()
             {
-                TabName = "H_Test5",
-                FieldName = "TestAdd",
+                TabName = "Hi_Test",
+                FieldName = "TestAdd22",
                 FieldType = HiType.VARCHAR,
                 FieldLen = 50,
                 DBDefault = HiTypeDBDefault.EMPTY,
@@ -228,7 +228,7 @@ namespace HiSql
 
             };
 
-            var rtn= sqlClient.DbFirst.AddColumn("H_Test5", column, OpLevel.Execute);
+            var rtn= sqlClient.DbFirst.AddColumn("Hi_Test", column, OpLevel.Execute);
 
             if (rtn.Item1)
             {
@@ -243,7 +243,7 @@ namespace HiSql
         {
             HiColumn column = new HiColumn()
             {
-                TabName = "H_Test5",
+                TabName = "Hi_Test",
                 FieldName = "TestAdd",
                 FieldType = HiType.VARCHAR,
                 FieldLen = 50,
@@ -253,7 +253,7 @@ namespace HiSql
 
             };
 
-            var rtn = sqlClient.DbFirst.DelColumn("H_Test5", column, OpLevel.Execute);
+            var rtn = sqlClient.DbFirst.DelColumn("Hi_Test", column, OpLevel.Execute);
 
             Console.WriteLine(rtn.Item2);
         }
@@ -290,18 +290,22 @@ namespace HiSql
         {
             //OpLevel.Execute  表示执行并返回生成的SQL
             //OpLevel.Check 表示仅做检测失败时返回消息且检测成功时返因生成的SQL
-            var tabinfo = sqlClient.Context.DMInitalize.GetTabStruct("H_Test5_1");
+            var tabinfo = sqlClient.Context.DMInitalize.GetTabStruct("Hi_Test");
 
             TabInfo _tabcopy = ClassExtensions.DeepCopy<TabInfo>(tabinfo);
-            //_tabcopy.Columns.RemoveAt(4);
+            _tabcopy.Columns.RemoveAt(4);
 
             HiColumn newcol = ClassExtensions.DeepCopy<HiColumn>(_tabcopy.Columns[1]);
-            newcol.FieldName = "Testname3";
-            newcol.ReFieldName = "Testname3";
+            newcol.FieldName = "Testname23";
+            newcol.ReFieldName = "Testname23";
+            newcol.IsNull = true;
             _tabcopy.Columns.Add(newcol);
-            //_tabcopy.Columns[4].ReFieldName = "Testname3";
-            //_tabcopy.Columns[4].FieldDesc = "Testname3";
-            //_tabcopy.Columns[4].IsRequire = true;
+
+            _tabcopy.Columns[4].ReFieldName = "Testname337";
+            _tabcopy.Columns[4].FieldDesc = "Testname337";
+            _tabcopy.Columns[4].IsRequire = true;
+
+            _tabcopy.Columns[3].FieldType = HiType.DATETIME;
 
             var rtn= sqlClient.DbFirst.ModiTable(_tabcopy, OpLevel.Execute);
             if (rtn.Item1)
@@ -320,9 +324,9 @@ namespace HiSql
             //OpLevel.Check 表示仅做检测失败时返回消息且检测成功时返因生成的SQL
             HiColumn column = new HiColumn()
             {
-                TabName = "H_Test5",
+                TabName = "Hi_Test",
                 FieldName = "TestAdd",
-                FieldType = HiType.VARCHAR,
+                FieldType = HiType.INT,
                 FieldLen = 51,
                 DBDefault = HiTypeDBDefault.VALUE,
                 DefaultValue = "TGM",
@@ -330,7 +334,7 @@ namespace HiSql
 
             };
 
-            var rtn = sqlClient.DbFirst.ModiColumn("H_Test5", column, OpLevel.Execute);
+            var rtn = sqlClient.DbFirst.ModiColumn("Hi_Test", column, OpLevel.Execute);
             if (rtn.Item1)
             {
                 Console.WriteLine(rtn.Item2);//输出成功消息

@@ -28,7 +28,7 @@ namespace HiSql.UnitTest
                          },
                          Schema = "dbo",
                          IsEncrypt = true,
-                         IsAutoClose = false,
+                         IsAutoClose = true,
                          SqlExecTimeOut = 60000,
                          AppEvents = new AopEvent()
                          {
