@@ -32,40 +32,7 @@ namespace HiSql
         {
 
         }
-        static DbFirst()
-        {
-            if (DbFirst.HiTypeAllowConvertDefind == null)
-            {
-                HiTypeAllowConvertDefind = new Dictionary<HiType, List<HiType>>();
-                //插入本身
-                foreach (HiType hiType in Enum.GetValues(typeof(HiType)))
-                {
-                    HiTypeAllowConvertDefind.Add(hiType, new List<HiType> { hiType });
-                }
-
-                HiTypeAllowConvertDefind[HiType.CHAR].AddRange(new List<HiType> { HiType.TEXT });
-                HiTypeAllowConvertDefind[HiType.NCHAR].AddRange(new List<HiType> { HiType.TEXT });
-                HiTypeAllowConvertDefind[HiType.NVARCHAR].AddRange(new List<HiType> { HiType.TEXT });
-                HiTypeAllowConvertDefind[HiType.VARCHAR].AddRange( new List<HiType> { HiType.TEXT });
-                HiTypeAllowConvertDefind[HiType.BOOL].AddRange( new List<HiType> { HiType.INT, HiType.BIGINT, HiType.SMALLINT });
-                HiTypeAllowConvertDefind[HiType.DATE].AddRange( new List<HiType> { HiType.DATE, HiType.DATETIME });
-                HiTypeAllowConvertDefind[HiType.DATETIME].AddRange( new List<HiType> { HiType.DATE, HiType.DATETIME });
-                HiTypeAllowConvertDefind[HiType.INT].AddRange(new List<HiType> { HiType.SMALLINT, HiType.BIGINT });
-                HiTypeAllowConvertDefind[HiType.BIGINT].AddRange(new List<HiType> { HiType.SMALLINT, HiType.INT });
-                HiTypeAllowConvertDefind[HiType.SMALLINT].AddRange(new List<HiType> { HiType.BIGINT, HiType.INT });
-
-
-                foreach (HiType key in HiTypeAllowConvertDefind.Keys)
-                {
-                    if (!HiType.BINARY.Equals(HiType.BINARY) && !HiType.BINARY.Equals(HiType.BINARY))
-                    {
-                        HiTypeAllowConvertDefind[key].AddRange(new List<HiType> { HiType.CHAR, HiType.VARCHAR, HiType.NVARCHAR, HiType.NCHAR });
-                    }
-
-                }
-            }
-        }
-        public readonly static Dictionary<HiType, List<HiType>> HiTypeAllowConvertDefind;
+        
 
 
         Tuple<bool, string, string> addColumn(IDM idm, TabInfo tabInfo, HiColumn hiColumn, OpLevel opLevel)
@@ -975,7 +942,7 @@ namespace HiSql
             else
             {
                 if (field.FieldType != hiColumn.FieldType
-                    && !HiTypeAllowConvertDefind[field.FieldType].Contains(hiColumn.FieldType)
+                    && !Constants.HiTypeAllowConvertDefinition[field.FieldType].Contains(hiColumn.FieldType)
                     )
                 {
 

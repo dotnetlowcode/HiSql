@@ -12,7 +12,7 @@ namespace HiSql
         {
 
             Console.WriteLine("表操作测试");
-            //Demo_AddColumn(sqlClient);
+           Demo_AddColumn(sqlClient);
 
             //Demo_ModiColumn(sqlClient);
             //Demo_ReColumn(sqlClient);

@@ -72,7 +72,30 @@ namespace HiSql
         private static List<string> _dbCurrentSpport ;
         private static List<string> _dbSpport;
 
-
+        static Constants()
+        {
+            if (Constants.HiTypeAllowConvertDefinition == null)
+            {
+                HiTypeAllowConvertDefinition = new Dictionary<HiType, List<HiType>>();
+                //插入本身
+                foreach (HiType hiType in Enum.GetValues(typeof(HiType)))
+                {
+                    HiTypeAllowConvertDefinition.Add(hiType, new List<HiType> { hiType });
+                }
+                HiTypeAllowConvertDefinition[HiType.CHAR].AddRange(new List<HiType> { HiType.TEXT, HiType.CHAR, HiType.VARCHAR, HiType.NVARCHAR, HiType.NCHAR });
+                HiTypeAllowConvertDefinition[HiType.NCHAR].AddRange(new List<HiType> { HiType.TEXT, HiType.CHAR, HiType.VARCHAR, HiType.NVARCHAR, HiType.NCHAR });
+                HiTypeAllowConvertDefinition[HiType.NVARCHAR].AddRange(new List<HiType> { HiType.TEXT, HiType.CHAR, HiType.VARCHAR, HiType.NVARCHAR, HiType.NCHAR });
+                HiTypeAllowConvertDefinition[HiType.VARCHAR].AddRange(new List<HiType> { HiType.TEXT, HiType.CHAR, HiType.VARCHAR, HiType.NVARCHAR, HiType.NCHAR });
+                HiTypeAllowConvertDefinition[HiType.BOOL].AddRange(new List<HiType> { HiType.INT, HiType.BIGINT, HiType.SMALLINT, HiType.CHAR, HiType.VARCHAR, HiType.NVARCHAR, HiType.NCHAR });
+                HiTypeAllowConvertDefinition[HiType.DATE].AddRange(new List<HiType> { HiType.DATE, HiType.DATETIME, HiType.CHAR, HiType.VARCHAR, HiType.NVARCHAR, HiType.NCHAR });
+                HiTypeAllowConvertDefinition[HiType.DATETIME].AddRange(new List<HiType> { HiType.DATE, HiType.DATETIME, HiType.CHAR, HiType.VARCHAR, HiType.NVARCHAR, HiType.NCHAR });
+                HiTypeAllowConvertDefinition[HiType.INT].AddRange(new List<HiType> { HiType.SMALLINT, HiType.BIGINT, HiType.DECIMAL, HiType.CHAR, HiType.VARCHAR, HiType.NVARCHAR, HiType.NCHAR });
+                HiTypeAllowConvertDefinition[HiType.BIGINT].AddRange(new List<HiType> { HiType.SMALLINT, HiType.INT, HiType.DECIMAL, HiType.CHAR, HiType.VARCHAR, HiType.NVARCHAR, HiType.NCHAR });
+                HiTypeAllowConvertDefinition[HiType.SMALLINT].AddRange(new List<HiType> { HiType.BIGINT, HiType.INT, HiType.DECIMAL, HiType.CHAR, HiType.VARCHAR, HiType.NVARCHAR, HiType.NCHAR });
+                HiTypeAllowConvertDefinition[HiType.DECIMAL].AddRange(new List<HiType> { HiType.SMALLINT, HiType.BIGINT, HiType.INT, HiType.CHAR, HiType.VARCHAR, HiType.NVARCHAR, HiType.NCHAR });
+                HiTypeAllowConvertDefinition[HiType.GUID].AddRange(new List<HiType> { HiType.CHAR, HiType.VARCHAR, HiType.NVARCHAR, HiType.NCHAR });
+            }
+        }
         /// <summary>
         /// 判断是否是标准字段
         /// </summary>
@@ -255,7 +278,8 @@ namespace HiSql
             {HiType.GUID,GuidType}
         };
 
-        
+        public readonly static Dictionary<HiType, List<HiType>> HiTypeAllowConvertDefinition = null;
+
 
         /// <summary>
         /// 表结构缓存路径 (该key值支持redis的分块）
