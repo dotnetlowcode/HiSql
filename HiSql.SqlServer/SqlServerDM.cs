@@ -978,7 +978,7 @@ namespace HiSql
             {
                 var _delsql = dbConfig.Del_Default;
                 _delsql = _delsql.Replace("[$TabName$]", hiColumn.TabName)
-                .Replace("[$FieldName$]", hiColumn.FieldName)
+                .Replace("[$FieldName$]", hiColumn.FieldName).Replace("[$Action$]", tabFieldAction.ToString())
                 .Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema);
                 _changesql = new StringBuilder()
                     .AppendLine(_delsql)
@@ -1006,7 +1006,7 @@ namespace HiSql
                 //字段重命名
                 var _delsql = dbConfig.Del_Default;
                 _delsql = _delsql.Replace("[$TabName$]", hiColumn.TabName)
-                .Replace("[$FieldName$]", hiColumn.FieldName)
+                .Replace("[$FieldName$]", hiColumn.FieldName).Replace("[$Action$]", tabFieldAction.ToString())
                 .Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema);
 
                 _changesql = new StringBuilder()
@@ -1072,6 +1072,8 @@ namespace HiSql
                             _str_temp_field = _str_temp_field.Replace("[$FieldName$]", hiColumn.FieldName)
                                 .Replace("[$IsNull$]", hiColumn.IsPrimary ? "" : hiColumn.IsNull == true ? "NULL" : "NOT NULL")
                                 .Replace("[$EXTEND$]", hiTable.TableType == TableType.Var && hiColumn.IsPrimary ? "primary key" : "")
+
+                                .Replace("[$Default$]", hiColumn.IsPrimary ? "" : GetDbDefault(hiColumn))
                                 ;
                             break;
                         case "decimal":

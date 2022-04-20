@@ -12,7 +12,7 @@ namespace HiSql.MySqlUnitTest
         {
             //Demo_AddColumn(sqlClient); //ok
             //Demo_ReColumn(sqlClient);//ok
-            //Demo_ModiColumn(sqlClient); //ok
+            Demo_ModiColumn(sqlClient); //ok
             //Demo_DelColumn(sqlClient);////ok
             //Demo_Tables(sqlClient);//ok
             //Demo_View(sqlClient);//ok
@@ -28,10 +28,10 @@ namespace HiSql.MySqlUnitTest
             //Demo_Index_Create(sqlClient);//ok
             //Demo_ReTable(sqlClient);//ok
 
-            //Demo_TableDataCount(sqlClient);
+            Demo_TableDataCount(sqlClient);
             //Demo_TablesPaging(sqlClient);
             //Demo_ViewsPaging(sqlClient);
-            Demo_AllTablesPaging(sqlClient);
+            //Demo_AllTablesPaging(sqlClient);
         }
         static void Demo_AllTablesPaging(HiSqlClient sqlClient)
         {

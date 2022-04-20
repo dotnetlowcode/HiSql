@@ -753,13 +753,13 @@ UNION ALL
 
             //删除字段默认值
             _temp_deldefalut = new StringBuilder()
-                .AppendLine("declare @_constname varchar(200)")
+                .AppendLine("declare @_constname_[$FieldName$][$Action$] varchar(200)")
                 .AppendLine("if exists(select a.name as fieldname, b.name as consname from syscolumns as a inner join sysobjects as b on a.cdefault=b.id where a.id=object_id('[$TabName$]') and a.name='[$FieldName$]')")
                 .AppendLine("   begin   ")
-                .AppendLine("       select @_constname = b.name from syscolumns as a ")
+                .AppendLine("       select @_constname_[$FieldName$][$Action$] = b.name from syscolumns as a ")
                 .AppendLine("       inner join sysobjects as b on a.cdefault=b.id")
                 .AppendLine("       where a.id=object_id('[$TabName$]') and a.name='[$FieldName$]'")
-                .AppendLine("       exec('ALTER TABLE [$Schema$].[$TabName$] DROP CONSTRAINT '+@_constname)")
+                .AppendLine("       exec('ALTER TABLE [$Schema$].[$TabName$] DROP CONSTRAINT '+@_constname_[$FieldName$][$Action$])")
                 .AppendLine("   end")
                 .ToString();
 
