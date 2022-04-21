@@ -6,11 +6,29 @@ using System.Threading.Tasks;
 using System.Threading;
 namespace HiSql
 {
-    public static class CacheContext
+    internal static class CacheContext
     {
         public static ThreadLocal<List<HiSqlProvider>> ContextList = new ThreadLocal<List<HiSqlProvider>>();
 
-        public static ICache MCache = new MCache(null);
+
+        static ICache _cache = null;
+
+        public static ICache MCache
+        {
+            get {
+
+                if (_cache == null)
+                {
+                    if (!Global.RedisOn)
+                        _cache = new MCache(null);
+                    else
+                        _cache = new RCache(Global.RedisOptions);
+                }
+                    
+                return _cache; ;
+
+            }
+        }
 
     }
 }

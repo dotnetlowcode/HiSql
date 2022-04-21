@@ -7,9 +7,15 @@ using System.Threading.Tasks;
 
 namespace HiSql
 {
+
+    /// <summary>
+    /// 本地Memory缓存
+    /// </summary>
     public class MCache :ICache
     {
-        public MCache(MemoryCacheOptions? options)//这里可以做成依赖注入，但没打算做成通用类库，所以直接把选项直接封在帮助类里边
+
+
+        public MCache(MemoryCacheOptions? options)//
         {
             //this._cache = new MemoryCache(options);
             if (options == null)
@@ -22,9 +28,17 @@ namespace HiSql
 
         private IMemoryCache _cache;
 
-
+        private string checkKey(string key)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+                throw new ArgumentNullException(nameof(key));
+            //if (!key.StartsWith($"{Constants.KEY_PRE}:"))
+            //    key = $"{Constants.KEY_PRE}:{key}";
+            return key;
+        }
         public bool Exists(string key)
         {
+            key = checkKey(key);
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentNullException(nameof(key));
 
@@ -33,9 +47,17 @@ namespace HiSql
             return this._cache.TryGetValue<object>(key, out v);
         }
 
-
+  
+        public string GetCache(string key)
+        {
+            key = checkKey(key);
+            string value = string.Empty;
+            this._cache.TryGetValue(key, out value);
+            return value;
+        }
         public T GetCache<T>(string key) where T : class
         {
+            key = checkKey(key);
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentNullException(nameof(key));
 
@@ -50,6 +72,7 @@ namespace HiSql
 
         public void SetCache(string key, object value)
         {
+            key = checkKey(key);
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentNullException(nameof(key));
             if (value == null)
@@ -65,6 +88,7 @@ namespace HiSql
 
         public void SetCache(string key, object value, double expirationMinute)
         {
+            key = checkKey(key);
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentNullException(nameof(key));
             if (value == null)
@@ -82,6 +106,7 @@ namespace HiSql
 
         public void SetCache(string key, object value, DateTimeOffset expirationTime)
         {
+            key = checkKey(key);
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentNullException(nameof(key));
             if (value == null)
@@ -97,6 +122,7 @@ namespace HiSql
         }
         public void SetCache(string key, object value, int second)
         {
+            key = checkKey(key);
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentNullException(nameof(key));
             if (value == null)
@@ -114,6 +140,7 @@ namespace HiSql
 
         public void RemoveCache(string key)
         {
+            key = checkKey(key);
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentNullException(nameof(key));
 
@@ -131,6 +158,7 @@ namespace HiSql
 
         public T GetOrCreate<T>(string key, Func<T> value)
         {
+            key = checkKey(key);
             return this._cache.GetOrCreate<T>(key, (entry)=> {
 
                 var objs = value.Invoke();
@@ -152,6 +180,7 @@ namespace HiSql
         /// <returns></returns>
         public T GetOrCreate<T>(string key, Func<T> value,int second)
         {
+            key = checkKey(key);
             return this._cache.GetOrCreate<T>(key, (entry) => {
 
                 DateTimeOffset expirationTime = DateTimeOffset.Now;
@@ -166,6 +195,7 @@ namespace HiSql
 
         public T GetOrCreate<T>(string key, Func<T> value,DateTimeOffset time)
         {
+            key = checkKey(key);
             return this._cache.GetOrCreate<T>(key, (entry) => {
 
                 var objs = value.Invoke();
