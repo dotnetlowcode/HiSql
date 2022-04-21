@@ -654,7 +654,7 @@ namespace HiSql
             }
             finally
             {
-                //if (this.IsAutoClose())
+                if (this.IsAutoClose())
                 {
                     this.Close();
                 }
@@ -718,7 +718,7 @@ namespace HiSql
             }
             finally
             {
-                //if (this.IsAutoClose())
+                if (this.IsAutoClose())
                 {
                     this.Close();
                 }

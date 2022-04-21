@@ -151,3 +151,8 @@ D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\net461\HiSql.SqlServer.csp
 D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\net461\HiSql.SqlServer.csproj.CopyComplete
 D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\net461\HiSql.SqlServer.dll
 D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\net461\HiSql.SqlServer.pdb
+D:\Project\OpenSource\HiSql\HiSql.SqlServer\bin\Debug\net461\Pipelines.Sockets.Unofficial.dll
+D:\Project\OpenSource\HiSql\HiSql.SqlServer\bin\Debug\net461\StackExchange.Redis.dll
+D:\Project\OpenSource\HiSql\HiSql.SqlServer\bin\Debug\net461\System.Diagnostics.PerformanceCounter.dll
+D:\Project\OpenSource\HiSql\HiSql.SqlServer\bin\Debug\net461\System.IO.Pipelines.dll
+D:\Project\OpenSource\HiSql\HiSql.SqlServer\bin\Debug\net461\System.Threading.Channels.dll

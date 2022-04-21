@@ -152,3 +152,7 @@ D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\net461\HiSql.PostGreSql.c
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\net461\HiSql.PostGreSql.csproj.CopyComplete
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\net461\HiSql.PostGreSql.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\net461\HiSql.PostGreSql.pdb
+D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\net461\Pipelines.Sockets.Unofficial.dll
+D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\net461\StackExchange.Redis.dll
+D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\net461\System.Diagnostics.PerformanceCounter.dll
+D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\net461\System.IO.Pipelines.dll

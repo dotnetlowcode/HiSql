@@ -158,3 +158,8 @@ D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Debug\net461\HiSql.MySql.csproj.Core
 D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Debug\net461\HiSql.MySql.csproj.CopyComplete
 D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Debug\net461\HiSql.MySql.dll
 D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Debug\net461\HiSql.MySql.pdb
+D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Debug\net461\Pipelines.Sockets.Unofficial.dll
+D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Debug\net461\StackExchange.Redis.dll
+D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Debug\net461\System.Diagnostics.PerformanceCounter.dll
+D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Debug\net461\System.IO.Pipelines.dll
+D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Debug\net461\System.Threading.Channels.dll

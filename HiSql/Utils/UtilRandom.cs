@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HiSql
 {
-    public class UtilRandom
+    internal class UtilRandom
     {
         public static Random Random = new Random();
 

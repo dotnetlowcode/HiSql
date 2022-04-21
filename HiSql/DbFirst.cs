@@ -29,9 +29,10 @@ namespace HiSql
         }
 
         public DbFirst()
-        { 
-            
+        {
+
         }
+        
 
 
         Tuple<bool, string, string> addColumn(IDM idm, TabInfo tabInfo, HiColumn hiColumn, OpLevel opLevel)
@@ -97,8 +98,8 @@ namespace HiSql
             //获取当前最新物理表结构信息
             HiSqlCommProvider.RemoveTabInfoCache(tabname);
             //获取最新
-            TabInfo tabinfo= idm.GetTabStruct(tabname);
-            return  addColumn(idm, tabinfo, hiColumn, opLevel);
+            TabInfo tabinfo = idm.GetTabStruct(tabname);
+            return addColumn(idm, tabinfo, hiColumn, opLevel);
         }
 
         /// <summary>
@@ -107,7 +108,7 @@ namespace HiSql
         /// <param name="tabname"></param>
         /// <param name="columns"></param>
         /// <returns></returns>
-        public Tuple<bool, string,string> CreateIndex(string tabname,string indexname, List<HiColumn> columns, OpLevel opLevel)
+        public Tuple<bool, string, string> CreateIndex(string tabname, string indexname, List<HiColumn> columns, OpLevel opLevel)
         {
             bool _isok = false;
             string _msg = "";
@@ -127,7 +128,8 @@ namespace HiSql
 
                     return new Tuple<bool, string, string>(_isok, _msg, _sql);
                 }
-                else {
+                else
+                {
                     _sql = idm.CreateIndex(tabname, indexname, columns);
                 }
                 if (idm.Context.CurrentConnectionConfig.UpperCase)
@@ -156,7 +158,7 @@ namespace HiSql
                     _isok = true;
                     _msg = $"为表[{tabname}]创建索引[{indexname}]检测成功";
                 }
-                
+
             }
             //return idm.CreateIndex(tabname, indexname, columns)
 
@@ -204,14 +206,14 @@ namespace HiSql
         /// <param name="viewname"></param>
         /// <param name="viewsql"></param>
         /// <returns></returns>
-        public Tuple<bool, string,string> CreateView(string viewname, string viewsql, OpLevel opLevel)
+        public Tuple<bool, string, string> CreateView(string viewname, string viewsql, OpLevel opLevel)
         {
             bool _isok = false;
             string _msg = "";
             string _sql = "";
             IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
             idm.Context = SqlClient.Context;
-            
+
             if (_sqlClient != null)
             {
                 _sql = idm.CreateView(viewname, viewsql);
@@ -242,7 +244,8 @@ namespace HiSql
                     _isok = true;
                     _msg = $"视图[{viewname}]创建检测成功!";
                 }
-            }else
+            }
+            else
                 throw new Exception($"请先指定数据库连接!");
 
 
@@ -410,7 +413,7 @@ namespace HiSql
         /// <param name="tabname"></param>
         /// <param name="indexname"></param>
         /// <returns></returns>
-        public Tuple<bool, string,string> DelIndex(string tabname, string indexname, OpLevel opLevel)
+        public Tuple<bool, string, string> DelIndex(string tabname, string indexname, OpLevel opLevel)
         {
             bool _isok = false;
             string _msg = "";
@@ -430,7 +433,8 @@ namespace HiSql
             {
                 _msg = $"索引[{indexname}]不存在于表[{tabname}]中";
             }
-            else {
+            else
+            {
                 if (idm.Context.CurrentConnectionConfig.UpperCase)
                 {
                     _sql = _sql.ToUpper();
@@ -459,7 +463,9 @@ namespace HiSql
 
 
 
-                } else{
+                }
+                else
+                {
                     _isok = true;
                     _msg = $"删除索引[{indexname}]检测成功";
                 }
@@ -601,7 +607,7 @@ namespace HiSql
             }
             return lsttabinfo;
         }
-        
+
 
 
         /// <summary>
@@ -653,7 +659,7 @@ namespace HiSql
             }
 
             return lsttabinfo;
-            
+
         }
 
         /// <summary>
@@ -706,7 +712,7 @@ namespace HiSql
             List<TableInfo> lsttabinfo = new List<TableInfo>();
             foreach (DataRow dr in dt.Rows)
             {
-                
+
                 lst.Add(dr["TabName"].ToString());
             }
 
@@ -808,7 +814,7 @@ namespace HiSql
             IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
             idm.Context = SqlClient.Context;
             return idm.GetTableDefinition(tabname);
-            
+
         }
 
         /// <summary>
@@ -817,7 +823,7 @@ namespace HiSql
         /// <returns></returns>
         public List<string> GetTempTables()
         {
-            
+
             throw new NotImplementedException();
         }
 
@@ -825,7 +831,7 @@ namespace HiSql
         /// 获取所有视图清单
         /// </summary>
         /// <returns></returns>
-        public List<TableInfo> GetViews() 
+        public List<TableInfo> GetViews()
         {
             IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
             idm.Context = SqlClient.Context;
@@ -923,17 +929,27 @@ namespace HiSql
             }
             return lsttabinfo;
         }
-        Tuple<bool, string, string> modiColumn(IDM idm,TabInfo tabInfo, HiColumn hiColumn, OpLevel opLevel)
+        Tuple<bool, string, string> modiColumn(IDM idm, TabInfo tabInfo, HiColumn hiColumn, OpLevel opLevel)
         {
             bool _isok = false;
             string _msg = "";
             string _sql = "";
-            if (!tabInfo.Columns.Any(c => c.FieldName.ToLower() == hiColumn.FieldName.ToLower()))
+            var field = tabInfo.Columns.FirstOrDefault(c => c.FieldName.ToLower() == hiColumn.FieldName.ToLower());
+            if (field == null)
             {
                 _msg = $"向表[{tabInfo.TabModel.TabName}]修改字段[{hiColumn.FieldName}]失败 原因:该字段[{hiColumn.FieldName}]不存在于表[{tabInfo.TabModel.TabName}]中";
             }
             else
             {
+                if (field.FieldType != hiColumn.FieldType
+                    && !Constants.HiTypeAllowConvertDefinition[field.FieldType].Contains(hiColumn.FieldType)
+                    )
+                {
+
+                    _isok = false;
+                    _msg = $"表【{hiColumn.TabName}】的字段【{hiColumn.FieldName}】类型【{field.FieldType.ToString()}】不允许转换成【{hiColumn.FieldType.ToString()}】";
+                    return new Tuple<bool, string, string>(_isok, _msg, _sql);
+                }
                 _sql = idm.BuildChangeFieldStatement(tabInfo.TabModel, hiColumn, TabFieldAction.MODI);
                 if (opLevel == OpLevel.Execute)
                 {
@@ -970,7 +986,7 @@ namespace HiSql
         /// <param name="hiColumn"></param>
         /// <param name="opLevel"></param>
         /// <returns></returns>
-        public Tuple<bool, string,string> ModiColumn(string tabname, HiColumn hiColumn, OpLevel opLevel)
+        public Tuple<bool, string, string> ModiColumn(string tabname, HiColumn hiColumn, OpLevel opLevel)
         {
             bool _isok = false;
             string _msg = "";
@@ -1082,11 +1098,11 @@ namespace HiSql
         /// <param name="tabInfo"></param>
         /// <param name="opLevel"></param>
         /// <returns></returns>
-        public Tuple<bool, string,string> ModiTable(TabInfo tabInfo, OpLevel opLevel)
+        public Tuple<bool, string, string> ModiTable(TabInfo tabInfo, OpLevel opLevel)
         {
-            TabInfo tab= _sqlClient.Context.DMInitalize.GetTabStruct(tabInfo.TabModel.TabName);
+            TabInfo tab = _sqlClient.Context.DMInitalize.GetTabStruct(tabInfo.TabModel.TabName);
 
-           
+
             IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
 
             idm.Context = SqlClient.Context;
@@ -1118,7 +1134,7 @@ namespace HiSql
                 {
                     #region 涉及物理表变更
 
-                    
+
                     if (hicol != null)
                     {
                         if (field.Action == TabFieldAction.ADD)
@@ -1138,7 +1154,7 @@ namespace HiSql
                         }
                         else if (field.Action == TabFieldAction.MODI)
                         {
-                            var modirtn = modiColumn(idm, tabInfo, hicol, OpLevel.Check);
+                            var modirtn = modiColumn(idm, tab, hicol, OpLevel.Check);
                             if (modirtn.Item1)
                             {
                                 sb_sql.AppendLine(modirtn.Item3);
@@ -1180,7 +1196,7 @@ namespace HiSql
 
 
                             }
-                                
+
                             else
                             {
                                 _msg = rertn.Item2;
@@ -1247,9 +1263,10 @@ namespace HiSql
                     #endregion
                 }
             }
-           
+
             if (changes.Count() > 0)
             {
+                int resultCnt = 0;
                 _sql = sb_sql.ToString();
                 if (_isok)
                 {
@@ -1258,24 +1275,24 @@ namespace HiSql
                         _sqlClient.BeginTran();
                         try
                         {
-                            if(_tabchange)
+                            if (_tabchange)
                             {
                                 _sql = idm.BuildSqlCodeBlock(_sql);
 
-                                _sqlClient.Context.DBO.ExecCommand(_sql, null);
+                                resultCnt = _sqlClient.Context.DBO.ExecCommand(_sql, null);
                             }
 
                             int del_count = 0;
                             int modi_count = 0;
                             if (lstdel.Count > 0)
                             {
-                                del_count = _sqlClient.Delete(Constants.HiSysTable["Hi_FieldModel"].ToString(), lstdel).ExecCommand();
+                               del_count = _sqlClient.Delete(Constants.HiSysTable["Hi_FieldModel"].ToString(), lstdel).ExecCommand();
                             }
 
                             if (lstchg.Count > 0)
                             {
                                 modi_count = _sqlClient.Modi(Constants.HiSysTable["Hi_FieldModel"].ToString(), lstchg).ExecCommand();
-                            } 
+                            }
                             _sqlClient.CommitTran();
                             _isok = true;
                             _msg = $"保存表[{tabInfo.TabModel.TabName}]的结构成功";
@@ -1344,7 +1361,7 @@ namespace HiSql
             HiSqlCommProvider.RemoveTabInfoCache(tabname);
             //获取最新
             TabInfo tabinfo = idm.GetTabStruct(tabname);
-           
+
             DataTable dt = idm.GetAllTables(newtabname);
             if (dt.Rows.Count == 0)
             {
@@ -1365,7 +1382,7 @@ namespace HiSql
                     _sqlClient.BeginTran();
                     try
                     {
-                        
+
                         _sqlClient.Context.DBO.ExecCommand(_sql, null);
 
                         _sqlClient.Delete("Hi_TabModel").Where($"TabName='{tabname.ToSqlInject()}'").ExecCommand();
@@ -1373,7 +1390,7 @@ namespace HiSql
 
                         _sqlClient.Insert("Hi_TabModel", _tabinfo.TabModel)
                                   .Insert("Hi_FieldModel", _tabinfo.Columns).ExecCommand();
-                        
+
                         _sqlClient.CommitTran();
                         _isok = true;
                         _msg = $"表[{tabname}]重命名为[{newtabname}]成功";

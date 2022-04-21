@@ -638,7 +638,7 @@ UNION ALL
                 .AppendLine("	a.column_comment as `FieldDesc` ")
                 .AppendLine("from  `INFORMATION_SCHEMA`.`COLUMNS` as a ")
                 .AppendLine("inner join `INFORMATION_SCHEMA`.`TABLES` as b on a.table_catalog = b.table_catalog and a.table_schema=b.table_schema and a.table_name=b.table_name")
-                .AppendLine("where b.table_name='[$TabName$]'")
+                .AppendLine("where b.table_name='[$TabName$]'  and b.TABLE_SCHEMA='[$Schema$]'")
 
                 .ToString();
 

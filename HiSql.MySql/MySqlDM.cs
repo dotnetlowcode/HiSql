@@ -1053,7 +1053,7 @@ namespace HiSql
         /// <returns></returns>
         public DataTable GetTableDefinition(string tabname)
         {
-            DataTable dt = Context.DBO.GetDataTable(dbConfig.Get_Table_Schema.Replace("[$TabName$]", tabname));
+            DataTable dt = Context.DBO.GetDataTable(dbConfig.Get_Table_Schema.Replace("[$TabName$]", tabname).Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema));
             if (dt.Rows.Count == 0)
                 throw new Exception($"表[{tabname}]不存在");
             return dt;
@@ -2716,7 +2716,11 @@ namespace HiSql
         public int GetTableDataCount(string tabname)
         {
             string _sql = dbConfig.Get_TableDataCount.Replace("[$TabName$]", $"{dbConfig.Schema_Pre}{this.Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{tabname}{dbConfig.Table_After}");
-
+            var tabinfo = this.Context.DMInitalize.GetTabStruct(tabname);
+            if (tabinfo.PrimaryKey.Any())
+            {
+                _sql = _sql.Replace("count(*)", $"count({dbConfig.Field_Pre}{tabinfo.PrimaryKey.FirstOrDefault().FieldName}{dbConfig.Field_After})");
+            }
             string v = this.Context.DBO.ExecScalar(_sql).ToString();
             int _effect = Convert.ToInt32(v);
             return _effect;

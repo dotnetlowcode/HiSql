@@ -68,3 +68,6 @@ D:\Project\OpenSource\HiSql\HiSql.OralceUnitTest\obj\Debug\net5.0\HiSql.OralceUn
 D:\Project\OpenSource\HiSql\HiSql.OralceUnitTest\obj\Debug\net5.0\ref\HiSql.OralceUnitTest.dll
 D:\Project\OpenSource\HiSql\HiSql.OralceUnitTest\obj\Debug\net5.0\HiSql.OralceUnitTest.pdb
 D:\Project\OpenSource\HiSql\HiSql.OralceUnitTest\obj\Debug\net5.0\HiSql.OralceUnitTest.genruntimeconfig.cache
+D:\Project\OpenSource\HiSql\HiSql.OralceUnitTest\bin\Debug\net5.0\Pipelines.Sockets.Unofficial.dll
+D:\Project\OpenSource\HiSql\HiSql.OralceUnitTest\bin\Debug\net5.0\StackExchange.Redis.dll
+D:\Project\OpenSource\HiSql\HiSql.OralceUnitTest\bin\Debug\net5.0\System.IO.Pipelines.dll

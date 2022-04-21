@@ -36,6 +36,14 @@ sqlclient.CodeFirst.InstallHisql();
 
 处理，开发人员只要关注于业务开发
 
+### 2022.4.21 新增支持redis缓存
+hisql底层默认是使用 MemoryCache 进行表结构信息的缓存处理(如果项目是单体应用的情况请建义使用这种方式)，如果项目是分布式的 可以使用redis作为缓存载体，如下所示
+
+```c#
+HiSql.Global.RedisOn = true;//开启redis缓存
+HiSql.Global.RedisOptions = new RedisOptions { Host = "172.16.80.178", PassWord = "pwd123" };
+```
+
 ### 2022.4.15 更新
 
 1. 新增获取表记录数 
