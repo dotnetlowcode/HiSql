@@ -106,7 +106,12 @@ namespace HiSql
                             _sb_n.AppendLine("do begin");
                         }
                         _sb_n.AppendLine(n);
-                        _sb_n.AppendLine("end;");
+                        
+                        if (this.Context.CurrentConnectionConfig.DbType == DBType.Hana)
+                        {
+                            _sb_n.AppendLine("end;");
+                        }
+
                         i = await this.Context.DBO.ExecCommandAsync(_sb_n.ToString());
 
                         if (OnPageExec != null)
@@ -207,6 +212,9 @@ namespace HiSql
                 throw new Exception("未指定要插入的表");
 
 
+
+            StringBuilder sb_pcksql = new StringBuilder();
+
             //仅限于数据插入
             StringBuilder sb_sql = new StringBuilder();
             if (this.Data != null && this.Data.Count > 0)
@@ -227,6 +235,26 @@ namespace HiSql
                 //{
                 //    rtnlst.Add(CheckInsertData(_isdic, attrs, tabinfo.GetColumns, obj));
                 //}
+
+                
+               
+                
+                //强制分页分包  如果已经指定了分批次则不需要分包
+                bool _forcepage = false;
+                int _pcount = 0;
+                int _cells = 0;
+                if (rtnlst.Count > 0)
+                {
+
+                    if (rtnlst[0].Count > this.DbConfig.PackageCell && rtnlst.Count> this.DbConfig.PackageRecord)
+                    {
+                        _forcepage = true;
+                        _cells = rtnlst[0].Count * rtnlst.Count;
+                        _pcount= _cells <= this.DbConfig.PackageCells ? 1 : _cells % this.DbConfig.PackageCells == 0 ? _cells / this.DbConfig.PackageCells : _cells / this.DbConfig.PackageCells + 1;
+
+
+                    }
+                }
 
                 for (int p = 0; p < page; p++)
                 {
@@ -273,20 +301,40 @@ namespace HiSql
                     }
 
                     //是否分批次执行
-                    if (IsBatchExec)
+                    if (IsBatchExec && !_forcepage)
                     {
                         _lstsql.Add(sb_sql.ToString());
                         sb_sql = new StringBuilder();
+                    }
+                    else if (_forcepage)
+                    {
+
+                        sb_pcksql.AppendLine(sb_sql.ToString());
+                        sb_sql = new StringBuilder();
+                        if (p == page - 1)
+                        {
+                            _lstsql.Add(sb_pcksql.ToString());
+                        }
+                        if ((p+1) % _pcount == 0 && p>0)
+                        {
+                            _lstsql.Add(sb_pcksql.ToString());
+                            sb_pcksql = new StringBuilder();
+                        }
                     }
 
                 }
                 string sql = sb_sql.ToString();
                 //sql=DbConfig.Code_Block.Replace("[$SQL$]", sql);
 
-                if (!IsBatchExec)
+                if (!IsBatchExec && !_forcepage)
                 {
                     _Sql.Append(sql);
                 }
+
+                ///如果强制分包 那么按批次执行
+                if (_forcepage)
+                    IsBatchExec = _forcepage;
+
                 sb_sql = new StringBuilder();
 
                 if (_mergeinto && Context.CurrentConnectionConfig.DbType != DBType.PostGreSql)
@@ -721,7 +769,14 @@ namespace HiSql
                                     #region 将值转成string 及特殊处理
                                     if (hiColumn.FieldType.IsIn<HiType>(HiType.DATE, HiType.DATETIME))
                                     {
-                                        DateTime dtime = (DateTime)_o[hiColumn.FieldName];
+                                        DateTime dtime = DateTime.MinValue;
+                                        if (_o[hiColumn.FieldName] != null)
+                                        {
+                                            
+                                            dtime = Convert.ToDateTime(_o[hiColumn.FieldName]);
+
+                                        }
+                                        
                                         if (dtime != null && dtime != DateTime.MinValue)
                                         {
                                             _value = dtime.ToString("yyyy-MM-dd HH:mm:ss.fff");

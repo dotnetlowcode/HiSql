@@ -24,10 +24,14 @@ D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\Microsoft.I
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\Microsoft.IdentityModel.Tokens.dll
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\Microsoft.Win32.SystemEvents.dll
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\Newtonsoft.Json.dll
+D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\Pipelines.Sockets.Unofficial.dll
+D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\StackExchange.Redis.dll
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\System.Configuration.ConfigurationManager.dll
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\System.Data.SqlClient.dll
+D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\System.Diagnostics.PerformanceCounter.dll
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\System.Drawing.Common.dll
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\System.IdentityModel.Tokens.Jwt.dll
+D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\System.IO.Pipelines.dll
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\System.Runtime.Caching.dll
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\System.Runtime.CompilerServices.Unsafe.dll
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\System.Security.Cryptography.ProtectedData.dll
@@ -45,6 +49,7 @@ D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\runtimes\wi
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\runtimes\win-x86\native\sni.dll
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\runtimes\unix\lib\netcoreapp2.1\System.Data.SqlClient.dll
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll
+D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\runtimes\win\lib\netcoreapp2.0\System.Diagnostics.PerformanceCounter.dll
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\runtimes\unix\lib\netcoreapp3.0\System.Drawing.Common.dll
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\runtimes\win\lib\netcoreapp3.0\System.Drawing.Common.dll
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\runtimes\win\lib\netstandard2.0\System.Runtime.Caching.dll
@@ -66,8 +71,3 @@ D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Debug\net5.0\HiSql.SqlSe
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Debug\net5.0\ref\HiSql.SqlServerUnitTest.dll
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Debug\net5.0\HiSql.SqlServerUnitTest.pdb
 D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\obj\Debug\net5.0\HiSql.SqlServerUnitTest.genruntimeconfig.cache
-D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\Pipelines.Sockets.Unofficial.dll
-D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\StackExchange.Redis.dll
-D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\System.Diagnostics.PerformanceCounter.dll
-D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\System.IO.Pipelines.dll
-D:\Project\OpenSource\HiSql\HiSql.SqlServerUnitTest\bin\Debug\net5.0\runtimes\win\lib\netcoreapp2.0\System.Diagnostics.PerformanceCounter.dll
