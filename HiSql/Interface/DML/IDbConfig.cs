@@ -29,6 +29,27 @@ namespace HiSql
         /// 批量写入表时最优的参数（行*列）
         /// </summary>
         public int BulkUnitSize { get; set; }
+
+
+
+
+
+
+        /// <summary>
+        /// 强制分包记录数大小 结合 强制分包列数量 一起触发
+        /// </summary>
+        public int PackageRecord { get; set; }
+
+
+        /// <summary>
+        /// 强制分包列数量 结合 强制分包记录数大小 一起触发
+        /// </summary>
+        public int PackageCell { get; set; }
+
+
+        public int PackageCells { get; set; }
+
+
         /// <summary>
         /// Schema 前辍
         /// </summary>

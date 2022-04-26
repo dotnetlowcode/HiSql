@@ -13,6 +13,10 @@ namespace HiSql
         public SqlServerInsert()
         {
             this.DbConfig = new SqlServerConfig(true);
+
+            this.DbConfig.PackageRecord = 2000;
+            this.DbConfig.PackageCells = 20000;
+            this.DbConfig.PackageCell = 50;
         }
 
         

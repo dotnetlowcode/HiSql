@@ -10,7 +10,7 @@ namespace HiSql
     /// <summary>
     /// 基于Redis的缓存
     /// </summary>
-    public class RCache : ICache
+    public class RCache : IRedis
     {
 
         private StackExchange.Redis.IDatabase _cache;
@@ -237,5 +237,161 @@ namespace HiSql
                 _cache.StringSet(key, _value, TimeSpan.FromSeconds(second));
             }
         }
+
+        /// <summary>
+        /// 广播方式订阅 不按发布顺序接口
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <param name="handler"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        public void BroadCastSubScriber(string channel, Action<string, string> handler = null)
+        {
+            checkRedis();
+            channel = checkKey(channel);
+
+            _connectMulti.GetSubscriber().Subscribe(channel, (rchannel, message) => {
+                handler(rchannel, message.ToString());
+            });
+            
+        }
+
+        /// <summary>
+        /// 队列方式订阅 按发布顺序接收
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <param name="handler"></param>
+        public void QueueSubScriber(string channel, Action<string, string> handler = null)
+        {
+            checkRedis();
+            channel = checkKey(channel);
+
+            _connectMulti.GetSubscriber().Subscribe(channel).OnMessage(message => {
+                handler(channel, message.ToString());
+            });
+        }
+
+        /// <summary>
+        /// 向某一个频道发送消息
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public long PublishMessage(string channel, string message)
+        {
+            checkRedis();
+            channel = checkKey(channel);
+            return _connectMulti.GetSubscriber().Publish(channel, message);
+        }
+
+        /// <summary>
+        /// 入列
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public long ListPush(string channel, string value)
+        {
+            checkRedis();
+            channel = checkKey(channel);
+            return _cache.ListLeftPush(channel, value);
+           
+        }
+
+        /// <summary>
+        /// 先进先出 出列
+        /// 最先入列的最先出列
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <returns></returns>
+        public string ListFirstPop(string channel)
+        {
+            checkRedis();
+            channel = checkKey(channel);
+            return _cache.ListRightPop(channel);
+        }
+        /// <summary>
+        /// 后进先出 出列
+        /// 最后一个入列最先出列
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <returns></returns>
+
+        public string ListLastPop(string channel)
+        {
+            checkRedis();
+            channel = checkKey(channel);
+            return _cache.ListLeftPop(channel);
+        }
+        /// <summary>
+        /// 获取队列的记录数
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <returns></returns>
+        public long ListCount(string channel)
+        {
+            checkRedis();
+            channel = checkKey(channel);
+            return _cache.ListLength(channel);
+        }
+
+
+
+        /// <summary>
+        /// 解业务锁
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+
+        public Tuple<bool, string> UnLock(string key)
+        {
+            checkRedis();
+            key = checkKey(key);
+
+            _cache.LockRelease(key, System.Threading.Thread.CurrentThread.ManagedThreadId);
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// 加业务锁
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="expresseconds"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public Tuple<bool, string> LockOn(string key, int expresseconds=5)
+        {
+            checkRedis();
+            key = checkKey(key);
+
+            expresseconds= expresseconds < 0? 5 : expresseconds;
+            expresseconds = expresseconds > 60 ? 60 : expresseconds;
+
+            bool isok = false;
+            while (!isok)
+            { 
+                isok=_cache.LockTake(key,System.Threading.Thread.CurrentThread.ManagedThreadId,TimeSpan.FromSeconds(expresseconds));
+                if (isok)
+                {
+                    break;
+                }
+            }
+            throw new NotImplementedException();
+        }
+        /// <summary>
+        /// 续锁
+        /// 对已经加了锁且快到期了就进行续锁
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="expresseconds"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+
+        public Tuple<bool, string> KeepLockOn(string key, int expresseconds)
+        {
+            throw new NotImplementedException();
+        }
+
+       
     }
 }
