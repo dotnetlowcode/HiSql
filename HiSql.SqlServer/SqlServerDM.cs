@@ -2485,7 +2485,7 @@ namespace HiSql
                         _idx++;
                     }
                 }
-                else if (_islist && hiColumn.FieldType.IsIn<HiType>(HiType.INT, HiType.SMALLINT, HiType.BIGINT))
+                else if (_islist && hiColumn.FieldType.IsIn<HiType>(HiType.BIGINT))
                 {
                     List<Int64> lstobj = (List<Int64>)value;
                     foreach (Int64 di in lstobj)
@@ -2497,11 +2497,40 @@ namespace HiSql
 
                         _idx++;
                     }
+                    
+                }
+                else if (_islist && hiColumn.FieldType.IsIn<HiType>(HiType.INT))
+                {
+                    List<int> lstobj = (List<int>)value;
+                    foreach (int di in lstobj)
+                    {
+                        if (_idx < lstobj.Count - 1)
+                            _sb_value.Append($"{di},");
+                        else
+                            _sb_value.Append($"{di}");
+
+                        _idx++;
+                    }
+
+                }
+                else if (_islist && hiColumn.FieldType.IsIn<HiType>(HiType.SMALLINT))
+                {
+                    List<Int16> lstobj = (List<Int16>)value;
+                    foreach (Int16 di in lstobj)
+                    {
+                        if (_idx < lstobj.Count - 1)
+                            _sb_value.Append($"{di},");
+                        else
+                            _sb_value.Append($"{di}");
+
+                        _idx++;
+                    }
+
                 }
                 else if (_islist && hiColumn.FieldType.IsIn<HiType>(HiType.DECIMAL))
                 {
-                    List<Int64> lstobj = (List<Int64>)value;
-                    foreach (Int64 di in lstobj)
+                    List<decimal> lstobj = (List<decimal>)value;
+                    foreach (decimal di in lstobj)
                     {
                         if (_idx < lstobj.Count - 1)
                             _sb_value.Append($"{di},");
