@@ -27,7 +27,7 @@ namespace HiSql.AST
             /// <summary>
             /// in 值带单引号
             /// </summary>
-            public static string REG_INCHARVALUE = @"[\'](?<content>[^,]*)[\'](?!\')";
+            public static string REG_INCHARVALUE = @"[\'](?<content>[^']*)[\'](?!\')";
 
             /// <summary>
             /// in 值 数值
