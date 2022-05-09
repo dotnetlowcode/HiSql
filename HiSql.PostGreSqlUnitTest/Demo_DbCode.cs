@@ -18,7 +18,7 @@ namespace HiSql.PostGreSqlUnitTest
             //   Demo_View(sqlClient);//ok
             //Demo_AllTables(sqlClient);//ok
             //Demo_GlobalTables(sqlClient);//  delay
-            //Demo_ModiTable(sqlClient);//ok
+            Demo_ModiTable(sqlClient);//ok
 
 
             // Demo_CreateView(sqlClient);//ok
@@ -34,10 +34,15 @@ namespace HiSql.PostGreSqlUnitTest
             //Demo_TablesPaging(sqlClient);
             //Demo_TableDataCount(sqlClient);
 
-          
+
             //Demo_ViewsPaging(sqlClient);
-            Demo_AllTablesPaging(sqlClient);
+            // Demo_AllTablesPaging(sqlClient);
+
+            //Demo_Primary_Create(sqlClient);
         }
+
+      
+
         static void Demo_AllTablesPaging(HiSqlClient sqlClient)
         {
             int total = 0;
@@ -82,16 +87,28 @@ namespace HiSql.PostGreSqlUnitTest
             var tabinfo = sqlClient.Context.DMInitalize.GetTabStruct("HTest02");
 
             TabInfo _tabcopy = ClassExtensions.DeepCopy<TabInfo>(tabinfo);
-            _tabcopy.Columns.RemoveAt(4);
+            //_tabcopy.Columns.RemoveAt(4);
 
-            HiColumn newcol = ClassExtensions.DeepCopy<HiColumn>(_tabcopy.Columns[1]);
-            newcol.FieldName = "Testnamwe3";
-            newcol.ReFieldName = "Testnamwe3";
-            _tabcopy.Columns.Add(newcol);
+            //HiColumn newcol = ClassExtensions.DeepCopy<HiColumn>(_tabcopy.Columns[1]);
+            //newcol.FieldName = "Testnamwe3";
+            //newcol.ReFieldName = "Testnamwe3";
+            //_tabcopy.Columns.Add(newcol);
 
-            _tabcopy.Columns[1].ReFieldName = "UName_04";
-            _tabcopy.Columns[1].IsRequire = true;
-            _tabcopy.Columns[1].FieldDesc = "asdUName_04f";
+            //_tabcopy.Columns[1].ReFieldName = "UName_04";
+            //_tabcopy.Columns[1].IsRequire = true;
+            //_tabcopy.Columns[1].FieldDesc = "asdUName_04f";
+
+            _tabcopy.PrimaryKey.ForEach(x => {
+                x.IsPrimary = false;
+            });
+
+            _tabcopy.Columns.ForEach(t => {
+                if (t.FieldName == "SID"  || t.FieldName == "Age"
+                )
+                {
+                    t.IsPrimary = true;
+                }
+            });
 
             var rtn = sqlClient.DbFirst.ModiTable(_tabcopy, OpLevel.Execute);
             if (rtn.Item1)
@@ -118,10 +135,34 @@ namespace HiSql.PostGreSqlUnitTest
                 Console.WriteLine(rtn.Item2);//输出重命名失败原因
 
         }
+        static void Demo_Primary_Create(HiSqlClient sqlClient)
+        {
+            //删除主键
+            List<TabIndex> lstindex = sqlClient.DbFirst.GetTabIndexs("HTest02").Where(t => t.IndexType == "Key_Index").ToList();
+            foreach (var item in lstindex)
+            {
+                var rtndel = sqlClient.DbFirst.DelPrimaryKey(item.TabName, OpLevel.Execute);
+                if (rtndel.Item1)
+                    Console.WriteLine(rtndel.Item3);
+                else
+                    Console.WriteLine(rtndel.Item2);
+            }
 
+            //创建主键
+            TabInfo tabInfo = sqlClient.Context.DMInitalize.GetTabStruct("HTest02");
+            List<HiColumn> hiColumns = tabInfo.Columns.Where(c => c.FieldName == "ModiTime").ToList();
+            hiColumns.ForEach((c) => {
+                c.IsPrimary = true;
+            });
+            var rtn = sqlClient.DbFirst.CreatePrimaryKey("HTest02", hiColumns, OpLevel.Execute);
+            if (rtn.Item1)
+                Console.WriteLine(rtn.Item3);
+            else
+                Console.WriteLine(rtn.Item2);
+
+        }
         static void Demo_Index_Create(HiSqlClient sqlClient)
         {
-
 
             TabInfo tabInfo = sqlClient.Context.DMInitalize.GetTabStruct("HTest02");
             List<HiColumn> hiColumns = tabInfo.Columns.Where(c => c.FieldName == "ModiTime" || c.FieldName == "ModiName").ToList();

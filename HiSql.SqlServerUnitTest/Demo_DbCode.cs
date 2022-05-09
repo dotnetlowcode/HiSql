@@ -12,7 +12,7 @@ namespace HiSql
         {
 
             Console.WriteLine("表操作测试");
-           Demo_AddColumn(sqlClient);
+            //Demo_AddColumn(sqlClient);
 
             //Demo_ModiColumn(sqlClient);
             //Demo_ReColumn(sqlClient);
@@ -31,8 +31,8 @@ namespace HiSql
             //Demo_ModiView(sqlClient);
             //Demo_IndexList(sqlClient);
             //Demo_Index_Create(sqlClient);
-
-           // Demo_AllTablesPaging(sqlClient);
+            //Demo_Primary_Create(sqlClient);
+            // Demo_AllTablesPaging(sqlClient);
         }
         static void Demo_AllTablesPaging(HiSqlClient sqlClient)
         {
@@ -42,7 +42,6 @@ namespace HiSql
             {
                 Console.WriteLine($"{tableInfo.TabName}  {tableInfo.TabReName}  {tableInfo.TabDescript}  {tableInfo.TableType} 表结构:{tableInfo.HasTabStruct}");
             }
-
         }
         static void Demo_ViewsPaging(HiSqlClient sqlClient)
         {
@@ -65,8 +64,10 @@ namespace HiSql
             }
             else
                 Console.WriteLine(rtn.Item2);//输出重命名失败原因
-            
+
         }
+
+
         static void Demo_Index_Create(HiSqlClient sqlClient)
         {
 
@@ -80,14 +81,39 @@ namespace HiSql
                 Console.WriteLine(rtn.Item2);
 
 
-            rtn = sqlClient.DbFirst.DelIndex("H04_OrderInfo", "H04_OrderInfo_POSOrderID",OpLevel.Execute);
+            rtn = sqlClient.DbFirst.DelIndex("H04_OrderInfo", "H04_OrderInfo_POSOrderID", OpLevel.Execute);
 
             if (rtn.Item1)
                 Console.WriteLine(rtn.Item3);
             else
                 Console.WriteLine(rtn.Item2);
         }
+        static void Demo_Primary_Create(HiSqlClient sqlClient)
+        {
+            //删除主键
+            List<TabIndex> lstindex = sqlClient.DbFirst.GetTabIndexs("Hi_Test").Where(t => t.IndexType == "Key_Index").ToList();
+            foreach (var item in lstindex)
+            {
+                var rtndel = sqlClient.DbFirst.DelPrimaryKey(item.TabName, OpLevel.Execute);
+                if (rtndel.Item1)
+                    Console.WriteLine(rtndel.Item3);
+                else
+                    Console.WriteLine(rtndel.Item2);
+            }
 
+            //创建主键
+            TabInfo tabInfo = sqlClient.Context.DMInitalize.GetTabStruct("Hi_Test");
+            List<HiColumn> hiColumns = tabInfo.Columns.Where(c => c.FieldName == "SNRO").ToList();
+            hiColumns.ForEach((c) => { 
+                c.IsPrimary = true;
+            });
+            var rtn = sqlClient.DbFirst.CreatePrimaryKey("Hi_Test", hiColumns, OpLevel.Execute);
+            if (rtn.Item1)
+                Console.WriteLine(rtn.Item3);
+            else
+                Console.WriteLine(rtn.Item2);
+
+        }
         static void Demo_IndexList(HiSqlClient sqlClient)
         {
             List<TabIndex> lstindex = sqlClient.DbFirst.GetTabIndexs("Hi_FieldModel");
@@ -97,18 +123,18 @@ namespace HiSql
                 Console.WriteLine($"TabName:{tabIndex.TabName} IndexName:{tabIndex.IndexName} IndexType:{tabIndex.IndexType}");
             }
 
-            List<TabIndexDetail> lstindexdetails = sqlClient.DbFirst.GetTabIndexDetail("Hi_FieldModel","PK_Hi_FieldModel_ed721f6b-296a-447e-ac67-7d02fd8e338c");
+            List<TabIndexDetail> lstindexdetails = sqlClient.DbFirst.GetTabIndexDetail("Hi_FieldModel", "PK_Hi_FieldModel_ed721f6b-296a-447e-ac67-7d02fd8e338c");
             foreach (TabIndexDetail tabIndexDetail in lstindexdetails)
             {
                 Console.WriteLine($"TabName:{tabIndexDetail.TabName} IndexName:{tabIndexDetail.IndexName} IndexType:{tabIndexDetail.IndexType} ColumnName:{tabIndexDetail.ColumnName}");
-               
+
             }
         }
 
         static void Demo_Tables(HiSqlClient sqlClient)
         {
             List<TableInfo> lsttales = sqlClient.DbFirst.GetTables();
-            foreach (  TableInfo tableInfo in lsttales)
+            foreach (TableInfo tableInfo in lsttales)
             {
                 Console.WriteLine($"{tableInfo.TabName}  {tableInfo.TabReName}  {tableInfo.TabDescript}  {tableInfo.TableType} 表结构:{tableInfo.HasTabStruct}");
             }
@@ -145,7 +171,7 @@ namespace HiSql
         static void Demo_TablesPaging(HiSqlClient sqlClient)
         {
             int total = 0;
-            List<TableInfo> lsttales = sqlClient.DbFirst.GetTables("HI", 11,1, out total);
+            List<TableInfo> lsttales = sqlClient.DbFirst.GetTables("HI", 11, 1, out total);
             foreach (TableInfo tableInfo in lsttales)
             {
                 Console.WriteLine($"{tableInfo.TabName}  {tableInfo.TabReName}  {tableInfo.TabDescript}  {tableInfo.TableType} 表结构:{tableInfo.HasTabStruct}");
@@ -154,10 +180,10 @@ namespace HiSql
         static void Demo_TableDataCount(HiSqlClient sqlClient)
         {
             int total = 0;
-             int lsttales = sqlClient.DbFirst.GetTableDataCount("Hi_FieldModel");
+            int lsttales = sqlClient.DbFirst.GetTableDataCount("Hi_FieldModel");
             Console.WriteLine($" {lsttales} ");
         }
-        
+
 
 
 
@@ -165,8 +191,8 @@ namespace HiSql
         {
             //OpLevel.Execute  表示执行并返回生成的SQL
             //OpLevel.Check 表示仅做检测失败时返回消息且检测成功时返因生成的SQL
-            var rtn = sqlClient.DbFirst.CreateView("vw_FModel", 
-                sqlClient.HiSql("select a.TabName,b.TabReName,b.TabDescript,a.FieldName,a.SortNum,a.FieldType from Hi_FieldModel as a inner join Hi_TabModel as b on a.TabName=b.TabName").ToSql(), 
+            var rtn = sqlClient.DbFirst.CreateView("vw_FModel",
+                sqlClient.HiSql("select a.TabName,b.TabReName,b.TabDescript,a.FieldName,a.SortNum,a.FieldType from Hi_FieldModel as a inner join Hi_TabModel as b on a.TabName=b.TabName").ToSql(),
                 OpLevel.Execute);
 
             if (rtn.Item1)
@@ -200,7 +226,7 @@ namespace HiSql
             //OpLevel.Execute  表示执行并返回生成的SQL
             //OpLevel.Check 表示仅做检测失败时返回消息且检测成功时返因生成的SQL
             var rtn = sqlClient.DbFirst.DropView("vw_FModel",
-            
+
                 OpLevel.Execute);
 
             if (rtn.Item1)
@@ -228,7 +254,7 @@ namespace HiSql
 
             };
 
-            var rtn= sqlClient.DbFirst.AddColumn("Hi_Test", column, OpLevel.Execute);
+            var rtn = sqlClient.DbFirst.AddColumn("Hi_Test", column, OpLevel.Execute);
 
             if (rtn.Item1)
             {
@@ -293,21 +319,29 @@ namespace HiSql
             var tabinfo = sqlClient.Context.DMInitalize.GetTabStruct("Hi_Test");
 
             TabInfo _tabcopy = ClassExtensions.DeepCopy<TabInfo>(tabinfo);
-            _tabcopy.Columns.RemoveAt(4);
+            //_tabcopy.Columns.RemoveAt(5);
 
-            HiColumn newcol = ClassExtensions.DeepCopy<HiColumn>(_tabcopy.Columns[1]);
-            newcol.FieldName = "Testname23";
-            newcol.ReFieldName = "Testname23";
+            HiColumn newcol = ClassExtensions.DeepCopy<HiColumn>(_tabcopy.Columns[3]);
+            newcol.FieldName = "Testname231233";
+            newcol.ReFieldName = "Testname231233";
             newcol.IsNull = true;
             _tabcopy.Columns.Add(newcol);
 
-            _tabcopy.Columns[4].ReFieldName = "Testname337";
-            _tabcopy.Columns[4].FieldDesc = "Testname337";
+            _tabcopy.Columns[4].ReFieldName = "Testname231233sdf";
             _tabcopy.Columns[4].IsRequire = true;
 
-            _tabcopy.Columns[3].FieldType = HiType.DATETIME;
+            _tabcopy.PrimaryKey.ForEach(x => {
+                x.IsPrimary = false;
+            });
+           
+            _tabcopy.Columns.ForEach(t => {
+                if (t.FieldName == "SNRO" || t.FieldName == "SNUM")
+                {
+                    t.IsPrimary = true;
+                }
+            });
 
-            var rtn= sqlClient.DbFirst.ModiTable(_tabcopy, OpLevel.Execute);
+            var rtn = sqlClient.DbFirst.ModiTable(_tabcopy, OpLevel.Execute);
             if (rtn.Item1)
             {
                 Console.WriteLine(rtn.Item2);//输出成功消息

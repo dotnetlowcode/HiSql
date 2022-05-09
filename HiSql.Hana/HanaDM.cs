@@ -313,7 +313,7 @@ namespace HiSql
                 dt_model.TableName = Constants.HiSysTable["Hi_TabModel"].ToString();
                 ds.Tables.Add(dt_model);
 
-                DataTable dt_struct = Context.DBO.GetDataTable($"select * from {dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{dbConfig.Table_After} where {dbConfig.Field_Pre}TabName{dbConfig.Field_After}='{tabname}' order by {dbConfig.Field_Pre}sortnum{dbConfig.Field_After} asc", null);
+                DataTable dt_struct = Context.DBO.GetDataTable($"select * from {dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{dbConfig.Table_After} where {dbConfig.Field_Pre}TabName{dbConfig.Field_After}='{tabname}' order by {dbConfig.Field_Pre}SortNum{dbConfig.Field_After} asc", null);
                 dt_struct.TableName = Constants.HiSysTable["Hi_FieldModel"].ToString();
                 ds.Tables.Add(dt_struct);
 
@@ -2352,6 +2352,19 @@ namespace HiSql
                 {
                     _value = value.ToString();
                 }
+                else if (hiColumn.FieldType.IsIn<HiType>(HiType.BOOL))
+                {
+                    if ("0".Equals(value.ToString()))
+                    {
+                        return "false";
+                    }
+                    if ("1".Equals(value.ToString()))
+                    {
+                        return "true";
+                    }
+                    _value =  value.ToString();
+                }
+
                 else if (hiColumn.FieldType.IsIn<HiType>(HiType.DATETIME))
                 {
                     DateTime _time = Convert.ToDateTime(value.ToString());
@@ -2396,6 +2409,18 @@ namespace HiSql
                 }
                 else if (hiColumn.FieldType.IsIn<HiType>(HiType.INT, HiType.DECIMAL, HiType.SMALLINT, HiType.BIGINT))
                 {
+                    _value = value.ToString();
+                }
+                else if (hiColumn.FieldType.IsIn<HiType>(HiType.BOOL))
+                {
+                    if ("0".Equals(value.ToString()))
+                    {
+                        return "false";
+                    }
+                    if ("1".Equals(value.ToString()))
+                    {
+                        return "true";
+                    }
                     _value = value.ToString();
                 }
                 else if (hiColumn.FieldType.IsIn<HiType>(HiType.DATETIME))
@@ -2718,7 +2743,30 @@ namespace HiSql
                 return new List<TabIndexDetail>();
             throw new NotImplementedException();
         }
+        /// <summary>
+        /// 创建主键
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <param name="primarykeyname"></param>
+        /// <param name="hiColumns"></param>
+        /// <returns></returns>
+        public string CreatePrimaryKey(string tabname, List<HiColumn> hiColumns)
+        {
+            //注未判断索引是否重复，由底层库抛出
+            string _sql = dbConfig.Table_PrimaryKeyCreate.Replace("[$TabName$]", tabname).Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema);
+            DataTable dt = GetTableDefinition(tabname);
+            string _fields = string.Empty;
 
+            string keys = BuildKey(hiColumns);
+            if (!string.IsNullOrEmpty(keys))
+            {
+                keys = dbConfig.Table_Key.Replace("[$TabName$]", tabname)
+                    .Replace("[$Keys$]", keys).Replace("[$ConnectID$]", this.Context.ConnectedId.Replace("-", "_"));
+            }
+
+            _sql = _sql.Replace("[$Primary$]", keys).Replace("[$ConnectID$]", this.Context.ConnectedId.Replace("-", "_"));
+            return "EXEC  '" + _sql + "';";
+        }
         public string CreateIndex(string tabname, string indexname, List<HiColumn> hiColumns)
         {
             //注未判断索引是否重复，由底层库抛出
@@ -2754,12 +2802,22 @@ namespace HiSql
                 throw new Exception($"表[{tabname}]不存在,无法创建索引");
         }
 
-        public string DropIndex(string tabname, string indexname)
+        public string DropIndex(string tabname, string indexname, bool isPrimary)
         {
-            
             //暂未校验索引是否存在 由底层数据库抛出
-            string _sql = dbConfig.Get_DropIndex.Replace("[$IndexName$]", indexname);
-            return _sql;
+            if (!isPrimary)
+            {
+                string _sql = dbConfig.Get_DropIndex.Replace("[$IndexName$]", indexname);
+                return _sql;
+            }
+            else
+            {
+                string _sql = dbConfig.Table_PrimaryKeyDrop.Replace("[$IndexName$]", indexname).Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema)
+                               .Replace("[$TabName$]", tabname);
+                return "EXEC  '" + _sql + "';" ;
+            }
+
+           
         }
 
         public string BuildReTableStatement(string tabname, string newtabname)

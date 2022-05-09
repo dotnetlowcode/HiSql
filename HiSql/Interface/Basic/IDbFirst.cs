@@ -77,6 +77,21 @@ namespace HiSql
         /// <param name="columns"></param>
         /// <returns></returns>
         Tuple<bool, string,string> CreateIndex(string tabname,string indexname, List<HiColumn> columns, OpLevel opLevel);
+        
+        /// <summary>
+        /// 创建表主键
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <param name="columns"></param>
+        /// <returns></returns>
+        Tuple<bool, string, string> CreatePrimaryKey(string tabname, List<HiColumn> columns, OpLevel opLevel);
+        /// <summary>
+        /// 删除表主键
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <param name="indexname"></param>
+        /// <returns></returns>
+        Tuple<bool, string, string> DelPrimaryKey(string tabname, OpLevel opLevel);
 
 
         /// <summary>

@@ -189,6 +189,9 @@ namespace HiSql
         string _temp_drop_index = "";
 
 
+        string _temp_tabel_primarykey_create = "";
+
+        string _temp_tabel_primarykey_drop = "";
         /// <summary>
         /// 字段创建时的模板[$FieldName$]  这是一个可替换的字符串ColumnName是在HiColumn中的属性名
         /// </summary>
@@ -377,6 +380,8 @@ namespace HiSql
         /// </summary>
         public string Get_DropIndex { get => _temp_drop_index; }
 
+        //public string Table_PrimaryKeyCreate { get => _temp_tabel_primarykey_create; }
+        public string Table_PrimaryKeyDrop { get => _temp_tabel_primarykey_drop; }
         /// <summary>
         /// 根据表的类型生成对应数据库的名称
         /// </summary>
@@ -865,7 +870,7 @@ UNION ALL
 
             //表索引
             _temp_get_tabindex = @"SELECT distinct TABLE_NAME as ""TableName"" , INDEX_NAME as ""IndexName"", 
-        case when UNIQUENESS='UNIQUE' AND  CONSTRAINT_INDEX ='YES' then 'Key_Index' ELSE 'Index' end as IndexType 
+        case when UNIQUENESS='UNIQUE' AND  CONSTRAINT_INDEX ='YES' then 'Key_Index' ELSE 'Index' end as ""IndexType"" 
 , '' as ""Disabled""   FROM user_indexes WHERE ""TABLE_NAME"" = '[$TabName$]' ";
 
 
@@ -887,6 +892,9 @@ where idx.TABLE_NAME = '[$TabName$]' and idxc.INDEX_NAME = '[$IndexName$]' ";
             _temp_drop_index = new StringBuilder()
                 .AppendLine($@"DROP INDEX  {_temp_schema_pre}[$IndexName$]{_temp_schema_after}")
                 .ToString();
+            _temp_tabel_primarykey_drop = $"ALTER TABLE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} DROP CONSTRAINT {_temp_table_pre}[$IndexName$]{_temp_table_after}";
+
+            _temp_tabel_primarykey_create = $@"ALTER TABLE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} add constraint {_temp_table_pre}PK_[$TabName$]_[$ConnectID$]{_temp_table_after} primary key ([$Keys$]) ";
 
         }
     }

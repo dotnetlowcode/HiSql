@@ -184,6 +184,9 @@ namespace HiSql
         /// </summary>
         string _temp_drop_index = "";
 
+        string _temp_tabel_primarykey_create = "";
+
+        string _temp_tabel_primarykey_drop = "";
 
         /// <summary>
         /// 字段创建时的模板[$FieldName$]  这是一个可替换的字符串ColumnName是在HiColumn中的属性名
@@ -369,7 +372,8 @@ namespace HiSql
         /// 删除索引
         /// </summary>
         public string Get_DropIndex { get => _temp_drop_index; }
-
+        public string Table_PrimaryKeyCreate { get => _temp_tabel_primarykey_create; }
+        public string Table_PrimaryKeyDrop { get => _temp_tabel_primarykey_drop; }
         public HanaConfig()
         {
 
@@ -792,6 +796,12 @@ UNION ALL
             _temp_drop_index = new StringBuilder()
                 .AppendLine($@"DROP INDEX  {_temp_schema_pre}[$IndexName$]{_temp_schema_after}")
                 .ToString();
+
+            _temp_tabel_primarykey_drop = $"ALTER TABLE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} DROP CONSTRAINT {_temp_table_pre}[$IndexName$]{_temp_table_after}";
+
+            _temp_tabel_primarykey_create = $@"ALTER TABLE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} add constraint {_temp_table_pre}PK_[$TabName$]_[$ConnectID$]{_temp_table_after} [$Primary$] ";
+            
+
         }
     }
 }

@@ -44,6 +44,9 @@ namespace HiSql
 
         string _temp_tabel_key = "";
 
+        string _temp_tabel_primarykey_create = "";
+
+        string _temp_tabel_primarykey_drop = "";
         string _temp_fun_date = "";
 
         string _temp_table_key2 = "";//如 User ASC
@@ -229,6 +232,12 @@ namespace HiSql
         public  string Table_Declare_Table { get => _temp_declare_table;   }
         public  string Field_Split { get => _temp_field_split;   }
         public  string Table_Key { get => _temp_tabel_key;  }
+        public string Table_PrimaryKeyCreate { get => _temp_tabel_primarykey_create; }
+        public string Table_PrimaryKeyDrop { get => _temp_tabel_primarykey_drop; }
+
+        
+
+
         public  string Table_Key2 { get => _temp_table_key2;   }
         public  string Table_Key3 { get => _temp_table_key3;  }
         public  string Field_Comment { get => _temp_field_comment; }
@@ -583,6 +592,9 @@ namespace HiSql
 
             _temp_table_key3 = "ON [PRIMARY] ";//TEXTIMAGE_ON [PRIMARY]
 
+
+            _temp_tabel_primarykey_drop = "ALTER TABLE [$Schema$].[$TabName$] DROP CONSTRAINT [[$IndexName$]]";
+            _temp_tabel_primarykey_create = $@"ALTER TABLE [$Schema$].[$TabName$] ADD [$Primary$]";
 
             _temp_field_comment = new StringBuilder()
 
