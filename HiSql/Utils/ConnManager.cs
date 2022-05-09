@@ -4,7 +4,7 @@ using System.Linq;
 namespace HiSql
 {
     //用于主库的连接管理
-    public   class ConnManager
+    internal   class ConnManager
     {
         /// <summary>
         /// 内部用范围内

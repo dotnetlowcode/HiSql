@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Dynamic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -92,10 +94,10 @@ namespace HiSql
             //Demo1_Insert7(sqlClient);
             //Demo_dynamic(sqlClient);
 
-            //Demo1_Insert8(sqlClient);
+            Demo1_Insert8(sqlClient);
             //Demo1_Insert9(sqlClient);
 
-            Demo1_Insert11(sqlClient);
+            //Demo1_Insert11(sqlClient);
         }
 
         static void Demo1_Insert11(HiSqlClient sqlClient)
@@ -124,27 +126,88 @@ namespace HiSql
             }
             string _josn=DataConvert.ToCSV(lstdata, tabinfo, DBType.MySql,true, "tansar");
         }
+        public static string ReadTextFile(string path)
+        {
+            StringBuilder sb = new StringBuilder();
+            if (System.IO.File.Exists(path))
+            {
+                StreamReader sr = new StreamReader(path, Encoding.Default);
+                string content;
+                while ((content = sr.ReadLine()) != null)
+                {
+                    //Console.WriteLine(content.ToString());
+                    sb.AppendLine(content);
+                }
+                sr.Close();
+            }
 
+            return sb.ToString();
+        }
+        static Dictionary<string, object> ToDictionary(Newtonsoft.Json.Linq.JObject jobject)
+        {
+            var dico = new Dictionary<string, object>();
+
+            foreach (var o in jobject)
+            {
+                var oValue = o.Value;
+
+                var jArray = o.Value as JArray;
+                if (jArray != null)
+                {
+                    var first = jArray[0]; // use first element to guess if we are dealing with a list of dico or an array
+                    var isValueArray = first is JValue;
+
+                    if (isValueArray)
+                    {
+                        var array = jArray.Values().Select(x => ((JValue)x).Value).ToArray();
+                        dico[o.Key] = array;
+                    }
+                    else
+                    {
+                        var list = new List<IDictionary<string, object>>();
+                        foreach (var token in jArray)
+                        {
+                            var elt = ToDictionary((JObject)token);//((JObject)token).ToDictionary();
+                            list.Add(elt);
+                        }
+
+                        dico[o.Key] = list;
+                    }
+                }
+                else
+                {
+                    dico[o.Key] = ((JValue)oValue).Value;
+                }
+            }
+
+            return dico;
+        }
         static async void Demo1_Insert8(HiSqlClient sqlClient)
         {
-            TabInfo tabinfo = sqlClient.Context.DMInitalize.GetTabStruct("HTest01");
+            TabInfo tabinfo = sqlClient.Context.DMInitalize.GetTabStruct("GD_UniqueCodeInfo");
 
             //List<Dictionary<string, object>> lstdata = new List<Dictionary<string, object>> {
             //    new Dictionary<string, object> { { "SID", 123456 }, { "UName", "tansar" }, { "Age", 25 }, { "Salary", 1999.9 }, { "descript", "hello world" } },
             //    new Dictionary<string, object> { { "SID", 123457 }, { "UName", "tansar" }, { "Age", 25 }, { "Salary", 1999.9 }, { "descript", "hello world" } }
             //};
 
-            List<Dictionary<string, object>> lstdata = new List<Dictionary<string, object>>();
-            int _count = 1000000;
-            Random random = new Random();
-            for (int i = 0; i < _count; i++)
-            {
-                lstdata.Add(new Dictionary<string, object> { { "SID", (i + 1) }, { "UName", $"tansar{i}" }, { "Age", 20 + (i % 50) }, { "Salary", 5000 + (i % 2000) + random.Next(10) }, { "descript", "hello world" } });
 
 
-            }
+            //sqlClient.TrunCate("HTest01").ExecCommand();
+            //List<Dictionary<string, object>> lstdata = new List<Dictionary<string, object>>();
+            //int _count = 10000;
+            //Random random = new Random();
+            //for (int i = 0; i < _count; i++)
+            //{
+            //    lstdata.Add(new Dictionary<string, object> { { "SID", (i + 1) }, { "UName", $"tansar{i}" }, { "Age", 20 + (i % 50) }, { "Salary", 5000 + (i % 2000) + random.Next(10) }, { "descript", "hello world" } });
 
 
+            //}
+            //Stopwatch sw = new Stopwatch();
+            //sw.Start();
+            //sqlClient.Insert("HTest01", lstdata).ExecCommand();
+            //sw.Stop();
+            //Console.WriteLine($"分包插入{_count}条 耗时{sw.Elapsed}秒");
 
             //List<TDynamic> lstdyn = new List<TDynamic>();
             //TDynamic t1 = new TDynamic();
@@ -169,16 +232,16 @@ namespace HiSql
             //    new { UTYP = "U3", UTypeName = "高级用户" }
             //};
 
-            sqlClient.TrunCate("HTest01").ExecCommand();
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-            DataTable dt= DataConvert.ToTable(lstdata, tabinfo,sqlClient.CurrentConnectionConfig.User);
-            sw.Stop();
-            Console.WriteLine($"数据转换Table{_count}条 耗时{sw.Elapsed}秒");
-            sw.Reset();
-            sw.Start();
-            int _effect= await  sqlClient.BulkCopyExecCommandAsyc("HTest01", dt);
-            Console.WriteLine($"写入{_effect}条 耗时{sw.Elapsed}秒");
+            //sqlClient.TrunCate("HTest01").ExecCommand();
+            //Stopwatch sw = new Stopwatch();
+            //sw.Start();
+            //DataTable dt= DataConvert.ToTable(lstdata, tabinfo,sqlClient.CurrentConnectionConfig.User);
+            //sw.Stop();
+            //Console.WriteLine($"数据转换Table{_count}条 耗时{sw.Elapsed}秒");
+            //sw.Reset();
+            //sw.Start();
+            //int _effect= await  sqlClient.BulkCopyExecCommandAsyc("HTest01", dt);
+            //Console.WriteLine($"写入{_effect}条 耗时{sw.Elapsed}秒");
             var s = Console.ReadLine();
 
         }

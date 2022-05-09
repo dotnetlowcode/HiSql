@@ -13,6 +13,10 @@ namespace HiSql
         /// </summary>
         int _bluksize = 200;
         int _bulkunitsize = 250000;
+
+        int _packagerecord = 3000;
+        int _packagecell = 40;
+        int _packagecells = 100000;
         string _temp_schema_pre = "`";
         string _temp_schema_after = "`";
 
@@ -194,6 +198,23 @@ namespace HiSql
         public string Fun_CurrDATE { get => _temp_fun_date; }
         public int BlukSize { get => _bluksize; set => _bluksize = value; }
         public int BulkUnitSize { get => _bulkunitsize; set => _bulkunitsize = value; }
+
+        /// <summary>
+        /// 强制分包记录数大小 结合 强制分包列数量 一起触发
+        /// </summary>
+        public int PackageRecord { get => _packagerecord; set => _packagerecord = value; }
+
+
+        /// <summary>
+        /// 强制分包列数量 结合 强制分包记录数大小 一起触发
+        /// </summary>
+        public int PackageCell { get => _packagecell; set => _packagecell = value; }
+
+
+        /// <summary>
+        /// 按分包单元格数
+        /// </summary>
+        public int PackageCells { get => _packagecells; set => _packagecells = value; }
         public string Schema_Pre { get => _temp_schema_pre; }
         public string Schema_After { get => _temp_schema_after; }
         public string Table_Pre { get => _temp_table_pre; }

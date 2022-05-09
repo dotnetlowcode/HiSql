@@ -13,7 +13,8 @@ namespace HiSql
 
 
         T GetCache<T>(string key) where T : class;
-
+        
+        string GetCache(string key);
 
         void SetCache(string key, object value);
 
