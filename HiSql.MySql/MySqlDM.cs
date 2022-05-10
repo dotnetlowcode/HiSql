@@ -2339,6 +2339,10 @@ namespace HiSql
                 {
                     _value = value.ToString();
                 }
+                else if (hiColumn.FieldType.IsIn<HiType>(HiType.BOOL))
+                {
+                    _value = value.ToString();
+                }
                 else if (hiColumn.FieldType.IsIn<HiType>(HiType.DATETIME))
                 {
                     DateTime _time = Convert.ToDateTime(value.ToString());
@@ -2383,6 +2387,18 @@ namespace HiSql
                 }
                 else if (hiColumn.FieldType.IsIn<HiType>(HiType.INT, HiType.DECIMAL, HiType.SMALLINT, HiType.BIGINT))
                 {
+                    _value = value.ToString();
+                }
+                else if (hiColumn.FieldType.IsIn<HiType>(HiType.BOOL))
+                {
+                    //if ("0".Equals(value.ToString()))
+                    //{
+                    //    return "false";
+                    //}
+                    //if ("1".Equals(value.ToString()))
+                    //{
+                    //    return "true";
+                    //}
                     _value = value.ToString();
                 }
                 else if (hiColumn.FieldType.IsIn<HiType>(HiType.DATETIME))
@@ -2673,6 +2689,31 @@ namespace HiSql
                 return new List<TabIndexDetail>();
             throw new NotImplementedException();
         }
+        /// <summary>
+        /// 创建主键
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <param name="primarykeyname"></param>
+        /// <param name="hiColumns"></param>
+        /// <returns></returns>
+        public string CreatePrimaryKey(string tabname, List<HiColumn> hiColumns)
+        {
+            //注未判断索引是否重复，由底层库抛出
+            string _sql = dbConfig.Table_PrimaryKeyCreate.Replace("[$TabName$]", tabname).Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema);
+            DataTable dt = GetTableDefinition(tabname);
+            string _fields = string.Empty;
+
+            string keys = BuildKey(hiColumns);
+            if (!string.IsNullOrEmpty(keys))
+            {
+                keys = dbConfig.Table_Key.Replace("[$TabName$]", tabname)
+                    .Replace("[$Keys$]", keys).Replace("[$ConnectID$]", this.Context.ConnectedId.Replace("-", "_"));
+            }
+
+            _sql = _sql.Replace("[$Primary$]", keys);
+            return _sql;
+        }
+
         public string CreateIndex(string tabname, string indexname, List<HiColumn> hiColumns)
         {
             //注未判断索引是否重复，由底层库抛出
@@ -2710,17 +2751,22 @@ namespace HiSql
             throw new NotImplementedException();
         }
 
-        public string DropIndex(string tabname, string indexname)
+        public string DropIndex(string tabname, string indexname, bool isPrimary)
         {
-            
             //暂未校验索引是否存在 由底层数据库抛出
-            string _sql = dbConfig.Get_DropIndex.Replace("[$IndexName$]", indexname).Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema)
-                .Replace("[$TabName$]", tabname)
-                ;
-
-
-            return _sql;
-            throw new NotImplementedException();
+            if (!isPrimary)
+            {
+                //暂未校验索引是否存在 由底层数据库抛出
+                string _sql = dbConfig.Get_DropIndex.Replace("[$IndexName$]", indexname).Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema)
+                    .Replace("[$TabName$]", tabname) ;
+                return _sql;
+            }
+            else
+            {
+                string _sql = dbConfig.Table_PrimaryKeyDrop.Replace("[$IndexName$]", indexname).Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema)
+                               .Replace("[$TabName$]", tabname) ;
+                return _sql;
+            }
         }
 
         /// <summary>

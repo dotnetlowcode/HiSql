@@ -198,7 +198,9 @@ namespace HiSql
         /// </summary>
         string _temp_drop_index = "";
 
+        string _temp_tabel_primarykey_create = "";
 
+        string _temp_tabel_primarykey_drop = "";
         /// <summary>
         /// 字段创建时的模板[$FieldName$]  这是一个可替换的字符串ColumnName是在HiColumn中的属性名
         /// </summary>
@@ -415,6 +417,8 @@ namespace HiSql
         /// </summary>
         public string Get_DropIndex { get => _temp_drop_index; }
 
+        public string Table_PrimaryKeyCreate { get => _temp_tabel_primarykey_create; }
+        public string Table_PrimaryKeyDrop { get => _temp_tabel_primarykey_drop; }
         /// <summary>
         /// 根据表的类型生成对应数据库的名称
         /// </summary>
@@ -788,8 +792,8 @@ UNION ALL
                 .AppendLine("   case when b.description is null then '' else b.description end as \"FieldDesc\",")
                 .AppendLine("   (select column_default from information_schema.columns where table_schema='[$Schema$]' and  table_name = C .relname and column_name =A .attname) as \"DbDefault\",")
                 .AppendLine("   case  when A .attnotnull = 't' THEN 'False' else 'True' end AS \"IsNull\",")
-                .AppendLine("   case when(select count(pc.conname) from pg_constraint  pc where a.attnum = pc.conkey [ 1 ] and pc.conrelid = c.oid) = '1' then 'True' else 'False' end as \"IsPrimary\",")
-                .AppendLine("   case when   A .attnotnull = 't' and (select count(column_default) from information_schema.columns where table_schema='[$Schema$]' and  table_name = C .relname and column_name =A .attname and column_default like 'nextval(%' )='1'  and (select count(pc.conname) from pg_constraint  pc where a.attnum = pc.conkey [ 1 ] and pc.conrelid = c.oid) = '1' then 'True' else 'Fasle' end as \"IsIdentity\"")
+                .AppendLine("   case when(select count(pc.conname) from pg_constraint  pc where a.attnum = ANY(pc.conkey) and pc.conrelid = c.oid) = '1' then 'True' else 'False' end as \"IsPrimary\",")
+                .AppendLine("   case when   A .attnotnull = 't' and (select count(column_default) from information_schema.columns where table_schema='[$Schema$]' and  table_name = C .relname and column_name =A .attname and column_default like 'nextval(%' )='1'  and (select count(pc.conname) from pg_constraint  pc where a.attnum = ANY(pc.conkey) and pc.conrelid = c.oid) = '1' then 'True' else 'Fasle' end as \"IsIdentity\"")
                 .AppendLine("FROM")
                 .AppendLine("   pg_class C, pg_namespace as ns,")
                 .AppendLine("   pg_attribute A ")
@@ -978,7 +982,10 @@ CREATE INDEX {_temp_schema_pre}[$IndexName$]{_temp_schema_after}
                 .AppendLine($@"ALTER TABLE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} RENAME TO {_temp_table_pre}[$ReTabName$]{_temp_table_after}; ")
                 .ToString();
 
-            
+            _temp_tabel_primarykey_drop = $"ALTER TABLE IF EXISTS {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} DROP CONSTRAINT IF EXISTS {_temp_table_pre}[$IndexName$]{_temp_table_after} ;";
+           
+
+            _temp_tabel_primarykey_create = $@"ALTER TABLE IF EXISTS {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} ADD PRIMARY KEY([$Keys$]) ;";
 
         }
     }

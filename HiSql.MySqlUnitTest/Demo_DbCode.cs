@@ -12,13 +12,13 @@ namespace HiSql.MySqlUnitTest
         {
             //Demo_AddColumn(sqlClient); //ok
             //Demo_ReColumn(sqlClient);//ok
-            Demo_ModiColumn(sqlClient); //ok
+            //Demo_ModiColumn(sqlClient); //ok
             //Demo_DelColumn(sqlClient);////ok
             //Demo_Tables(sqlClient);//ok
             //Demo_View(sqlClient);//ok
             //Demo_AllTables(sqlClient);//ok
             //Demo_GlobalTables(sqlClient);//  delay
-            //Demo_ModiTable(sqlClient);//ok
+            Demo_ModiTable(sqlClient);//ok
 
             //Demo_DropView(sqlClient); //ok
             //Demo_CreateView(sqlClient);//ok
@@ -28,10 +28,12 @@ namespace HiSql.MySqlUnitTest
             //Demo_Index_Create(sqlClient);//ok
             //Demo_ReTable(sqlClient);//ok
 
-            Demo_TableDataCount(sqlClient);
+            //Demo_TableDataCount(sqlClient);
             //Demo_TablesPaging(sqlClient);
             //Demo_ViewsPaging(sqlClient);
             //Demo_AllTablesPaging(sqlClient);
+
+            //Demo_Primary_Create(sqlClient);
         }
         static void Demo_AllTablesPaging(HiSqlClient sqlClient)
         {
@@ -78,14 +80,26 @@ namespace HiSql.MySqlUnitTest
             var tabinfo = sqlClient.Context.DMInitalize.GetTabStruct("htest03");
 
             TabInfo _tabcopy = ClassExtensions.DeepCopy<TabInfo>(tabinfo);
-            _tabcopy.Columns.RemoveAt(4);
-            HiColumn newcol = ClassExtensions.DeepCopy<HiColumn>(_tabcopy.Columns[1]);
-            newcol.FieldName = "Testne32";
-            newcol.ReFieldName = "Testne32";
-            _tabcopy.Columns.Add(newcol);
-            _tabcopy.Columns[1].ReFieldName = "UName_85";
+            //_tabcopy.Columns.RemoveAt(4);
+            //HiColumn newcol = ClassExtensions.DeepCopy<HiColumn>(_tabcopy.Columns[1]);
+            //newcol.FieldName = "Testne32";
+            //newcol.ReFieldName = "Testne32";
+            //_tabcopy.Columns.Add(newcol);
+            //_tabcopy.Columns[1].ReFieldName = "UName_85";
 
-            _tabcopy.Columns[4].IsRequire = true;
+            //_tabcopy.Columns[4].IsRequire = true;
+
+            _tabcopy.PrimaryKey.ForEach(x => {
+                x.IsPrimary = false;
+            });
+
+            _tabcopy.Columns.ForEach(t => {
+                if (t.FieldName == "SID" //|| t.FieldName == "Age"
+                )
+                {
+                    t.IsPrimary = true;
+                }
+            });
 
             var rtn = sqlClient.DbFirst.ModiTable(_tabcopy, OpLevel.Execute);
             if (rtn.Item1)
@@ -112,7 +126,32 @@ namespace HiSql.MySqlUnitTest
                 Console.WriteLine(rtn.Item2);//输出重命名失败原因
 
         }
+        static void Demo_Primary_Create(HiSqlClient sqlClient)
+        {
+            //删除主键
+            List<TabIndex> lstindex = sqlClient.DbFirst.GetTabIndexs("htest01").Where(t => t.IndexType == "Key_Index").ToList();
+            foreach (var item in lstindex)
+            {
+                var rtndel = sqlClient.DbFirst.DelPrimaryKey(item.TabName, OpLevel.Execute);
+                if (rtndel.Item1)
+                    Console.WriteLine(rtndel.Item3);
+                else
+                    Console.WriteLine(rtndel.Item2);
+            }
 
+            //创建主键
+            TabInfo tabInfo = sqlClient.Context.DMInitalize.GetTabStruct("htest01");
+            List<HiColumn> hiColumns = tabInfo.Columns.Where(c => c.FieldName == "SID").ToList();
+            hiColumns.ForEach((c) => {
+                c.IsPrimary = true;
+            });
+            var rtn = sqlClient.DbFirst.CreatePrimaryKey("htest01", hiColumns, OpLevel.Execute);
+            if (rtn.Item1)
+                Console.WriteLine(rtn.Item3);
+            else
+                Console.WriteLine(rtn.Item2);
+
+        }
         static void Demo_Index_Create(HiSqlClient sqlClient)
         {
 

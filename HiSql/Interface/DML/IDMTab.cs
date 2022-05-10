@@ -97,22 +97,28 @@ namespace HiSql
 
 
         /// <summary>
+        /// 对指定表创建主键
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <param name="hiColumns"></param>
+        /// <returns></returns>
+        string CreatePrimaryKey(string tabname,List<HiColumn> hiColumns);
+        /// <summary>
         /// 对指定表创建索引
         /// </summary>
         /// <param name="tabname"></param>
         /// <param name="hiColumns"></param>
         /// <returns></returns>
-        string CreateIndex(string tabname,string indexname,List<HiColumn> hiColumns);
-
+        string CreateIndex(string tabname, string indexname, List<HiColumn> hiColumns);
         /// <summary>
         /// 删除索引
         /// </summary>
         /// <param name="tabname"></param>
         /// <param name="indexname"></param>
         /// <returns></returns>
-        string DropIndex(string tabname, string indexname);
+        string DropIndex(string tabname, string indexname, bool isPrimary);
 
-
+        
         /// <summary>
         /// 获取所有表和视图
         /// </summary>
