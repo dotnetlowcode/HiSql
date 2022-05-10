@@ -19,10 +19,14 @@ D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\net461\Microsoft.Identity
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\net461\Microsoft.IdentityModel.Tokens.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\net461\Newtonsoft.Json.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\net461\Npgsql.dll
+D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\net461\Pipelines.Sockets.Unofficial.dll
+D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\net461\StackExchange.Redis.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\net461\System.Buffers.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\net461\System.Configuration.ConfigurationManager.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\net461\System.Diagnostics.DiagnosticSource.dll
+D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\net461\System.Diagnostics.PerformanceCounter.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\net461\System.IdentityModel.Tokens.Jwt.dll
+D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\net461\System.IO.Pipelines.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\net461\System.Memory.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\net461\System.Numerics.Vectors.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\net461\System.Runtime.CompilerServices.Unsafe.dll
@@ -152,7 +156,3 @@ D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\net461\HiSql.PostGreSql.c
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\net461\HiSql.PostGreSql.csproj.CopyComplete
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\net461\HiSql.PostGreSql.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\net461\HiSql.PostGreSql.pdb
-D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\net461\Pipelines.Sockets.Unofficial.dll
-D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\net461\StackExchange.Redis.dll
-D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\net461\System.Diagnostics.PerformanceCounter.dll
-D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Debug\net461\System.IO.Pipelines.dll

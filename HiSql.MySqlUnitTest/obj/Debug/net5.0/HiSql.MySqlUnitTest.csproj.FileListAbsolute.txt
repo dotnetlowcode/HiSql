@@ -33,6 +33,8 @@ D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\Ubiety.Dns.Core
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\Zstandard.Net.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\Newtonsoft.Json.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\Oracle.ManagedDataAccess.dll
+D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\Pipelines.Sockets.Unofficial.dll
+D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\StackExchange.Redis.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\System.Configuration.ConfigurationManager.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\System.Data.OracleClient.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\System.Diagnostics.PerformanceCounter.dll
@@ -40,6 +42,7 @@ D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\System.Director
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\System.DirectoryServices.Protocols.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\System.Drawing.Common.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\System.IdentityModel.Tokens.Jwt.dll
+D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\System.IO.Pipelines.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\System.Runtime.Caching.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\System.Runtime.CompilerServices.Unsafe.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\System.Security.Cryptography.ProtectedData.dll
@@ -78,6 +81,3 @@ D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\obj\Debug\net5.0\HiSql.MySqlUnit
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\obj\Debug\net5.0\ref\HiSql.MySqlUnitTest.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\obj\Debug\net5.0\HiSql.MySqlUnitTest.pdb
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\obj\Debug\net5.0\HiSql.MySqlUnitTest.genruntimeconfig.cache
-D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\Pipelines.Sockets.Unofficial.dll
-D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\StackExchange.Redis.dll
-D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\System.IO.Pipelines.dll

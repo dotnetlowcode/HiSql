@@ -178,6 +178,9 @@ namespace HiSql
         string _temp_drop_index = "";
 
 
+        string _temp_tabel_primarykey_create = "";
+
+        string _temp_tabel_primarykey_drop = "";
 
         /// <summary>
         /// 字段创建时的模板[$FieldName$]  这是一个可替换的字符串ColumnName是在HiColumn中的属性名
@@ -359,7 +362,8 @@ namespace HiSql
         /// </summary>
         public string Get_DropIndex { get => _temp_drop_index; }
 
-
+        public string Table_PrimaryKeyCreate { get => _temp_tabel_primarykey_create; }
+        public string Table_PrimaryKeyDrop { get => _temp_tabel_primarykey_drop; }
 
         /// <summary>
         /// 根据表的类型生成对应数据库的名称
@@ -694,6 +698,11 @@ UNION ALL
                 .AppendLine("AS")
                 .AppendLine("[$ViewSql$]")
                 .ToString();
+
+            _temp_tabel_primarykey_drop = $"ALTER TABLE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} DROP PRIMARY KEY ;";
+
+            _temp_tabel_primarykey_create = $@"ALTER TABLE  {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} ADD [$Primary$] ;";
+
 
 
             //修改视图

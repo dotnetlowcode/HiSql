@@ -25,6 +25,8 @@ D:\Project\OpenSource\HiSql\HiSql.OralceUnitTest\bin\Debug\net5.0\Microsoft.Iden
 D:\Project\OpenSource\HiSql\HiSql.OralceUnitTest\bin\Debug\net5.0\Microsoft.Win32.SystemEvents.dll
 D:\Project\OpenSource\HiSql\HiSql.OralceUnitTest\bin\Debug\net5.0\Newtonsoft.Json.dll
 D:\Project\OpenSource\HiSql\HiSql.OralceUnitTest\bin\Debug\net5.0\Oracle.ManagedDataAccess.dll
+D:\Project\OpenSource\HiSql\HiSql.OralceUnitTest\bin\Debug\net5.0\Pipelines.Sockets.Unofficial.dll
+D:\Project\OpenSource\HiSql\HiSql.OralceUnitTest\bin\Debug\net5.0\StackExchange.Redis.dll
 D:\Project\OpenSource\HiSql\HiSql.OralceUnitTest\bin\Debug\net5.0\System.Configuration.ConfigurationManager.dll
 D:\Project\OpenSource\HiSql\HiSql.OralceUnitTest\bin\Debug\net5.0\System.Data.OracleClient.dll
 D:\Project\OpenSource\HiSql\HiSql.OralceUnitTest\bin\Debug\net5.0\System.Diagnostics.PerformanceCounter.dll
@@ -32,6 +34,7 @@ D:\Project\OpenSource\HiSql\HiSql.OralceUnitTest\bin\Debug\net5.0\System.Directo
 D:\Project\OpenSource\HiSql\HiSql.OralceUnitTest\bin\Debug\net5.0\System.DirectoryServices.Protocols.dll
 D:\Project\OpenSource\HiSql\HiSql.OralceUnitTest\bin\Debug\net5.0\System.Drawing.Common.dll
 D:\Project\OpenSource\HiSql\HiSql.OralceUnitTest\bin\Debug\net5.0\System.IdentityModel.Tokens.Jwt.dll
+D:\Project\OpenSource\HiSql\HiSql.OralceUnitTest\bin\Debug\net5.0\System.IO.Pipelines.dll
 D:\Project\OpenSource\HiSql\HiSql.OralceUnitTest\bin\Debug\net5.0\System.Runtime.Caching.dll
 D:\Project\OpenSource\HiSql\HiSql.OralceUnitTest\bin\Debug\net5.0\System.Runtime.CompilerServices.Unsafe.dll
 D:\Project\OpenSource\HiSql\HiSql.OralceUnitTest\bin\Debug\net5.0\System.Security.Cryptography.ProtectedData.dll
@@ -68,6 +71,3 @@ D:\Project\OpenSource\HiSql\HiSql.OralceUnitTest\obj\Debug\net5.0\HiSql.OralceUn
 D:\Project\OpenSource\HiSql\HiSql.OralceUnitTest\obj\Debug\net5.0\ref\HiSql.OralceUnitTest.dll
 D:\Project\OpenSource\HiSql\HiSql.OralceUnitTest\obj\Debug\net5.0\HiSql.OralceUnitTest.pdb
 D:\Project\OpenSource\HiSql\HiSql.OralceUnitTest\obj\Debug\net5.0\HiSql.OralceUnitTest.genruntimeconfig.cache
-D:\Project\OpenSource\HiSql\HiSql.OralceUnitTest\bin\Debug\net5.0\Pipelines.Sockets.Unofficial.dll
-D:\Project\OpenSource\HiSql\HiSql.OralceUnitTest\bin\Debug\net5.0\StackExchange.Redis.dll
-D:\Project\OpenSource\HiSql\HiSql.OralceUnitTest\bin\Debug\net5.0\System.IO.Pipelines.dll

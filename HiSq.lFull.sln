@@ -31,6 +31,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HiSql.Test", "HiSql.Test\Hi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HiSql.SqlServer.Test", "HiSql.SqlServer.Test\HiSql.SqlServer.Test.csproj", "{F4E42882-38C5-4C4F-B28D-4F04437D3278}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HiSql.Extension", "HiSql.Extension", "{045DC594-A170-4FC0-8539-B497334BBF34}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HiSql.Excel", "HiSql.Extension\HiSql.Excel\HiSql.Excel.csproj", "{53209EF7-0829-4C01-88CB-B1F90114401F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HiSql.Excel.Test", "HiSql.Extension\HiSql.Excel.Demo\HiSql.Excel.Test.csproj", "{14ABDDEA-33D2-4E43-90F7-4EB9CCE3E07F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -93,9 +99,21 @@ Global
 		{F4E42882-38C5-4C4F-B28D-4F04437D3278}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F4E42882-38C5-4C4F-B28D-4F04437D3278}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F4E42882-38C5-4C4F-B28D-4F04437D3278}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53209EF7-0829-4C01-88CB-B1F90114401F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53209EF7-0829-4C01-88CB-B1F90114401F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53209EF7-0829-4C01-88CB-B1F90114401F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53209EF7-0829-4C01-88CB-B1F90114401F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14ABDDEA-33D2-4E43-90F7-4EB9CCE3E07F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14ABDDEA-33D2-4E43-90F7-4EB9CCE3E07F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14ABDDEA-33D2-4E43-90F7-4EB9CCE3E07F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14ABDDEA-33D2-4E43-90F7-4EB9CCE3E07F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{53209EF7-0829-4C01-88CB-B1F90114401F} = {045DC594-A170-4FC0-8539-B497334BBF34}
+		{14ABDDEA-33D2-4E43-90F7-4EB9CCE3E07F} = {045DC594-A170-4FC0-8539-B497334BBF34}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B9C035B8-4C64-4997-8777-A0FAD4554779}

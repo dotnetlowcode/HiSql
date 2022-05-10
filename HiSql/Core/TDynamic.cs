@@ -49,6 +49,11 @@ namespace HiSql
                     _dicO.Add(p.Name, p.GetValue(objdata));
                 }
             }
+            else if (type.FullName.IndexOf("ExpandoObject") > 0)
+            {
+                _exObject =(ExpandoObject) objdata;
+                _dicO = ((IDictionary<string, object>)_exObject);
+            }
             else
             {
                 throw new Exception("不支持该类型");

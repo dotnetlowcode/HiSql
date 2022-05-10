@@ -101,6 +101,69 @@ namespace HiSql
             TabInfo tabinfo = idm.GetTabStruct(tabname);
             return addColumn(idm, tabinfo, hiColumn, opLevel);
         }
+        public Tuple<bool, string, string> CreatePrimaryKey(string tabname, List<HiColumn> columns, OpLevel opLevel)
+        {
+
+            bool _isok = false;
+            string _msg = "";
+            string _sql = "";
+
+            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
+
+            idm.Context = SqlClient.Context;
+
+            List<TabIndex> lstindex = idm.GetIndexs(tabname);
+            if (lstindex.Any(i => string.Equals(i.IndexType ,"Key_Index", StringComparison.OrdinalIgnoreCase)))
+                _msg = $"表[{tabname}]已经存在主键";
+            else
+            {
+                if (columns.Count == 0)
+                {
+                    _msg = $"创建索引必须要指定列";
+
+                    return new Tuple<bool, string, string>(_isok, _msg, _sql);
+                }
+                if (columns.Any(t => t.FieldType == HiType.BINARY || t.FieldType == HiType.TEXT))
+                {
+                    _msg = $"创建索引字段不能是【{HiType.BINARY}】或【{HiType.TEXT}】";
+                    return new Tuple<bool, string, string>(_isok, _msg, _sql);
+                }
+                
+                _sql = idm.CreatePrimaryKey(tabname, columns);
+                
+                if (idm.Context.CurrentConnectionConfig.UpperCase)
+                {
+                    _sql = _sql.ToUpper();
+
+                }
+                if (opLevel == OpLevel.Execute)
+                {
+                    _sqlClient.BeginTran();
+                    try
+                    {
+                        _sqlClient.Context.DBO.ExecCommand(_sql);
+                        _sqlClient.CommitTran();
+                        _isok = true;
+                        _msg = $"为表[{tabname}]创建主键成功";
+                    }
+                    catch (Exception E)
+                    {
+                        _msg = E.Message.ToString();
+                        _sqlClient.RollBackTran();
+                    }
+                }
+                else
+                {
+                    _isok = true;
+                    _msg = $"为表[{tabname}]创建主键检测成功";
+                }
+
+            }
+            //return idm.CreateIndex(tabname, indexname, columns)
+
+            return new Tuple<bool, string, string>(_isok, _msg, _sql);
+        }
+
 
         /// <summary>
         /// 向表创建索引
@@ -126,6 +189,12 @@ namespace HiSql
                 {
                     _msg = $"创建索引必须要指定列";
 
+                    return new Tuple<bool, string, string>(_isok, _msg, _sql);
+                }
+
+                if (columns.Any(t=>t.FieldType == HiType.BINARY || t.FieldType == HiType.TEXT))
+                {
+                    _msg = $"创建索引字段不能是【{HiType.BINARY}】或【{HiType.TEXT}】";
                     return new Tuple<bool, string, string>(_isok, _msg, _sql);
                 }
                 else
@@ -406,6 +475,67 @@ namespace HiSql
             return delColumn(idm, tabinfo, hiColumn, opLevel);
         }
 
+        /// <summary>
+        /// 删除指定的索引
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <param name="indexname"></param>
+        /// <returns></returns>
+        public Tuple<bool, string, string> DelPrimaryKey(string tabname, OpLevel opLevel)
+        {
+            bool _isok = false;
+            string _msg = "";
+            string _sql = "";
+            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
+            idm.Context = SqlClient.Context;
+
+            if (idm.Context.CurrentConnectionConfig.UpperCase)
+            {
+                tabname = tabname.ToUpper();
+            }
+
+            List<TabIndex> lst = idm.GetIndexs(tabname);
+            if (!lst.Any(t => string.Equals(t.IndexType,"Key_Index", StringComparison.OrdinalIgnoreCase)))
+            {
+                _msg = $"表[{tabname}]没有主键";
+                return new Tuple<bool, string, string>(false, _msg, _sql);
+            }
+            string primaryKeyName = lst.FirstOrDefault(t => string.Equals(t.IndexType, "Key_Index", StringComparison.OrdinalIgnoreCase)).IndexName;
+            _sql = idm.DropIndex(tabname, primaryKeyName, true);
+                 
+            {
+                if (idm.Context.CurrentConnectionConfig.UpperCase)
+                {
+                    _sql = _sql.ToUpper();
+
+                }
+                if (opLevel == OpLevel.Execute)
+                {
+                    //执行数据库命令
+
+                    _sqlClient.BeginTran();
+                    try
+                    {
+                        _sqlClient.Context.DBO.ExecCommand(_sql, null);
+                        _sqlClient.CommitTran();
+                        _isok = true;
+                        _msg = $"删除主键[{primaryKeyName}]成功";
+                    }
+                    catch (Exception E)
+                    {
+                        _sqlClient.RollBackTran();
+                        _isok = false;
+                        _msg = E.Message.ToString();
+                    }
+                }
+                else
+                {
+                    _isok = true;
+                    _msg = $"删除主键[{primaryKeyName}]检测成功";
+                }
+            }
+            return new Tuple<bool, string, string>(_isok, _msg, _sql);
+        }
 
         /// <summary>
         /// 删除指定的索引
@@ -427,8 +557,20 @@ namespace HiSql
             }
 
             List<TabIndex> lst = idm.GetIndexs(tabname);
+            if (!lst.Any(t => t.IndexName.ToLower() == indexname.ToLower()))
+            {
+                _msg = $"索引[{indexname}]不存在于表[{tabname}]中";
+                return new Tuple<bool, string, string>(false, _msg, _sql);
+            }
+            if (lst.Any(t => t.IndexName.ToLower() == indexname.ToLower() && t.IndexType == "Key_Index"))
+            {
+                _sql = idm.DropIndex(tabname, indexname, true);
+            }
+            else
+            {
+                _sql = idm.DropIndex(tabname, indexname, false);
+            }
 
-            _sql = idm.DropIndex(tabname, indexname);
             if (!lst.Any(t => t.IndexName.ToLower() == indexname.ToLower()))
             {
                 _msg = $"索引[{indexname}]不存在于表[{tabname}]中";
@@ -460,9 +602,6 @@ namespace HiSql
                         _isok = false;
                         _msg = E.Message.ToString();
                     }
-
-
-
                 }
                 else
                 {
@@ -1122,6 +1261,12 @@ namespace HiSql
             var changes = fieldChanges.Where(f => f.Action != TabFieldAction.NONE);
 
 
+            //检查是否要删除主键并创建主键
+            var reBuilderPrimaryKey = true;
+            if (tab.PrimaryKey.Count == tabInfo.PrimaryKey.Count && tab.PrimaryKey.Select(t => t.FieldName).ToList().All(tabInfo.PrimaryKey.Select(t => t.FieldName).ToList().Contains))
+            {
+                reBuilderPrimaryKey = false;
+            }
             List<HiColumn> lstchg = new List<HiColumn>();
             List<HiColumn> lstdel = new List<HiColumn>();
 
@@ -1264,7 +1409,26 @@ namespace HiSql
                 }
             }
 
-            if (changes.Count() > 0)
+            if (reBuilderPrimaryKey)
+            {
+                List<TabIndex> lst = idm.GetIndexs(tabInfo.TabModel.TabName);
+                if (lst.Count > 0)
+                {
+                    string primaryKeyName = lst.FirstOrDefault(t => string.Equals(t.IndexType, "Key_Index", StringComparison.OrdinalIgnoreCase)).IndexName;
+                    string delPrimaryKey = idm.DropIndex(tabInfo.TabModel.TabName, primaryKeyName, true);
+                    if (!delPrimaryKey.IsNullOrEmpty())
+                    {
+                        sb_sql = sb_sql.Insert(0, delPrimaryKey + "\r\n");
+                    }
+                }
+                if (tabInfo.PrimaryKey.Count > 0)
+                {
+                    string createPrimaryKey = idm.CreatePrimaryKey(tabInfo.TabModel.TabName, tabInfo.PrimaryKey);
+                    sb_sql.AppendLine().AppendLine(createPrimaryKey);
+                }
+               
+            }
+            if (changes.Count() > 0 || reBuilderPrimaryKey)
             {
                 int resultCnt = 0;
                 _sql = sb_sql.ToString();
@@ -1275,7 +1439,7 @@ namespace HiSql
                         _sqlClient.BeginTran();
                         try
                         {
-                            if (_tabchange)
+                            if (_tabchange || reBuilderPrimaryKey)
                             {
                                 _sql = idm.BuildSqlCodeBlock(_sql);
 

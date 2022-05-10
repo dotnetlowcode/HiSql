@@ -19,7 +19,7 @@ namespace HiSql.HanaUnitTest
             //Demo_View(sqlClient);// ok
             //Demo_AllTables(sqlClient);//ok
             //Demo_GlobalTables(sqlClient);//  delay
-            //Demo_ModiTable(sqlClient);///ok
+            Demo_ModiTable(sqlClient);///ok
 
             //Demo_DropView(sqlClient); //ok
             //Demo_CreateView(sqlClient);//ok
@@ -34,8 +34,11 @@ namespace HiSql.HanaUnitTest
             //Demo_TablesPaging(sqlClient);
             //Demo_ViewsPaging(sqlClient);
 
-            Demo_AllTablesPaging(sqlClient);
+            //Demo_AllTablesPaging(sqlClient);
+            //Demo_Primary_Create(sqlClient);
         }
+
+      
         static void Demo_AllTablesPaging(HiSqlClient sqlClient)
         {
             int total = 0;
@@ -84,16 +87,24 @@ namespace HiSql.HanaUnitTest
 
             TabInfo _tabcopy = ClassExtensions.DeepCopy<TabInfo>(tabinfo);
             _tabcopy.Columns.RemoveAt(4);
-            _tabcopy.Columns.RemoveAt(3);
 
             HiColumn newcol = ClassExtensions.DeepCopy<HiColumn>(_tabcopy.Columns[1]);
-           newcol.FieldName = "Testnames33";
-            newcol.ReFieldName = "Testnames33";
+           newcol.FieldName = "Testnames332";
+            newcol.ReFieldName = "Testnames332";
             _tabcopy.Columns.Add(newcol);
-            _tabcopy.Columns[1].ReFieldName = "UNAME_013";
-
+            _tabcopy.Columns[1].ReFieldName = "UNAME_0123";
             _tabcopy.Columns[4].IsRequire = true;
 
+            _tabcopy.PrimaryKey.ForEach(x =>{
+                x.IsPrimary = false;
+            });
+            _tabcopy.Columns.ForEach(t => {
+                if (t.FieldName == "SID" || t.FieldName == "AGE")
+                {
+                    t.IsPrimary = true;
+                }
+            });
+            
             var rtn = sqlClient.DbFirst.ModiTable(_tabcopy, OpLevel.Execute);
             if (rtn.Item1)
             {
@@ -119,7 +130,35 @@ namespace HiSql.HanaUnitTest
                 Console.WriteLine(rtn.Item2);//输出重命名失败原因
 
         }
+        static void Demo_Primary_Create(HiSqlClient sqlClient)
+        {
+            //sqlClient.CodeFirst.CreateTable(typeof(Table.HTest01));
 
+            List<TabIndex> lstindex = sqlClient.DbFirst.GetTabIndexs("HI_TEST01").Where(t => string.Compare(t.IndexType, "Key_Index", true) == 0).ToList();
+            foreach (var item in lstindex)
+            {
+                var rtndel = sqlClient.DbFirst.DelPrimaryKey(item.TabName, OpLevel.Execute);
+                if (rtndel.Item1)
+                    Console.WriteLine(rtndel.Item3);
+                else
+                    Console.WriteLine(rtndel.Item2);
+            }
+
+            //创建主键
+            TabInfo tabInfo = sqlClient.Context.DMInitalize.GetTabStruct("HI_TEST01");
+
+            List<HiColumn> hiColumns = tabInfo.Columns.Where(c => string.Compare(c.FieldName, "AGE", true) == 0 || string.Compare(c.FieldName, "SID", true) == 0).ToList();
+           
+            hiColumns.ForEach((c) => {
+                c.IsPrimary = true;
+            });
+            var rtn = sqlClient.DbFirst.CreatePrimaryKey("HI_TEST01", hiColumns, OpLevel.Execute);
+            if (rtn.Item1)
+                Console.WriteLine(rtn.Item3);
+            else
+                Console.WriteLine(rtn.Item2);
+
+        }
         static void Demo_Index_Create(HiSqlClient sqlClient)
         {
             TabInfo tabInfo = sqlClient.Context.DMInitalize.GetTabStruct("HI_TEST01");

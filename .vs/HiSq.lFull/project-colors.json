@@ -65,7 +65,17 @@
       "ProjectGuid": "988a8244-67ab-49cd-9700-d0aba79f2ead",
       "DisplayName": "HiSql.MySqlUnitTest",
       "ColorIndex": 11
+    },
+    "14abddea-33d2-4e43-90f7-4eb9cce3e07f": {
+      "ProjectGuid": "14abddea-33d2-4e43-90f7-4eb9cce3e07f",
+      "DisplayName": "HiSql.Excel.Test",
+      "ColorIndex": 12
+    },
+    "53209ef7-0829-4c01-88cb-b1f90114401f": {
+      "ProjectGuid": "53209ef7-0829-4c01-88cb-b1f90114401f",
+      "DisplayName": "HiSql.Excel",
+      "ColorIndex": 13
     }
   },
-  "NextColorIndex": 12
+  "NextColorIndex": 14
 }

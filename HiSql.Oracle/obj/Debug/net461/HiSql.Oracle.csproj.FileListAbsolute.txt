@@ -19,10 +19,14 @@ D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net461\Microsoft.IdentityMode
 D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net461\Microsoft.IdentityModel.Tokens.dll
 D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net461\Newtonsoft.Json.dll
 D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net461\Oracle.ManagedDataAccess.dll
+D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net461\Pipelines.Sockets.Unofficial.dll
+D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net461\StackExchange.Redis.dll
 D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net461\System.Buffers.dll
 D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net461\System.Configuration.ConfigurationManager.dll
 D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net461\System.Diagnostics.DiagnosticSource.dll
+D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net461\System.Diagnostics.PerformanceCounter.dll
 D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net461\System.IdentityModel.Tokens.Jwt.dll
+D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net461\System.IO.Pipelines.dll
 D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net461\System.Memory.dll
 D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net461\System.Numerics.Vectors.dll
 D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net461\System.Runtime.CompilerServices.Unsafe.dll
@@ -32,6 +36,7 @@ D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net461\System.Security.Permis
 D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net461\System.Security.Principal.Windows.dll
 D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net461\System.Text.Encodings.Web.dll
 D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net461\System.Text.Json.dll
+D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net461\System.Threading.Channels.dll
 D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net461\System.Threading.Tasks.Extensions.dll
 D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net461\System.ValueTuple.dll
 D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net461\de\Microsoft.Data.SqlClient.resources.dll
@@ -151,8 +156,3 @@ D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Debug\net461\HiSql.Oracle.csproj.Co
 D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Debug\net461\HiSql.Oracle.csproj.CopyComplete
 D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Debug\net461\HiSql.Oracle.dll
 D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Debug\net461\HiSql.Oracle.pdb
-D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net461\Pipelines.Sockets.Unofficial.dll
-D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net461\StackExchange.Redis.dll
-D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net461\System.Diagnostics.PerformanceCounter.dll
-D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net461\System.IO.Pipelines.dll
-D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net461\System.Threading.Channels.dll

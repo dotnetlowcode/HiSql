@@ -62,9 +62,9 @@ namespace HiSql
             //(p.Name.ToLower()!= "SortNum".ToLower() && p.Name.ToLower() != "IsSys".ToLower()) 
             (
 
-                 p.Name.ToLower().IsIn("FieldDesc".ToLower(), "IsIdentity".ToLower(), "IsPrimary".ToLower(), "FieldName".ToLower(),
+                 p.Name.ToLower().IsIn("FieldDesc".ToLower(), "IsIdentity".ToLower(), "FieldName".ToLower(),
                 "FieldType".ToLower(), "DefaultValue".ToLower(), "FieldLen".ToLower(), "FieldDec".ToLower(), "IsNull".ToLower(), "ReFieldName".ToLower())
-            )
+            ) // "IsPrimary".ToLower(),  是否主键额外处理  pengxy 
             && p.MemberType == MemberTypes.Property).ToArray();
             foreach (var po in props)
             {
@@ -86,10 +86,10 @@ namespace HiSql
             props = t1.GetProperties().Where(p => p.CanWrite == true && !Constants.IsStandardField(p.Name)
             &&
             (
-                 p.Name.ToLower().NotIn("FieldDesc".ToLower(), "IsIdentity".ToLower(), "IsPrimary".ToLower(), "FieldName".ToLower(),
+                 p.Name.ToLower().NotIn("FieldDesc".ToLower(), "IsIdentity".ToLower(),  "FieldName".ToLower(),
                 "FieldType".ToLower(), "DefaultValue".ToLower(), "FieldLen".ToLower(), "FieldDec".ToLower(), "IsNull".ToLower(),
                 "SortNum".ToLower(), "IsSys".ToLower())
-                )
+                )   // "IsPrimary".ToLower(),  是否主键额外处理  pengxy 
 
             && p.MemberType == MemberTypes.Property).ToArray();
 
@@ -130,7 +130,7 @@ namespace HiSql
                 
                  p.Name.ToLower().IsIn("FieldDesc".ToLower(), "IsIdentity".ToLower(), "IsPrimary".ToLower(), "FieldName".ToLower(),
                 "FieldType".ToLower(), "DefaultValue".ToLower(), "FieldLen".ToLower(), "FieldDec".ToLower(), "IsNull".ToLower())
-            )
+            ) 
             && p.MemberType==MemberTypes.Property ).ToArray();
             foreach (var po in props)
             {

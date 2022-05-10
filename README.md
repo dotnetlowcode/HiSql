@@ -36,6 +36,114 @@ sqlclient.CodeFirst.InstallHisql();
 
 处理，开发人员只要关注于业务开发
 
+### 2022.5.1 新增excel操作支持
+平常在开发的过程需要将表中的数据导出到excel ,在excel编辑完成后再上传保存到表中
+源码在：HiSql.Extension 目录中
+
+
+
+
+1. 生成带字段 及字段描述为标题的excel数据
+
+生成excel
+```c#
+    HiSqlClient sqlClient = Demo_Init.GetSqlClient();
+    DataTable dt = sqlClient.HiSql("select * from GD_UniqueCodeInfo").ToTable();
+    TabInfo tabInfo = sqlClient.Context.DMInitalize.GetTabStruct("GD_UniqueCodeInfo");
+
+    // TempType = Extension.TempType.HEADER 
+    HiSql.Extension.Excel excel = new HiSql.Extension.Excel(new Extension.ExcelOptions() { TempType = Extension.TempType.HEADER });
+    excel.Add(new Extension.ExcelHeader(1).Add("表名").Add("GD_UniqueCodeInfo"));//标识表名
+
+    Extension.ExcelHeader excelHeader = new Extension.ExcelHeader(2);
+    Extension.ExcelHeader excelHeader3 = new Extension.ExcelHeader(3);
+    foreach (DataColumn dataColumn in dt.Columns)
+    {
+        HiColumn hiColumn = tabInfo.Columns.Where(c => c.FieldName.Equals(dataColumn.ColumnName)).FirstOrDefault();
+        if (hiColumn != null)
+        {
+            excelHeader.Add(string.IsNullOrEmpty(hiColumn.FieldDesc) ? dataColumn.ColumnName : hiColumn.FieldDesc);
+        }
+        else
+            excelHeader.Add(dataColumn.ColumnName);
+
+        excelHeader3.Add(dataColumn.ColumnName);
+    }
+    excel.Add(excelHeader);//字段中文描述
+    excel.Add(excelHeader3);//字段名
+
+    //生成excel
+    excel.WriteExcel(dt, @"D:\data\GD_UniqueCodeInfo1.xlsx");
+
+```
+
+读取生成的excel
+```c#
+    HiSql.Extension.Excel excel = new HiSql.Extension.Excel(new Extension.ExcelOptions() { TempType = Extension.TempType.HEADER });
+    DataTable dt = excel.ExcelToDataTable(@"D:\data\GD_UniqueCodeInfo1.xlsx", true);
+```
+
+
+
+
+2. 生成带数据库字段标题的excel
+   
+生成excel
+```c#
+    HiSqlClient sqlClient = Demo_Init.GetSqlClient();
+    DataTable dt = sqlClient.HiSql("select * from GD_UniqueCodeInfo").ToTable();
+    TabInfo tabInfo = sqlClient.Context.DMInitalize.GetTabStruct("GD_UniqueCodeInfo");
+
+    HiSql.Extension.Excel excel = new HiSql.Extension.Excel();
+    //生成excel
+    excel.WriteExcel(dt, @"D:\data\GD_UniqueCodeInfo2.xlsx");
+```
+
+读取excel
+```c#
+    HiSql.Extension.Excel excel = new HiSql.Extension.Excel(new Extension.ExcelOptions() { TempType = Extension.TempType.STANDARD, DataBeginRow = 2, HeaderRow = 1 });
+    DataTable dt = excel.ExcelToDataTable(@"D:\data\GD_UniqueCodeInfo2.xlsx", true);
+```
+
+
+3. 生成自定义标题的excel
+生成excel
+```c#
+    HiSqlClient sqlClient = Demo_Init.GetSqlClient();
+    DataTable dt = sqlClient.HiSql("select * from GD_UniqueCodeInfo").ToTable();
+    TabInfo tabInfo = sqlClient.Context.DMInitalize.GetTabStruct("GD_UniqueCodeInfo");
+    HiSql.Extension.Excel excel = new HiSql.Extension.Excel();
+    Extension.ExcelHeader excelHeader = new Extension.ExcelHeader(2);
+
+    foreach (DataColumn dataColumn in dt.Columns)
+    {
+        HiColumn hiColumn = tabInfo.Columns.Where(c => c.FieldName.Equals(dataColumn.ColumnName)).FirstOrDefault();
+        if (hiColumn != null)
+        {
+            excelHeader.Add(string.IsNullOrEmpty(hiColumn.FieldDesc) ? dataColumn.ColumnName : hiColumn.FieldDesc);
+        }
+        else
+            excelHeader.Add(dataColumn.ColumnName);
+
+
+    }
+    excel.Add(excelHeader);//字段中文描述
+
+    //生成excel
+    excel.WriteExcel(dt, @"D:\data\GD_UniqueCodeInfo3.xlsx");
+```
+
+读取excel
+```c#
+    HiSql.Extension.Excel excel = new HiSql.Extension.Excel(new Extension.ExcelOptions() { TempType = Extension.TempType.STANDARD, DataBeginRow = 2, HeaderRow = 1 });
+
+    DataTable dt = excel.ExcelToDataTable(@"D:\data\GD_UniqueCodeInfo3.xlsx", true);
+```
+
+
+
+
+
 ### 2022.4.21 新增支持redis缓存
 hisql底层默认是使用 MemoryCache 进行表结构信息的缓存处理(如果项目是单体应用的情况请建义使用这种方式)，如果项目是分布式的 可以使用redis作为缓存载体，如下所示
 

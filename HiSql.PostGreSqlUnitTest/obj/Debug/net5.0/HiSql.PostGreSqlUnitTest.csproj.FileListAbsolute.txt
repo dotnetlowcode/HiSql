@@ -25,9 +25,13 @@ D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Debug\net5.0\Microsoft.
 D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Debug\net5.0\Microsoft.Win32.SystemEvents.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Debug\net5.0\Newtonsoft.Json.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Debug\net5.0\Npgsql.dll
+D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Debug\net5.0\Pipelines.Sockets.Unofficial.dll
+D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Debug\net5.0\StackExchange.Redis.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Debug\net5.0\System.Configuration.ConfigurationManager.dll
+D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Debug\net5.0\System.Diagnostics.PerformanceCounter.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Debug\net5.0\System.Drawing.Common.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Debug\net5.0\System.IdentityModel.Tokens.Jwt.dll
+D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Debug\net5.0\System.IO.Pipelines.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Debug\net5.0\System.Runtime.Caching.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Debug\net5.0\System.Runtime.CompilerServices.Unsafe.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Debug\net5.0\System.Security.Cryptography.ProtectedData.dll
@@ -40,6 +44,7 @@ D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Debug\net5.0\runtimes\w
 D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Debug\net5.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Debug\net5.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Debug\net5.0\runtimes\win\lib\netcoreapp3.0\Microsoft.Win32.SystemEvents.dll
+D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Debug\net5.0\runtimes\win\lib\netcoreapp2.0\System.Diagnostics.PerformanceCounter.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Debug\net5.0\runtimes\unix\lib\netcoreapp3.0\System.Drawing.Common.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Debug\net5.0\runtimes\win\lib\netcoreapp3.0\System.Drawing.Common.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Debug\net5.0\runtimes\win\lib\netstandard2.0\System.Runtime.Caching.dll
@@ -59,8 +64,3 @@ D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\obj\Debug\net5.0\HiSql.Post
 D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\obj\Debug\net5.0\ref\HiSql.PostGreSqlUnitTest.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\obj\Debug\net5.0\HiSql.PostGreSqlUnitTest.pdb
 D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\obj\Debug\net5.0\HiSql.PostGreSqlUnitTest.genruntimeconfig.cache
-D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Debug\net5.0\Pipelines.Sockets.Unofficial.dll
-D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Debug\net5.0\StackExchange.Redis.dll
-D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Debug\net5.0\System.Diagnostics.PerformanceCounter.dll
-D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Debug\net5.0\System.IO.Pipelines.dll
-D:\Project\OpenSource\HiSql\HiSql.PostGreSqlUnitTest\bin\Debug\net5.0\runtimes\win\lib\netcoreapp2.0\System.Diagnostics.PerformanceCounter.dll
