@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <TargetFrameworks>net461;net5.0;netcoreapp3.1;net6.0</TargetFrameworks>
+	  <Version>1.0.0.0</Version>
+	  <Authors>tansar</Authors>
+	  <Company>Hone</Company>
+	  <Description>
+		  HiSql Excel扩展表
+
+		  支持对查询出的结果数据进行序列化到excel中
+	  </Description>
+	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+	<ItemGroup Condition="'$(TargetFramework)' == 'net461'">
+		<Reference Include="Microsoft.CSharp" />
+	</ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="NPOI" Version="2.5.6" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Compile Update="Properties\Resources.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>Resources.resx</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+	<ItemGroup>
+	  <EmbeddedResource Update="Properties\Resources.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	</ItemGroup>
+</Project>
