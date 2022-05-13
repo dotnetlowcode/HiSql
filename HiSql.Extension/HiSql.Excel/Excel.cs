@@ -58,6 +58,11 @@ namespace HiSql.Extension
             try
             {
                 FileStream fs;
+                var dirPath = Path.GetDirectoryName(newpath);
+                if (!Directory.Exists(dirPath))
+                {
+                    Directory.CreateDirectory(dirPath);
+                }
                 if (System.IO.File.Exists(newpath))
                 {
                     fs = new FileStream(newpath, FileMode.Open, FileAccess.Write, FileShare.None);
