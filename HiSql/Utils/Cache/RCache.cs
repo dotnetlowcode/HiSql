@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using StackExchange.Redis;
@@ -16,6 +17,9 @@ namespace HiSql
         private StackExchange.Redis.IDatabase _cache;
         private ConnectionMultiplexer _connectMulti;
 
+
+        private string _lockhashname = $"{HiSql.Constants.NameSpace}:locktable";
+        private string _lockhishashname = $"{HiSql.Constants.NameSpace}:locktable_his";
 
         RedisOptions _options;
         public RCache(RedisOptions options)
@@ -98,9 +102,6 @@ namespace HiSql
             var cachevalue= _cache.StringGet(key);
             if (!cachevalue.IsNull)
             {
-
-                
-
                 value=JsonConvert.DeserializeObject<T>(cachevalue);
             }
             return value;
@@ -337,61 +338,283 @@ namespace HiSql
 
 
         /// <summary>
-        /// 解业务锁
+        /// 解除锁定
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
 
-        public Tuple<bool, string> UnLock(string key)
+        public bool UnLock(string key)
         {
             checkRedis();
             key = checkKey(key);
+            HDel(_lockhashname, key);
+            return  _cache.LockRelease(key, 1);
+            
+        }
+        public bool HSet(string hashkey,string key, string value)
+        {
+            checkRedis();
+            hashkey = checkKey(hashkey);
 
-            _cache.LockRelease(key, System.Threading.Thread.CurrentThread.ManagedThreadId);
-            throw new NotImplementedException();
+            return _cache.HashSet(hashkey, key, value, When.Always, CommandFlags.None);
+
+            
         }
 
+        public bool HDel(string hashkey, string key)
+        {
+            checkRedis();
+            hashkey = checkKey(hashkey);
+
+            return _cache.HashDelete(hashkey, key);
+        }
+
+        public string HGet(string hashkey,string key)
+        {
+            checkRedis();
+            hashkey = checkKey(hashkey);
+            
+            return _cache.HashGet(hashkey,key);
+        }
+
+        public delegate bool deleLockOn(string key, int expresseconds);
+
+
         /// <summary>
-        /// 加业务锁
+        /// 加业务锁 
+        /// 加锁持续时间最长不超过60秒 默认30
+        /// 等待加锁有效期最长不超过10秒 （默认5秒）
         /// </summary>
         /// <param name="key"></param>
         /// <param name="expresseconds"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public Tuple<bool, string> LockOn(string key, int expresseconds=5)
+        public Tuple<bool, string> LockOn(string key, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
         {
             checkRedis();
+            key = $"lck:{key}";
             key = checkKey(key);
 
-            expresseconds= expresseconds < 0? 5 : expresseconds;
-            expresseconds = expresseconds > 60 ? 60 : expresseconds;
+            int _max_second = 60;//最长定锁有效期
+            int _max_timeout = 10;//最长加锁等待时间
 
+
+            expresseconds = expresseconds < 0 ? 5 : expresseconds;
+            expresseconds = expresseconds > _max_second ? _max_second : expresseconds;
+
+            timeoutseconds = timeoutseconds < 0 ? 5 : timeoutseconds;
+            timeoutseconds = timeoutseconds > _max_timeout ? _max_timeout : timeoutseconds;
+
+            deleLockOn _deleLock = new deleLockOn(lockOn);
+            var workTask = Task.Run(() =>
+            {
+                bool _success = _deleLock.Invoke(key, expresseconds);
+                if (_success)
+                {
+                    lckinfo = getLockInfo(lckinfo, expresseconds, 0);
+                    HSet(_lockhashname, key, JsonConvert.SerializeObject(lckinfo));
+                    HSet(_lockhishashname, $"{key}:{lckinfo.LockTime.ToString("yyyyMMddHHmmssfff")}", JsonConvert.SerializeObject(lckinfo));
+                }
+                return _success;
+            });
+            bool flag = workTask.Wait(timeoutseconds * 1000, new CancellationToken(false));
+
+
+            string msg = "";
+            if (flag)
+            {
+                if (workTask.Result)
+                {
+                    msg = "加锁成功";
+                }
+                else
+                {
+
+                    flag = false;
+                    msg = "加锁失败";
+                }
+
+            }
+            else
+            {
+                workTask.Wait(new CancellationToken(true));
+                msg = $"key:[{key}]锁定失败,加锁等待超过{timeoutseconds}秒!";
+            }
+            return new Tuple<bool, string>(flag, msg);
+        }
+
+
+        /// <summary>
+        /// 检测Key是否被锁定
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public Tuple<bool, string> CheckLock(string key)
+        {
+            checkRedis();
+            string _key = key;
+            key = $"lck:{key}";
+            key = checkKey(key);
+            bool _islock = false;
+            string _msg = "";
+            if (_cache.KeyExists(key))
+            {
+
+                _islock = true;
+                string _lockinfo = HGet(_lockhashname, key);
+                if (!string.IsNullOrEmpty(_lockinfo))
+                {
+                    LckInfo lckInfo = JsonConvert.DeserializeObject<LckInfo>(_lockinfo);
+                    _msg = $"key:[{_key}]已经被[{lckInfo.UName}]在[{lckInfo.EventName}]于[{lckInfo.LockTime.ToString("yyyy-MM-dd HH:mm:ss")}]锁定!";
+
+                }else
+                    _msg = $"key:[{_key}]被锁定";
+            }
+            else
+            {
+                _msg = $"key:[{_key}]未被锁定";
+            }
+            return new Tuple<bool,string>(_islock, _msg);
+
+        }
+
+
+        /// <summary>
+        /// 锁定并执行业务
+        /// </summary>
+        /// <param name="key">需要锁定的key</param>
+        /// <param name="action">锁定后执行的方法</param>
+        /// <param name="lckinfo">锁定信息</param>
+        /// <param name="expresseconds">锁定持续时间</param>
+        /// <param name="timeoutseconds">等待加锁时间</param>
+        /// <returns></returns>
+        public Tuple<bool, string> LockOnExecute(string key, Action action,LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
+        {
+            checkRedis();
+            key = $"lck:{key}";
+            key = checkKey(key);
+
+            int _max_second = 60;//最长定锁有效期
+            int _max_timeout = 10;//最长加锁等待时间
+
+            int _times = 5;//续锁最多次数
+
+            int _millsecond = 900;
+
+
+            expresseconds = expresseconds < 0 ? 5 : expresseconds;
+            expresseconds = expresseconds > _max_second ? _max_second : expresseconds;
+
+            timeoutseconds = timeoutseconds < 0 ? 5 : timeoutseconds;
+            timeoutseconds = timeoutseconds > _max_timeout ? _max_timeout : timeoutseconds;
+
+            CancellationTokenSource tokenSource = new CancellationTokenSource();
+            CancellationToken cancellationToken = tokenSource.Token;
+            deleLockOn _deleLock = new deleLockOn(lockOn);
+            Thread thread = null;
+            int _timesa = 0;
+            var workTask = Task.Run(() => { 
+                thread=System.Threading.Thread.CurrentThread;
+                try
+                {
+                    if (_deleLock.Invoke(key, expresseconds))
+                    {
+                        lckinfo = getLockInfo(lckinfo, expresseconds, 0);
+                        HSet(_lockhashname, key, JsonConvert.SerializeObject(lckinfo));
+                        HSet(_lockhishashname, $"{key}:{lckinfo.LockTime.ToString("yyyyMMddHHmmssfff")}", JsonConvert.SerializeObject(lckinfo));
+                        action.Invoke();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    //Console.WriteLine($"线程中断。。");
+                }
+            });
+            bool flag = workTask.Wait(timeoutseconds * _millsecond, cancellationToken);
+            string msg = "";
+            if (flag)
+            {
+                msg = $"key:[{key}]锁定并操作业务成功!锁已自动释放";
+            }
+
+            while (!flag)
+            {
+                if (_timesa >= _times)
+                {
+                    if (!workTask.IsCompleted && !workTask.IsCanceled)
+                    {
+                        thread.Interrupt();
+                        tokenSource.Cancel();
+                    }
+                    flag = false;
+                    break;
+                }
+                else
+                {
+                    //续锁
+                    _cache.StringSet(key, 1, TimeSpan.FromSeconds(expresseconds));
+                    lckinfo = getLockInfo(lckinfo, expresseconds, _timesa);
+                    HSet(_lockhashname, key, JsonConvert.SerializeObject(lckinfo));
+                    HSet(_lockhishashname, $"{key}:{lckinfo.LockTime.ToString("yyyyMMddHHmmssfff")}", JsonConvert.SerializeObject(lckinfo));
+                    flag = workTask.Wait(timeoutseconds * _millsecond, cancellationToken);
+                    if (flag)
+                    {
+                        msg = $"key:[{key}]锁定并操作业务成功!续锁{_timesa+1}次,锁已经自动释放";
+                    }
+                }
+                _timesa++;
+            }
+
+            if (!flag)
+            {
+                msg = $"key:[{key}]锁定操作业务失败!超过最大[{_times}]次续锁没有完成,操作被撤销";
+            }
+            UnLock(key);
+            return new Tuple<bool, string>(flag, msg);
+        }
+
+
+        #region 私有变量
+        LckInfo getLockInfo(LckInfo lckInfo, int expresseconds, int times)
+        {
+
+            if(lckInfo.LockTime==null || lckInfo.LockTime==DateTime.MinValue)
+                lckInfo.LockTime = DateTime.Now;
+
+
+            if (lckInfo.ExpireTime == null || lckInfo.ExpireTime == DateTime.MinValue)
+            {
+                lckInfo.ExpireTime = DateTime.Now.AddSeconds(expresseconds);
+            }
+            else
+                lckInfo.ExpireTime = lckInfo.ExpireTime.AddSeconds(expresseconds);
+
+            lckInfo.KeepTimes = times;
+
+
+            return lckInfo; 
+        }
+
+        bool lockOn(string key, int expresseconds = 5)
+        {
+            expresseconds = expresseconds < 0 ? 5 : expresseconds;
+            expresseconds = expresseconds > 60 ? 60 : expresseconds;
+            //deleLockOn _deleLock=new deleLockOn ()
             bool isok = false;
             while (!isok)
-            { 
-                isok=_cache.LockTake(key,System.Threading.Thread.CurrentThread.ManagedThreadId,TimeSpan.FromSeconds(expresseconds));
+            {
+                isok = _cache.LockTake(key, 1, TimeSpan.FromSeconds(expresseconds));
+                
                 if (isok)
                 {
                     break;
                 }
             }
-            throw new NotImplementedException();
-        }
-        /// <summary>
-        /// 续锁
-        /// 对已经加了锁且快到期了就进行续锁
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="expresseconds"></param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-
-        public Tuple<bool, string> KeepLockOn(string key, int expresseconds)
-        {
-            throw new NotImplementedException();
+            return true;
         }
 
-       
+        #endregion
+
     }
 }
