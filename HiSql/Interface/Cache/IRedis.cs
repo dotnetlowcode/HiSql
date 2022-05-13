@@ -70,23 +70,63 @@ namespace HiSql
         public long ListCount(string channel);
 
 
+
+        /// <summary>
+        /// 设置hash值
+        /// </summary>
+        /// <param name="hashkey"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public bool HSet(string hashkey,string key, string value);
+
+
+        /// <summary>
+        /// 获取hash值
+        /// </summary>
+        /// <param name="hashkey"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public string HGet(string hashkey,string key);
+
+        /// <summary>
+        /// hash 删除
+        /// </summary>
+        /// <param name="hashkey"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public bool HDel(string hashkey, string key);
         /// <summary>
         /// 加业务锁
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="expresseconds">锁的周期</param>
+        /// <param name="key">自定锁的KEY</param>
+        /// <param name="expresseconds">锁的周期时间 单位秒</param>
+        /// <param name="timeoutseconds">加锁等待超时时间 单位秒</param>
         /// <returns></returns>
-        public Tuple<bool,string> LockOn(string key,int expresseconds);
+        public Tuple<bool,string> LockOn(string key, LckInfo lckinfo,int expresseconds,int timeoutseconds);
+
 
         /// <summary>
-        /// 如果锁的时间快到期了 延续加锁
+        /// 检测key是否已经锁定
         /// </summary>
         /// <param name="key"></param>
-        /// <param name="expresseconds"></param>
         /// <returns></returns>
-        public Tuple<bool, string> KeepLockOn(string key, int expresseconds);
+        public Tuple<bool, string> CheckLock(string key);
 
-        public Tuple<bool, string> UnLock(string key);
+
+        /// <summary>
+        /// 加业务锁
+        /// </summary>
+        /// <param name="key">自定锁的KEY</param>
+        /// <param name="action">加锁后执行的业务</param>
+        /// <param name="expresseconds">锁的周期时间 单位秒</param>
+        /// <param name="timeoutseconds">加锁等待超时时间 单位秒</param>
+        /// <returns></returns>
+        public Tuple<bool, string> LockOnExecute(string key, Action action,LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5);
+
+
+
+        public bool UnLock(string key);
 
     }
 }

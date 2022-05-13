@@ -342,36 +342,42 @@ namespace HiSql.Extension
                     }
                 }
 
-
-
             }
 
-            //写数据
-            for (var i = 0; i < dtable.Rows.Count; i++)
-            {
-                beginRow = beginRow + 1;
-                var excelRow = xssfsheet.CreateRow(beginRow);
-
-                for (int j = 0; j < dtable.Columns.Count; j++)
-                {
-                    ICell _dcell = excelRow.CreateCell(j);
-
-                    _dcell.SetCellValue(dtable.Rows[i][j].ToString().Trim());
-                }
-            }
-
-
-            //   }
-
+            //保存抬头数据
             using (FileStream fs = File.OpenWrite(newfile))
             {
                 xssfsheet.ForceFormulaRecalculation = false;
                 workbook.Write(fs);
                 //workbook2.Dispose();
-         
+
                 workbook.Close();
                 if (fs != null) fs.Close();
             }
+
+
+
+
+
+            int pageSize = 1000;
+            int pageCount = dtable.Rows.Count > pageSize ? dtable.Rows.Count % pageSize == 0 ? dtable.Rows.Count / pageSize : dtable.Rows.Count / pageSize + 1 : 1;
+
+
+            ////写数据
+            //for (var i = 0; i < dtable.Rows.Count; i++)
+            //{
+            //    beginRow = beginRow + 1;
+            //    var excelRow = xssfsheet.CreateRow(beginRow);
+
+            //    for (int j = 0; j < dtable.Columns.Count; j++)
+            //    {
+            //        ICell _dcell = excelRow.CreateCell(j);
+
+            //        _dcell.SetCellValue(dtable.Rows[i][j].ToString().Trim());
+            //    }
+            //}
+
+            pageWriteExcel(dtable, _actidx, beginRow, newfile);
 
 
             //fs.Flush();
@@ -383,6 +389,56 @@ namespace HiSql.Extension
             //Thread.Sleep(500);
 
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <param name="sheetidx"></param>
+        /// <param name="currrowidx"></param>
+        /// <param name="pagesize"></param>
+        /// <param name="pageidx"></param>
+        /// <param name="excelpath"></param>
+        /// <returns></returns>
+        //private bool pageWriteExcel(DataTable dt,int sheetidx,int currrowidx, int pagesize, int pageidx,string excelpath)
+        private bool pageWriteExcel(DataTable dt,int sheetidx,int currrowidx, string excelpath)
+        {
+            FileStream file = new FileStream(excelpath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+
+
+            XSSFWorkbook workbook = new XSSFWorkbook(file);//将文件读到内存，在内存中操作excel
+
+            SXSSFWorkbook xssfworkbook = new SXSSFWorkbook(workbook, 1000);
+            SXSSFSheet xssfsheet = xssfworkbook.GetSheetAt(sheetidx) as SXSSFSheet;
+            file.Close();
+
+            int beginRow = currrowidx;
+
+            for (var i = 0; i < dt.Rows.Count; i++)
+            {
+                beginRow = beginRow + 1;
+                var excelRow = xssfsheet.CreateRow(beginRow);
+
+                for (int j = 0; j < dt.Columns.Count; j++)
+                {
+                    ICell _dcell = excelRow.CreateCell(j);
+
+                    _dcell.SetCellValue(dt.Rows[i][j].ToString().Trim());
+                }
+            }
+
+            using (FileStream fs = File.OpenWrite(excelpath))
+            {
+                xssfsheet.ForceFormulaRecalculation = true;
+                xssfworkbook.Write(fs);
+                xssfworkbook.Dispose();
+                xssfworkbook.Close();
+                if (fs != null) fs.Close();
+            }
+
+            return true;
+        }
+
 
         public virtual Excel Add(ExcelHeader header)
         {
