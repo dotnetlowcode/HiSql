@@ -14,6 +14,7 @@ using System.Reflection.Emit;
 //using SqlSugar;
 using System.Transactions;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 
 namespace HiSql.Test
 {
@@ -324,10 +325,225 @@ namespace HiSql.Test
             //}
             return sb_sql.ToString();
         }
+        private static readonly object lockObj = new object();
+        /// <summary>
+        /// 测试 redis lock 
+        /// </summary>
+        static void RedisTest()
+        {
+            {
+              //  var rel3 = System.Threading.Monitor.TryEnter(lockObj);
+              //var rel =  System.Threading.Monitor.TryEnter(lockObj);
+                HiSql.ICache rCache = new MCache(null);
 
+                rCache = new RCache(new RedisOptions { Host = "192.168.10.130", Port=8379, PassWord = "" , Database = 1});
+
+                int coujnt = 0;
+                string _key = "491524444";
+
+
+                ///后台线程输出锁的信息
+                Task.Run(() => {
+                    while (true)
+                    {
+                        Console.WriteLine($"输出当前 锁的信息：");
+                        rCache.GetCurrLockInfo().ForEach(x => {
+                            Console.WriteLine($"GetCurrLockInfo  key:{ x.Key}  value:" + JsonConvert.SerializeObject(x));
+                        });
+                        SpinWait.SpinUntil(() => false, 1000);
+                    }
+
+                });
+                int threadId = 0;
+                {//加锁，模拟所过期
+                    //Tuple<bool, string> rtn = rCache.LockOn(_key, new LckInfo { UName = "tansar", EventName = "Program", Ip = "127.0.0.1" }, 10);
+                    //threadId = Thread.CurrentThread.ManagedThreadId;
+
+                    //Console.WriteLine(rtn.Item2 + " _ " + Thread.CurrentThread.ManagedThreadId);
+                    //rCache.UnLock(_key);
+                }
+                //SpinWait.SpinUntil(() => false, 4000);
+
+                
+
+                {
+                    // 加锁 执行耗时的动作
+                    Tuple<bool, string> rtn = rCache.LockOnExecute(_key, () =>
+                    {
+                        try
+                        {
+                            new TestInstance().TestInsertToDB();
+                        }
+                        catch (Exception EX)
+                        {
+                            throw;
+                        }
+                    }, new LckInfo { UName = "tansar", EventName = "单次获取加锁动作", Ip = "192.168.1.1" }, 10, 5);
+
+
+                    threadId = Thread.CurrentThread.ManagedThreadId;
+
+                    Console.WriteLine(" 单次获取加锁动作： " + rtn.Item2 + " _ " + Thread.CurrentThread.ManagedThreadId);
+                }
+                Task.Run(() => {
+                    bool islockok = false;
+                    while (!islockok)
+                    {
+                        // 加锁 执行耗时的动作
+                        Tuple<bool, string> rtn = rCache.LockOnExecute(_key, () =>
+                        {
+                            try
+                            {
+                                new TestInstance().TestInsertToDB();
+                            }
+                            catch (Exception EX)
+                            {
+                                throw;
+                            }
+                        }, new LckInfo { UName = "tansar", EventName = "获取失败后重复加锁动作", Ip = "127.0.0.1" }, 10, 5);
+
+                        threadId = Thread.CurrentThread.ManagedThreadId;
+
+                        islockok = rtn.Item1;
+                        Console.WriteLine(" 获取失败后重复加锁动作： " + rtn.Item2 + " _ " + Thread.CurrentThread.ManagedThreadId);
+                    }
+
+                });
+                Console.ReadLine();
+                return;
+                Parallel.For(0, 2, (x, y) =>
+                {
+                    if (threadId == Thread.CurrentThread.ManagedThreadId)
+                    {
+                       // return;
+                    }
+                    Tuple<bool, string> rtn = rCache.LockOn(_key+"_"+x, new LckInfo { UName = "tansar", EventName = "Program", Ip = "127.0.0.1" }, 20);
+                    Console.WriteLine(rtn.Item2 +" _ "+ Thread.CurrentThread.ManagedThreadId);
+                    if (rtn.Item1)
+                    {
+                        coujnt++;
+
+                        //SpinWait.SpinUntil(() => false, 2000);
+                        //var _rtn = rCache.CheckLock(_key);
+                        //Console.WriteLine(_rtn.Item2);
+                       
+                        //bool unlck = rCache.UnLock(_key);
+
+                        //if (unlck)
+                        //    Console.WriteLine($"解锁成功");
+                        //else
+                        //    Console.WriteLine($"解锁失败");
+                    }
+
+                });
+
+                Console.WriteLine($"输出当前 锁的信息：");
+                rCache.GetCurrLockInfo().ForEach(x =>{
+                    Console.WriteLine($"GetCurrLockInfo  key:{ x.Key}  value:" + JsonConvert.SerializeObject(x));
+                });
+                Console.WriteLine($"输出历史 锁 的信息：");
+                rCache.GetHisLockInfo().ForEach(x => {
+                    Console.WriteLine($"GetHisLockInfo key:{ x.Key}  value:" + JsonConvert.SerializeObject(x));
+                });
+                return;
+                ;
+                Parallel.For(0, 2, (x, y) =>
+                {
+                    Tuple<bool, string> rtn = rCache.LockOn(_key, new LckInfo { UName = "tansar", EventName = "Program", Ip = "127.0.0.1" });
+                    Console.WriteLine(rtn.Item2 + Thread.CurrentThread.ManagedThreadId);
+                    if (rtn.Item1)
+                    {
+                        System.Threading.Thread.Sleep(2000);
+
+                        //var _rtn = rCache.CheckLock(_key);
+                        //Console.WriteLine(_rtn.Item2);
+
+
+                        bool unlck = rCache.UnLock(_key);
+
+                        //if (unlck)
+                        //    Console.WriteLine($"解锁成功");
+                        //else
+                        //    Console.WriteLine($"解锁失败");
+                    }
+
+                });
+
+            }
+
+
+
+            #region RCache  加锁
+            //Parallel.For(0, 100, (x, y) => {
+           
+
+            //    string _key = "491524444_"+ x;
+
+            //    Tuple<bool, string> rtn = rCache.LockOn(_key, new LckInfo { UName = "tansar", EventName = "Program", Ip = "127.0.0.1" });
+
+            //    Console.WriteLine(rtn.Item2);
+            //    if (rtn.Item1)
+            //    {
+            //        // System.Threading.Thread.Sleep(2000);
+
+            //        var _rtn = rCache.CheckLock(_key);
+            //        if (!_rtn.Item1)
+            //        {
+            //            Console.WriteLine(_rtn.Item2);
+            //        }
+
+            //        //bool unlck = rCache.UnLock(_key);
+
+            //        //if (unlck)
+            //        //    Console.WriteLine($"解锁成功");
+            //        //else
+            //        //    Console.WriteLine($"解锁失败");
+            //    }
+            //   // rCache.UnLock(_key);
+            //});
+
+            //{
+
+            //    string _key = "491524444";
+
+            //    Tuple<bool, string> rtn = rCache.LockOn(_key, new LckInfo { UName = "tansar", EventName = "Program", Ip = "127.0.0.1" });
+
+            //    Console.WriteLine(rtn.Item2);
+            //    if (rtn.Item1)
+            //    {
+            //        // System.Threading.Thread.Sleep(2000);
+
+            //        var _rtn = rCache.CheckLock(_key);
+            //        Console.WriteLine(_rtn.Item2);
+
+
+            //        bool unlck = rCache.UnLock(_key);
+
+            //        //if (unlck)
+            //        //    Console.WriteLine($"解锁成功");
+            //        //else
+            //        //    Console.WriteLine($"解锁失败");
+            //    }
+            //}
+
+            #endregion
+
+            //Tuple<bool, string> rtn = rCache.LockOnExecute(_key, () =>
+            //{
+            //    Console.WriteLine($"正在执行..{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}");
+            //    int sotck = 1;
+            //    sotck++;
+            //    System.Threading.Thread.Sleep(15 * 1000);
+            //    Console.WriteLine($"执行完成..{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}");
+            //}, new LckInfo { UName = "tansar", EventName = "Program", Ip = "127.0.0.1" });
+            //Console.WriteLine( rCache.ListLastPop("qlist"));
+        }
 
         static void Main(string[] args)
         {
+
+            RedisTest();
+            return;
 
             //string _regs = "(?<=\\d)(?=(?:\\d{3})+(?!\\d))";
             //string _regs = "(?<=\\d)(?=(?:\\d{4})+(?!\\d))";
@@ -343,20 +559,20 @@ namespace HiSql.Test
             //}
 
 
-            
-            Dictionary<string, string> _dic_key = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "uname","tansar"},{ "unamE", "30"} };
-         
+
+            Dictionary<string, string> _dic_key = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "uname", "tansar" }, { "unamE", "30" } };
+
             Type type = _dic_key.GetType();
-            if (type == typeof(Dictionary<string,object>))
+            if (type == typeof(Dictionary<string, object>))
             {
                 if (type.Name != "")
                 {
 
                 }
             }
-            
 
-            
+
+
 
 
 
@@ -500,8 +716,8 @@ namespace HiSql.Test
                          },
                          OnTimeOut = (int timer) =>
                            {
-                             //Console.WriteLine($"执行SQL语句超过[{timer.ToString()}]毫秒...");
-                         }
+                               //Console.WriteLine($"执行SQL语句超过[{timer.ToString()}]毫秒...");
+                           }
                      }
                  }
                  );
@@ -627,7 +843,7 @@ namespace HiSql.Test
 
             //List<Hi_Domain> lstefresult = sqlclient.Query("Hi_Domain").Field("*").Sort(new SortBy { { "createtime", SortType.ASC } }).Skip(1).Take(1000).ToList<Hi_Domain>();
             //List<Hi_Domain> lstefresult = sqlclient.Query("Hi_Domain").Field("*").Sort("createtime asc","moditime").Skip(1).Take(1000).ToList<Hi_Domain>();
-            
+
 
 
             //string _json= sqlclient.Query("DataDomain").Field("Domain").Sort(new SortBy { { "createtime" } }).ToJson();
@@ -663,7 +879,7 @@ namespace HiSql.Test
                 .WithRank(DbRank.ROWNUMBER, DbFunction.COUNT, "*", "rowidx2", SortType.ASC)
                 .WithRank(DbRank.RANK, DbFunction.COUNT, "*", "rowidx3", SortType.ASC)
                 .Group(new GroupBy { { "TabName" } }).ToJson();
-            
+
 
             Console.WriteLine(_json2);
 
@@ -789,8 +1005,8 @@ namespace HiSql.Test
             dMTab.Context = sqlclient.Context;
             sqlclient.Context.MCache.SetCache($"{tabinfo.TabModel.TabName}", tabinfo);
 
-            
-            int effect=dMTab.BuildTabCreate(tabinfo);
+
+            int effect = dMTab.BuildTabCreate(tabinfo);
             if (effect > 0)
                 Console.WriteLine("表创建成功");
             else
@@ -803,13 +1019,13 @@ namespace HiSql.Test
 
 
             using (TransactionScope tsCope = new TransactionScope())
-            { 
-                
+            {
+
             }
 
 
-                //DataTable dts = sqlclient.Context.DBO.GetDataTable($"select * from {tabinfo.TabModel.TabName}", null);
-                //DataTable dts2=sqlclient.Query($"{tabinfo.TabModel.TabName}").Field("*").Sort(new SortBy { { "createtime" } }).ToTable();
+            //DataTable dts = sqlclient.Context.DBO.GetDataTable($"select * from {tabinfo.TabModel.TabName}", null);
+            //DataTable dts2=sqlclient.Query($"{tabinfo.TabModel.TabName}").Field("*").Sort(new SortBy { { "createtime" } }).ToTable();
 
             //string _sql2 = dMTab.BuildTabCreateSql(tabinfo);
 
@@ -1195,6 +1411,6 @@ namespace HiSql.Test
             string s = Console.ReadLine();
             //Console.WriteLine("Hello World!");
         }
-        
+
     }
 }

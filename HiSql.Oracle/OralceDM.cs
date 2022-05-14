@@ -2557,6 +2557,16 @@ namespace HiSql
             totalCount = int.Parse(dataSet.Tables[0].Rows[0][0].ToString());
             return dataSet.Tables[1];
         }
+        /// <summary>
+        /// 检查表或视图是否存在
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <returns></returns>
+        public bool CheckTabExists(string tabname = "")
+        {
+            DataTable dt = Context.DBO.GetDataTable(dbConfig.Get_CheckTabExists.Replace("[$TabName$]", tabname));
+            return dt.Rows.Count > 0;
+        }
         public DataTable GetAllTables(string tabname = "")
         {
             string _tempsql = dbConfig.Get_AllTables.Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema);
