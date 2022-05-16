@@ -12,7 +12,7 @@ namespace HiSql
     /// <summary>
     /// 公共类
     /// </summary>
-    public static partial  class HiSqlCommProvider
+    public static partial class HiSqlCommProvider
     {
         /// <summary>
         /// 映射表结构
@@ -26,7 +26,7 @@ namespace HiSql
 
         public static void InitMaping(TableDefinition table)
         {
-            string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$DBSERVER$]",  table.DbServer)
+            string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$DBSERVER$]", table.DbServer)
                 .Replace("[$SCHEMA$]", table.Schema)
                 .Replace("[$TABLE$]", table.TabName)
                 ;
@@ -38,15 +38,56 @@ namespace HiSql
         /// <param name="tabname"></param>
         /// <param name="GetInfo"></param>
         /// <returns></returns>
-        public static TabInfo InitTabMaping(string tabname,Func<TabInfo> GetInfo)
+        public static TabInfo InitTabMaping(string tabname, Func<TabInfo> GetInfo)
         {
-            
             string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", tabname);
-            return CacheContext.MCache.GetOrCreate<TabInfo>(_keyname, () => {
-                return GetInfo();
-            });
-                
-           
+            TabInfo tableInfo = null;
+            try
+            {
+                tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
+                if (tableInfo == null)
+                {
+                    var lockinfo = CacheContext.MCache.LockOn(_keyname, new LckInfo() { UName = "hisql", EventName = "InitTabMaping" }, 60, 60);
+                    if (lockinfo.Item1) //加锁成功
+                    {
+                        tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
+                        if (tableInfo == null)
+                        {
+                            tableInfo = GetInfo();
+                            CacheContext.MCache.SetCache(_keyname, tableInfo);
+                        }
+                        CacheContext.MCache.UnLock(_keyname);
+                    }
+                    else
+                    {
+                        tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
+                        if (tableInfo == null)
+                        {
+                            throw new Exception("InitTabMaping获取表结构信息因为未获取到独占锁，无法创建并获取表信息");
+                        }
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
+            }
+            finally {
+                CacheContext.MCache.UnLock(_keyname);
+            }
+            if (tableInfo != null)
+            {
+                return tableInfo;
+            }
+            else
+            {
+                throw new Exception("InitTabMaping获取表结构信息因为未获取到独占锁，无法创建并获取表信息");
+            }
+            //return CacheContext.MCache.GetOrCreate<TabInfo>(_keyname, () =>
+            //{
+            //    return GetInfo();
+            //});
         }
 
         /// <summary>
@@ -56,11 +97,11 @@ namespace HiSql
         public static void RemoveTabInfoCache(string tabname)
         {
             string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", tabname);
-            if(CacheContext.MCache.Exists(_keyname))
+            if (CacheContext.MCache.Exists(_keyname))
                 CacheContext.MCache.RemoveCache(_keyname);
 
         }
-        
+
 
 
 
@@ -70,7 +111,7 @@ namespace HiSql
         /// <param name="_dbmapping"></param>
         /// <param name="fieldtype"></param>
         /// <returns></returns>
-        public static  HiType ConvertToHiType(Dictionary<HiType, string> _dbmapping, string fieldtype)
+        public static HiType ConvertToHiType(Dictionary<HiType, string> _dbmapping, string fieldtype)
         {
             foreach (HiType ht in _dbmapping.Keys)
             {
@@ -89,7 +130,7 @@ namespace HiSql
                  && table.Columns.Contains("IsIdentity") && table.Columns.Contains("IsPrimary") && table.Columns.Contains("FieldType")
                  && table.Columns.Contains("UseBytes") && table.Columns.Contains("Lens") && table.Columns.Contains("PointDec") && table.Columns.Contains("IsNull")
                  && table.Columns.Contains("DbDefault") && table.Columns.Contains("FieldDesc")
-                 && table.Rows.Count>0
+                 && table.Rows.Count > 0
                 )
             {
                 tabInfo = new TabInfo();
@@ -108,23 +149,23 @@ namespace HiSql
                     HiColumn hiColumn = new HiColumn();
                     hiColumn.FieldName = drow["FieldName"].ToString().Trim();
                     //hiColumn.FieldType
-                    hiColumn.IsPrimary = drow["IsPrimary"].ToString().Trim().IsIn<string>("1","True") ? true : false;
-                    hiColumn.IsIdentity= drow["IsIdentity"].ToString().Trim().IsIn<string>("1", "True") ? true : false;
+                    hiColumn.IsPrimary = drow["IsPrimary"].ToString().Trim().IsIn<string>("1", "True") ? true : false;
+                    hiColumn.IsIdentity = drow["IsIdentity"].ToString().Trim().IsIn<string>("1", "True") ? true : false;
                     hiColumn.IsBllKey = hiColumn.IsPrimary;
                     hiColumn.SortNum = Convert.ToInt32(drow["FieldNo"].ToString().Trim());
-                    hiColumn.FieldType = ConvertToHiType(_dbmapping,drow["FieldType"].ToString().ToLower().Trim());
-                    
-                    hiColumn.FieldLen = Convert.ToInt32(string.IsNullOrEmpty(drow["Lens"].ToString().Trim())?"0": drow["Lens"].ToString().Trim());
+                    hiColumn.FieldType = ConvertToHiType(_dbmapping, drow["FieldType"].ToString().ToLower().Trim());
+
+                    hiColumn.FieldLen = Convert.ToInt32(string.IsNullOrEmpty(drow["Lens"].ToString().Trim()) ? "0" : drow["Lens"].ToString().Trim());
 
                     if (hiColumn.FieldType.IsIn<HiType>(HiType.DECIMAL))
                     {
-                        hiColumn.FieldDec= Convert.ToInt32(string.IsNullOrEmpty(drow["PointDec"].ToString().Trim()) ? "0" : drow["PointDec"].ToString().Trim());
+                        hiColumn.FieldDec = Convert.ToInt32(string.IsNullOrEmpty(drow["PointDec"].ToString().Trim()) ? "0" : drow["PointDec"].ToString().Trim());
                     }
-                    hiColumn.IsNull= drow["IsNull"].ToString().Trim().IsIn<string>("1", "True") ? true : false;
+                    hiColumn.IsNull = drow["IsNull"].ToString().Trim().IsIn<string>("1", "True") ? true : false;
                     hiColumn.IsShow = true;
                     hiColumn.SrchMode = SrchMode.Single;
                     hiColumn.IsSys = false;
-                    hiColumn.FieldDesc= drow["FieldDesc"].ToString().Trim();
+                    hiColumn.FieldDesc = drow["FieldDesc"].ToString().Trim();
                     //默认值未适配数据库类型 需要调整
                     switch ((drow["DbDefault"].ToString().Trim()))
                     {
@@ -188,7 +229,7 @@ namespace HiSql
                     hiColumn.IsSearch = column.IsSearch;
 
                     //如果有扩展信息需要在此处赋值
-                    
+
                 }
                 newColumns.Add(hiColumn);
             }
@@ -213,9 +254,9 @@ namespace HiSql
             foreach (HiColumn column in phycolumns)
             {
                 var _column = columns.Where(h => h.FieldName.ToLower() == column.FieldName.ToLower()).FirstOrDefault();
-                if (_column!=null && column.FieldName.ToLower().Equals(column.ReFieldName.ToLower()))
+                if (_column != null && column.FieldName.ToLower().Equals(column.ReFieldName.ToLower()))
                 {
-                    
+
                     //可能变更也可能没有变更
 
                     if (string.IsNullOrEmpty(column.TabName))
@@ -236,7 +277,7 @@ namespace HiSql
 
                     if (!rtntuple.Item1)
                     {
-                        fieldChanges.Add(new FieldChange { IsTabChange=rtntuple.Item2, OldColumn = _column, NewColumn = column, FieldName = column.FieldName, Action = TabFieldAction.MODI });
+                        fieldChanges.Add(new FieldChange { IsTabChange = rtntuple.Item2, OldColumn = _column, NewColumn = column, FieldName = column.FieldName, Action = TabFieldAction.MODI });
                     }
 
 
@@ -249,18 +290,19 @@ namespace HiSql
                     {
                         //重命名字段
                         fieldChanges.Add(new FieldChange { IsTabChange = true, NewColumn = column, FieldName = column.FieldName, Action = TabFieldAction.RENAME });
-                    }else
-                        fieldChanges.Add(new FieldChange { IsTabChange=true, NewColumn=column, FieldName = column.FieldName, Action = TabFieldAction.ADD });
+                    }
+                    else
+                        fieldChanges.Add(new FieldChange { IsTabChange = true, NewColumn = column, FieldName = column.FieldName, Action = TabFieldAction.ADD });
                 }
             }
 
-            foreach(HiColumn column in columns)
+            foreach (HiColumn column in columns)
             {
-                var _column= phycolumns.Where(h => h.FieldName.ToLower() == column.FieldName.ToLower()).FirstOrDefault();
+                var _column = phycolumns.Where(h => h.FieldName.ToLower() == column.FieldName.ToLower()).FirstOrDefault();
                 if (_column == null)
                 {
                     //说明该字段是删除
-                    fieldChanges.Add(new FieldChange { IsTabChange=true, OldColumn= column, FieldName = column.FieldName, Action = TabFieldAction.DELETE });
+                    fieldChanges.Add(new FieldChange { IsTabChange = true, OldColumn = column, FieldName = column.FieldName, Action = TabFieldAction.DELETE });
                 }
 
             }
@@ -331,9 +373,9 @@ namespace HiSql
                                             prop.SetValue(hiTable, Convert.ToInt16(tabModel.Rows[0][prop.Name].ToString()));
                                         }
                                         else
-                                            prop.SetValue(hiTable,  tabModel.Rows[0][prop.Name]);
+                                            prop.SetValue(hiTable, tabModel.Rows[0][prop.Name]);
                                     }
-                                        
+
                                 }
                                 break;
                         }
@@ -440,7 +482,7 @@ namespace HiSql
                 return null;
                 //throw new Exception($"无法将DataSet表结构信息传成实体");
             }
-                
+
 
             return tabInfo;
         }
@@ -448,13 +490,14 @@ namespace HiSql
         public static void InitMapping(Type type)
         {
             string _keyname = Constants.KEY_ENTITY_NAME.Replace("[$NAME$]", type.FullName);
-            CacheContext.MCache.GetOrCreate<TabInfo>(_keyname, () => {
+            CacheContext.MCache.GetOrCreate<TabInfo>(_keyname, () =>
+            {
                 TabInfo tabinfo = new TabInfo();
-                HiTable hitabs = new HiTable(); 
+                HiTable hitabs = new HiTable();
                 tabinfo.EntityName = type.Name;
                 tabinfo.DbTabName = type.Name;
                 //类属性必须挂上 HiTable特性
-                var  _hitabs = type.GetCustomAttributes(true).Where(t => t is HiTable).Select(it=>(HiTable)it).FirstOrDefault();
+                var _hitabs = type.GetCustomAttributes(true).Where(t => t is HiTable).Select(it => (HiTable)it).FirstOrDefault();
                 if (hitabs != null)
                 {
                     hitabs = _hitabs.MoveCross<HiTable>(hitabs);
@@ -493,7 +536,7 @@ namespace HiSql
                             hiColumn.FieldDesc = hiColumn.FieldName;
                         }
 
-                        _hicolumn =hiColumn.MoveCross< HiColumn>(_hicolumn);
+                        _hicolumn = hiColumn.MoveCross<HiColumn>(_hicolumn);
 
                         HiType ftype = n.PropertyType.ToDbFieldType();
                         //没有特别标记忽略
@@ -506,7 +549,7 @@ namespace HiSql
                     {
                         _hicolumn.FieldName = n.Name;
                         tabinfo.Columns.Add(_hicolumn);
-                       
+
                     }
                 }
                 return tabinfo;

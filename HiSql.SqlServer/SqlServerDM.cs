@@ -1296,8 +1296,18 @@ namespace HiSql
                 _tempsql = _tempsql.Replace("[$Where$]", $" and [name]='{tabname.ToSqlInject()}'");
             return Context.DBO.GetDataTable(_tempsql);
         }
-
+        /// <summary>
+        /// 检查表或视图是否存在
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <returns></returns>
+        public bool CheckTabExists(string tabname = "")
+        {
+            DataTable dt = Context.DBO.GetDataTable(dbConfig.Get_CheckTabExists.Replace("[$TabName$]", tabname));
+            return dt.Rows.Count > 0;
+        }
         
+
         public DataTable GetAllTables(string tabname, int pageSize, int pageIndex, out int totalCount)
         {
             int SeqBegin = (pageIndex - 1) * pageSize;

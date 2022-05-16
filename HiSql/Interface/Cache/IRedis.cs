@@ -71,22 +71,7 @@ namespace HiSql
 
 
 
-        /// <summary>
-        /// 设置hash值
-        /// </summary>
-        /// <param name="hashkey"></param>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public bool HSet(string hashkey,string key, string value);
-
-
-        /// <summary>
-        /// 获取hash值
-        /// </summary>
-        /// <param name="hashkey"></param>
-        /// <param name="key"></param>
-        /// <returns></returns>
+      
         public string HGet(string hashkey,string key);
 
         /// <summary>

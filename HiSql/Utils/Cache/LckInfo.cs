@@ -9,6 +9,11 @@ namespace HiSql
     public class LckInfo
     {
         /// <summary>
+        /// 键
+        /// </summary>
+        public string Key { get; set; }
+
+        /// <summary>
         /// 锁定人
         /// </summary>
         public string UName { get; set; }

@@ -15,20 +15,25 @@ namespace HiSql
 
         public static ICache MCache
         {
-            get {
+            get
+            {
 
                 if (_cache == null)
                 {
-                    if (!Global.RedisOn)
-                        _cache = new MCache(null);
-                    else
-                        _cache = new RCache(Global.RedisOptions);
+                    lock (ContextList)
+                    {
+                        if (_cache == null)
+                        {
+                            if (!Global.RedisOn)
+                                _cache = new MCache(null);
+                            else
+                                _cache = new RCache(Global.RedisOptions);
+                        }
+                    }
                 }
-                    
-                return _cache; ;
 
+                return _cache; 
             }
         }
-
     }
 }

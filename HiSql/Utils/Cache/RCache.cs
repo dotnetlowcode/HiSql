@@ -13,7 +13,7 @@ namespace HiSql
     /// </summary>
     public class RCache : IRedis
     {
-
+       
         private StackExchange.Redis.IDatabase _cache;
         private ConnectionMultiplexer _connectMulti;
 
@@ -56,6 +56,8 @@ namespace HiSql
                 string _connstr = $"{this._options.Host}:{this._options.Port}";
                 if (!string.IsNullOrEmpty(this._options.PassWord))
                     _connstr = $"{_connstr},password={this._options.PassWord}";
+
+                ConnectionMultiplexer.SetFeatureFlag("preventthreadtheft", true); //add pengxy  参考 https://stackexchange.github.io/StackExchange.Redis/ThreadTheft 
                 _connectMulti = ConnectionMultiplexer.Connect(_connstr);
                 _cache = _connectMulti.GetDatabase(this._options.Database);
             }
@@ -347,6 +349,8 @@ namespace HiSql
         public bool UnLock(string key)
         {
             checkRedis();
+            if(!key.Contains("lck:"))
+                key = $"lck:{key}";
             key = checkKey(key);
             HDel(_lockhashname, key);
             return  _cache.LockRelease(key, 1);
@@ -378,6 +382,53 @@ namespace HiSql
             return _cache.HashGet(hashkey,key);
         }
 
+
+        public List<LckInfo> GetCurrLockInfo()
+        {
+            List<LckInfo> lckInfos = new List<LckInfo>();
+            var valu = _cache.HashGetAll(_lockhashname);
+            if (valu.Length > 0)
+            {
+                List<string> lckInfosWaitRemove = new List<string>();
+                foreach (var item in valu)
+                {
+                    var isexists = _cache.KeyExists(item.Name.ToString());
+                    var isexists2 = _cache.StringGet(item.Name.ToString());
+                    if (isexists)
+                    {
+                        LckInfo lckInfo = JsonConvert.DeserializeObject<LckInfo>(item.Value);
+                        lckInfo.Key = item.Name;
+                        lckInfos.Add(lckInfo);
+                    }
+                    else
+                    {
+                        lckInfosWaitRemove.Add(item.Name);
+                    }
+                }
+                foreach (var key in lckInfosWaitRemove)
+                {
+                    HDel(_lockhashname, key);
+                }
+            }
+            return lckInfos;
+        }
+
+        public List<LckInfo> GetHisLockInfo()
+        {
+            List<LckInfo> lckInfos = new List<LckInfo>();
+            var valu = _cache.HashGetAll(_lockhishashname);
+            if (valu.Length > 0)
+            {
+                foreach (var item in valu)
+                {
+                    LckInfo lckInfo = JsonConvert.DeserializeObject<LckInfo>(item.Value);
+                    lckInfo.Key = item.Name;
+                    lckInfos.Add(lckInfo);
+                }
+            }
+            return lckInfos;
+        }
+
         public delegate bool deleLockOn(string key, int expresseconds);
 
 
@@ -405,18 +456,26 @@ namespace HiSql
 
             timeoutseconds = timeoutseconds < 0 ? 5 : timeoutseconds;
             timeoutseconds = timeoutseconds > _max_timeout ? _max_timeout : timeoutseconds;
-
+            Thread thread = null;
             deleLockOn _deleLock = new deleLockOn(lockOn);
             var workTask = Task.Run(() =>
             {
-                bool _success = _deleLock.Invoke(key, expresseconds);
-                if (_success)
+                try
                 {
-                    lckinfo = getLockInfo(lckinfo, expresseconds, 0);
-                    HSet(_lockhashname, key, JsonConvert.SerializeObject(lckinfo));
-                    HSet(_lockhishashname, $"{key}:{lckinfo.LockTime.ToString("yyyyMMddHHmmssfff")}", JsonConvert.SerializeObject(lckinfo));
+                    thread = System.Threading.Thread.CurrentThread;
+                    bool _success = _deleLock.Invoke(key, expresseconds);
+                    if (_success)
+                    {
+                        lckinfo = getLockInfo(lckinfo, expresseconds, 0);
+                        HSet(_lockhashname, key, JsonConvert.SerializeObject(lckinfo));
+                        HSet(_lockhishashname, $"{key}:{lckinfo.LockTime.ToString("yyyyMMddHHmmssfff")}", JsonConvert.SerializeObject(lckinfo));
+                    }
+                    return _success;
                 }
-                return _success;
+                catch (Exception ex)
+                {
+                    return false;
+                }
             });
             bool flag = workTask.Wait(timeoutseconds * 1000, new CancellationToken(false));
 
@@ -438,7 +497,8 @@ namespace HiSql
             }
             else
             {
-                workTask.Wait(new CancellationToken(true));
+                if(thread != null)
+                    thread.Interrupt();
                 msg = $"key:[{key}]锁定失败,加锁等待超过{timeoutseconds}秒!";
             }
             return new Tuple<bool, string>(flag, msg);
@@ -491,86 +551,116 @@ namespace HiSql
         /// <returns></returns>
         public Tuple<bool, string> LockOnExecute(string key, Action action,LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
         {
+           
             checkRedis();
             key = $"lck:{key}";
             key = checkKey(key);
 
             int _max_second = 60;//最长定锁有效期
             int _max_timeout = 10;//最长加锁等待时间
-
             int _times = 5;//续锁最多次数
-
             int _millsecond = 900;
-
 
             expresseconds = expresseconds < 0 ? 5 : expresseconds;
             expresseconds = expresseconds > _max_second ? _max_second : expresseconds;
 
+            if (expresseconds <= timeoutseconds)
+            {
+                expresseconds = timeoutseconds + 2;
+            }
             timeoutseconds = timeoutseconds < 0 ? 5 : timeoutseconds;
             timeoutseconds = timeoutseconds > _max_timeout ? _max_timeout : timeoutseconds;
 
             CancellationTokenSource tokenSource = new CancellationTokenSource();
             CancellationToken cancellationToken = tokenSource.Token;
             deleLockOn _deleLock = new deleLockOn(lockOn);
+            Thread threadGetlock = null;
             Thread thread = null;
-            int _timesa = 0;
-            var workTask = Task.Run(() => { 
-                thread=System.Threading.Thread.CurrentThread;
+            var workTaskGetLock = Task.Run(() =>
+            {
                 try
                 {
-                    if (_deleLock.Invoke(key, expresseconds))
+                    threadGetlock = System.Threading.Thread.CurrentThread;
+                    bool _success = _deleLock.Invoke(key, expresseconds);
+                    if (_success)
                     {
                         lckinfo = getLockInfo(lckinfo, expresseconds, 0);
                         HSet(_lockhashname, key, JsonConvert.SerializeObject(lckinfo));
                         HSet(_lockhishashname, $"{key}:{lckinfo.LockTime.ToString("yyyyMMddHHmmssfff")}", JsonConvert.SerializeObject(lckinfo));
-                        action.Invoke();
                     }
+                    return _success;
                 }
                 catch (Exception ex)
                 {
-                    //Console.WriteLine($"线程中断。。");
+                    return false;
                 }
             });
-            bool flag = workTask.Wait(timeoutseconds * _millsecond, cancellationToken);
+            bool isgetlock = workTaskGetLock.Wait(timeoutseconds * 1000, new CancellationToken(false));
             string msg = "";
-            if (flag)
+            bool flag = false;
+            if (isgetlock) //获取锁成功
             {
-                msg = $"key:[{key}]锁定并操作业务成功!锁已自动释放";
+                int _timesa = 0;
+                var workTask = Task.Run(() =>
+                {
+                    thread = System.Threading.Thread.CurrentThread;
+                    try
+                    {
+                        action.Invoke();
+                    }
+                    catch (Exception ex)
+                    {
+                        //Console.WriteLine($"线程中断。。");
+                    }
+                    finally
+                    {
+                        UnLock(key);
+                    }
+                });
+                flag = workTask.Wait(expresseconds * _millsecond, cancellationToken);
+               
+                if (flag)
+                {
+                    msg = $"key:[{key}]锁定并操作业务成功!锁已自动释放";
+                }
+
+                while (!flag)
+                {
+                    if (_timesa >= _times)
+                    {
+                        if (!workTask.IsCompleted && !workTask.IsCanceled)
+                        {
+                            UnLock(key);
+                            tokenSource.Cancel();
+                            thread.Interrupt();
+                        }
+                        flag = false;
+                        msg = $"key:[{key}]锁定操作业务失败!超过最大[{_times}]次续锁没有完成,操作被撤销";
+                        break;
+                    }
+                    else
+                    {
+                        //续锁
+                        _cache.StringSet(key, 1, TimeSpan.FromSeconds(expresseconds));
+                        lckinfo = getLockInfo(lckinfo, expresseconds, _timesa);
+                        HSet(_lockhashname, key, JsonConvert.SerializeObject(lckinfo));
+                        HSet(_lockhishashname, $"{key}:{lckinfo.LockTime.ToString("yyyyMMddHHmmssfff")}", JsonConvert.SerializeObject(lckinfo));
+                        flag = workTask.Wait(expresseconds * _millsecond, cancellationToken);
+                        if (flag)
+                        {
+                            flag = true;
+                            msg = $"key:[{key}]锁定并操作业务成功!续锁{_timesa + 1}次,锁已经自动释放";
+                            break;
+                        }
+                    }
+                    _timesa++;
+                }
+            }
+            else  //获取锁失败
+            {
+                msg = $"key:[{key}]锁定失败,加锁等待超过{timeoutseconds}秒!";
             }
 
-            while (!flag)
-            {
-                if (_timesa >= _times)
-                {
-                    if (!workTask.IsCompleted && !workTask.IsCanceled)
-                    {
-                        thread.Interrupt();
-                        tokenSource.Cancel();
-                    }
-                    flag = false;
-                    break;
-                }
-                else
-                {
-                    //续锁
-                    _cache.StringSet(key, 1, TimeSpan.FromSeconds(expresseconds));
-                    lckinfo = getLockInfo(lckinfo, expresseconds, _timesa);
-                    HSet(_lockhashname, key, JsonConvert.SerializeObject(lckinfo));
-                    HSet(_lockhishashname, $"{key}:{lckinfo.LockTime.ToString("yyyyMMddHHmmssfff")}", JsonConvert.SerializeObject(lckinfo));
-                    flag = workTask.Wait(timeoutseconds * _millsecond, cancellationToken);
-                    if (flag)
-                    {
-                        msg = $"key:[{key}]锁定并操作业务成功!续锁{_timesa+1}次,锁已经自动释放";
-                    }
-                }
-                _timesa++;
-            }
-
-            if (!flag)
-            {
-                msg = $"key:[{key}]锁定操作业务失败!超过最大[{_times}]次续锁没有完成,操作被撤销";
-            }
-            UnLock(key);
             return new Tuple<bool, string>(flag, msg);
         }
 
@@ -613,6 +703,7 @@ namespace HiSql
             }
             return true;
         }
+
 
         #endregion
 
