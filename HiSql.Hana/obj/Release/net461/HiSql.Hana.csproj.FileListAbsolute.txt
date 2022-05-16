@@ -155,3 +155,8 @@ D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Release\net461\System.Xml.XmlDocument
 D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Release\net461\System.Xml.XmlSerializer.dll
 D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Release\net461\System.Xml.XPath.dll
 D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Release\net461\System.Xml.XPath.XDocument.dll
+D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Release\net461\Pipelines.Sockets.Unofficial.dll
+D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Release\net461\StackExchange.Redis.dll
+D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Release\net461\System.Diagnostics.PerformanceCounter.dll
+D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Release\net461\System.IO.Pipelines.dll
+D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Release\net461\System.Threading.Channels.dll

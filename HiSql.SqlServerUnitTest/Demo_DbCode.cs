@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HiSql.UnitTest;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,7 +17,7 @@ namespace HiSql
 
             //Demo_ModiColumn(sqlClient);
             //Demo_ReColumn(sqlClient);
-            Demo_ModiTable(sqlClient);
+            //Demo_ModiTable(sqlClient);
             //Demo_ReTable(sqlClient);
             //Demo_DelColumn(sqlClient);
             //Demo_Tables(sqlClient);
@@ -33,7 +34,23 @@ namespace HiSql
             //Demo_Index_Create(sqlClient);
             //Demo_Primary_Create(sqlClient);
             // Demo_AllTablesPaging(sqlClient);
+            Dome_GetTableStruct();
         }
+
+        static void Dome_GetTableStruct()
+        {
+            //Global.RedisOn = true;
+            //Global.RedisOptions = new RedisOptions() { Host = "192.168.10.130", Port = 8379, PassWord = "", Database = 1 }; //rCache = new RCache(new RedisOptions { Host = "192.168.10.130", Port=8379, PassWord = "" , Database = 1});
+            //Global.RedisOptions = new RedisOptions() { Host = "172.16.80.178", PassWord = "pwd123", Database = 1 };
+            Parallel.For(0, 10, (x, y) => {
+                HiSqlClient sqlClient = Demo_Init.GetSqlClient();
+                TabInfo tableInfo = sqlClient.Context.DMInitalize.GetTabStruct("Hi_Test23");
+                Console.WriteLine($"创建成功：字段数："+ tableInfo.Columns.Count);
+            });
+
+        }
+
+
         static void Demo_AllTablesPaging(HiSqlClient sqlClient)
         {
             int total = 0;

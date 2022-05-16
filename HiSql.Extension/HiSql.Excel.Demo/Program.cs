@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 namespace HiSql.Excel.Test
 {
@@ -10,6 +11,7 @@ namespace HiSql.Excel.Test
         {
             Console.WriteLine("Hello World!");
 
+            //BuildExceBigData();
             //BuildExcel_1();
             //ReadExcel_1();
 
@@ -48,6 +50,47 @@ namespace HiSql.Excel.Test
             HiSql.Extension.Excel excel = new HiSql.Extension.Excel(new Extension.ExcelOptions() { TempType = Extension.TempType.STANDARD, DataBeginRow = 2, HeaderRow = 1 });
 
             DataTable dt = excel.ExcelToDataTable(@"D:\data\GD_UniqueCodeInfo3.xlsx", true);
+        }
+
+        static void BuildExceBigData()
+        {
+            HiSqlClient sqlClient = Demo_Init.GetSqlClient2();
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            DataTable dt = sqlClient.HiSql("select * from S4_REP_ZRMB52_2022_05_12").Take(100000).Skip(1).ToTable();
+            TabInfo tabInfo = sqlClient.Context.DMInitalize.GetTabStruct("S4_REP_ZRMB52_2022_05_12");
+            sw.Stop();
+            Console.WriteLine($"获取{dt.Rows.Count}条 耗时{sw.Elapsed}秒");
+
+            // TempType = Extension.TempType.HEADER 
+            HiSql.Extension.Excel excel = new HiSql.Extension.Excel(new Extension.ExcelOptions() { TempType = Extension.TempType.HEADER });
+            excel.Add(new Extension.ExcelHeader(1).Add("表名").Add("S4_REP_ZRMB52_2022_05_12"));//标识表名
+
+            Extension.ExcelHeader excelHeader = new Extension.ExcelHeader(2);
+            Extension.ExcelHeader excelHeader3 = new Extension.ExcelHeader(3);
+            foreach (DataColumn dataColumn in dt.Columns)
+            {
+                HiColumn hiColumn = tabInfo.Columns.Where(c => c.FieldName.Equals(dataColumn.ColumnName)).FirstOrDefault();
+                if (hiColumn != null)
+                {
+                    excelHeader.Add(string.IsNullOrEmpty(hiColumn.FieldDesc) ? dataColumn.ColumnName : hiColumn.FieldDesc);
+                }
+                else
+                    excelHeader.Add(dataColumn.ColumnName);
+
+                excelHeader3.Add(dataColumn.ColumnName);
+            }
+            excel.Add(excelHeader);//字段中文描述
+            excel.Add(excelHeader3);//字段名
+
+
+
+            sw.Restart();
+            sw.Start();
+            //生成excel
+            excel.WriteExcel(dt, @"D:\data\S4_REP_ZRMB52_2022_05_12.xlsx");
+            sw.Stop();
+            Console.WriteLine($"写入excel 数据插入{dt.Rows.Count}条 耗时{sw.Elapsed}秒");
         }
 
 
@@ -141,8 +184,8 @@ namespace HiSql.Excel.Test
         {
             HiSqlClient sqlClient = Demo_Init.GetSqlClient();
             HiSql.Extension.Excel excel = new HiSql.Extension.Excel(new Extension.ExcelOptions() { TempType = Extension.TempType.STANDARD, EndRow = -1 });
-            excel.Add(new Extension.ExcelHeader(1).Add("表名").Add("GD_UniqueCodeInfo"));
-            DataTable dt = excel.ExcelToDataTable(@"C:\Users\admin\Downloads\2088531658652104-20220505-086373743-账务组合查询.xls\20220505.xlsx", true);
+            //DataTable dt = excel.ExcelToDataTable(@"C:\Users\admin\Downloads\2088531658652104-20220505-086373743-账务组合查询.xls\20220505.xlsx", true);
+            DataTable dt = excel.ExcelToDataTable(@"C:\Users\admin\Downloads\2088531658652104-20220509-086513029-账务组合查询.xls\20220511.xlsx", true);
 
             List<dynamic> list = new List<dynamic>();
 

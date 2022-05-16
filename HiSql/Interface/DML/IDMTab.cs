@@ -125,6 +125,14 @@ namespace HiSql
         /// <returns></returns>
         DataTable GetAllTables(string tabname="");
 
+        /// <summary>
+        /// 检查表或视图是否存在
+        /// </summary>
+        /// <param name="tabname">表名称或视图名称</param>
+        /// <returns></returns>
+        bool CheckTabExists(string tabname = "");
+
+
         DataTable GetAllTables(string tabname, int pageSize, int pageIndex, out int totalCount);
 
 

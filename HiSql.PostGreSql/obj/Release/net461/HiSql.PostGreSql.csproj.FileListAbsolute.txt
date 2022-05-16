@@ -152,3 +152,7 @@ D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Release\net461\pt-BR\Microsoft.
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Release\net461\ru\Microsoft.Data.SqlClient.resources.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Release\net461\zh-Hans\Microsoft.Data.SqlClient.resources.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Release\net461\zh-Hant\Microsoft.Data.SqlClient.resources.dll
+D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Release\net461\Pipelines.Sockets.Unofficial.dll
+D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Release\net461\StackExchange.Redis.dll
+D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Release\net461\System.Diagnostics.PerformanceCounter.dll
+D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Release\net461\System.IO.Pipelines.dll

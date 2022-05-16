@@ -151,3 +151,8 @@ D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Release\net461\HiSql.Oracle.csproj.
 D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Release\net461\HiSql.Oracle.csproj.CopyComplete
 D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Release\net461\HiSql.Oracle.dll
 D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Release\net461\HiSql.Oracle.pdb
+D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Release\net461\Pipelines.Sockets.Unofficial.dll
+D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Release\net461\StackExchange.Redis.dll
+D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Release\net461\System.Diagnostics.PerformanceCounter.dll
+D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Release\net461\System.IO.Pipelines.dll
+D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Release\net461\System.Threading.Channels.dll
