@@ -36,9 +36,9 @@ namespace HiSql.Test
                 });
             }
 
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < 1; i++)
             {
-                restultBaidu.AddRange(restultBaidu);
+                //restultBaidu.AddRange(restultBaidu);
             }
             InitDB();
         }

@@ -12,7 +12,6 @@ namespace HiSql
     /// </summary>
     public interface IRedis: ICache
     {
-
         /// <summary>
         /// 广播方式订阅 不按发布顺序接口
         /// </summary>
@@ -72,46 +71,42 @@ namespace HiSql
 
 
       
-        public string HGet(string hashkey,string key);
+        //public string HGet(string hashkey,string key);
 
-        /// <summary>
-        /// hash 删除
-        /// </summary>
-        /// <param name="hashkey"></param>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        public bool HDel(string hashkey, string key);
-        /// <summary>
-        /// 加业务锁
-        /// </summary>
-        /// <param name="key">自定锁的KEY</param>
-        /// <param name="expresseconds">锁的周期时间 单位秒</param>
-        /// <param name="timeoutseconds">加锁等待超时时间 单位秒</param>
-        /// <returns></returns>
-        public Tuple<bool,string> LockOn(string key, LckInfo lckinfo,int expresseconds,int timeoutseconds);
-
-
-        /// <summary>
-        /// 检测key是否已经锁定
-        /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        public Tuple<bool, string> CheckLock(string key);
+        ///// <summary>
+        ///// hash 删除
+        ///// </summary>
+        ///// <param name="hashkey"></param>
+        ///// <param name="key"></param>
+        ///// <returns></returns>
+        //public bool HDel(string hashkey, string key);
+        ///// <summary>
+        ///// 加业务锁
+        ///// </summary>
+        ///// <param name="key">自定锁的KEY</param>
+        ///// <param name="expresseconds">锁的周期时间 单位秒</param>
+        ///// <param name="timeoutseconds">加锁等待超时时间 单位秒</param>
+        ///// <returns></returns>
+        //public Tuple<bool,string> LockOn(string key, LckInfo lckinfo,int expresseconds,int timeoutseconds);
 
 
-        /// <summary>
-        /// 加业务锁
-        /// </summary>
-        /// <param name="key">自定锁的KEY</param>
-        /// <param name="action">加锁后执行的业务</param>
-        /// <param name="expresseconds">锁的周期时间 单位秒</param>
-        /// <param name="timeoutseconds">加锁等待超时时间 单位秒</param>
-        /// <returns></returns>
-        public Tuple<bool, string> LockOnExecute(string key, Action action,LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5);
+        ///// <summary>
+        ///// 检测key是否已经锁定
+        ///// </summary>
+        ///// <param name="key"></param>
+        ///// <returns></returns>
+        //public Tuple<bool, string> CheckLock(string key);
 
 
-
-        public bool UnLock(string key);
+        ///// <summary>
+        ///// 加业务锁
+        ///// </summary>
+        ///// <param name="key">自定锁的KEY</param>
+        ///// <param name="action">加锁后执行的业务</param>
+        ///// <param name="expresseconds">锁的周期时间 单位秒</param>
+        ///// <param name="timeoutseconds">加锁等待超时时间 单位秒</param>
+        ///// <returns></returns>
+        //public Tuple<bool, string> LockOnExecute(string key, Action action,LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5);
 
     }
 }
