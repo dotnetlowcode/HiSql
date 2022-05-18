@@ -26,7 +26,7 @@
 ### 初始安装 
 注：只需要执行一次即可
 ```c#
-sqlclient.CodeFirst.InstallHisql();
+   sqlclient.CodeFirst.InstallHisql();
 ```
 
 
@@ -35,8 +35,60 @@ sqlclient.CodeFirst.InstallHisql();
 传统ORM框架最大的弊端就是完全要依赖于实体用lambda表达式写查询语句，但最大的问题就是如果业务场景需要动态拼接条件时只能又切换到原生数据库的sql语句进行完成，如果自行拼接开发人员还要解决防注入的问题,hisql 刚才完美的解决这些问题,Hisql底层已经对sql注入进行了
 
 处理，开发人员只要关注于业务开发
+### 2022.5.16 hisql缓存支持多级缓存
 
-### 2022.5.1 新增excel操作支持
+hisql缓存支持多级缓存，优先取MemoryCache，再找redis缓存,如下所示
+
+```c#
+    HiSql.ICache rCache = new RCache(new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "", CacheRegion = "HRM", Database = 2,EnableMultiCache = true }); //EnableMultiCache默认是启用的
+                    rCache.SetCache("test1", list);
+                    Stopwatch sw = Stopwatch.StartNew();
+                    sw.Start();
+                    Parallel.For(0, 10000, (x, y) =>
+                    {
+                        rCache.GetCache("test1");
+                    });
+                    Console.WriteLine($"测试多级缓存性能：" + sw.ElapsedMilliseconds);
+```
+
+### 2022.5.16 新增本地锁、分布式锁(redis锁）
+
+业务代码可以使用本地锁或分布式锁(redis锁）避免多线程同时更新数据库出现数据库死锁，也可以在扣减库存场景使用。
+单实例可以使用本地锁，支持同时加多个key，如下所示
+
+```c#
+    HiSql.ICache rCache = new MCache();
+    Tuple<bool, string> rtn = rCache.LockOnExecute(new string[] { "test_key1","test_key2" }, () =>
+                            {
+                                try
+                                {
+                                    new TestInstance().TestInsertToDB();
+                                }
+                                catch (Exception EX)
+                                {
+                                    throw;
+                                }
+                            }, new LckInfo { UName = "tansar", EventName = "单次获取加锁动作", Ip = "192.168.1.1" }, 60, 20);
+```
+分布式实例可以使用redis锁，支持同时加多个key，如下所示
+
+```c#
+    HiSql.ICache rCache = new RCache(new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "", CacheRegion = "HRM", Database = 2 });
+
+    Tuple<bool, string> rtn = rCache.LockOnExecute(new string[] { "test_key1","test_key2" }, () =>
+                            {
+                                try
+                                {
+                                    new TestInstance().TestInsertToDB();
+                                }
+                                catch (Exception EX)
+                                {
+                                    throw;
+                                }
+                            }, new LckInfo { UName = "tansar", EventName = "单次获取加锁动作", Ip = "192.168.1.1" }, 60, 20);
+```
+
+### 2022.5.10 新增excel操作支持
 平常在开发的过程需要将表中的数据导出到excel ,在excel编辑完成后再上传保存到表中
 源码在：HiSql.Extension 目录中
 
@@ -149,7 +201,7 @@ hisql底层默认是使用 MemoryCache 进行表结构信息的缓存处理(如�
 
 ```c#
 HiSql.Global.RedisOn = true;//开启redis缓存
-HiSql.Global.RedisOptions = new RedisOptions { Host = "172.16.80.178", PassWord = "pwd123" };
+HiSql.Global.RedisOptions = new RedisOptions { Host = "172.16.80.178", PassWord = "pwd123", Port = 6379, CacheRegion = "HRM", Database = 2 };
 ```
 
 ### 2022.4.15 更新
