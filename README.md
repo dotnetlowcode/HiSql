@@ -54,7 +54,8 @@ hisql缓存支持多级缓存，优先取MemoryCache，再找redis缓存,如下�
 ### 2022.5.16 新增本地锁、分布式锁(redis锁）
 
 业务代码可以使用本地锁或分布式锁(redis锁）避免多线程同时更新数据库出现数据库死锁，也可以在扣减库存场景使用。
-单实例可以使用本地锁，支持同时加多个key，如下所示
+
+1.单实例可以使用本地锁，支持同时加多个key，如下所示
 
 ```c#
     HiSql.ICache rCache = new MCache();
@@ -70,7 +71,7 @@ hisql缓存支持多级缓存，优先取MemoryCache，再找redis缓存,如下�
                                 }
                             }, new LckInfo { UName = "tansar", EventName = "单次获取加锁动作", Ip = "192.168.1.1" }, 60, 20);
 ```
-分布式实例可以使用redis锁，支持同时加多个key，如下所示
+2.分布式实例可以使用redis锁，支持同时加多个key，如下所示
 
 ```c#
     HiSql.ICache rCache = new RCache(new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "", CacheRegion = "HRM", Database = 2 });
