@@ -39,7 +39,17 @@ namespace HiSql.Extension
         /// 值
         /// </summary>
         public string Value { get; set; }
-    
+
+        public ExcelCell(int colidx, int colspan, int rowspan)
+        {
+            _colidx = colidx;
+            _colspan = colspan;
+            _rowspan = rowspan;
+        }
+        public ExcelCell()
+        { 
+            
+        }
     }
 
     public class ExcelHeader:IEnumerable<ExcelCell>
