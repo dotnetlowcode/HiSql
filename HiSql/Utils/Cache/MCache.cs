@@ -93,7 +93,11 @@ namespace HiSql
             return v;
         }
 
-
+        /// <summary>
+        /// 设置缓存对象
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public void SetCache(string key, object value)
         {
             DateTimeOffset expirationTime = DateTimeOffset.Now;
@@ -101,6 +105,13 @@ namespace HiSql
             SetCache(key, value, expirationTime);
         }
 
+        /// <summary>
+        /// 设置缓存对象（带有效期）
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="expirationTime"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public void SetCache(string key, object value, DateTimeOffset expirationTime)
         {
             key = GetRegionKey(key);
@@ -114,6 +125,13 @@ namespace HiSql
 
             this._cache.Set<object>(key, value, expirationTime);
         }
+
+        /// <summary>
+        /// 设置缓存对象
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="second"></param>
         public void SetCache(string key, object value, int second)
         {
             DateTimeOffset expirationTime = DateTimeOffset.Now;
@@ -122,6 +140,10 @@ namespace HiSql
         }
 
 
+        /// <summary>
+        /// 移除缓存缓存对象
+        /// </summary>
+        /// <param name="key"></param>
         public void RemoveCache(string key)
         {
             key = GetRegionKey(key);
@@ -144,6 +166,13 @@ namespace HiSql
             old.Dispose();
 
         }
+        /// <summary>
+        /// 获取或设置缓存对象
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public T GetOrCreate<T>(string key, Func<T> value) where T : class
         {
             return GetOrCreate(key, value, DefaultExpirySecond);
@@ -177,6 +206,13 @@ namespace HiSql
             });
         }
 
+        /// <summary>
+        /// 设置hash值
+        /// </summary>
+        /// <param name="hashkey"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public bool HSet(string hashkey, string key, string value)
         {
             if (!hashkey.Contains(_hsetkeyPrefix))
@@ -209,6 +245,12 @@ namespace HiSql
             return true;
         }
 
+        /// <summary>
+        /// 获取hash对象
+        /// </summary>
+        /// <param name="hashkey"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public string HGet(string hashkey, string key)
         {
             if (!hashkey.Contains(_hsetkeyPrefix))
@@ -224,6 +266,12 @@ namespace HiSql
             return null;
         }
 
+        /// <summary>
+        /// 删除hash
+        /// </summary>
+        /// <param name="hashkey"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public bool HDel(string hashkey, string key)
         {
             if (!hashkey.Contains(_hsetkeyPrefix))
@@ -241,7 +289,14 @@ namespace HiSql
             return false;
         }
 
-
+        /// <summary>
+        /// 业务锁
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="lckinfo"></param>
+        /// <param name="expresseconds"></param>
+        /// <param name="timeoutseconds"></param>
+        /// <returns></returns>
         public Tuple<bool, string> LockOn(string key, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
         {
             if (!key.Contains(_lockkeyPrefix))
@@ -319,7 +374,7 @@ namespace HiSql
 
         }
 
-        private Tuple<bool, string> CheckLock(string key)
+        public Tuple<bool, string> CheckLock(string key)
         {
             string _key = key;
             if (!key.Contains(_lockkeyPrefix))
@@ -349,6 +404,7 @@ namespace HiSql
             return new Tuple<bool, string>(_islock, _msg);
         }
 
+        
         public Tuple<bool, string> CheckLock(params string[] keys)
         {
             foreach (var key in keys)
@@ -485,6 +541,15 @@ namespace HiSql
         }
 
 
+        /// <summary>
+        /// 业务锁等待并执行
+        /// </summary>
+        /// <param name="keys"></param>
+        /// <param name="action"></param>
+        /// <param name="lckinfo"></param>
+        /// <param name="expresseconds"></param>
+        /// <param name="timeoutseconds"></param>
+        /// <returns></returns>
         public Tuple<bool, string> LockOnExecute(string[] keys, Action action, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
         {
 
@@ -635,6 +700,10 @@ namespace HiSql
             return true;
         }
 
+        /// <summary>
+        /// 获取当前缓存锁信息
+        /// </summary>
+        /// <returns></returns>
         public List<LckInfo> GetCurrLockInfo()
         {
             List<LckInfo> lckInfos = new List<LckInfo>();
@@ -666,6 +735,10 @@ namespace HiSql
             return lckInfos;
         }
 
+        /// <summary>
+        /// 获取历史表锁信息
+        /// </summary>
+        /// <returns></returns>
         public List<LckInfo> GetHisLockInfo()
         {
             var newkey = GetRegionKey(_lockhishashname);

@@ -51,11 +51,11 @@ namespace HiSql
                     if (tupple.Item3 != this.UniqueId)
                     {
                         _MemoryCache.RemoveCache($"{tupple.Item2}:{tupple.Item1}");
-                        Console.WriteLine($"Got remove event for key   {tupple.Item2}:{tupple.Item1} 需要移除");
+                        //Console.WriteLine($"Got remove event for key   {tupple.Item2}:{tupple.Item1} 需要移除");
                         return;
                     }
 
-                    Console.WriteLine($"Got remove event for key   {tupple.Item2}:{tupple.Item1} 不需要移除");
+                    //Console.WriteLine($"Got remove event for key   {tupple.Item2}:{tupple.Item1} 不需要移除");
 
                 });
                 ///启用消息通知
@@ -63,16 +63,14 @@ namespace HiSql
                 {
                     this.BroadCastSubScriber($"__keyevent@{options.Database}__:expired", (rchannel, key) =>
                     {
-
                         var tupple = ParseRegionKey(key);
                         if (tupple.Item3 != this.UniqueId)
                         {
                             _MemoryCache.RemoveCache($"{tupple.Item2}:{tupple.Item1}");
-                            Console.WriteLine($"Got expired event for key   {tupple.Item2}:{tupple.Item1} 需要移除");
+                            //Console.WriteLine($"Got expired event for key   {tupple.Item2}:{tupple.Item1} 需要移除");
                             return;
                         }
-
-                        Console.WriteLine($"Got expired event for key   {tupple.Item2}:{tupple.Item1} 不需要移除");
+                        //Console.WriteLine($"Got expired event for key   {tupple.Item2}:{tupple.Item1} 不需要移除");
 
                     });
                     this.BroadCastSubScriber($"__keyevent@{options.Database}__:evicted", (rchannel, key) =>
@@ -81,16 +79,13 @@ namespace HiSql
                         if (tupple.Item3 != this.UniqueId)
                         {
                             _MemoryCache.RemoveCache($"{tupple.Item2}:{tupple.Item1}");
-                            Console.WriteLine($"Got evicted event for key   {tupple.Item2}:{tupple.Item1} 需要移除");
+                            //Console.WriteLine($"Got evicted event for key   {tupple.Item2}:{tupple.Item1} 需要移除");
                             return;
                         }
-
-                        Console.WriteLine($"Got evicted event for key   {tupple.Item2}:{tupple.Item1} 不需要移除");
-
+                        //Console.WriteLine($"Got evicted event for key   {tupple.Item2}:{tupple.Item1} 不需要移除");
                     });
                     this.BroadCastSubScriber($"__keyevent@{options.Database}__:del", (rchannel, key) =>
                     {
-
                         var tupple = ParseRegionKey(key);
                         if (tupple.Item3 != this.UniqueId)
                         {
@@ -98,9 +93,7 @@ namespace HiSql
                             Console.WriteLine($"Got del event for key   {tupple.Item2}:{tupple.Item1} 需要移除");
                             return;
                         }
-
-                        Console.WriteLine($"Got del event for key   {tupple.Item2}:{tupple.Item1} 不需要移除");
-
+                        //Console.WriteLine($"Got del event for key   {tupple.Item2}:{tupple.Item1} 不需要移除");
                     });
                 }
             }
@@ -583,7 +576,10 @@ namespace HiSql
             hashkey = GetRegionKey(hashkey);
             return _cache.HashGet(hashkey, key);
         }
-
+        /// <summary>
+        /// 获取当前锁信息
+        /// </summary>
+        /// <returns></returns>
         public List<LckInfo> GetCurrLockInfo()
         {
             List<LckInfo> lckInfos = new List<LckInfo>();
@@ -615,6 +611,10 @@ namespace HiSql
             return lckInfos;
         }
 
+        /// <summary>
+        /// 获取当前缓存历史表锁信息
+        /// </summary>
+        /// <returns></returns>
         public List<LckInfo> GetHisLockInfo()
         {
             List<LckInfo> lckInfos = new List<LckInfo>();
@@ -742,7 +742,7 @@ namespace HiSql
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        private Tuple<bool, string> CheckLock(string key)
+        public Tuple<bool, string> CheckLock(string key)
         {
             CheckRedis();
             string _key = key;
