@@ -166,6 +166,13 @@ namespace HiSql
         public Tuple<bool, string> CheckLock(params string[] keys);
 
         /// <summary>
+        /// 检测key是否已经锁定
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public Tuple<bool, string> CheckLock(string key);
+
+        /// <summary>
         /// 加业务锁
         /// </summary>
         /// <param name="key">自定锁的KEY</param>
