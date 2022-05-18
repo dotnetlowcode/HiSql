@@ -40,7 +40,7 @@
 hisql缓存支持多级缓存，优先取MemoryCache，再找redis缓存,如下所示
 
 ```c#
-    HiSql.ICache rCache = new RCache(new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "", CacheRegion = "HRM", Database = 2,EnableMultiCache = true }); //EnableMultiCache默认是启用的
+    HiSql.ICache rCache = new RCache(new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "", CacheRegion = "HR", Database = 2,EnableMultiCache = true }); //EnableMultiCache默认是启用的
                     rCache.SetCache("test1", list);
                     Stopwatch sw = Stopwatch.StartNew();
                     sw.Start();
@@ -69,12 +69,12 @@ hisql缓存支持多级缓存，优先取MemoryCache，再找redis缓存,如下�
                                 {
                                     throw;
                                 }
-                            }, new LckInfo { UName = "tansar", EventName = "单次获取加锁动作", Ip = "192.168.1.1" }, 60, 20);
+                            }, new LckInfo { UName = "hisql", EventName = "单次获取加锁动作", Ip = "192.168.1.1" }, 60, 20);
 ```
 2.分布式实例可以使用redis锁，支持同时加多个key，如下所示
 
 ```c#
-    HiSql.ICache rCache = new RCache(new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "", CacheRegion = "HRM", Database = 2 });
+    HiSql.ICache rCache = new RCache(new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "", CacheRegion = "HR", Database = 2 });
 
     Tuple<bool, string> rtn = rCache.LockOnExecute(new string[] { "test_key1","test_key2" }, () =>
                             {
@@ -86,7 +86,7 @@ hisql缓存支持多级缓存，优先取MemoryCache，再找redis缓存,如下�
                                 {
                                     throw;
                                 }
-                            }, new LckInfo { UName = "tansar", EventName = "单次获取加锁动作", Ip = "192.168.1.1" }, 60, 20);
+                            }, new LckInfo { UName = "hisql", EventName = "单次获取加锁动作", Ip = "192.168.1.1" }, 60, 20);
 ```
 
 ### 2022.5.10 新增excel操作支持
