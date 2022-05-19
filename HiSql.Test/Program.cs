@@ -333,20 +333,21 @@ namespace HiSql.Test
             //var rel =  System.Threading.Monitor.TryEnter(lockObj);
             HiSql.RCache rCache = null;// new MCache();
             var rCacheOptions = new RedisOptions { Host = "192.168.10.130", Port = 8379, PassWord = "", CacheRegion = "HRM", Database = 6 };
-            rCacheOptions = new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "", CacheRegion = "HRM", Database = 2, EnableMultiCache = false, KeyspaceNotificationsEnabled = false };
+            rCacheOptions = new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "", CacheRegion = "HRM", Database = 2, EnableMultiCache = true, KeyspaceNotificationsEnabled = true };
             rCache = new RCache(rCacheOptions);
+            var aa = new MCache();
 
             {
                 ///后台线程输出锁的信息
-                //Task.Run(() =>
-                //{
-                //    while (true)
-                //    {
-                //        Console.WriteLine($"总缓存数：" + rCache.Count);
+                Task.Run(() =>
+                {
+                    while (true)
+                    {
+                        Console.WriteLine($"总缓存数：" + rCache.Count);
 
-                //        SpinWait.SpinUntil(() => false, 1000);
-                //    }
-                //});
+                        SpinWait.SpinUntil(() => false, 1000);
+                    }
+                });
 
 
             }
@@ -372,6 +373,7 @@ namespace HiSql.Test
                 });
                 Console.WriteLine($"测试多级缓存性能：" + sw.ElapsedMilliseconds);
 
+                
                 return;
 
                 ///测试多级缓存
@@ -471,6 +473,9 @@ namespace HiSql.Test
 
             }
         }
+
+       
+
         private static readonly object lockObj = new object();
         /// <summary>
         /// 测试 redis lock 
@@ -710,6 +715,8 @@ namespace HiSql.Test
         {
             CacheTest();
             //LockTest();
+
+        Console.ReadLine();
             return;
 
             //string _regs = "(?<=\\d)(?=(?:\\d{3})+(?!\\d))";

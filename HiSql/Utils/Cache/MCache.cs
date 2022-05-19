@@ -17,7 +17,7 @@ namespace HiSql
     /// </summary>
     public class MCache : ICache
     {
-        public int DefaultExpirySecond { set; get; } = 30;
+        public int DefaultExpirySecond { set; get; } = 60*10;
         private readonly object lockList = new object();
         private readonly Hashtable globalHSet = new Hashtable();
         private readonly object lockHstObj = new object();
@@ -32,6 +32,11 @@ namespace HiSql
         private string _lockkeyPrefix = $"{HiSql.Constants.NameSpace}:lck:";
 
         private string _hsetkeyPrefix = $"{HiSql.Constants.NameSpace}:";
+
+
+        internal  void SetCacheRegion(string resion) {
+            CacheRegion = resion;
+        }
 
         public MCache(MemoryCacheOptions memoryCacheOptions = null)//
         {

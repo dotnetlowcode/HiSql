@@ -14,7 +14,7 @@ namespace HiSql
 
         string _host = string.Empty;
 
-        public int DefaultExpirySecond { set; get; } = 30;
+        public int DefaultExpirySecond { set; get; } = 60*10;
         /// <summary>
         /// redis地址
         /// </summary>

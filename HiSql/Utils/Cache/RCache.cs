@@ -26,8 +26,8 @@ namespace HiSql
 
         private string _lockhashname = $"{HiSql.Constants.NameSpace}:locktable";
         private string _lockhishashname = $"{HiSql.Constants.NameSpace}:locktable_his";
-
-        private ICache _MemoryCache;
+        
+        private MCache _MemoryCache;
         private RedisOptions _options;
         public RCache(RedisOptions options)
         {
@@ -41,7 +41,8 @@ namespace HiSql
             //_lockhishashname = GetRegionKey(_lockhishashname);
             if (this._options.EnableMultiCache)
             {
-                _MemoryCache = new MCache(null);
+                _MemoryCache = new MCache();
+                _MemoryCache.SetCacheRegion(_options.CacheRegion);
                 _cache_notity_channel_remove = string.Format(_cache_notity_channel_remove, options.Database.ToString());
                 //订阅移除事件
                 this.BroadCastSubScriber(_cache_notity_channel_remove, (rchannel, key) =>
@@ -113,10 +114,13 @@ namespace HiSql
             {
                 return Tuple.Create<string, string, string>(null, null, null);
             }
+            var unionId = string.Empty;
             var unionIdIndex = value.IndexOf(keySplitKey);
-            var unionId = value.Substring(unionIdIndex + keySplitKey.Length);
-
-            value = value.Substring(0, unionIdIndex);
+            if (unionIdIndex > 0)
+            {
+                unionId = value.Substring(unionIdIndex + keySplitKey.Length);
+                value = value.Substring(0, unionIdIndex);
+            }
 
             var sepIndex = value.IndexOf(':');
 
@@ -159,21 +163,21 @@ namespace HiSql
                 return key;
 
             if (!key.Contains(HiSql.Constants.NameSpace))
-                key = HiSql.Constants.NameSpace+":" + key;
+                key = HiSql.Constants.NameSpace + ":" + key;
 
-            if (_options.KeyspaceNotificationsEnabled && key.Contains(":"))
-            {
-                key = Base64Prefix + Convert.ToBase64String(Encoding.UTF8.GetBytes(key));
-            }
+            //if (_options.KeyspaceNotificationsEnabled && key.Contains(":"))
+            //{
+            //    key = Base64Prefix + Convert.ToBase64String(Encoding.UTF8.GetBytes(key));
+            //}
 
             var fullKey = key;
 
             if (!string.IsNullOrWhiteSpace(region))
             {
-                if (_options.KeyspaceNotificationsEnabled && region.Contains(":"))
-                {
-                    region = Base64Prefix + Convert.ToBase64String(Encoding.UTF8.GetBytes(region));
-                }
+                //if (_options.KeyspaceNotificationsEnabled && region.Contains(":"))
+                //{
+                //    region = Base64Prefix + Convert.ToBase64String(Encoding.UTF8.GetBytes(region));
+                //}
 
                 fullKey = string.Concat(region, ":", key);
             }
@@ -427,12 +431,9 @@ namespace HiSql
         public void BroadCastSubScriber(string channel, Action<string, string> handler = null)
         {
             CheckRedis();
-            channel = GetRegionKey(channel);
-
             _connectMulti.GetSubscriber().Subscribe(channel, (rchannel, message) =>
             {
                 var tupple = ParseRegionKey(message);
-
                 handler(rchannel, message.ToString());
             });
 
@@ -451,8 +452,6 @@ namespace HiSql
         public void QueueSubScriber(string channel, Action<string, string> handler = null)
         {
             CheckRedis();
-            channel = GetRegionKey(channel);
-
             _connectMulti.GetSubscriber().Subscribe(channel).OnMessage(message =>
             {
                 handler(channel, message.ToString());
@@ -468,7 +467,6 @@ namespace HiSql
         public long PublishMessage(string channel, string message)
         {
             CheckRedis();
-            channel = GetRegionKey(channel);
             return _connectMulti.GetSubscriber().Publish(channel, message);
         }
 
@@ -756,7 +754,7 @@ namespace HiSql
             {
 
                 _islock = true;
-                
+
                 string _lockinfo = HGet(_lockhashname, key);
                 if (!string.IsNullOrEmpty(_lockinfo))
                 {
@@ -968,7 +966,7 @@ namespace HiSql
 
                 if (flag)
                 {
-                    
+
                     msg = $"key:[{keys}]锁定并操作业务成功!锁已自动释放";
                 }
 
