@@ -165,6 +165,8 @@ namespace HiSql
         /// <returns></returns>
         public Tuple<bool, string> CheckLock(params string[] keys);
 
+        
+
         /// <summary>
         /// 加业务锁
         /// </summary>

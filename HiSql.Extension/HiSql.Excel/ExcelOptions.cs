@@ -59,7 +59,7 @@ namespace HiSql.Extension
         /// <summary>
         /// 单个sheet 设置最大的行数
         /// </summary>
-        private int _sheetrow = 500000;
+        private int _sheetrow = 1000000;
 
         private bool _isheader = true;
 
