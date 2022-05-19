@@ -34,16 +34,20 @@ namespace HiSql.UnitTest
             //Query_Demo5(sqlClient);
             //Query_Demo6(sqlClient);
             //Query_Demo7(sqlClient);
-            Query_Demo8(sqlClient);
+            //Query_Demo8(sqlClient);
             //Query_Demo9(sqlClient);
             //Query_Demo10(sqlClient);
             //Query_Demo11(sqlClient);
             //Query_Demo12(sqlClient);
-           // Query_Demo13(sqlClient);
-            var s = Console.ReadLine();
+            // Query_Demo13(sqlClient);
+            Query_Demo14(sqlClient);
+             var s = Console.ReadLine();
         }
 
-
+        static void Query_Demo14(HiSqlClient sqlClient)
+        {
+            var _sql = sqlClient.HiSql("select a.TabName, a.FieldName from Hi_FieldModel as a inner join Hi_TabModel as b on a.TabName=b.TabName where a.TabName=b.TabName and a.FieldType>3").ToSql();
+        }
 
         /// <summary>
         /// distinct 

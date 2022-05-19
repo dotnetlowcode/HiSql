@@ -35,6 +35,18 @@
 传统ORM框架最大的弊端就是完全要依赖于实体用lambda表达式写查询语句，但最大的问题就是如果业务场景需要动态拼接条件时只能又切换到原生数据库的sql语句进行完成，如果自行拼接开发人员还要解决防注入的问题,hisql 刚才完美的解决这些问题,Hisql底层已经对sql注入进行了
 
 处理，开发人员只要关注于业务开发
+
+
+### 2022.5.19 hisql 查询语法新增字段与字段的条件判断
+
+如下所示
+`a.TabName=b.TabName`  操作符支持>=,>,<,<=,!=,<>
+
+```c#
+var _sql = sqlClient.HiSql("select a.TabName, a.FieldName from Hi_FieldModel as a inner join Hi_TabModel as b on a.TabName=b.TabName where a.TabName=b.TabName and a.FieldType>3").ToSql();
+```
+
+
 ### 2022.5.16 hisql缓存支持多级缓存
 
 hisql缓存支持多级缓存，优先取MemoryCache，再找redis缓存,如下所示
