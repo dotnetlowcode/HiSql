@@ -53,6 +53,10 @@ HiSql.SqlServerUnitTest/[Oo]bj/
 HiSql.Test/[Bb]in/
 HiSql.Test/[Oo]bj/
 
+HiSql.Extension/HiSql.Excel/[Bb]in/
+HiSql.Extension/HiSql.Excel/[Oo]bj//
+HiSql.Extension/HiSql.Excel.Demo/[Bb]in/
+HiSql.Extension/HiSql.Excel.Demo/[Oo]bj/
 
 # Visual Studio 2015 cache/options directory
 .vs/

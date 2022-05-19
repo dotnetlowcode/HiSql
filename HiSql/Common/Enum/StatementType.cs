@@ -26,6 +26,11 @@ namespace HiSql
         In=2,
 
         /// <summary>
+        /// 如 username=user
+        /// </summary>
+        Field=3,
+
+        /// <summary>
         /// 如 usertype in (select utype from usertype)
         /// </summary>
         //InSelect=4,

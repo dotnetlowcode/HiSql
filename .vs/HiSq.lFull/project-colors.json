@@ -75,7 +75,12 @@
       "ProjectGuid": "53209ef7-0829-4c01-88cb-b1f90114401f",
       "DisplayName": "HiSql.Excel",
       "ColorIndex": 13
+    },
+    "9fe3ef44-5fc1-4468-b494-1779be3e0cd9": {
+      "ProjectGuid": "9fe3ef44-5fc1-4468-b494-1779be3e0cd9",
+      "DisplayName": "HiSql.Test",
+      "ColorIndex": 14
     }
   },
-  "NextColorIndex": 14
+  "NextColorIndex": 15
 }

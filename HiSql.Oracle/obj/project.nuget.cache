@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "jSbJ/Zh6Qxvap88RcgUNThCTJXLYzSJdGnXNesFNXdlHci6F4cixf3X4OjOgD7TmzYiWKIoOZXjLlK1xQpVffQ==",
+  "dgSpecHash": "Sb+S4YVH01Yifz/QRFBQdEqxz9uG62cy3gOgoiMfj6zVN74+TBkM8WXzqU3iBPOA0BLmzwSE9pYfKKa0OxVuRw==",
   "success": true,
   "projectFilePath": "D:\\Project\\OpenSource\\HiSql\\HiSql.Oracle\\HiSql.Oracle.csproj",
   "expectedPackageFiles": [
@@ -84,8 +84,7 @@
     "C:\\Users\\admin\\.nuget\\packages\\system.threading.tasks.extensions\\4.5.2\\system.threading.tasks.extensions.4.5.2.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\system.threading.tasks.extensions\\4.5.4\\system.threading.tasks.extensions.4.5.4.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\system.valuetuple\\4.5.0\\system.valuetuple.4.5.0.nupkg.sha512",
-    "C:\\Users\\admin\\.nuget\\packages\\system.windows.extensions\\5.0.0\\system.windows.extensions.5.0.0.nupkg.sha512",
-    "C:\\Users\\admin\\.nuget\\packages\\hisql\\1.0.3.6\\hisql.1.0.3.6.nupkg.sha512"
+    "C:\\Users\\admin\\.nuget\\packages\\system.windows.extensions\\5.0.0\\system.windows.extensions.5.0.0.nupkg.sha512"
   ],
   "logs": []
 }
