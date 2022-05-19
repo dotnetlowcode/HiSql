@@ -742,7 +742,7 @@ namespace HiSql
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public Tuple<bool, string> CheckLock(string key)
+        private Tuple<bool, string> CheckLock(string key)
         {
             CheckRedis();
             string _key = key;

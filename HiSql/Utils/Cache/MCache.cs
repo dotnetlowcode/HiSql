@@ -374,7 +374,7 @@ namespace HiSql
 
         }
 
-        public Tuple<bool, string> CheckLock(string key)
+        private Tuple<bool, string> CheckLock(string key)
         {
             string _key = key;
             if (!key.Contains(_lockkeyPrefix))
