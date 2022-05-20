@@ -414,6 +414,14 @@ namespace HiSql.Extension
 
             int beginRow = currrowidx;
 
+            Type typeint = typeof(int);
+            Type typeint64 = typeof(Int64);
+            Type typefloat=typeof(float);
+            Type typedec=typeof(decimal);
+            Type typedatetime = typeof(DateTime);
+            XSSFCellStyle xSSFCellStyle1 = (XSSFCellStyle)workbook.CreateCellStyle();
+            XSSFDataFormat format = (XSSFDataFormat)workbook.CreateDataFormat();
+
             for (var i = 0; i < dt.Rows.Count; i++)
             {
                 beginRow = beginRow + 1;
@@ -422,8 +430,38 @@ namespace HiSql.Extension
                 for (int j = 0; j < dt.Columns.Count; j++)
                 {
                     ICell _dcell = excelRow.CreateCell(j);
+                    var _value = dt.Rows[i][j].ToString().Trim();
+                    if (dt.Columns[j].DataType == typedec || dt.Columns[j].DataType == typeint || dt.Columns[j].DataType == typeint64 || dt.Columns[j].DataType == typefloat)
+                    {
+                        if (_value.Length <= 10)
+                        {
+                            _dcell.SetCellType(CellType.Numeric);
+                            if (_value.IndexOf(".") > 0)
+                                _dcell.SetCellValue(Convert.ToDouble(_value));
+                            else
+                                _dcell.SetCellValue(Convert.ToInt64(_value));
+                        }
+                        else
+                            _dcell.SetCellValue(_value);
 
-                    _dcell.SetCellValue(dt.Rows[i][j].ToString().Trim());
+
+                    }
+                    else if (dt.Columns[j].DataType == typedatetime)
+                    {
+                        
+                        _dcell.SetCellValue(Convert.ToDateTime(_value));
+                        
+                        xSSFCellStyle1.DataFormat = format.GetFormat("yyyy-MM-dd");
+                        _dcell.CellStyle = xSSFCellStyle1;
+
+                    }
+                    else
+                        _dcell.SetCellValue(_value);
+
+
+
+
+
                 }
             }
 

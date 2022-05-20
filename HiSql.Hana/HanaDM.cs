@@ -1270,6 +1270,31 @@ namespace HiSql
                             throw new Exception($"未能识别的解析结果");
                         }
                     }
+                    //add by tgm date:2022.5.19 新增字段与字段的条件
+                    else if (whereResult.SType == StatementType.Field)
+                    {
+                        if (whereResult.Result.ContainsKey("fields") && whereResult.Result.ContainsKey("rfields"))
+                        {
+                            FieldDefinition field = new FieldDefinition(whereResult.Result["fields"].ToString());
+                            HiColumn hiColumn = CheckField(TableList, dictabinfo, Fields, field);
+                            if (hiColumn == null)
+                                throw new Exception($"字段[{whereResult.Result["fields"].ToString()}]出现错误");
+
+                            FieldDefinition rfield = new FieldDefinition(whereResult.Result["rfields"].ToString());
+                            HiColumn rhiColumn = CheckField(TableList, dictabinfo, Fields, rfield);
+                            if (rhiColumn == null)
+                                throw new Exception($"字段[{whereResult.Result["rfields"].ToString()}]出现错误");
+
+                            if (hiColumn != null && rhiColumn != null)
+                            {
+                                sb_sql.Append($"{dbConfig.Table_Pre}{field.AsTabName}{dbConfig.Table_After}.{dbConfig.Table_Pre}{field.AsFieldName}{dbConfig.Table_After}");
+                                sb_sql.Append($" {whereResult.Result["op"].ToString()} ");
+                                sb_sql.Append($"{dbConfig.Table_Pre}{rfield.AsTabName}{dbConfig.Table_After}.{dbConfig.Table_Pre}{rfield.AsFieldName}{dbConfig.Table_After}");
+                            }
+                        }
+                        else
+                            throw new Exception($"未能识别解析结果");
+                    }
                     else if (whereResult.SType == StatementType.SubCondition)
                     {
                         //子条件中可能会嵌套多个深度子条件
@@ -2599,6 +2624,16 @@ namespace HiSql
 
             totalCount = int.Parse(dataSet.Tables[0].Rows[0][0].ToString());
             return dataSet.Tables[1];
+        }
+        /// <summary>
+        /// 检查表或视图是否存在
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <returns></returns>
+        public bool CheckTabExists(string tabname = "")
+        {
+            DataTable dt = Context.DBO.GetDataTable(dbConfig.Get_CheckTabExists.Replace("[$TabName$]", tabname));
+            return dt.Rows.Count > 0;
         }
         public DataTable GetAllTables(string tabname = "")
         {

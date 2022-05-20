@@ -68,6 +68,18 @@ namespace HiSql.AST
                     .Append(@"(?:[\s]*)\((?<content>[^\(\)]*(((?<open>\()[^\(\)]*)+((?<-open>\))[^\(\)]*)+)*(?(open)(?!)))\)(?<close>[\)]*)")
                     .ToString()
 
+                },
+                new WhereGrp()
+                { 
+                    //识别 字段条件 如a.user=b.user
+                    SType=StatementType.Field,
+                    Reg = new StringBuilder()
+                   
+                    .Append(@"^(?:[\s]*)[`]?(?<fields>(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w]+)(?:[\.]{1}))?(?<field>[\w]+))\s*[`]?[\s]*")
+                    .Append(@"(?<op>=|\>(?![\=\>\<\!])|\<(?![\=\>\<\!])|\!\=|\<\>|[\>\<]{1}[=]{1})[\s]*")
+                    .Append(@"(?!\d+)(?<rfields>(?:(?<rflag>[\#]{1,2}|[\@]{1})?(?!\d+)(?<rtab>[\w]+)(?:[\.]{1}))?(?!\d+)(?<rfield>[\w]+)")
+                    .Append(")").ToString()
+                   
                 }
 
             };

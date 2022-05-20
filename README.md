@@ -26,7 +26,7 @@
 ### 初始安装 
 注：只需要执行一次即可
 ```c#
-sqlclient.CodeFirst.InstallHisql();
+   sqlclient.CodeFirst.InstallHisql();
 ```
 
 
@@ -36,7 +36,148 @@ sqlclient.CodeFirst.InstallHisql();
 
 处理，开发人员只要关注于业务开发
 
-### 2022.5.1 新增excel操作支持
+### 2022.5.20 业务锁使用方法
+
+
+为什么要用业务锁？业务锁是防止多人同时操作某一个业务或表中某一条数据导致的业务问题或并发时产生的数据库级锁的问题
+
+通过业务锁可以控制在同一时间只允许一个任务来执行，可用于库存扣减，秒杀等高并发场景
+
+
+1. 检测指定的锁是否存在
+
+```c#
+    string _key = "4900001223";
+    var rtn = HiSql.Lock.CheckLock(_key);
+    if (!rtn.Item1)
+    {
+        Console.WriteLine($"没有其它人操作采购订单[{_key}]");
+    }
+    else
+        Console.WriteLine(rtn.Item2);//输出是谁在操作采购订单
+
+
+    //同时检测多个key是否被锁定 其中有一个锁定锁则返回锁定状态
+    var rtn2 = HiSql.Lock.CheckLock("4900001223", "4900001224");
+```
+
+2. 占用锁和解除锁
+
+占用锁即加锁,加锁后不允许其它任务占用
+```c#
+    string _key = "4900001223";
+
+    /*
+    加锁后默认超时时间为30秒，当执行超过27秒时会自动续锁30秒默认会自动续5次 超过则会取消执行
+    可通过expresseconds和timeoutseconds 参数进行修改
+    */
+
+    //LckInfo 是指加锁时需要指定的信息  UName 表示加锁人，ip表示在哪一个地址加的锁，可以通过 HiSql.Lock.GetCurrLockInfo  获取所有的详细加锁信息便于后台管理
+    var rtn= HiSql.Lock.LockOn(_key, new LckInfo { UName = "登陆名", Ip = "127.0.0.1" });
+    if (rtn.Item1)
+    {
+        Console.WriteLine($"针对于采购订单[{_key}] 加锁成功");
+        //执行采购订单处理业务
+
+        //解锁  如果没有解锁默认30秒后会自动解锁
+        HiSql.Lock.UnLock(_key);
+    }
+
+    //同时加锁多个key 如果有一个key被其它任务加锁那么 锁定失败
+    var rtn2 = HiSql.Lock.LockOn(new string[] { "4900001223", "4900001224" }, new LckInfo { UName = "登陆名", Ip = "127.0.0.1" });
+
+```
+
+3. 占用并处理业务
+
+```c#
+    string _key = "4900001223";
+
+    /*
+    加锁后默认超时时间为30秒，当执行超过27秒时会自动续锁30秒默认会自动续5次 超过则会取消执行
+    可通过expresseconds和timeoutseconds 参数进行修改
+    */
+
+    //LckInfo 是指加锁时需要指定的信息  UName 表示加锁人，ip表示在哪一个地址加的锁，可以通过 HiSql.Lock.GetCurrLockInfo  获取所有的详细加锁信息便于后台管理
+    var rtn = HiSql.Lock.LockOnExecute(_key, () =>
+    {
+        //加锁成功后执行的业务
+        Console.WriteLine($"针对于采购订单[{_key}] 加锁并业务处理成功");
+
+        //处理成功后 会自动解锁
+
+
+    }, new LckInfo { UName = "登陆名", Ip = "127.0.0.1" });
+
+```
+
+
+
+### 2022.5.19 hisql 查询语法新增字段与字段的条件判断
+
+如下所示
+`a.TabName=b.TabName`  操作符支持>=,>,<,<=,!=,<>
+
+```c#
+var _sql = sqlClient.HiSql("select a.TabName, a.FieldName from Hi_FieldModel as a inner join Hi_TabModel as b on a.TabName=b.TabName where a.TabName=b.TabName and a.FieldType>3").ToSql();
+```
+
+
+### 2022.5.16 hisql缓存支持多级缓存
+
+hisql缓存支持多级缓存，优先取MemoryCache，再找redis缓存,如下所示
+
+```c#
+    HiSql.ICache rCache = new RCache(new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "", CacheRegion = "HR", Database = 2,EnableMultiCache = true }); //EnableMultiCache默认是启用的
+                    rCache.SetCache("test1", list);
+                    Stopwatch sw = Stopwatch.StartNew();
+                    sw.Start();
+                    Parallel.For(0, 10000, (x, y) =>
+                    {
+                        rCache.GetCache("test1");
+                    });
+                    Console.WriteLine($"测试多级缓存性能：" + sw.ElapsedMilliseconds);
+```
+
+### 2022.5.16 新增本地锁、分布式锁(redis锁）
+
+业务代码可以使用本地锁或分布式锁(redis锁）避免多线程同时更新数据库出现数据库死锁，也可以在扣减库存场景使用。
+
+1.单实例可以使用本地锁，支持同时加多个key，如下所示
+
+```c#
+    HiSql.ICache rCache = new MCache();
+    Tuple<bool, string> rtn = rCache.LockOnExecute(new string[] { "test_key1","test_key2" }, () =>
+                            {
+                                try
+                                {
+                                    new TestInstance().TestInsertToDB();
+                                }
+                                catch (Exception EX)
+                                {
+                                    throw;
+                                }
+                            }, new LckInfo { UName = "hisql", EventName = "单次获取加锁动作", Ip = "192.168.1.1" }, 60, 20);
+```
+2.分布式实例可以使用redis锁，支持同时加多个key，如下所示
+
+```c#
+    HiSql.ICache rCache = new RCache(new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "", CacheRegion = "HR", Database = 2 });
+
+    Tuple<bool, string> rtn = rCache.LockOnExecute(new string[] { "test_key1","test_key2" }, () =>
+                            {
+                                try
+                                {
+                                    new TestInstance().TestInsertToDB();
+                                }
+                                catch (Exception EX)
+                                {
+                                    throw;
+                                }
+                            }, new LckInfo { UName = "hisql", EventName = "单次获取加锁动作", Ip = "192.168.1.1" }, 60, 20);
+```
+
+### 2022.5.10 新增excel操作支持
 平常在开发的过程需要将表中的数据导出到excel ,在excel编辑完成后再上传保存到表中
 源码在：HiSql.Extension 目录中
 
@@ -149,7 +290,7 @@ hisql底层默认是使用 MemoryCache 进行表结构信息的缓存处理(如�
 
 ```c#
 HiSql.Global.RedisOn = true;//开启redis缓存
-HiSql.Global.RedisOptions = new RedisOptions { Host = "172.16.80.178", PassWord = "pwd123" };
+HiSql.Global.RedisOptions = new RedisOptions { Host = "172.16.80.178", PassWord = "pwd123", Port = 6379, CacheRegion = "HRM", Database = 2 };
 ```
 
 ### 2022.4.15 更新
