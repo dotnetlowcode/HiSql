@@ -23,6 +23,12 @@ namespace HiSql
             }
             else
                 Console.WriteLine(rtn.Item2);//输出是谁在操作采购订单
+
+            //同时检测多个key是否被锁定 其中有一个锁定锁则返回锁定状态
+            var rtn2 = HiSql.Lock.CheckLock("4900001223", "4900001224");
+            
+
+
         }
 
         static void Demo_LockOn()
@@ -38,7 +44,9 @@ namespace HiSql
                 //解锁
                 HiSql.Lock.UnLock(_key);
             }
-            
+
+            //同时加锁多个key 如果有一个key被其它任务加锁那么 锁定失败
+            var rtn2 = HiSql.Lock.LockOn(new string[] { "4900001223", "4900001224" }, new LckInfo { UName = "登陆名", Ip = "127.0.0.1" });
         }
 
         static void Demo_LockOnExcute()
