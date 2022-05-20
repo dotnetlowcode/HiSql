@@ -145,7 +145,6 @@ D:\Project\OpenSource\HiSql\HiSql\obj\Release\net461\HiSql.csproj.CoreCompileInp
 D:\Project\OpenSource\HiSql\HiSql\obj\Release\net461\HiSql.csproj.CopyComplete
 D:\Project\OpenSource\HiSql\HiSql\obj\Release\net461\HiSql.dll
 D:\Project\OpenSource\HiSql\HiSql\obj\Release\net461\HiSql.pdb
-D:\Project\OpenSource\HiSql\HiSql\obj\Release\net461\HiSql.csproj.AssemblyReference.cache
 D:\Project\OpenSource\HiSql\HiSql\bin\Release\net461\Pipelines.Sockets.Unofficial.dll
 D:\Project\OpenSource\HiSql\HiSql\bin\Release\net461\StackExchange.Redis.dll
 D:\Project\OpenSource\HiSql\HiSql\bin\Release\net461\System.Diagnostics.PerformanceCounter.dll

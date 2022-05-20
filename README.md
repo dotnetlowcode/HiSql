@@ -36,6 +36,75 @@
 
 处理，开发人员只要关注于业务开发
 
+### 2022.5.20 业务锁使用方法
+
+
+为什么要用业务锁？业务锁是防止多人同时操作某一个业务或表中某一条数据导致的业务问题或并发时产生的数据库级锁的问题
+
+通过业务锁可以控制在同一时间只允许一个任务来执行，可用于库存扣减，秒杀等高并发场景
+
+
+1. 检测指定的锁是否存在
+
+```c#
+    string _key = "4900001223";
+    var rtn = HiSql.Lock.CheckLock(_key);
+    if (!rtn.Item1)
+    {
+        Console.WriteLine($"没有其它人操作采购订单[{_key}]");
+    }
+    else
+        Console.WriteLine(rtn.Item2);//输出是谁在操作采购订单
+```
+
+2. 占用锁和解除锁
+
+占用锁即加锁,加锁后不允许其它任务占用
+```c#
+    string _key = "4900001223";
+
+    /*
+    加锁后默认超时时间为30秒，当执行超过27秒时会自动续锁30秒默认会自动续5次 超过则会取消执行
+    可通过expresseconds和timeoutseconds 参数进行修改
+    */
+
+    //LckInfo 是指加锁时需要指定的信息  UName 表示加锁人，ip表示在哪一个地址加的锁，可以通过 HiSql.Lock.GetCurrLockInfo  获取所有的详细加锁信息便于后台管理
+    var rtn= HiSql.Lock.LockOn(_key, new LckInfo { UName = "登陆名", Ip = "127.0.0.1" });
+    if (rtn.Item1)
+    {
+        Console.WriteLine($"针对于采购订单[{_key}] 加锁成功");
+        //执行采购订单处理业务
+
+        //解锁  如果没有解锁默认30秒后会自动解锁
+        HiSql.Lock.UnLock(_key);
+    }
+
+```
+
+3. 占用并处理业务
+
+```c#
+    string _key = "4900001223";
+
+    /*
+    加锁后默认超时时间为30秒，当执行超过27秒时会自动续锁30秒默认会自动续5次 超过则会取消执行
+    可通过expresseconds和timeoutseconds 参数进行修改
+    */
+
+    //LckInfo 是指加锁时需要指定的信息  UName 表示加锁人，ip表示在哪一个地址加的锁，可以通过 HiSql.Lock.GetCurrLockInfo  获取所有的详细加锁信息便于后台管理
+    var rtn = HiSql.Lock.LockOnExecute(_key, () =>
+    {
+        //加锁成功后执行的业务
+        Console.WriteLine($"针对于采购订单[{_key}] 加锁并业务处理成功");
+
+        //处理成功后 会自动解锁
+
+
+    }, new LckInfo { UName = "登陆名", Ip = "127.0.0.1" });
+
+```
+
+
 
 ### 2022.5.19 hisql 查询语法新增字段与字段的条件判断
 
