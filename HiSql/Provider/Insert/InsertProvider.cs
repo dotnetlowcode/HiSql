@@ -944,7 +944,7 @@ namespace HiSql
                             {
                                 throw new Exception($"行[{_rowidx}] 缺少字段[{hiColumn.FieldName}] 为必填字段");
                             }
-                            if (hiColumn.IsIdentity || _dic.ContainsKey(hiColumn.FieldName))
+                            if (hiColumn.IsIdentity && _dic.ContainsKey(hiColumn.FieldName))
                             {
                                 _value = _dic[hiColumn.FieldName].ToString();
                                 if (_value == "0" || string.IsNullOrEmpty(_value))
@@ -952,9 +952,13 @@ namespace HiSql
                                 else
                                     throw new Exception($"行[{_rowidx}] 字段[{hiColumn.FieldName}] 为自增长字段 不需要外部赋值");
                             }
-                            #endregion
+                            else if (hiColumn.IsIdentity)
+                            {
+                                continue;
+                            }
+                                #endregion
 
-                            if (objprop != null && objprop.GetValue(objdata) != null)
+                                if (objprop != null && objprop.GetValue(objdata) != null)
                             {
                                 #region 将值转成string 及特殊处理
                                 if (hiColumn.FieldType.IsIn<HiType>(HiType.DATE, HiType.DATETIME))
