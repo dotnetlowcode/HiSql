@@ -70,7 +70,7 @@ namespace HiSql.UnitTest
             //Demo_DbCode.Init(sqlcient);
 
             //Demo_Cache.Init(sqlcient);
-            SnowId();
+            //SnowId();
             Console.ReadLine();
         }
 
