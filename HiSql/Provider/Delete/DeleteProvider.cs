@@ -345,7 +345,7 @@ namespace HiSql
                     {
                         if (hiColumn.FieldType.IsIn<HiType>(HiType.NVARCHAR, HiType.NCHAR, HiType.GUID))
                         {
-                            if (_value.Length > hiColumn.FieldLen)
+                            if (_value.Length > hiColumn.FieldLen && hiColumn.FieldLen>0)
                             {
                                 throw new Exception($"字段[{objprop.Name}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
                             }
@@ -392,7 +392,7 @@ namespace HiSql
                         {
                             if (hiColumn.FieldType.IsIn<HiType>(HiType.NVARCHAR, HiType.NCHAR, HiType.GUID))
                             {
-                                if (_value.Length > hiColumn.FieldLen)
+                                if (_value.Length > hiColumn.FieldLen && hiColumn.FieldLen>0)
                                 {
                                     throw new Exception($"字段[{hiColumn.FieldName}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
                                 }
