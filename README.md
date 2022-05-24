@@ -32,9 +32,128 @@
 
  目前流行的ORM框架如果需要动态的拼接查询语句，只能用原生的sql进行拼接，无法跨不同数据库执行。hisql推出新的语法一套语句可以在不同的数据库执行
 
-传统ORM框架最大的弊端就是完全要依赖于实体用lambda表达式写查询语句，但最大的问题就是如果业务场景需要动态拼接条件时只能又切换到原生数据库的sql语句进行完成，如果自行拼接开发人员还要解决防注入的问题,hisql 刚才完美的解决这些问题,Hisql底层已经对sql注入进行了
+传统ORM框架最大的弊端就是完全要依赖于实体用lambda表达式写查询语句，但最大的问题就是如果业务场景需要动态拼接条件时只能又切换到原生数据库的sql语句进行完成，如果自行拼接开发人员还要解决防注入的问题,hisql 刚才完美的解决这些问题,Hisql底层已经对sql注入进行了处理，开发人员只要关注于业务开发
 
-处理，开发人员只要关注于业务开发
+
+### 2022.5.23 新增雪花ID生成方法
+
+雪花ID引擎每微秒理论可生成4096个不重复ID,
+
+IdSnow引擎性能实测生成10000个ID耗时`0.00623`秒
+IdWorker引擎性能实测生成10000个ID耗时`0.01364 `秒
+
+
+
+```c#
+    //指定雪花ID生成引擎(IdWorker和IdSnow) 默认是IdSnow
+    Snowflake.SnowType = SnowType.IdSnow;
+
+    //指定机器码（0-31)之间 默认是0
+    Snowflake.WorkerId = 0;
+
+    List<long> lst=new List<long>();
+    Stopwatch sw = new Stopwatch();
+    sw.Start();
+    for (int i = 0; i < 10000; i++)
+    {
+        lst.Add(Snowflake.NextId());
+       
+    }
+    sw.Stop();
+    Console.WriteLine($"耗时：{sw.Elapsed}秒");
+
+```
+
+
+
+
+### 2022.5.20 业务锁使用方法
+
+
+为什么要用业务锁？业务锁是防止多人同时操作某一个业务或表中某一条数据导致的业务问题或并发时产生的数据库级锁的问题
+
+通过业务锁可以控制在同一时间只允许一个任务来执行，可用于库存扣减，秒杀等高并发场景
+
+
+1. 检测指定的锁是否存在
+
+```c#
+    string _key = "4900001223";
+    var rtn = HiSql.Lock.CheckLock(_key);
+    if (!rtn.Item1)
+    {
+        Console.WriteLine($"没有其它人操作采购订单[{_key}]");
+    }
+    else
+        Console.WriteLine(rtn.Item2);//输出是谁在操作采购订单
+
+
+    //同时检测多个key是否被锁定 其中有一个锁定锁则返回锁定状态
+    var rtn2 = HiSql.Lock.CheckLock("4900001223", "4900001224");
+```
+
+2. 占用锁和解除锁
+
+占用锁即加锁,加锁后不允许其它任务占用
+```c#
+    string _key = "4900001223";
+
+    /*
+    加锁后默认超时时间为30秒，当执行超过27秒时会自动续锁30秒默认会自动续5次 超过则会取消执行
+    可通过expresseconds和timeoutseconds 参数进行修改
+    */
+
+    //LckInfo 是指加锁时需要指定的信息  UName 表示加锁人，ip表示在哪一个地址加的锁，可以通过 HiSql.Lock.GetCurrLockInfo  获取所有的详细加锁信息便于后台管理
+    var rtn= HiSql.Lock.LockOn(_key, new LckInfo { UName = "登陆名", Ip = "127.0.0.1" });
+    if (rtn.Item1)
+    {
+        Console.WriteLine($"针对于采购订单[{_key}] 加锁成功");
+        //执行采购订单处理业务
+
+        //解锁  如果没有解锁默认30秒后会自动解锁
+        HiSql.Lock.UnLock(_key);
+    }
+
+    //同时加锁多个key 如果有一个key被其它任务加锁那么 锁定失败
+    var rtn2 = HiSql.Lock.LockOn(new string[] { "4900001223", "4900001224" }, new LckInfo { UName = "登陆名", Ip = "127.0.0.1" });
+
+```
+
+3. 占用并处理业务
+
+```c#
+    string _key = "4900001223";
+
+    /*
+    加锁后默认超时时间为30秒，当执行超过27秒时会自动续锁30秒默认会自动续5次 超过则会取消执行
+    可通过expresseconds和timeoutseconds 参数进行修改
+    */
+
+    //LckInfo 是指加锁时需要指定的信息  UName 表示加锁人，ip表示在哪一个地址加的锁，可以通过 HiSql.Lock.GetCurrLockInfo  获取所有的详细加锁信息便于后台管理
+    var rtn = HiSql.Lock.LockOnExecute(_key, () =>
+    {
+        //加锁成功后执行的业务
+        Console.WriteLine($"针对于采购订单[{_key}] 加锁并业务处理成功");
+
+        //处理成功后 会自动解锁
+
+
+    }, new LckInfo { UName = "登陆名", Ip = "127.0.0.1" });
+
+```
+
+
+
+### 2022.5.19 hisql 查询语法新增字段与字段的条件判断
+
+如下所示
+`a.TabName=b.TabName`  操作符支持>=,>,<,<=,!=,<>
+
+```c#
+var _sql = sqlClient.HiSql("select a.TabName, a.FieldName from Hi_FieldModel as a inner join Hi_TabModel as b on a.TabName=b.TabName where a.TabName=b.TabName and a.FieldType>3").ToSql();
+```
+
+
 ### 2022.5.16 hisql缓存支持多级缓存
 
 hisql缓存支持多级缓存，优先取MemoryCache，再找redis缓存,如下所示

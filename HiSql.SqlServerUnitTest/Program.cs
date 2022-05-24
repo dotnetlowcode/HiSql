@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Dynamic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -56,18 +58,48 @@ namespace HiSql.UnitTest
 
             HiSqlClient sqlcient = Demo_Init.GetSqlClient();
 
-           // Console.WriteLine($"数据库连接id"+sqlcient.Context.ConnectedId);
+            // Console.WriteLine($"数据库连接id"+sqlcient.Context.ConnectedId);
 
             //Demo_Update.Init(sqlcient);
-           // Demo_Query.Init(sqlcient);
+            //Demo_Query.Init(sqlcient);
 
             //Demo_Delete.Init(sqlcient);
             //Demo_Insert.Init(sqlcient);
             //DemoCodeFirst.Init(sqlcient);
             //Demo_Snro.Init(sqlcient);
-            Demo_DbCode.Init(sqlcient);
-            
-            Console.Read();
+            //Demo_DbCode.Init(sqlcient);
+
+            //Demo_Cache.Init(sqlcient);
+            //SnowId();
+            Console.ReadLine();
+        }
+
+        static void SnowId()
+        {
+            //IdWorker idWorker = new IdWorker(0, IdWorker.TimeTick(new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc)));
+            //IdSnow snowflake = new IdSnow(0, IdSnow.TimeTick(new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc)));
+            List<long> lst=new List<long>();
+
+
+         
+            Snowflake.SnowType = SnowType.IdSnow;
+            Snowflake.WorkerId = 0;
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
+            for (int i = 0; i < 10000; i++)
+            {
+                lst.Add(Snowflake.NextId());
+                //Console.WriteLine(idWorker.NextId());
+                //Console.WriteLine(snowflake.NextId());
+
+                //Console.WriteLine(Snowflake.NextId());
+            }
+            sw.Stop();
+
+            Console.WriteLine($"耗时：{sw.Elapsed}秒");
+
+
         }
 
          public static void ToAnonymous(dynamic o)

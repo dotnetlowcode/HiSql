@@ -13,6 +13,14 @@ namespace HiSql
 
         static ICache _cache = null;
 
+        /// <summary>
+        /// 提供外部访问缓存
+        /// </summary>
+        public static ICache Cache
+        {
+            get => MCache;
+        }
+
         public static ICache MCache
         {
             get
