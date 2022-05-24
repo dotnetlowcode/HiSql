@@ -20,13 +20,13 @@ namespace HiSql
         private ConnectionMultiplexer _connectMulti;
 
         private string _cache_notity_channel_remove = "hisql_cache_notity_channel@{0}__:remove";
-        private string _lockkeyPrefix = $"{HiSql.Constants.NameSpace}:lck:";
+        private string _lockkeyPrefix = string.Empty;
 
-        private string _hsetkeyPrefix = $"{HiSql.Constants.NameSpace}:";
+        private string _hsetkeyPrefix = string.Empty;
 
-        private string _lockhashname = $"{HiSql.Constants.NameSpace}:locktable";
-        private string _lockhishashname = $"{HiSql.Constants.NameSpace}:locktable_his";
-        
+        private string _lockhashname = string.Empty;
+        private string _lockhishashname = string.Empty;
+
         private MCache _MemoryCache;
         private RedisOptions _options;
         public RCache(RedisOptions options)
@@ -34,15 +34,30 @@ namespace HiSql
             if (options == null)
                 throw new ArgumentNullException("options");
 
+            if (options.Host.IsNullOrEmpty())
+            {
+                throw new ArgumentException("Value must not be empty", nameof(options.Host));
+            }
+            if (options.CacheRegion.IsNullOrEmpty())
+            {
+                throw new ArgumentException("Value must not be empty", nameof(options.CacheRegion));
+            }
             this._options = options;
+
+            _lockkeyPrefix = $"{_options.CacheRegion}:lck:";
+
+            _hsetkeyPrefix = $"{_options.CacheRegion}:";
+
+            _lockhashname = $"{_options.CacheRegion}:locktable";
+            _lockhishashname = $"{_options.CacheRegion}:locktable_his";
+
             CheckRedis();
 
             //_lockhashname = GetRegionKey(_lockhashname);
             //_lockhishashname = GetRegionKey(_lockhishashname);
             if (this._options.EnableMultiCache)
             {
-                _MemoryCache = new MCache();
-                _MemoryCache.SetCacheRegion(_options.CacheRegion);
+                _MemoryCache = new MCache(_options.CacheRegion);
                 _cache_notity_channel_remove = string.Format(_cache_notity_channel_remove, options.Database.ToString());
                 //订阅移除事件
                 this.BroadCastSubScriber(_cache_notity_channel_remove, (rchannel, key) =>
@@ -142,21 +157,17 @@ namespace HiSql
             return Tuple.Create(key, region, unionId);
         }
 
-        private string GetRegionKey(string key, string region = null)
+        private string GetRegionKey(string key)
         {
-            if (region == null)
-            {
-                region = _options.CacheRegion;
-            }
             if (string.IsNullOrWhiteSpace(key))
             {
                 throw new ArgumentNullException(nameof(key));
             }
-            if (key.StartsWith(region + ":"))
+            if (key.StartsWith(_options.CacheRegion + ":"))
                 return key;
 
-            if (!key.Contains(HiSql.Constants.NameSpace))
-                key = HiSql.Constants.NameSpace + ":" + key;
+            //if (!key.Contains(HiSql.Constants.NameSpace))
+            //    key = HiSql.Constants.NameSpace + ":" + key;
 
             //if (_options.KeyspaceNotificationsEnabled && key.Contains(":"))
             //{
@@ -165,14 +176,14 @@ namespace HiSql
 
             var fullKey = key;
 
-            if (!string.IsNullOrWhiteSpace(region))
+            if (!string.IsNullOrWhiteSpace(_options.CacheRegion))
             {
                 //if (_options.KeyspaceNotificationsEnabled && region.Contains(":"))
                 //{
                 //    region = Base64Prefix + Convert.ToBase64String(Encoding.UTF8.GetBytes(region));
                 //}
 
-                fullKey = string.Concat(region, ":", key);
+                fullKey = string.Concat(_options.CacheRegion, ":", key);
             }
 
             return fullKey;
@@ -303,8 +314,9 @@ namespace HiSql
 
         public T GetOrCreate<T>(string key, Func<T> value) where T : class
         {
-            return GetOrCreate<T>(key, value, _options.DefaultExpirySecond);
-
+            DateTimeOffset currdate = DateTimeOffset.Now;
+            int _seconds = int.Parse(DateTimeOffset.MaxValue.Subtract(currdate).TotalSeconds.ToString());
+            return GetOrCreate<T>(key, value, _seconds);
         }
 
         private string keySplitKey = "~@~@";
@@ -382,7 +394,7 @@ namespace HiSql
 
         public void SetCache(string key, object value)
         {
-            SetCache(key, value, _options.DefaultExpirySecond);
+            SetCache(key, value, -1);
         }
 
         public void SetCache(string key, object value, DateTimeOffset expiressAbsoulte)
@@ -399,19 +411,20 @@ namespace HiSql
         {
             CheckRedis();
             var fullKey = GetRegionKey(key);
-            if (second > 0)
+            
+            string _value = JsonConvert.SerializeObject(value);
+            _cache.StringSet(fullKey, _value, second > 0 ?TimeSpan.FromSeconds(second):null);
+            if (!string.IsNullOrWhiteSpace(_options.CacheRegion))
             {
-                string _value = JsonConvert.SerializeObject(value);
-                _cache.StringSet(fullKey, _value, TimeSpan.FromSeconds(second));
-                if (!string.IsNullOrWhiteSpace(_options.CacheRegion))
-                {
-                    _cache.HashSet(_options.CacheRegion, fullKey, "regionKey", When.Always, CommandFlags.FireAndForget);
-                }
-                if (this._options.EnableMultiCache)
-                { //本地存储，并发布消息
+                _cache.HashSet(_options.CacheRegion, fullKey, "regionKey", When.Always, CommandFlags.FireAndForget);
+            }
+            if (this._options.EnableMultiCache)
+            { //本地存储，并发布消息
+                if (second > 0)
                     _MemoryCache.SetCache(fullKey, _value, DateTime.Now.Add(TimeSpan.FromSeconds(second)));
-                    this.PublishMessage(_cache_notity_channel_remove, GetRegionKeyForNotityKey(fullKey));
-                }
+                else
+                    _MemoryCache.SetCache(fullKey, _value);
+                this.PublishMessage(_cache_notity_channel_remove, GetRegionKeyForNotityKey(fullKey));
             }
         }
 

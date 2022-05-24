@@ -333,9 +333,9 @@ namespace HiSql.Test
             //var rel =  System.Threading.Monitor.TryEnter(lockObj);
             HiSql.RCache rCache = null;// new MCache();
             var rCacheOptions = new RedisOptions { Host = "192.168.10.130", Port = 8379, PassWord = "", CacheRegion = "HRM", Database = 6 };
-            rCacheOptions = new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "", CacheRegion = "HRM", Database = 2, EnableMultiCache = true, KeyspaceNotificationsEnabled = true };
+            rCacheOptions = new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "", CacheRegion = "HRM", Database = 3, EnableMultiCache = true, KeyspaceNotificationsEnabled = true };
             rCache = new RCache(rCacheOptions);
-            var aa = new MCache();
+            var aa = new MCache(rCacheOptions.CacheRegion);
 
             {
                 ///后台线程输出锁的信息
@@ -485,9 +485,9 @@ namespace HiSql.Test
             {
                 //  var rel3 = System.Threading.Monitor.TryEnter(lockObj);
                 //var rel =  System.Threading.Monitor.TryEnter(lockObj);
-                HiSql.ICache rCache = new MCache(null);
+                HiSql.ICache rCache = new MCache("HRM");
 
-                //rCache = new RCache(new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "", CacheRegion = "HRM", Database = 2, EnableMultiCache = false, KeyspaceNotificationsEnabled = false });
+                rCache = new RCache(new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "", CacheRegion = "HRM", Database = 3, EnableMultiCache = false, KeyspaceNotificationsEnabled = false });
 
 
                 int coujnt = 0;
@@ -495,7 +495,7 @@ namespace HiSql.Test
                 var _key2 = "test2";
                 var _key3 = "test3";
 
-                rCache.HSet(_key, _key2, _key3);
+                rCache.HSet("HSetHashKey ", "keytest21", "asfasdf");
 
                 ///后台线程输出锁的信息
                 Task.Run(() =>
@@ -713,8 +713,10 @@ namespace HiSql.Test
 
         static void Main(string[] args)
         {
-            CacheTest();
-            //LockTest();
+
+            Console.WriteLine(DateTimeOffset.MaxValue);
+            //CacheTest();
+            LockTest();
 
         Console.ReadLine();
             return;

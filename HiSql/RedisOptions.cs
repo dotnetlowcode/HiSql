@@ -14,7 +14,6 @@ namespace HiSql
 
         string _host = string.Empty;
 
-        public int DefaultExpirySecond { set; get; } = 60*10;
         /// <summary>
         /// redis地址
         /// </summary>
@@ -29,6 +28,9 @@ namespace HiSql
         /// </summary>
         public int Database { get => _database; set => _database = value; }
 
+        /// <summary>
+        /// 缓存区域名称。建议以系统名称命名。如 CRM
+        /// </summary>
         public string CacheRegion { get; set; } = "HI";
         /// <summary>
         /// redis 密码 默认无密码

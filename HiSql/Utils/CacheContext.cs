@@ -25,7 +25,7 @@ namespace HiSql
                         if (_cache == null)
                         {
                             if (!Global.RedisOn)
-                                _cache = new MCache(null);
+                                _cache = new MCache(HiSql.Constants.NameSpace);
                             else
                                 _cache = new RCache(Global.RedisOptions);
                         }

@@ -17,54 +17,62 @@ namespace HiSql
     /// </summary>
     public class MCache : ICache
     {
-        public int DefaultExpirySecond { set; get; } = 60*10;
         private readonly object lockList = new object();
         private readonly Hashtable globalHSet = new Hashtable();
         private readonly object lockHstObj = new object();
 
-        private string CacheRegion = "HI";
+        private string CacheRegion = HiSql.Constants.NameSpace;
         internal MemoryCacheOptions MemoryCacheOptions { get; }
 
         public int Count => _cache.Count;
 
-        private string _lockhashname = $"{HiSql.Constants.NameSpace}:locktable";
-        private string _lockhishashname = $"{HiSql.Constants.NameSpace}:locktable_his";
-        private string _lockkeyPrefix = $"{HiSql.Constants.NameSpace}:lck:";
+        private string _lockhashname = string.Empty;
+        private string _lockhishashname = string.Empty;
+        private string _lockkeyPrefix = string.Empty;
+        private string _hsetkeyPrefix = string.Empty;
 
-        private string _hsetkeyPrefix = $"{HiSql.Constants.NameSpace}:";
 
-
-        internal  void SetCacheRegion(string resion) {
+        private void SetCacheRegion(string resion) {
             CacheRegion = resion;
+             _lockhashname = $"{CacheRegion}:locktable";
+            _lockhishashname = $"{CacheRegion}:locktable_his";
+            _lockkeyPrefix = $"{CacheRegion}:lck:";
+            _hsetkeyPrefix = $"{CacheRegion}:";
         }
 
-        public MCache(MemoryCacheOptions memoryCacheOptions = null)//
+        /// <summary>
+        ///  初始化构造函数
+        /// </summary>
+        /// <param name="cacheRegion">缓存区域名称。建议以系统名称命名。如 CRM</param>
+        /// <param name="memoryCacheOptions">MemoryCache缓存参数配置</param>
+        public MCache(string cacheRegion, MemoryCacheOptions memoryCacheOptions = null)//
         {
+            if (cacheRegion.IsNullOrEmpty())
+            {
+                cacheRegion = HiSql.Constants.NameSpace;
+            }
             MemoryCacheOptions = memoryCacheOptions ?? new MemoryCacheOptions();
             this._cache = new MemoryCache(MemoryCacheOptions);
+            SetCacheRegion(cacheRegion);
         }
         private MemoryCache _cache;
-        private string GetRegionKey(string key, string region = null)
+        private string GetRegionKey(string key)
         {
-            if (region == null)
-            {
-                region = CacheRegion;
-            }
             if (string.IsNullOrWhiteSpace(key))
             {
                 throw new ArgumentNullException(nameof(key));
             }
-            if (key.StartsWith(region + ":"))
+            if (key.StartsWith(CacheRegion + ":"))
                 return key;
 
-            if (!key.StartsWith(HiSql.Constants.NameSpace))
-                key = HiSql.Constants.NameSpace + ":" + key;
+            //if (!key.StartsWith(HiSql.Constants.NameSpace))
+            //    key = HiSql.Constants.NameSpace + ":" + key;
 
             var fullKey = key;
 
-            if (!string.IsNullOrWhiteSpace(region))
+            if (!string.IsNullOrWhiteSpace(CacheRegion))
             {
-                fullKey = string.Concat(region, ":", key);
+                fullKey = string.Concat(CacheRegion, ":", key);
             }
 
             return fullKey;
@@ -105,9 +113,7 @@ namespace HiSql
         /// <param name="value"></param>
         public void SetCache(string key, object value)
         {
-            DateTimeOffset expirationTime = DateTimeOffset.Now;
-            expirationTime = expirationTime.AddSeconds(DefaultExpirySecond);
-            SetCache(key, value, expirationTime);
+            SetCache(key, value, DateTimeOffset.MaxValue);
         }
 
         /// <summary>
@@ -127,8 +133,7 @@ namespace HiSql
             object v = null;
             if (this._cache.TryGetValue(key, out v))
                 this._cache.Remove(key);
-
-            this._cache.Set<object>(key, value, expirationTime);
+                this._cache.Set<object>(key, value, expirationTime);
         }
 
         /// <summary>
@@ -180,7 +185,7 @@ namespace HiSql
         /// <returns></returns>
         public T GetOrCreate<T>(string key, Func<T> value) where T : class
         {
-            return GetOrCreate(key, value, DefaultExpirySecond);
+            return GetOrCreate(key, value, DateTimeOffset.MaxValue);
         }
 
         /// <summary>
@@ -195,7 +200,7 @@ namespace HiSql
         {
             DateTimeOffset expirationTime = DateTimeOffset.Now;
             expirationTime = expirationTime.AddSeconds(second);
-            return GetOrCreate(key, value, DefaultExpirySecond);
+            return GetOrCreate(key, value, expirationTime);
         }
 
         public T GetOrCreate<T>(string key, Func<T> value, DateTimeOffset time) where T : class
