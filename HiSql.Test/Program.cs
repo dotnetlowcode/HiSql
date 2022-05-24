@@ -362,14 +362,15 @@ namespace HiSql.Test
                 {
                     list.Add("asdfasdfasdf");
                 }
-                rCache.SetCache("test1", list);
-                rCache.SetCache("test2", list);
+                rCache.SetCache("SetCache_test1", list);
+                rCache.SetCache("SetCache_test2", list);
+
                 Stopwatch sw = Stopwatch.StartNew();
                 sw.Start();
                 Parallel.For(0, 10000, (x, y) =>
                 {
-                    rCache.GetCache("test1");
-                    rCache.GetCache("test2");
+                    rCache.GetCache("SetCache_test1");
+                    rCache.GetCache("SetCache_test2");
                 });
                 Console.WriteLine($"测试多级缓存性能：" + sw.ElapsedMilliseconds);
 
@@ -491,11 +492,10 @@ namespace HiSql.Test
 
 
                 int coujnt = 0;
-                string _key = "491524444";
-                var _key2 = "test2";
-                var _key3 = "test3";
+                var _lockkey2 = "lockkey_test2";
+                var _lockkey3 = "lockkey_test3";
 
-                rCache.HSet("HSetHashKey ", "keytest21", "asfasdf");
+                rCache.HSet("HSetHashKey", "keytest21", "asfasdf");
 
                 ///后台线程输出锁的信息
                 Task.Run(() =>
@@ -513,26 +513,26 @@ namespace HiSql.Test
 
                 });
                 int threadId = 0;
-                //{
-                //    Tuple<bool, string> rtn = rCache.LockOn(new string[] { _key3, _key }, new LckInfo { UName = "tansar", EventName = "Program", Ip = "127.0.0.1" }, 2000);
-                //    threadId = Thread.CurrentThread.ManagedThreadId;
-                //    SpinWait.SpinUntil(() => false, 4000);
-                //    Console.WriteLine(rtn.Item2 + " _ " + Thread.CurrentThread.ManagedThreadId);
-                //    rCache.UnLock(new string[] { _key3, _key });
-                //}
+                {
+                    Tuple<bool, string> rtn = rCache.LockOn(new string[] { _lockkey2, _lockkey3 }, new LckInfo { UName = "tansar", EventName = "Program", Ip = "127.0.0.1" }, 2000);
+                    threadId = Thread.CurrentThread.ManagedThreadId;
+                   // SpinWait.SpinUntil(() => false, 4000);
+                    Console.WriteLine(rtn.Item2 + " _ " + Thread.CurrentThread.ManagedThreadId);
+                   // rCache.UnLock(new string[] { _key3, _key });
+                }
                 //SpinWait.SpinUntil(() => false, 4000);
                 //return;
 
-              
+
 
                 //加锁，模拟所过期
                 {
                     //Task.Run(() =>
                     //{
-                        var t = rCache.CheckLock(_key3, _key);
+                        var t = rCache.CheckLock(_lockkey2, _lockkey3);
                         //t.Item1
                         // 加锁 执行耗时的动作
-                        Tuple<bool, string> rtn = rCache.LockOnExecute(new string[] { _key3,_key }, () =>
+                        Tuple<bool, string> rtn = rCache.LockOnExecute(new string[] { _lockkey2, _lockkey3 }, () =>
                         {
                             try
                             {
@@ -560,7 +560,7 @@ namespace HiSql.Test
                     while (!islockok)
                     {
                         // 加锁 执行耗时的动作
-                        Tuple<bool, string> rtn = rCache.LockOnExecute(_key3, () =>
+                        Tuple<bool, string> rtn = rCache.LockOnExecute( _lockkey3, () =>
                         {
                             try
                             {
@@ -587,7 +587,7 @@ namespace HiSql.Test
                     {
                         // return;
                     }
-                    Tuple<bool, string> rtn = rCache.LockOn(_key + "_" + x, new LckInfo { UName = "tansar", EventName = "Program", Ip = "127.0.0.1" }, 20);
+                    Tuple<bool, string> rtn = rCache.LockOn(_lockkey2 + "_" + x, new LckInfo { UName = "tansar", EventName = "Program", Ip = "127.0.0.1" }, 20);
                     Console.WriteLine(rtn.Item2 + " _ " + Thread.CurrentThread.ManagedThreadId);
                     if (rtn.Item1)
                     {
@@ -621,7 +621,7 @@ namespace HiSql.Test
                 ;
                 Parallel.For(0, 2, (x, y) =>
                 {
-                    Tuple<bool, string> rtn = rCache.LockOn(_key, new LckInfo { UName = "tansar", EventName = "Program", Ip = "127.0.0.1" });
+                    Tuple<bool, string> rtn = rCache.LockOn( _lockkey3, new LckInfo { UName = "tansar", EventName = "Program", Ip = "127.0.0.1" });
                     Console.WriteLine(rtn.Item2 + Thread.CurrentThread.ManagedThreadId);
                     if (rtn.Item1)
                     {
@@ -631,7 +631,7 @@ namespace HiSql.Test
                         //Console.WriteLine(_rtn.Item2);
 
 
-                        bool unlck = rCache.UnLock(_key);
+                        bool unlck = rCache.UnLock(_lockkey3);
 
                         //if (unlck)
                         //    Console.WriteLine($"解锁成功");
@@ -715,7 +715,7 @@ namespace HiSql.Test
         {
 
             Console.WriteLine(DateTimeOffset.MaxValue);
-            //CacheTest();
+            CacheTest();
             LockTest();
 
         Console.ReadLine();

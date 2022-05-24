@@ -42,11 +42,18 @@ namespace HiSql
             //Global.RedisOn = true;
             //Global.RedisOptions = new RedisOptions() { Host = "192.168.10.130", Port = 8379, PassWord = "", Database = 1 }; //rCache = new RCache(new RedisOptions { Host = "192.168.10.130", Port=8379, PassWord = "" , Database = 1});
             //Global.RedisOptions = new RedisOptions() { Host = "172.16.80.178", PassWord = "pwd123", Database = 1 };
-            Parallel.For(0, 10, (x, y) => {
-                HiSqlClient sqlClient = Demo_Init.GetSqlClient();
-                TabInfo tableInfo = sqlClient.Context.DMInitalize.GetTabStruct("Hi_Test23");
-                Console.WriteLine($"创建成功：字段数："+ tableInfo.Columns.Count);
-            });
+
+            HiSqlClient sqlClient = Demo_Init.GetSqlClient();
+            TabInfo tabInfo = sqlClient.Context.DMInitalize.GetTabStruct("Hi_FieldModel");
+            tabInfo = sqlClient.Context.DMInitalize.GetTabStruct("Hi_TabModel");
+
+            TabInfo tableInfo = sqlClient.Context.DMInitalize.GetTabStruct("Hi_Test23");
+
+            //Parallel.For(0, 10, (x, y) => {
+            //    HiSqlClient sqlClient = Demo_Init.GetSqlClient();
+            //    TabInfo tableInfo = sqlClient.Context.DMInitalize.GetTabStruct("Hi_Test23");
+            //    Console.WriteLine($"创建成功：字段数："+ tableInfo.Columns.Count);
+            //});
 
         }
 
