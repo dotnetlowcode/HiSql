@@ -317,24 +317,17 @@ namespace HiSql
                     if (objprop == null)
                     {
 
-                        if (hiColumn.IsRequire)
-                            throw new Exception($"字段[{hiColumn.FieldName}] 为必填 无法数据提交");
-                        else
-                            continue;
+                        throw new Exception($"字段[{hiColumn.FieldName}] 为主键或业务主键,传入的删除对象中未发现此字段");
+
+                        
 
                     }
                     else
                     {
                         object _vobj = objprop.GetValue(objdata);
-
-                        if (_vobj == null)
-                        {
-                            if (hiColumn.IsRequire)
-                                throw new Exception($"字段[{hiColumn.FieldName}] 为必填 无法数据提交");
-                            else
-                                continue;
-                        }
                         _value = _vobj.ToString();
+
+
                     }
                     if (hiColumn.IsBllKey && objprop == null)//&& isRequireKey
                     {
@@ -345,7 +338,7 @@ namespace HiSql
                     {
                         if (hiColumn.FieldType.IsIn<HiType>(HiType.NVARCHAR, HiType.NCHAR, HiType.GUID))
                         {
-                            if (_value.Length > hiColumn.FieldLen && hiColumn.FieldLen>0)
+                            if (_value.Length > hiColumn.FieldLen && hiColumn.FieldLen > 0)
                             {
                                 throw new Exception($"字段[{objprop.Name}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
                             }
@@ -353,18 +346,72 @@ namespace HiSql
                         }
                         else if (hiColumn.FieldType.IsIn<HiType>(HiType.VARCHAR, HiType.CHAR, HiType.TEXT))
                         {
-
+                            if (_value.LengthZH() > hiColumn.FieldLen && hiColumn.FieldLen > 0)
+                            {
+                                throw new Exception($"字段[{objprop.Name}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
+                            }
                             _values.Add(hiColumn.FieldName, $"'{_value.ToSqlInject()}'");
+
                         }
                         else if (hiColumn.FieldType.IsIn<HiType>(HiType.INT, HiType.BIGINT, HiType.DECIMAL, HiType.SMALLINT))
                         {
-                            _values.Add(hiColumn.FieldName, $"{_value}");
+                            if (!Tool.IsDecimal(_value))
+                            {
+                                throw new Exception($"字段[{hiColumn.FieldName}]的值[{_value}]与类型[{hiColumn.FieldType.ToString()}]不符可能有SQL注入风险");
+                            }
+
+                            _values.Add(hiColumn.FieldName, $"{_value.ToSqlInject()}");
                         }
                         else if (hiColumn.FieldType.IsIn<HiType>(HiType.DATE, HiType.DATETIME))
                         {
                             _value = objprop.GetValue(objdata).ToString();
                             DateTime dtime = Convert.ToDateTime(_value);
                             _values.Add(hiColumn.FieldName, $"'{dtime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                        }
+                        else if (hiColumn.FieldType == HiType.BOOL)
+                        {
+                            
+                            if (this.Context.CurrentConnectionConfig.DbType.IsIn(DBType.SqlServer, DBType.Oracle))
+                            {
+                                if (_value.ToLower().Equals("true") || _value.ToLower().Equals("1"))
+                                {
+                                    _value = "1";
+                                }
+                                else if (_value.ToLower().Equals("false") || _value.ToLower().Equals("0"))
+                                {
+                                    _value = "0";
+                                }
+                                else
+                                    throw new Exception($"字段[{hiColumn.FieldName}]的值[{_value}]与类型[{hiColumn.FieldType.ToString()}]不符");
+                            }
+                            else if (this.Context.CurrentConnectionConfig.DbType.IsIn(DBType.Hana))
+                            {
+                                if (_value.ToLower().Equals("true") || _value.ToLower().Equals("1"))
+                                {
+                                    _value = "true";
+                                }
+                                else if (_value.ToLower().Equals("false") || _value.ToLower().Equals("0"))
+                                {
+                                    _value = "true";
+                                }
+                                else
+                                    throw new Exception($"字段[{hiColumn.FieldName}]的值[{_value}]与类型[{hiColumn.FieldType.ToString()}]不符");
+                            }
+                            else
+                            {
+                                if (_value.ToLower().Equals("true") || _value.ToLower().Equals("1"))
+                                {
+                                    _value = "True";
+                                }
+                                else if (_value.ToLower().Equals("false") || _value.ToLower().Equals("0"))
+                                {
+                                    _value = "False";
+                                }
+                                else
+                                    throw new Exception($"字段[{hiColumn.FieldName}]的值[{_value}]与类型[{hiColumn.FieldType.ToString()}]不符");
+
+                            }
+                            _values.Add(hiColumn.FieldName, $"'{_value}'");
                         }
                         else
                         {
@@ -405,7 +452,14 @@ namespace HiSql
                             }
                             else if (hiColumn.FieldType.IsIn<HiType>(HiType.INT, HiType.BIGINT, HiType.DECIMAL, HiType.SMALLINT))
                             {
-                                _values.Add(hiColumn.FieldName, $"{_value}");
+                                if (!Tool.IsDecimal(_value))
+                                {
+                                    throw new Exception($"字段[{hiColumn.FieldName}]的值[{_value}]与类型[{hiColumn.FieldType.ToString()}]不符");
+                                }
+
+
+
+                                _values.Add(hiColumn.FieldName, $"{_value.ToSqlInject()}");
                             }
                             else if (hiColumn.FieldType.IsIn<HiType>(HiType.DATE, HiType.DATETIME))
                             {
@@ -414,9 +468,54 @@ namespace HiSql
                                 //DateTime dtime = Convert.ToDateTime(_value);
                                 _values.Add(hiColumn.FieldName, $"'{dtime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
                             }
+                            else if (hiColumn.FieldType == HiType.BOOL)
+                            {
+
+                                if (this.Context.CurrentConnectionConfig.DbType.IsIn(DBType.SqlServer, DBType.Oracle))
+                                {
+                                    if (_value.ToLower().Equals("true") || _value.ToLower().Equals("1"))
+                                    {
+                                        _value = "1";
+                                    }
+                                    else if (_value.ToLower().Equals("false") || _value.ToLower().Equals("0"))
+                                    {
+                                        _value = "0";
+                                    }
+                                    else
+                                        throw new Exception($"字段[{hiColumn.FieldName}]的值[{_value}]与类型[{hiColumn.FieldType.ToString()}]不符");
+                                }
+                                else if (this.Context.CurrentConnectionConfig.DbType.IsIn(DBType.Hana))
+                                {
+                                    if (_value.ToLower().Equals("true") || _value.ToLower().Equals("1"))
+                                    {
+                                        _value = "true";
+                                    }
+                                    else if (_value.ToLower().Equals("false") || _value.ToLower().Equals("0"))
+                                    {
+                                        _value = "true";
+                                    }
+                                    else
+                                        throw new Exception($"字段[{hiColumn.FieldName}]的值[{_value}]与类型[{hiColumn.FieldType.ToString()}]不符");
+                                }
+                                else
+                                {
+                                    if (_value.ToLower().Equals("true") || _value.ToLower().Equals("1"))
+                                    {
+                                        _value = "True";
+                                    }
+                                    else if (_value.ToLower().Equals("false") || _value.ToLower().Equals("0"))
+                                    {
+                                        _value = "False";
+                                    }
+                                    else
+                                        throw new Exception($"字段[{hiColumn.FieldName}]的值[{_value}]与类型[{hiColumn.FieldType.ToString()}]不符");
+
+                                }
+                                _values.Add(hiColumn.FieldName, $"'{_value}'");
+                            }
                             else
                             {
-                                _values.Add(hiColumn.FieldName, $"'{_value}'");
+                                _values.Add(hiColumn.FieldName, $"'{_value.ToSqlInject()}'");
                             }
                         }
                     }
