@@ -332,8 +332,8 @@ namespace HiSql.Test
             //  var rel3 = System.Threading.Monitor.TryEnter(lockObj);
             //var rel =  System.Threading.Monitor.TryEnter(lockObj);
             HiSql.RCache rCache = null;// new MCache();
-            var rCacheOptions = new RedisOptions { Host = "192.168.10.130", Port = 8379, PassWord = "", CacheRegion = "HRM", Database = 6 };
-            rCacheOptions = new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "", CacheRegion = "HRM", Database = 3, EnableMultiCache = true, KeyspaceNotificationsEnabled = true };
+            var rCacheOptions = new RedisOptions { Host = "192.168.10.130", Port = 8379, PassWord = "",  Database = 6 };
+            rCacheOptions = new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "", Database = 3, EnableMultiCache = true, KeyspaceNotificationsEnabled = true };
             rCache = new RCache(rCacheOptions);
             var aa = new MCache(rCacheOptions.CacheRegion);
 
@@ -483,17 +483,24 @@ namespace HiSql.Test
         /// </summary>
         static void LockTest()
         {
+            
             {
                 //  var rel3 = System.Threading.Monitor.TryEnter(lockObj);
                 //var rel =  System.Threading.Monitor.TryEnter(lockObj);
-                HiSql.ICache rCache = new MCache("HRM");
+                HiSql.BaseCache rCache = new MCache(null);
+                rCache = new RCache(new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "",  Database = 3, EnableMultiCache = false, KeyspaceNotificationsEnabled = false });
 
-                rCache = new RCache(new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "", CacheRegion = "HRM", Database = 3, EnableMultiCache = false, KeyspaceNotificationsEnabled = false });
+                rCache.IsSaveLockHis = true;
 
+                rCache.OnLockedSuccess += (object sender, LockItemSuccessEventArgs e) => {
+                    //Thread.Sleep(5000);
+                    Console.WriteLine($"锁定成功事件：key{e.Key} info:{ JsonConvert.SerializeObject(e.LckInfo)}");
 
+                   
+                };
                 int coujnt = 0;
-                var _lockkey2 = "lockkey_test2";
-                var _lockkey3 = "lockkey_test3";
+                var _lockkey2 = "lockkey_test488";
+                var _lockkey3 = "lockkey_test4884";
 
                 rCache.HSet("HSetHashKey", "keytest21", "asfasdf");
 
@@ -514,14 +521,15 @@ namespace HiSql.Test
                 });
                 int threadId = 0;
                 {
-                    Tuple<bool, string> rtn = rCache.LockOn(new string[] { _lockkey2, _lockkey3 }, new LckInfo { UName = "tansar", EventName = "Program", Ip = "127.0.0.1" }, 2000);
+                    Tuple<bool, string> rtn = rCache.LockOn(new string[] { _lockkey2, _lockkey3 }, new LckInfo { UName = "tansar",
+                        EventName = "Program", Ip = "127.0.0.1" }, 2000);
                     threadId = Thread.CurrentThread.ManagedThreadId;
                    // SpinWait.SpinUntil(() => false, 4000);
                     Console.WriteLine(rtn.Item2 + " _ " + Thread.CurrentThread.ManagedThreadId);
-                   // rCache.UnLock(new string[] { _key3, _key });
+                    rCache.UnLock(new string[] { _lockkey2, _lockkey3 });
                 }
                 //SpinWait.SpinUntil(() => false, 4000);
-                //return;
+                return;
 
 
 
@@ -709,6 +717,11 @@ namespace HiSql.Test
             //    Console.WriteLine($"执行完成..{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}");
             //}, new LckInfo { UName = "tansar", EventName = "Program", Ip = "127.0.0.1" });
             //Console.WriteLine( rCache.ListLastPop("qlist"));
+        }
+
+        private static void RCache_OnLockedSuccess(object sender, LockItemSuccessEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         static void Main(string[] args)

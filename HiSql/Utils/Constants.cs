@@ -58,6 +58,9 @@ namespace HiSql
         
         public readonly static string NameSpace = "HiSql";
 
+        public readonly static string PlatformName = "LowCoder";
+
+        
         /// <summary>
         /// 用于数据库中 函数产生的日期
         /// </summary>

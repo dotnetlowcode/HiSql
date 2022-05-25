@@ -15,29 +15,16 @@ namespace HiSql
     /// <summary>
     /// 本地Memory缓存
     /// </summary>
-    public class MCache : ICache
+    public class MCache : BaseCache
     {
         private readonly object lockList = new object();
         private readonly Hashtable globalHSet = new Hashtable();
         private readonly object lockHstObj = new object();
-
-        private string CacheRegion = HiSql.Constants.NameSpace;
         internal MemoryCacheOptions MemoryCacheOptions { get; }
-
-        public int Count => _cache.Count;
-
-        private string _lockhashname = string.Empty;
-        private string _lockhishashname = string.Empty;
-        private string _lockkeyPrefix = string.Empty;
-        private string _hsetkeyPrefix = string.Empty;
-
+        public override int Count => _cache.Count;
 
         private void SetCacheRegion(string resion) {
-            CacheRegion = resion;
-             _lockhashname = $"{CacheRegion}:locktable";
-            _lockhishashname = $"{CacheRegion}:locktable_his";
-            _lockkeyPrefix = $"{CacheRegion}:lck:";
-            _hsetkeyPrefix = $"{CacheRegion}:";
+            base.Init(resion);
         }
 
         /// <summary>
@@ -49,7 +36,7 @@ namespace HiSql
         {
             if (cacheRegion.IsNullOrEmpty())
             {
-                cacheRegion = HiSql.Constants.NameSpace;
+                cacheRegion = HiSql.Constants.PlatformName;
             }
             MemoryCacheOptions = memoryCacheOptions ?? new MemoryCacheOptions();
             this._cache = new MemoryCache(MemoryCacheOptions);
@@ -78,7 +65,7 @@ namespace HiSql
             return fullKey;
         }
 
-        public bool Exists(string key)
+        public override bool Exists(string key)
         {
             key = GetRegionKey(key);
 
@@ -87,7 +74,7 @@ namespace HiSql
         }
 
 
-        public string GetCache(string key)
+        public override string GetCache(string key)
         {
             key = GetRegionKey(key);
             string value = string.Empty;
@@ -95,7 +82,7 @@ namespace HiSql
             return value;
         }
 
-        public T GetCache<T>(string key) where T : class
+        public override T GetCache<T>(string key) where T : class
         {
             key = GetRegionKey(key);
 
@@ -111,7 +98,7 @@ namespace HiSql
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
-        public void SetCache(string key, object value)
+        public override void SetCache(string key, object value)
         {
             SetCache(key, value, DateTimeOffset.MaxValue);
         }
@@ -123,7 +110,7 @@ namespace HiSql
         /// <param name="value"></param>
         /// <param name="expirationTime"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public void SetCache(string key, object value, DateTimeOffset expirationTime)
+        public override void SetCache(string key, object value, DateTimeOffset expirationTime)
         {
             key = GetRegionKey(key);
 
@@ -142,7 +129,7 @@ namespace HiSql
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <param name="second"></param>
-        public void SetCache(string key, object value, int second)
+        public override void SetCache(string key, object value, int second)
         {
             DateTimeOffset expirationTime = DateTimeOffset.Now;
             expirationTime = expirationTime.AddSeconds(second);
@@ -154,13 +141,13 @@ namespace HiSql
         /// 移除缓存缓存对象
         /// </summary>
         /// <param name="key"></param>
-        public void RemoveCache(string key)
+        public override void RemoveCache(string key)
         {
             key = GetRegionKey(key);
             this._cache.Remove(key);
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             if (_cache != null)
             {
@@ -169,7 +156,7 @@ namespace HiSql
             }
 
         }
-        public void Clear()
+        public override void Clear()
         {
             var old = this._cache;
             _cache = new MemoryCache(MemoryCacheOptions);
@@ -183,7 +170,7 @@ namespace HiSql
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public T GetOrCreate<T>(string key, Func<T> value) where T : class
+        public override T GetOrCreate<T>(string key, Func<T> value) where T : class
         {
             return GetOrCreate(key, value, DateTimeOffset.MaxValue);
         }
@@ -196,14 +183,14 @@ namespace HiSql
         /// <param name="value"></param>
         /// <param name="second"></param>
         /// <returns></returns>
-        public T GetOrCreate<T>(string key, Func<T> value, int second) where T : class
+        public override T GetOrCreate<T>(string key, Func<T> value, int second) where T : class
         {
             DateTimeOffset expirationTime = DateTimeOffset.Now;
             expirationTime = expirationTime.AddSeconds(second);
             return GetOrCreate(key, value, expirationTime);
         }
 
-        public T GetOrCreate<T>(string key, Func<T> value, DateTimeOffset time) where T : class
+        public override T GetOrCreate<T>(string key, Func<T> value, DateTimeOffset time) where T : class
         {
             key = GetRegionKey(key);
             return this._cache.GetOrCreate<T>(key, (entry) =>
@@ -223,7 +210,7 @@ namespace HiSql
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public bool HSet(string hashkey, string key, string value)
+        public override bool HSet(string hashkey, string key, string value)
         {
             if (!hashkey.Contains(_hsetkeyPrefix))
             {
@@ -261,7 +248,7 @@ namespace HiSql
         /// <param name="hashkey"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        public string HGet(string hashkey, string key)
+        public override string HGet(string hashkey, string key)
         {
             if (!hashkey.Contains(_hsetkeyPrefix))
             {
@@ -282,7 +269,7 @@ namespace HiSql
         /// <param name="hashkey"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        public bool HDel(string hashkey, string key)
+        public override bool HDel(string hashkey, string key)
         {
             if (!hashkey.Contains(_hsetkeyPrefix))
             {
@@ -307,7 +294,7 @@ namespace HiSql
         /// <param name="expresseconds"></param>
         /// <param name="timeoutseconds"></param>
         /// <returns></returns>
-        public Tuple<bool, string> LockOn(string key, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
+        public override Tuple<bool, string> LockOn(string key, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
         {
             if (!key.Contains(_lockkeyPrefix))
                 key = _lockkeyPrefix + key;
@@ -345,15 +332,15 @@ namespace HiSql
             }
             else
             {
-                HSet(_lockhashname, key, JsonConvert.SerializeObject(lckinfo));
-                HSet(_lockhishashname, $"{key}:{lckinfo.LockTime.ToString("yyyyMMddHHmmssfff")}", JsonConvert.SerializeObject(lckinfo));
+                SaveLockInfo(key, lckinfo);
+               
                 msg = "加锁成功";
                 flag1 = true;
             }
             return new Tuple<bool, string>(flag1, msg);
         }
 
-        public Tuple<bool, string> LockOn(string[] keys, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
+        public override Tuple<bool, string> LockOn(string[] keys, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
         {
             Tuple<bool, string> tuple = new Tuple<bool, string>(false, "");
             Stopwatch stopwatch = Stopwatch.StartNew();
@@ -415,7 +402,7 @@ namespace HiSql
         }
 
         
-        public Tuple<bool, string> CheckLock(params string[] keys)
+        public override Tuple<bool, string> CheckLock(params string[] keys)
         {
             foreach (var key in keys)
             {
@@ -427,7 +414,7 @@ namespace HiSql
             }
             return new Tuple<bool, string>(false, $"key:[{string.Join(",", keys)}]未被锁定");
         }
-        public Tuple<bool, string> LockOnExecute(string key, Action action, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
+        public override Tuple<bool, string> LockOnExecute(string key, Action action, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
         {
             if (!key.Contains(_lockkeyPrefix))
                 key = _lockkeyPrefix + key;
@@ -470,9 +457,7 @@ namespace HiSql
             }
             else
             {
-                HSet(_lockhashname, key, JsonConvert.SerializeObject(lckinfo));
-                HSet(_lockhishashname, $"{key}:{lckinfo.LockTime.ToString("yyyyMMddHHmmssfff")}", JsonConvert.SerializeObject(lckinfo));
-
+                SaveLockInfo(key, lckinfo);
                 CancellationTokenSource tokenSource = new CancellationTokenSource();
                 CancellationToken cancellationToken = tokenSource.Token;
 
@@ -526,8 +511,9 @@ namespace HiSql
                             //续锁
                             SetCache(key, lckinfo, expresseconds);
                             lckinfo = getLockInfo(lckinfo, expresseconds, _timesa);
-                            HSet(_lockhashname, key, JsonConvert.SerializeObject(lckinfo));
-                            HSet(_lockhishashname, $"{key}:{lckinfo.LockTime.ToString("yyyyMMddHHmmssfff")}", JsonConvert.SerializeObject(lckinfo));
+
+                            SaveLockInfo(key, lckinfo);
+
                             flag = workTask.Wait(timeoutseconds * _millsecond, cancellationToken);
                             if (flag)
                             {
@@ -560,7 +546,7 @@ namespace HiSql
         /// <param name="expresseconds"></param>
         /// <param name="timeoutseconds"></param>
         /// <returns></returns>
-        public Tuple<bool, string> LockOnExecute(string[] keys, Action action, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
+        public override Tuple<bool, string> LockOnExecute(string[] keys, Action action, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
         {
 
             int _max_second = 60;//最长定锁有效期
@@ -649,8 +635,7 @@ namespace HiSql
 
                                 SetCache(newKey, lckinfo, expresseconds);
                                 lckinfo = getLockInfo(lckinfo, expresseconds, _timesa);
-                                HSet(_lockhashname, newKey, JsonConvert.SerializeObject(lckinfo));
-                                HSet(_lockhishashname, $"{newKey}:{lckinfo.LockTime.ToString("yyyyMMddHHmmssfff")}", JsonConvert.SerializeObject(lckinfo));
+                                SaveLockInfo(newKey, lckinfo);
                             }
                             flag = workTask.Wait(timeoutseconds * _millsecond, cancellationToken);
                             if (flag)
@@ -690,7 +675,7 @@ namespace HiSql
 
             return lckInfo;
         }
-        public bool UnLock(params string[] keys)
+        public override bool UnLock(params string[] keys)
         {
             foreach (string key in keys)
             {
@@ -714,7 +699,7 @@ namespace HiSql
         /// 获取当前缓存锁信息
         /// </summary>
         /// <returns></returns>
-        public List<LckInfo> GetCurrLockInfo()
+        public override List<LckInfo> GetCurrLockInfo()
         {
             List<LckInfo> lckInfos = new List<LckInfo>();
             var newkey = GetRegionKey(_lockhashname);
@@ -749,7 +734,7 @@ namespace HiSql
         /// 获取历史表锁信息
         /// </summary>
         /// <returns></returns>
-        public List<LckInfo> GetHisLockInfo()
+        public override List<LckInfo> GetHisLockInfo()
         {
             var newkey = GetRegionKey(_lockhishashname);
 

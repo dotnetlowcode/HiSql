@@ -13,11 +13,10 @@ namespace HiSql.UnitTest
         {
 
             Global.RedisOn = true;
-            Global.RedisOptions = new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "", CacheRegion = "HRM", Database = 3, EnableMultiCache = false, KeyspaceNotificationsEnabled = false };
+            Global.RedisOptions = new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "", CacheRegion = "", Database = 3, EnableMultiCache = false, KeyspaceNotificationsEnabled = false };
             HiSqlClient sqlclient = new HiSqlClient(
                      new ConnectionConfig()
                      {
-                         
                          DbType = DBType.SqlServer,
                          DbServer = "local-HoneBI",
                          ConnectionString = "server=(local);uid=sa;pwd=Hone@123;database=HiSql;Encrypt=True; TrustServerCertificate=True;",//; MultipleActiveResultSets = true;

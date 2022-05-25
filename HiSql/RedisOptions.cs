@@ -31,7 +31,7 @@ namespace HiSql
         /// <summary>
         /// 缓存区域名称。建议以系统名称命名。如 CRM
         /// </summary>
-        public string CacheRegion { get; set; } = "HI";
+        public string CacheRegion { get; set; }
         /// <summary>
         /// redis 密码 默认无密码
         /// </summary>
@@ -41,6 +41,7 @@ namespace HiSql
         /// 是否启用多级缓存
         /// </summary>
         public bool EnableMultiCache { get; set; } = true;
+
 
         /// <summary>
         /// 获取或设置一个值，该值指示redis缓存句柄是否应该使用键空间通知来响应，从redis中清除或过期事件，然后将这些事件转发给缓存管理器。    
