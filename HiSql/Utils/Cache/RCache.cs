@@ -535,7 +535,8 @@ namespace HiSql
                     newkey = _lockkeyPrefix + newkey;
                 newkey = GetRegionKey(newkey);
                 HDel(_lockhashname, newkey);
-                _cache.LockRelease(newkey, 1);
+                var res = _cache.LockRelease(newkey, 1);
+                //Console.WriteLine($"释放锁：{newkey}  结果：{res}");
             }
             return true;
         }
@@ -652,8 +653,8 @@ namespace HiSql
 
             key = GetRegionKey(key);
 
-            int _max_second = 60;//最长定锁有效期
-            int _max_timeout = 10;//最长加锁等待时间
+            int _max_second = int.MaxValue;//最长定锁有效期  原来是 60
+            int _max_timeout = int.MaxValue;//最长加锁等待时间 原来是 10
 
 
             expresseconds = expresseconds < 0 ? 5 : expresseconds;
@@ -804,8 +805,8 @@ namespace HiSql
 
             key = GetRegionKey(key);
 
-            int _max_second = 60;//最长定锁有效期
-            int _max_timeout = 10;//最长加锁等待时间
+            int _max_second = int.MaxValue;//最长定锁有效期
+            int _max_timeout = int.MaxValue;//最长加锁等待时间
             int _times = 5;//续锁最多次数
             int _millsecond = 900;
 
@@ -917,8 +918,8 @@ namespace HiSql
         public override Tuple<bool, string> LockOnExecute(string[] keys, Action action, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
         {
             CheckRedis();
-            int _max_second = 60;//最长定锁有效期
-            int _max_timeout = 10;//最长加锁等待时间
+            int _max_second = int.MaxValue;//最长定锁有效期
+            int _max_timeout = int.MaxValue;//最长加锁等待时间
             int _times = 5;//续锁最多次数
             int _millsecond = 900;
 
@@ -1053,6 +1054,7 @@ namespace HiSql
                 {
                     break;
                 }
+                Thread.Sleep(1);
             }
             return true;
         }

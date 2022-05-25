@@ -301,8 +301,8 @@ namespace HiSql
 
             key = GetRegionKey(key);
 
-            int _max_second = 60;//最长定锁有效期
-            int _max_timeout = 10;//最长加锁等待时间
+            int _max_second = int.MaxValue;//最长定锁有效期
+            int _max_timeout = int.MaxValue;//最长加锁等待时间
 
             expresseconds = expresseconds < 0 ? 5 : expresseconds;
             expresseconds = expresseconds > _max_second ? _max_second : expresseconds;
@@ -421,8 +421,8 @@ namespace HiSql
 
             key = GetRegionKey(key);
 
-            int _max_second = 60;//最长定锁有效期
-            int _max_timeout = 10;//最长加锁等待时间
+            int _max_second = int.MaxValue;//最长定锁有效期
+            int _max_timeout = int.MaxValue;//最长加锁等待时间
 
             int _times = 5;//续锁最多次数
 
@@ -549,8 +549,8 @@ namespace HiSql
         public override Tuple<bool, string> LockOnExecute(string[] keys, Action action, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
         {
 
-            int _max_second = 60;//最长定锁有效期
-            int _max_timeout = 10;//最长加锁等待时间
+            int _max_second = int.MaxValue;//最长定锁有效期
+            int _max_timeout = int.MaxValue;//最长加锁等待时间
 
             int _times = 5;//续锁最多次数
 
