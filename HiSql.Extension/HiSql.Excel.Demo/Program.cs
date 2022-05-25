@@ -11,6 +11,8 @@ namespace HiSql.Excel.Test
         {
             Console.WriteLine("Hello World!");
 
+
+            //ReadExcelName();
             //BuildExceBigData();
             //BuildExcel_1();
             //ReadExcel_1();
@@ -31,6 +33,16 @@ namespace HiSql.Excel.Test
 
         }
 
+
+        static void ReadExcelName()
+        {
+            HiSql.Extension.Excel excel = new HiSql.Extension.Excel(new Extension.ExcelOptions() { TempType = Extension.TempType.HEADER });
+            List<string> names = excel.GetExcelSheetNames(@"D:\data\GD_UniqueCodeInfo1.xlsx");
+            foreach (string name in names)
+            {
+                Console.WriteLine($"excel sheetName:{name}");
+            }
+        }
 
         static void ReadExcel_1()
         {

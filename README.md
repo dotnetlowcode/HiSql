@@ -33,6 +33,20 @@
  目前流行的ORM框架如果需要动态的拼接查询语句，只能用原生的sql进行拼接，无法跨不同数据库执行。hisql推出新的语法一套语句可以在不同的数据库执行
 
 传统ORM框架最大的弊端就是完全要依赖于实体用lambda表达式写查询语句，但最大的问题就是如果业务场景需要动态拼接条件时只能又切换到原生数据库的sql语句进行完成，如果自行拼接开发人员还要解决防注入的问题,hisql 刚才完美的解决这些问题,Hisql底层已经对sql注入进行了处理，开发人员只要关注于业务开发
+
+### 2022.5.25 新增获取excel 的Sheet名称方法
+
+```c#
+HiSql.Extension.Excel excel = new HiSql.Extension.Excel(new Extension.ExcelOptions() { TempType = Extension.TempType.HEADER });
+            List<string> names = excel.GetExcelSheetNames(@"D:\data\GD_UniqueCodeInfo1.xlsx");
+            foreach (string name in names)
+            {
+                Console.WriteLine($"excel sheetName:{name}");
+            }
+
+```
+
+
 ### 2022.5.25 新增锁定成功事件通知，可用于锁信息外部存储
 
 ```c#
