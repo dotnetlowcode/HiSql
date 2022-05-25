@@ -487,16 +487,11 @@ namespace HiSql.Test
             {
                 //  var rel3 = System.Threading.Monitor.TryEnter(lockObj);
                 //var rel =  System.Threading.Monitor.TryEnter(lockObj);
-                HiSql.BaseCache rCache = new MCache(null);
-                rCache = new RCache(new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "",  Database = 3, EnableMultiCache = false, KeyspaceNotificationsEnabled = false });
-
+                HiSql.BaseCache rCache = new RCache(new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "",  Database = 3, EnableMultiCache = false, KeyspaceNotificationsEnabled = false });
                 rCache.IsSaveLockHis = true;
-
-                rCache.OnLockedSuccess += (object sender, LockItemSuccessEventArgs e) => {
-                    //Thread.Sleep(5000);
+                rCache.OnLockedSuccess += (object sender, LockItemSuccessEventArgs e) =>
+                {
                     Console.WriteLine($"锁定成功事件：key{e.Key} info:{ JsonConvert.SerializeObject(e.LckInfo)}");
-
-                   
                 };
                 int coujnt = 0;
                 var _lockkey2 = "lockkey_test488";
