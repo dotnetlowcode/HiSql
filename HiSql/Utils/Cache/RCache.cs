@@ -12,43 +12,48 @@ namespace HiSql
     /// <summary>
     /// 基于Redis的缓存
     /// </summary>
-    public class RCache : IRedis
+    public class RCache : BaseCache,IRedis
     {
         private readonly string UniqueId = Guid.NewGuid().ToString();
-
         private StackExchange.Redis.IDatabase _cache;
         private ConnectionMultiplexer _connectMulti;
-
         private string _cache_notity_channel_remove = "hisql_cache_notity_channel@{0}__:remove";
-        private string _lockkeyPrefix = $"{HiSql.Constants.NameSpace}:lck:";
-
-        private string _hsetkeyPrefix = $"{HiSql.Constants.NameSpace}:";
-
-        private string _lockhashname = $"{HiSql.Constants.NameSpace}:locktable";
-        private string _lockhishashname = $"{HiSql.Constants.NameSpace}:locktable_his";
-
-        private ICache _MemoryCache;
+        private MCache _MemoryCache;
         private RedisOptions _options;
         public RCache(RedisOptions options)
         {
             if (options == null)
                 throw new ArgumentNullException("options");
 
+            if (options.Host.IsNullOrEmpty())
+            {
+                throw new ArgumentException("Value must not be empty", nameof(options.Host));
+            }
+            //if (options.CacheRegion.IsNullOrEmpty())
+            //{
+            //    throw new ArgumentException("Value must not be empty", nameof(options.CacheRegion));
+            //}
+            if (options.CacheRegion.IsNullOrEmpty())
+            {
+                options.CacheRegion = HiSql.Constants.PlatformName;
+            }
             this._options = options;
+
+            base.Init(this._options.CacheRegion);
+
             CheckRedis();
 
             //_lockhashname = GetRegionKey(_lockhashname);
             //_lockhishashname = GetRegionKey(_lockhishashname);
             if (this._options.EnableMultiCache)
             {
-                _MemoryCache = new MCache(null);
+                _MemoryCache = new MCache(_options.CacheRegion);
                 _cache_notity_channel_remove = string.Format(_cache_notity_channel_remove, options.Database.ToString());
                 //订阅移除事件
                 this.BroadCastSubScriber(_cache_notity_channel_remove, (rchannel, key) =>
                 {
-
                     var tupple = ParseRegionKey(key);
-                    if (tupple.Item3 != this.UniqueId)
+                    if (!tupple.Item3.IsNullOrEmpty() && tupple.Item3 != this.UniqueId)
                     {
                         _MemoryCache.RemoveCache($"{tupple.Item2}:{tupple.Item1}");
                         //Console.WriteLine($"Got remove event for key   {tupple.Item2}:{tupple.Item1} 需要移除");
@@ -64,7 +69,7 @@ namespace HiSql
                     this.BroadCastSubScriber($"__keyevent@{options.Database}__:expired", (rchannel, key) =>
                     {
                         var tupple = ParseRegionKey(key);
-                        if (tupple.Item3 != this.UniqueId)
+                        if (!tupple.Item3.IsNullOrEmpty() && tupple.Item3 != this.UniqueId)
                         {
                             _MemoryCache.RemoveCache($"{tupple.Item2}:{tupple.Item1}");
                             //Console.WriteLine($"Got expired event for key   {tupple.Item2}:{tupple.Item1} 需要移除");
@@ -76,7 +81,7 @@ namespace HiSql
                     this.BroadCastSubScriber($"__keyevent@{options.Database}__:evicted", (rchannel, key) =>
                     {
                         var tupple = ParseRegionKey(key);
-                        if (tupple.Item3 != this.UniqueId)
+                        if (!tupple.Item3.IsNullOrEmpty() && tupple.Item3 != this.UniqueId)
                         {
                             _MemoryCache.RemoveCache($"{tupple.Item2}:{tupple.Item1}");
                             //Console.WriteLine($"Got evicted event for key   {tupple.Item2}:{tupple.Item1} 需要移除");
@@ -87,10 +92,10 @@ namespace HiSql
                     this.BroadCastSubScriber($"__keyevent@{options.Database}__:del", (rchannel, key) =>
                     {
                         var tupple = ParseRegionKey(key);
-                        if (tupple.Item3 != this.UniqueId)
+                        if (!tupple.Item3.IsNullOrEmpty() && tupple.Item3 != this.UniqueId)
                         {
                             _MemoryCache.RemoveCache($"{tupple.Item2}:{tupple.Item1}");
-                            Console.WriteLine($"Got del event for key   {tupple.Item2}:{tupple.Item1} 需要移除");
+                            //Console.WriteLine($"Got del event for key   {tupple.Item2}:{tupple.Item1} 需要移除");
                             return;
                         }
                         //Console.WriteLine($"Got del event for key   {tupple.Item2}:{tupple.Item1} 不需要移除");
@@ -106,10 +111,13 @@ namespace HiSql
             {
                 return Tuple.Create<string, string, string>(null, null, null);
             }
+            var unionId = string.Empty;
             var unionIdIndex = value.IndexOf(keySplitKey);
-            var unionId = value.Substring(unionIdIndex + keySplitKey.Length);
-
-            value = value.Substring(0, unionIdIndex);
+            if (unionIdIndex > 0)
+            {
+                unionId = value.Substring(unionIdIndex + keySplitKey.Length);
+                value = value.Substring(0, unionIdIndex);
+            }
 
             var sepIndex = value.IndexOf(':');
 
@@ -138,37 +146,33 @@ namespace HiSql
             return Tuple.Create(key, region, unionId);
         }
 
-        private string GetRegionKey(string key, string region = null)
+        private string GetRegionKey(string key)
         {
-            if (region == null)
-            {
-                region = _options.CacheRegion;
-            }
             if (string.IsNullOrWhiteSpace(key))
             {
                 throw new ArgumentNullException(nameof(key));
             }
-            if (key.StartsWith(region + ":"))
+            if (key.StartsWith(_options.CacheRegion + ":"))
                 return key;
 
-            if (!key.Contains(HiSql.Constants.NameSpace))
-                key = HiSql.Constants.NameSpace+":" + key;
+            //if (!key.Contains(HiSql.Constants.NameSpace))
+            //    key = HiSql.Constants.NameSpace + ":" + key;
 
-            if (_options.KeyspaceNotificationsEnabled && key.Contains(":"))
-            {
-                key = Base64Prefix + Convert.ToBase64String(Encoding.UTF8.GetBytes(key));
-            }
+            //if (_options.KeyspaceNotificationsEnabled && key.Contains(":"))
+            //{
+            //    key = Base64Prefix + Convert.ToBase64String(Encoding.UTF8.GetBytes(key));
+            //}
 
             var fullKey = key;
 
-            if (!string.IsNullOrWhiteSpace(region))
+            if (!string.IsNullOrWhiteSpace(_options.CacheRegion))
             {
-                if (_options.KeyspaceNotificationsEnabled && region.Contains(":"))
-                {
-                    region = Base64Prefix + Convert.ToBase64String(Encoding.UTF8.GetBytes(region));
-                }
+                //if (_options.KeyspaceNotificationsEnabled && region.Contains(":"))
+                //{
+                //    region = Base64Prefix + Convert.ToBase64String(Encoding.UTF8.GetBytes(region));
+                //}
 
-                fullKey = string.Concat(region, ":", key);
+                fullKey = string.Concat(_options.CacheRegion, ":", key);
             }
 
             return fullKey;
@@ -189,7 +193,7 @@ namespace HiSql
             }
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             if (_connectMulti != null)
             {
@@ -198,7 +202,7 @@ namespace HiSql
 
             }
         }
-        public void Clear()
+        public override void Clear()
         {
             if (_connectMulti != null)
             {
@@ -215,7 +219,7 @@ namespace HiSql
         }
 
 
-        public bool Exists(string key)
+        public override bool Exists(string key)
         {
             CheckRedis();
             key = GetRegionKey(key);
@@ -228,7 +232,7 @@ namespace HiSql
                 return _cache.KeyExists(key);
             }
         }
-        public string GetCache(string key)
+        public override string GetCache(string key)
         {
             CheckRedis();
             key = GetRegionKey(key);
@@ -261,7 +265,7 @@ namespace HiSql
             return obj;
         }
 
-        public T GetCache<T>(string key) where T : class
+        public override T GetCache<T>(string key) where T : class
         {
             CheckRedis();
             key = GetRegionKey(key);
@@ -297,15 +301,16 @@ namespace HiSql
             return value;
         }
 
-        public T GetOrCreate<T>(string key, Func<T> value) where T : class
+        public override T GetOrCreate<T>(string key, Func<T> value) where T : class
         {
-            return GetOrCreate<T>(key, value, _options.DefaultExpirySecond);
-
+            DateTimeOffset currdate = DateTimeOffset.Now;
+            int _seconds = int.Parse(DateTimeOffset.MaxValue.Subtract(currdate).TotalSeconds.ToString());
+            return GetOrCreate<T>(key, value, _seconds);
         }
 
         private string keySplitKey = "~@~@";
 
-        public int Count
+        public override int Count
         {
             get
             {
@@ -319,7 +324,7 @@ namespace HiSql
             return key += keySplitKey + this.UniqueId;
         }
 
-        public T GetOrCreate<T>(string key, Func<T> value, int second) where T : class
+        public override T GetOrCreate<T>(string key, Func<T> value, int second) where T : class
         {
             CheckRedis();
             key = GetRegionKey(key);
@@ -352,7 +357,7 @@ namespace HiSql
         /// <param name="value"></param>
         /// <param name="time">过期时间</param>
         /// <returns></returns>
-        public T GetOrCreate<T>(string key, Func<T> value, DateTimeOffset time) where T : class
+        public override T GetOrCreate<T>(string key, Func<T> value, DateTimeOffset time) where T : class
         {
             DateTimeOffset currdate = DateTimeOffset.Now;
             int _seconds = int.Parse(time.Subtract(currdate).TotalSeconds.ToString());
@@ -360,7 +365,7 @@ namespace HiSql
 
         }
 
-        public void RemoveCache(string key)
+        public override void RemoveCache(string key)
         {
             CheckRedis();
             var fullKey = GetRegionKey(key);
@@ -376,12 +381,12 @@ namespace HiSql
             }
         }
 
-        public void SetCache(string key, object value)
+        public override void SetCache(string key, object value)
         {
-            SetCache(key, value, _options.DefaultExpirySecond);
+            SetCache(key, value, -1);
         }
 
-        public void SetCache(string key, object value, DateTimeOffset expiressAbsoulte)
+        public override void SetCache(string key, object value, DateTimeOffset expiressAbsoulte)
         {
             DateTimeOffset currdate = DateTimeOffset.Now;
             int _seconds = int.Parse(expiressAbsoulte.Subtract(currdate).TotalSeconds.ToString());
@@ -391,23 +396,24 @@ namespace HiSql
             }
         }
 
-        public void SetCache(string key, object value, int second)
+        public override void SetCache(string key, object value, int second)
         {
             CheckRedis();
             var fullKey = GetRegionKey(key);
-            if (second > 0)
+            
+            string _value = JsonConvert.SerializeObject(value);
+            _cache.StringSet(fullKey, _value, second > 0 ?TimeSpan.FromSeconds(second):null);
+            if (!string.IsNullOrWhiteSpace(_options.CacheRegion))
             {
-                string _value = JsonConvert.SerializeObject(value);
-                _cache.StringSet(fullKey, _value, TimeSpan.FromSeconds(second));
-                if (!string.IsNullOrWhiteSpace(_options.CacheRegion))
-                {
-                    _cache.HashSet(_options.CacheRegion, fullKey, "regionKey", When.Always, CommandFlags.FireAndForget);
-                }
-                if (this._options.EnableMultiCache)
-                { //本地存储，并发布消息
+                _cache.HashSet(_options.CacheRegion, fullKey, "regionKey", When.Always, CommandFlags.FireAndForget);
+            }
+            if (this._options.EnableMultiCache)
+            { //本地存储，并发布消息
+                if (second > 0)
                     _MemoryCache.SetCache(fullKey, _value, DateTime.Now.Add(TimeSpan.FromSeconds(second)));
-                    this.PublishMessage(_cache_notity_channel_remove, GetRegionKeyForNotityKey(fullKey));
-                }
+                else
+                    _MemoryCache.SetCache(fullKey, _value);
+                this.PublishMessage(_cache_notity_channel_remove, GetRegionKeyForNotityKey(fullKey));
             }
         }
 
@@ -420,12 +426,9 @@ namespace HiSql
         public void BroadCastSubScriber(string channel, Action<string, string> handler = null)
         {
             CheckRedis();
-            channel = GetRegionKey(channel);
-
             _connectMulti.GetSubscriber().Subscribe(channel, (rchannel, message) =>
             {
                 var tupple = ParseRegionKey(message);
-
                 handler(rchannel, message.ToString());
             });
 
@@ -444,8 +447,6 @@ namespace HiSql
         public void QueueSubScriber(string channel, Action<string, string> handler = null)
         {
             CheckRedis();
-            channel = GetRegionKey(channel);
-
             _connectMulti.GetSubscriber().Subscribe(channel).OnMessage(message =>
             {
                 handler(channel, message.ToString());
@@ -461,7 +462,6 @@ namespace HiSql
         public long PublishMessage(string channel, string message)
         {
             CheckRedis();
-            channel = GetRegionKey(channel);
             return _connectMulti.GetSubscriber().Publish(channel, message);
         }
 
@@ -525,7 +525,7 @@ namespace HiSql
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
 
-        public bool UnLock(params string[] keys)
+        public override bool UnLock(params string[] keys)
         {
             CheckRedis();
             foreach (string key in keys)
@@ -539,7 +539,7 @@ namespace HiSql
             }
             return true;
         }
-        public bool HSet(string hashkey, string key, string value)
+        public override bool HSet(string hashkey, string key, string value)
         {
             CheckRedis();
 
@@ -554,7 +554,7 @@ namespace HiSql
 
         }
 
-        public bool HDel(string hashkey, string key)
+        public override bool HDel(string hashkey, string key)
         {
             CheckRedis();
             if (!hashkey.Contains(_hsetkeyPrefix))
@@ -566,7 +566,7 @@ namespace HiSql
             return _cache.HashDelete(hashkey, key, CommandFlags.FireAndForget);
         }
 
-        public string HGet(string hashkey, string key)
+        public override string HGet(string hashkey, string key)
         {
             CheckRedis();
             if (!hashkey.Contains(_hsetkeyPrefix))
@@ -580,7 +580,7 @@ namespace HiSql
         /// 获取当前锁信息
         /// </summary>
         /// <returns></returns>
-        public List<LckInfo> GetCurrLockInfo()
+        public override List<LckInfo> GetCurrLockInfo()
         {
             List<LckInfo> lckInfos = new List<LckInfo>();
             var hashkey = GetRegionKey(_lockhashname);
@@ -615,7 +615,7 @@ namespace HiSql
         /// 获取当前缓存历史表锁信息
         /// </summary>
         /// <returns></returns>
-        public List<LckInfo> GetHisLockInfo()
+        public override List<LckInfo> GetHisLockInfo()
         {
             List<LckInfo> lckInfos = new List<LckInfo>();
             var key = GetRegionKey(_lockhishashname);
@@ -644,7 +644,7 @@ namespace HiSql
         /// <param name="expresseconds"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public Tuple<bool, string> LockOn(string key, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
+        public override Tuple<bool, string> LockOn(string key, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
         {
             CheckRedis();
             if (!key.Contains(_lockkeyPrefix))
@@ -672,8 +672,7 @@ namespace HiSql
                     if (_success)
                     {
                         lckinfo = getLockInfo(lckinfo, expresseconds, 0);
-                        HSet(_lockhashname, key, JsonConvert.SerializeObject(lckinfo));
-                        HSet(_lockhishashname, $"{key}:{lckinfo.LockTime.ToString("yyyyMMddHHmmssfff")}", JsonConvert.SerializeObject(lckinfo));
+                        SaveLockInfo(key, lckinfo);
                     }
                     return _success;
                 }
@@ -708,7 +707,7 @@ namespace HiSql
             }
             return new Tuple<bool, string>(flag, msg);
         }
-        public Tuple<bool, string> LockOn(string[] keys, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
+        public override Tuple<bool, string> LockOn(string[] keys, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
         {
             Tuple<bool, string> tuple = new Tuple<bool, string>(false, "获取锁超时");
             Stopwatch stopwatch = Stopwatch.StartNew();
@@ -756,7 +755,7 @@ namespace HiSql
             {
 
                 _islock = true;
-                
+
                 string _lockinfo = HGet(_lockhashname, key);
                 if (!string.IsNullOrEmpty(_lockinfo))
                 {
@@ -775,7 +774,7 @@ namespace HiSql
 
         }
 
-        public Tuple<bool, string> CheckLock(params string[] keys)
+        public override Tuple<bool, string> CheckLock(params string[] keys)
         {
             foreach (var key in keys)
             {
@@ -796,7 +795,7 @@ namespace HiSql
         /// <param name="expresseconds">锁定持续时间</param>
         /// <param name="timeoutseconds">等待加锁时间</param>
         /// <returns></returns>
-        public Tuple<bool, string> LockOnExecute(string key, Action action, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
+        public override Tuple<bool, string> LockOnExecute(string key, Action action, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
         {
 
             CheckRedis();
@@ -834,8 +833,8 @@ namespace HiSql
                     if (_success)
                     {
                         lckinfo = getLockInfo(lckinfo, expresseconds, 0);
-                        HSet(_lockhashname, key, JsonConvert.SerializeObject(lckinfo));
-                        HSet(_lockhishashname, $"{key}:{lckinfo.LockTime.ToString("yyyyMMddHHmmssfff")}", JsonConvert.SerializeObject(lckinfo));
+
+                        SaveLockInfo(key, lckinfo);
                     }
                     return _success;
                 }
@@ -892,8 +891,8 @@ namespace HiSql
                         //续锁
                         _cache.StringSet(key, 1, TimeSpan.FromSeconds(expresseconds));
                         lckinfo = getLockInfo(lckinfo, expresseconds, _timesa);
-                        HSet(_lockhashname, key, JsonConvert.SerializeObject(lckinfo));
-                        HSet(_lockhishashname, $"{key}:{lckinfo.LockTime.ToString("yyyyMMddHHmmssfff")}", JsonConvert.SerializeObject(lckinfo));
+                        SaveLockInfo(key, lckinfo);
+
                         flag = workTask.Wait(expresseconds * _millsecond, cancellationToken);
                         if (flag)
                         {
@@ -913,7 +912,9 @@ namespace HiSql
             return new Tuple<bool, string>(flag, msg);
         }
 
-        public Tuple<bool, string> LockOnExecute(string[] keys, Action action, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
+
+
+        public override Tuple<bool, string> LockOnExecute(string[] keys, Action action, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
         {
             CheckRedis();
             int _max_second = 60;//最长定锁有效期
@@ -968,7 +969,7 @@ namespace HiSql
 
                 if (flag)
                 {
-                    
+
                     msg = $"key:[{keys}]锁定并操作业务成功!锁已自动释放";
                 }
 
@@ -999,8 +1000,8 @@ namespace HiSql
 
                             _cache.StringSet(newKey, 1, TimeSpan.FromSeconds(expresseconds));
                             lckinfo = getLockInfo(lckinfo, expresseconds, _timesa);
-                            HSet(_lockhashname, newKey, JsonConvert.SerializeObject(lckinfo));
-                            HSet(_lockhishashname, $"{newKey}:{lckinfo.LockTime.ToString("yyyyMMddHHmmssfff")}", JsonConvert.SerializeObject(lckinfo));
+                            SaveLockInfo(newKey, lckinfo);
+
                         }
                         flag = workTask.Wait(expresseconds * _millsecond, cancellationToken);
                         if (flag)

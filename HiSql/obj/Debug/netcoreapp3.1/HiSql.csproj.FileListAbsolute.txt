@@ -7,4 +7,3 @@ D:\Project\OpenSource\HiSql\HiSql\obj\Debug\netcoreapp3.1\HiSql.AssemblyInfo.cs
 D:\Project\OpenSource\HiSql\HiSql\obj\Debug\netcoreapp3.1\HiSql.csproj.CoreCompileInputs.cache
 D:\Project\OpenSource\HiSql\HiSql\obj\Debug\netcoreapp3.1\HiSql.dll
 D:\Project\OpenSource\HiSql\HiSql\obj\Debug\netcoreapp3.1\HiSql.pdb
-D:\Project\OpenSource\HiSql\HiSql\obj\Debug\netcoreapp3.1\HiSql.csproj.AssemblyReference.cache

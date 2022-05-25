@@ -14,4 +14,3 @@ D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\net5.0\HiSql.PostGreSql.c
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\net5.0\HiSql.PostGreSql.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\net5.0\ref\HiSql.PostGreSql.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\net5.0\HiSql.PostGreSql.pdb
-D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\net5.0\HiSql.PostGreSql.csproj.AssemblyReference.cache

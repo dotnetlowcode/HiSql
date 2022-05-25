@@ -11,8 +11,9 @@ namespace HiSql.UnitTest
 
         public static HiSqlClient GetSqlClient()
         {
-            
 
+            Global.RedisOn = true;
+            Global.RedisOptions = new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "", CacheRegion = "", Database = 3, EnableMultiCache = false, KeyspaceNotificationsEnabled = false };
             HiSqlClient sqlclient = new HiSqlClient(
                      new ConnectionConfig()
                      {
