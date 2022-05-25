@@ -32,9 +32,49 @@
 
  目前流行的ORM框架如果需要动态的拼接查询语句，只能用原生的sql进行拼接，无法跨不同数据库执行。hisql推出新的语法一套语句可以在不同的数据库执行
 
-传统ORM框架最大的弊端就是完全要依赖于实体用lambda表达式写查询语句，但最大的问题就是如果业务场景需要动态拼接条件时只能又切换到原生数据库的sql语句进行完成，如果自行拼接开发人员还要解决防注入的问题,hisql 刚才完美的解决这些问题,Hisql底层已经对sql注入进行了
+传统ORM框架最大的弊端就是完全要依赖于实体用lambda表达式写查询语句，但最大的问题就是如果业务场景需要动态拼接条件时只能又切换到原生数据库的sql语句进行完成，如果自行拼接开发人员还要解决防注入的问题,hisql 刚才完美的解决这些问题,Hisql底层已经对sql注入进行了处理，开发人员只要关注于业务开发
+### 2022.5.25 新增锁定成功事件通知，可用于锁信息外部存储
 
-处理，开发人员只要关注于业务开发
+```c#
+    HiSql.BaseCache rCache = new RCache(new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "",  Database = 3});
+    rCache.IsSaveLockHis = true;
+    rCache.OnLockedSuccess += (object sender, LockItemSuccessEventArgs e) => {
+        Console.WriteLine($"锁定成功事件：key{e.Key} info:{ JsonConvert.SerializeObject(e.LckInfo)}");
+    };
+
+```
+
+### 2022.5.23 新增雪花ID生成方法
+
+雪花ID引擎每微秒理论可生成4096个不重复ID,
+
+IdSnow引擎性能实测生成10000个ID耗时`0.00623`秒
+IdWorker引擎性能实测生成10000个ID耗时`0.01364 `秒
+
+
+
+```c#
+    //指定雪花ID生成引擎(IdWorker和IdSnow) 默认是IdSnow
+    Snowflake.SnowType = SnowType.IdSnow;
+
+    //指定机器码（0-31)之间 默认是0
+    Snowflake.WorkerId = 0;
+
+    List<long> lst=new List<long>();
+    Stopwatch sw = new Stopwatch();
+    sw.Start();
+    for (int i = 0; i < 10000; i++)
+    {
+        lst.Add(Snowflake.NextId());
+       
+    }
+    sw.Stop();
+    Console.WriteLine($"耗时：{sw.Elapsed}秒");
+
+```
+
+
+
 
 ### 2022.5.20 业务锁使用方法
 

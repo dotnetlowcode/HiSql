@@ -26,9 +26,9 @@ namespace HiSql
         }
         public static void Init(HiSqlClient sqlClient)
         {
-            //Delete_Demo(sqlClient);
+            Delete_Demo(sqlClient);
             //Delete_Demo2(sqlClient);
-            Drop_Demo(sqlClient);
+            //Drop_Demo(sqlClient);
         }
 
         static void Drop_Demo(HiSqlClient sqlClient)
@@ -52,6 +52,9 @@ namespace HiSql
         {
 
             Dictionary<string, string> _dic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "HID", "1" }  };
+
+            IDelete where_del = sqlClient.Delete("H_Test", new { Id = "1", UNAME="tansar" });
+            string _where_sql2 = where_del.ToSql();
 
             IDelete where_delete = sqlClient.Delete("H_Test", new { Hid = 1 }).Where("HID=1");
             string _where_sql = where_delete.ToSql();

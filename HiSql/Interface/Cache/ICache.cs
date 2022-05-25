@@ -1,14 +1,10 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 
 namespace HiSql
 {
     public interface ICache:ILock
     {
+       
         /// <summary>
         /// 判断一个key在缓存中在不在
         /// </summary>

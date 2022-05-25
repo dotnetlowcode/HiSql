@@ -762,6 +762,8 @@ namespace HiSql
                                     else
                                         throw new Exception($"行[{_rowidx}] 字段[{hiColumn.FieldName}] 为自增长字段 不需要外部赋值");
                                 }
+                                else if (hiColumn.IsIdentity)
+                                    continue;
                                 #endregion
 
                                 if (_o.ContainsKey(hiColumn.FieldName))
@@ -873,9 +875,11 @@ namespace HiSql
                                     else
                                         throw new Exception($"行[{_rowidx}] 字段[{hiColumn.FieldName}] 为自增长字段 不需要外部赋值");
                                 }
+                                else if (hiColumn.IsIdentity)
+                                    continue;
                                 #endregion
 
-                                if (_o.ContainsKey(hiColumn.FieldName) || _o.ContainsKey(hiColumn.FieldName.ToLower()))
+                                    if (_o.ContainsKey(hiColumn.FieldName) || _o.ContainsKey(hiColumn.FieldName.ToLower()))
                                 {
                                     _value = _o[hiColumn.FieldName].ToString();
 
@@ -952,9 +956,13 @@ namespace HiSql
                                 else
                                     throw new Exception($"行[{_rowidx}] 字段[{hiColumn.FieldName}] 为自增长字段 不需要外部赋值");
                             }
-                            #endregion
+                            else if (hiColumn.IsIdentity)
+                            {
+                                continue;
+                            }
+                                #endregion
 
-                            if (objprop != null && objprop.GetValue(objdata) != null)
+                                if (objprop != null && objprop.GetValue(objdata) != null)
                             {
                                 #region 将值转成string 及特殊处理
                                 if (hiColumn.FieldType.IsIn<HiType>(HiType.DATE, HiType.DATETIME))
@@ -1469,7 +1477,7 @@ namespace HiSql
                             //中文按1个字符计算
                             //_value = "test";
                             _value = _dic[hiColumn.FieldName].ToString();
-                            if (_value.Length > hiColumn.FieldLen)
+                            if (_value.Length > hiColumn.FieldLen && hiColumn.FieldLen>0)
                             {
                                 throw new Exception($"字段[{hiColumn.FieldName}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
                             }
@@ -1487,7 +1495,7 @@ namespace HiSql
                             //中文按两个字符计算
                             _value = _dic[hiColumn.FieldName].ToString();
                             //_value = "test";
-                            if (_value.LengthZH() > hiColumn.FieldLen)
+                            if (_value.LengthZH() > hiColumn.FieldLen && hiColumn.FieldLen>0)
                             {
                                 throw new Exception($"字段[{hiColumn.FieldName}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
                             }

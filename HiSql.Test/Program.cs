@@ -332,21 +332,22 @@ namespace HiSql.Test
             //  var rel3 = System.Threading.Monitor.TryEnter(lockObj);
             //var rel =  System.Threading.Monitor.TryEnter(lockObj);
             HiSql.RCache rCache = null;// new MCache();
-            var rCacheOptions = new RedisOptions { Host = "192.168.10.130", Port = 8379, PassWord = "", CacheRegion = "HRM", Database = 6 };
-            rCacheOptions = new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "", CacheRegion = "HRM", Database = 2, EnableMultiCache = false, KeyspaceNotificationsEnabled = false };
+            var rCacheOptions = new RedisOptions { Host = "192.168.10.130", Port = 8379, PassWord = "",  Database = 6 };
+            rCacheOptions = new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "", Database = 3, EnableMultiCache = true, KeyspaceNotificationsEnabled = true };
             rCache = new RCache(rCacheOptions);
+            var aa = new MCache(rCacheOptions.CacheRegion);
 
             {
                 ///后台线程输出锁的信息
-                //Task.Run(() =>
-                //{
-                //    while (true)
-                //    {
-                //        Console.WriteLine($"总缓存数：" + rCache.Count);
+                Task.Run(() =>
+                {
+                    while (true)
+                    {
+                        Console.WriteLine($"总缓存数：" + rCache.Count);
 
-                //        SpinWait.SpinUntil(() => false, 1000);
-                //    }
-                //});
+                        SpinWait.SpinUntil(() => false, 1000);
+                    }
+                });
 
 
             }
@@ -361,17 +362,19 @@ namespace HiSql.Test
                 {
                     list.Add("asdfasdfasdf");
                 }
-                rCache.SetCache("test1", list);
-                rCache.SetCache("test2", list);
+                rCache.SetCache("SetCache_test1", list);
+                rCache.SetCache("SetCache_test2", list);
+
                 Stopwatch sw = Stopwatch.StartNew();
                 sw.Start();
                 Parallel.For(0, 10000, (x, y) =>
                 {
-                    rCache.GetCache("test1");
-                    rCache.GetCache("test2");
+                    rCache.GetCache("SetCache_test1");
+                    rCache.GetCache("SetCache_test2");
                 });
                 Console.WriteLine($"测试多级缓存性能：" + sw.ElapsedMilliseconds);
 
+                
                 return;
 
                 ///测试多级缓存
@@ -471,26 +474,30 @@ namespace HiSql.Test
 
             }
         }
+
+       
+
         private static readonly object lockObj = new object();
         /// <summary>
         /// 测试 redis lock 
         /// </summary>
         static void LockTest()
         {
+            
             {
                 //  var rel3 = System.Threading.Monitor.TryEnter(lockObj);
                 //var rel =  System.Threading.Monitor.TryEnter(lockObj);
-                HiSql.ICache rCache = new MCache(null);
-
-                //rCache = new RCache(new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "", CacheRegion = "HRM", Database = 2, EnableMultiCache = false, KeyspaceNotificationsEnabled = false });
-
-
+                HiSql.BaseCache rCache = new RCache(new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "",  Database = 3, EnableMultiCache = false, KeyspaceNotificationsEnabled = false });
+                rCache.IsSaveLockHis = true;
+                rCache.OnLockedSuccess += (object sender, LockItemSuccessEventArgs e) =>
+                {
+                    Console.WriteLine($"锁定成功事件：key{e.Key} info:{ JsonConvert.SerializeObject(e.LckInfo)}");
+                };
                 int coujnt = 0;
-                string _key = "491524444";
-                var _key2 = "test2";
-                var _key3 = "test3";
+                var _lockkey2 = "lockkey_test488";
+                var _lockkey3 = "lockkey_test4884";
 
-                rCache.HSet(_key, _key2, _key3);
+                rCache.HSet("HSetHashKey", "keytest21", "asfasdf");
 
                 ///后台线程输出锁的信息
                 Task.Run(() =>
@@ -508,26 +515,27 @@ namespace HiSql.Test
 
                 });
                 int threadId = 0;
-                //{
-                //    Tuple<bool, string> rtn = rCache.LockOn(new string[] { _key3, _key }, new LckInfo { UName = "tansar", EventName = "Program", Ip = "127.0.0.1" }, 2000);
-                //    threadId = Thread.CurrentThread.ManagedThreadId;
-                //    SpinWait.SpinUntil(() => false, 4000);
-                //    Console.WriteLine(rtn.Item2 + " _ " + Thread.CurrentThread.ManagedThreadId);
-                //    rCache.UnLock(new string[] { _key3, _key });
-                //}
+                {
+                    Tuple<bool, string> rtn = rCache.LockOn(new string[] { _lockkey2, _lockkey3 }, new LckInfo { UName = "tansar",
+                        EventName = "Program", Ip = "127.0.0.1" }, 2000);
+                    threadId = Thread.CurrentThread.ManagedThreadId;
+                   // SpinWait.SpinUntil(() => false, 4000);
+                    Console.WriteLine(rtn.Item2 + " _ " + Thread.CurrentThread.ManagedThreadId);
+                    rCache.UnLock(new string[] { _lockkey2, _lockkey3 });
+                }
                 //SpinWait.SpinUntil(() => false, 4000);
-                //return;
+                return;
 
-              
+
 
                 //加锁，模拟所过期
                 {
                     //Task.Run(() =>
                     //{
-                        var t = rCache.CheckLock(_key3, _key);
+                        var t = rCache.CheckLock(_lockkey2, _lockkey3);
                         //t.Item1
                         // 加锁 执行耗时的动作
-                        Tuple<bool, string> rtn = rCache.LockOnExecute(new string[] { _key3,_key }, () =>
+                        Tuple<bool, string> rtn = rCache.LockOnExecute(new string[] { _lockkey2, _lockkey3 }, () =>
                         {
                             try
                             {
@@ -555,7 +563,7 @@ namespace HiSql.Test
                     while (!islockok)
                     {
                         // 加锁 执行耗时的动作
-                        Tuple<bool, string> rtn = rCache.LockOnExecute(_key3, () =>
+                        Tuple<bool, string> rtn = rCache.LockOnExecute( _lockkey3, () =>
                         {
                             try
                             {
@@ -582,7 +590,7 @@ namespace HiSql.Test
                     {
                         // return;
                     }
-                    Tuple<bool, string> rtn = rCache.LockOn(_key + "_" + x, new LckInfo { UName = "tansar", EventName = "Program", Ip = "127.0.0.1" }, 20);
+                    Tuple<bool, string> rtn = rCache.LockOn(_lockkey2 + "_" + x, new LckInfo { UName = "tansar", EventName = "Program", Ip = "127.0.0.1" }, 20);
                     Console.WriteLine(rtn.Item2 + " _ " + Thread.CurrentThread.ManagedThreadId);
                     if (rtn.Item1)
                     {
@@ -616,7 +624,7 @@ namespace HiSql.Test
                 ;
                 Parallel.For(0, 2, (x, y) =>
                 {
-                    Tuple<bool, string> rtn = rCache.LockOn(_key, new LckInfo { UName = "tansar", EventName = "Program", Ip = "127.0.0.1" });
+                    Tuple<bool, string> rtn = rCache.LockOn( _lockkey3, new LckInfo { UName = "tansar", EventName = "Program", Ip = "127.0.0.1" });
                     Console.WriteLine(rtn.Item2 + Thread.CurrentThread.ManagedThreadId);
                     if (rtn.Item1)
                     {
@@ -626,7 +634,7 @@ namespace HiSql.Test
                         //Console.WriteLine(_rtn.Item2);
 
 
-                        bool unlck = rCache.UnLock(_key);
+                        bool unlck = rCache.UnLock(_lockkey3);
 
                         //if (unlck)
                         //    Console.WriteLine($"解锁成功");
@@ -706,10 +714,19 @@ namespace HiSql.Test
             //Console.WriteLine( rCache.ListLastPop("qlist"));
         }
 
+        private static void RCache_OnLockedSuccess(object sender, LockItemSuccessEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
         static void Main(string[] args)
         {
+
+            Console.WriteLine(DateTimeOffset.MaxValue);
             CacheTest();
-            //LockTest();
+            LockTest();
+
+        Console.ReadLine();
             return;
 
             //string _regs = "(?<=\\d)(?=(?:\\d{3})+(?!\\d))";

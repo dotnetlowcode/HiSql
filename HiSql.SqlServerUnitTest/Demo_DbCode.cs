@@ -42,11 +42,38 @@ namespace HiSql
             //Global.RedisOn = true;
             //Global.RedisOptions = new RedisOptions() { Host = "192.168.10.130", Port = 8379, PassWord = "", Database = 1 }; //rCache = new RCache(new RedisOptions { Host = "192.168.10.130", Port=8379, PassWord = "" , Database = 1});
             //Global.RedisOptions = new RedisOptions() { Host = "172.16.80.178", PassWord = "pwd123", Database = 1 };
-            Parallel.For(0, 10, (x, y) => {
-                HiSqlClient sqlClient = Demo_Init.GetSqlClient();
-                TabInfo tableInfo = sqlClient.Context.DMInitalize.GetTabStruct("Hi_Test23");
-                Console.WriteLine($"创建成功：字段数："+ tableInfo.Columns.Count);
-            });
+
+            HiSqlClient sqlClient = Demo_Init.GetSqlClient();
+            TabInfo tabInfo = sqlClient.Context.DMInitalize.GetTabStruct("Hi_FieldModel");
+            tabInfo = sqlClient.Context.DMInitalize.GetTabStruct("Hi_TabModel");
+
+            TabInfo tableInfo = sqlClient.Context.DMInitalize.GetTabStruct("Hi_Test23");
+
+            {
+                string _key = "Lock.LockOn4900001223";
+                //LckInfo 是指加锁时需要指定的信息  UName 表示加锁人，ip表示在哪一个地址加的锁，可以通过 HiSql.Lock.GetCurrLockInfo  获取所有的详细加锁信息便于后台管理
+                var rtn = HiSql.Lock.LockOn(_key, new LckInfo { UName = "登陆名", Ip = "127.0.0.1" });
+
+                HiSql.Lock.LockOn("Lock.LockOn4test", new LckInfo { UName = "登陆名", Ip = "127.0.0.1" });
+                if (rtn.Item1)
+                {
+                    Console.WriteLine($"针对于采购订单[{_key}] 加锁成功");
+                    //执行采购订单处理业务
+
+                    //解锁
+                    //HiSql.Lock.UnLock(_key);
+                }
+
+                //同时加锁多个key 如果有一个key被其它任务加锁那么 锁定失败
+                var rtn2 = HiSql.Lock.LockOn(new string[] { "4900001223", "4900001224" }, new LckInfo { UName = "登陆名", Ip = "127.0.0.1" });
+
+            }
+
+            //Parallel.For(0, 10, (x, y) => {
+            //    HiSqlClient sqlClient = Demo_Init.GetSqlClient();
+            //    TabInfo tableInfo = sqlClient.Context.DMInitalize.GetTabStruct("Hi_Test23");
+            //    Console.WriteLine($"创建成功：字段数："+ tableInfo.Columns.Count);
+            //});
 
         }
 
