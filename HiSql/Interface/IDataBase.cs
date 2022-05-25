@@ -80,6 +80,7 @@ namespace HiSql
 
         IDataReader GetDataReader(string sql, params HiParameter[] parameters);
 
+
         /// <summary>
         /// 返回映射好的DataTable(标参)
         /// </summary>
