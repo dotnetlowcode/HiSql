@@ -27,6 +27,7 @@ namespace HiSql
 
         static int _workerid = 0;
 
+        static object lckObj = new object();
 
         static SnowType snowType=SnowType.IdSnow;
 
@@ -92,10 +93,16 @@ namespace HiSql
         /// <returns></returns>
         public static long NextId()
         {
-            if (idGenerate == null)
-                idGenerate = getIdGenerate();
+            lock (lckObj)
+            {
+                if (idGenerate == null)
+                    idGenerate = getIdGenerate();
 
-            return idGenerate.NextId();
+                return idGenerate.NextId();
+
+            }
+
+            
         }
     }
 }
