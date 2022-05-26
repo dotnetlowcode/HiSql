@@ -677,6 +677,7 @@ namespace HiSql
         }
         public override bool UnLock(params string[] keys)
         {
+            if (keys.Length == 0) return true;
             foreach (string key in keys)
             {
                 var newkey = key;

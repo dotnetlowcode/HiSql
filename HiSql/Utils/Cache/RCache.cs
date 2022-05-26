@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace HiSql
     /// </summary>
     public class RCache : BaseCache,IRedis
     {
+        
         private readonly string UniqueId = Guid.NewGuid().ToString();
         private StackExchange.Redis.IDatabase _cache;
         private ConnectionMultiplexer _connectMulti;
@@ -527,6 +529,7 @@ namespace HiSql
 
         public override bool UnLock(params string[] keys)
         {
+            if (keys.Length == 0) return true;
             CheckRedis();
             foreach (string key in keys)
             {

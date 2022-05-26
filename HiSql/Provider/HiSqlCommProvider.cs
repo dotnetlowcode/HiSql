@@ -41,22 +41,26 @@ namespace HiSql
         public static TabInfo InitTabMaping(string tabname, Func<TabInfo> GetInfo)
         {
             string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", tabname);
-            TabInfo tableInfo = null;
+            TabInfo tableInfo = null; 
+            bool locked = false;
             try
             {
                 tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
+               
                 if (tableInfo == null)
                 {
                     var lockinfo = CacheContext.MCache.LockOn(_keyname, new LckInfo() { UName = "hisql", EventName = "InitTabMaping" }, 60, 60);
                     if (lockinfo.Item1) //加锁成功
                     {
-                        tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
+                        locked = true;
+                         tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
                         if (tableInfo == null)
                         {
                             tableInfo = GetInfo();
                             CacheContext.MCache.SetCache(_keyname, tableInfo);
                         }
-                        CacheContext.MCache.UnLock(_keyname);
+                        CacheContext.MCache.UnLock(_keyname); 
+                        locked = false;
                     }
                     else
                     {
@@ -65,7 +69,6 @@ namespace HiSql
                         {
                             throw new Exception("InitTabMaping获取表结构信息因为未获取到独占锁，无法创建并获取表信息");
                         }
-
                     }
                 }
             }
@@ -74,7 +77,8 @@ namespace HiSql
                 tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
             }
             finally {
-                CacheContext.MCache.UnLock(_keyname);
+                if (locked) { CacheContext.MCache.UnLock(_keyname); }
+                
             }
             if (tableInfo != null)
             {
