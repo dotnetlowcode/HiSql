@@ -20,6 +20,15 @@ namespace HiSql
         {
             get => MCache;
         }
+        public static void Reset()
+        {
+            if (_cache != null)
+            {
+                _cache.Clear();
+                _cache = null;
+            }
+        }
+
 
         public static ICache MCache
         {
