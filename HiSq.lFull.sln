@@ -33,9 +33,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HiSql.SqlServer.Test", "HiS
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HiSql.Extension", "HiSql.Extension", "{045DC594-A170-4FC0-8539-B497334BBF34}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HiSql.Excel", "HiSql.Extension\HiSql.Excel\HiSql.Excel.csproj", "{53209EF7-0829-4C01-88CB-B1F90114401F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HiSql.Excel", "HiSql.Extension\HiSql.Excel\HiSql.Excel.csproj", "{53209EF7-0829-4C01-88CB-B1F90114401F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HiSql.Excel.Test", "HiSql.Extension\HiSql.Excel.Demo\HiSql.Excel.Test.csproj", "{14ABDDEA-33D2-4E43-90F7-4EB9CCE3E07F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HiSql.Excel.Test", "HiSql.Extension\HiSql.Excel.Demo\HiSql.Excel.Test.csproj", "{14ABDDEA-33D2-4E43-90F7-4EB9CCE3E07F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HiSql.DaMeng", "HiSql.DaMeng\HiSql.DaMeng.csproj", "{073266E8-9C20-4774-88B9-3F1028B148ED}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HiSql.DaMengUnitTest", "HiSql.DaMengUnitTest\HiSql.DaMengUnitTest.csproj", "{5A438067-0E7A-4BCC-ADDF-FF2489B2BADE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -107,6 +111,14 @@ Global
 		{14ABDDEA-33D2-4E43-90F7-4EB9CCE3E07F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{14ABDDEA-33D2-4E43-90F7-4EB9CCE3E07F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{14ABDDEA-33D2-4E43-90F7-4EB9CCE3E07F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{073266E8-9C20-4774-88B9-3F1028B148ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{073266E8-9C20-4774-88B9-3F1028B148ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{073266E8-9C20-4774-88B9-3F1028B148ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{073266E8-9C20-4774-88B9-3F1028B148ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A438067-0E7A-4BCC-ADDF-FF2489B2BADE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A438067-0E7A-4BCC-ADDF-FF2489B2BADE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A438067-0E7A-4BCC-ADDF-FF2489B2BADE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A438067-0E7A-4BCC-ADDF-FF2489B2BADE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
