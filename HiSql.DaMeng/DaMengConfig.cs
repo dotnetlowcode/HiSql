@@ -530,8 +530,8 @@ namespace HiSql
                 .AppendLine($"  v_number2 integer;")
                 .AppendLine("   v_secout integer;")
                 .AppendLine($"begin")
-                .AppendLine($"   select count(*)  into v_number  from user_tables  where  table_name=upper('[$TabName$]');")
-                .AppendLine($"   select count(*)  into v_number2  from user_views  where  view_name=upper('[$TabName$]');")
+                .AppendLine($"   select count(*)  into v_number  from SYS.ALL_tables  where  table_name='[$TabName$]';")
+                .AppendLine($"   select count(*)  into v_number2  from SYS.all_views  where  view_name='[$TabName$]';")
                 .AppendLine($"   IF v_number = 0  and v_number2=0 then")
                 .AppendLine($"      execute immediate  'create table [$TabName$]('")
                 .AppendLine("           [$Fields$]")
@@ -564,7 +564,7 @@ namespace HiSql
                 .AppendLine($"  v_number integer;")
                 .AppendLine("   v_secout integer;")
                 .AppendLine($"begin")
-                .AppendLine($"   select count(*)  into v_number  from user_tables  where  table_name='[$TabName$]' AND TEMPORARY='Y';")
+                .AppendLine($"   select count(*)  into v_number  from SYS.ALL_tables  where  table_name='[$TabName$]' AND TEMPORARY='Y';")
                 .AppendLine($"   IF v_number = 0 then")
 
                 .AppendLine($"      [$Sequence$]")
@@ -583,7 +583,7 @@ namespace HiSql
                 .AppendLine($"  v_number integer;")
                 .AppendLine("   v_secout integer;")
                 .AppendLine($"begin")
-                .AppendLine($"   select count(*)  into v_number  from user_tables  where table_name='[$TabName$]' AND TEMPORARY='Y';")
+                .AppendLine($"   select count(*)  into v_number  from SYS.ALL_tables  where table_name='[$TabName$]' AND TEMPORARY='Y';")
                 .AppendLine($"   IF v_number > 0 then")
                 .AppendLine($"      execute immediate 'TRUNCATE TABLE [$TabName$] ';")
                 .AppendLine($"      execute immediate 'drop table [$TabName$] ';")
@@ -606,7 +606,7 @@ namespace HiSql
                 .AppendLine($"  v_number integer;")
                 .AppendLine("   v_secout integer;")
                 .AppendLine($"begin")
-                .AppendLine($"   select count(*)  into v_number  from user_tables  where  table_name='[$TabName$]' AND TEMPORARY='Y';")
+                .AppendLine($"   select count(*)  into v_number  from SYS.ALL_tables  where  table_name='[$TabName$]' AND TEMPORARY='Y';")
                 .AppendLine($"   IF v_number = 0 then")
 
                 .AppendLine($"      [$Sequence$]")
@@ -625,7 +625,7 @@ namespace HiSql
                 .AppendLine($"  v_number integer;")
                 .AppendLine("   v_secout integer;")
                 .AppendLine($"begin")
-                .AppendLine($"   select count(*)  into v_number  from user_tables  where  table_name='[$TabName$]' AND TEMPORARY='Y';")
+                .AppendLine($"   select count(*)  into v_number  from SYS.ALL_tables  where  table_name='[$TabName$]' AND TEMPORARY='Y';")
                 .AppendLine($"   IF v_number > 0 then")
                 .AppendLine($"      execute immediate 'TRUNCATE TABLE [$TabName$] ';")
                 .AppendLine($"      execute immediate 'drop table [$TabName$] ';")
@@ -707,8 +707,8 @@ UNION ALL
             _temp_get_table_schema = new StringBuilder()
                 .AppendLine("SELECT ")
                 .AppendLine("	case")
-                .AppendLine("	    when (select count(*) from user_tables  where  table_name=T1.TABLE_NAME) = 1 then 'Table'")
-                .AppendLine("	    when (select count(*) from user_views  where  view_name=T1.TABLE_NAME) = 1 then 'View' ")
+                .AppendLine("	    when (select count(*) from SYS.ALL_tables  where  table_name=T1.TABLE_NAME) = 1 then 'Table'")
+                .AppendLine("	    when (select count(*) from SYS.all_views  where  view_name=T1.TABLE_NAME) = 1 then 'View' ")
                 .AppendLine("	end as \"TabType\", ")
                 .AppendLine("	T1.TABLE_NAME as \"TabName\",")
                 .AppendLine("	T1.COLUMN_ID AS \"FieldNo\", ")
@@ -801,17 +801,17 @@ UNION ALL
             //获取当前库所有的表
             _temp_gettables = new StringBuilder()
                 .AppendLine("select * from ( ")
-                 .AppendLine(@"select table_name as ""TabName"", 'Table' AS ""TabType"",  to_char(cast(LAST_ANALYZED as DATE),'yyyy-mm-dd hh24:mi:ss') as ""CreateTime"" from SYS.user_tables where TABLESPACE_NAME ='[$Schema$]' and table_name not like '/%' [$Where$]")
+                 .AppendLine(@"select table_name as ""TabName"", 'Table' AS ""TabType"",  to_char(cast(LAST_ANALYZED as DATE),'yyyy-mm-dd hh24:mi:ss') as ""CreateTime"" from SYS.all_tables where OWNER ='[$Schema$]' and table_name not like '#%' [$Where$]")
 
                 .AppendLine(") temp")
                 .AppendLine("ORDER BY \"TabName\" ASC, \"CreateTime\" desc ")
                 .ToString();
 
-            _temp_gettables_pagingcount = "select count(*) from SYS.user_tables where TABLESPACE_NAME ='[$Schema$]' and table_name not like '/%' [$Where$]";
+            _temp_gettables_pagingcount = "select count(*) from SYS.all_tables where OWNER ='[$Schema$]' and table_name not like '#%' [$Where$]";
             _temp_gettables_paging = new StringBuilder()
                 .AppendLine("select * from ( ")
                  .AppendLine(@"select ROW_NUMBER()OVER( order by table_name ASC) as row_seq , table_name as ""TabName"", 'Table' AS ""TabType"",  to_char(cast(LAST_ANALYZED as DATE),'yyyy-mm-dd hh24:mi:ss') as ""CreateTime"" 
-            from SYS.user_tables where TABLESPACE_NAME ='[$Schema$]' and table_name not like '/%' [$Where$]")
+            from SYS.SYS.ALL_tables where OWNER ='[$Schema$]' and table_name not like '#%' [$Where$]")
                 .AppendLine(") temp  WHERE row_seq > [$SeqBegin$] AND row_seq <=[$SeqEnd$] ")
                .AppendLine(@"  order by row_seq")
                 .ToString();
@@ -819,17 +819,17 @@ UNION ALL
 
             _temp_getviews = new StringBuilder()
              .AppendLine("select * from ( ")
-                 .AppendLine(@"select VIEW_NAME as ""TabName"", 'View' AS ""TabType"",  '' as ""CreateTime"" from SYS.user_views where 1=1 [$Where$]  ")
+                 .AppendLine(@"select VIEW_NAME as ""TabName"", 'View' AS ""TabType"",  '' as ""CreateTime"" from SYS.all_views where OWNER ='[$Schema$]'  [$Where$]  ")
 
                 .AppendLine(") temp")
                 .AppendLine("ORDER BY \"TabName\" ASC, \"CreateTime\" desc ")
                 .ToString();
 
-            _temp_getviews_pagingcount = "select count(*) from SYS.user_views where 1=1 [$Where$] ";
+            _temp_getviews_pagingcount = "select count(*) from SYS.all_views where OWNER ='[$Schema$]' [$Where$] ";
             _temp_getviews_paging = new StringBuilder()
                 .AppendLine("select * from ( ")
                  .AppendLine(@"select ROW_NUMBER()OVER( order by VIEW_NAME ASC) as row_seq , VIEW_NAME as ""TabName"", 'View' AS ""TabType"",  '' as ""CreateTime"" 
-            from SYS.user_views where 1=1 [$Where$] ")
+            from SYS.all_views where OWNER ='[$Schema$]' [$Where$] ")
                 .AppendLine(") temp  WHERE row_seq > [$SeqBegin$] AND row_seq <=[$SeqEnd$] ")
                .AppendLine(@"  order by row_seq")
                 .ToString();
@@ -838,9 +838,9 @@ UNION ALL
 
             _temp_getalltables = new StringBuilder()
                .AppendLine("select * from ( ")
-                .AppendLine(@"select table_name as ""TabName"", 'Table' AS ""TabType"",  to_char(cast(LAST_ANALYZED as DATE),'yyyy-mm-dd hh24:mi:ss') as ""CreateTime"" from SYS.user_tables where TABLESPACE_NAME ='[$Schema$]' and table_name not like '/%' ")
+                .AppendLine(@"select table_name as ""TabName"", 'Table' AS ""TabType"",  to_char(cast(LAST_ANALYZED as DATE),'yyyy-mm-dd hh24:mi:ss') as ""CreateTime"" from SYS.all_tables where OWNER ='[$Schema$]' and table_name not like '#%' ")
                 .AppendLine("union all")
-                .AppendLine(@"select VIEW_NAME as ""TabName"", 'View' AS ""TabType"",  '' as ""CreateTime"" from SYS.user_views  ")
+                .AppendLine(@"select VIEW_NAME as ""TabName"", 'View' AS ""TabType"",  '' as ""CreateTime"" from SYS.all_views where OWNER ='[$Schema$]'")
 
                .AppendLine(") temp [$Where$]")
                .AppendLine(@"ORDER BY ""TabName"" ASC, ""CreateTime"" desc ")
@@ -848,9 +848,9 @@ UNION ALL
 
             _temp_getalltables_pagingcount = new StringBuilder()
                .AppendLine("select count(*) from ( ")
-                .AppendLine(@"select table_name as ""TabName"", 'Table' AS ""TabType"",  to_char(cast(LAST_ANALYZED as DATE),'yyyy-mm-dd hh24:mi:ss') as ""CreateTime"" from SYS.user_tables where TABLESPACE_NAME ='[$Schema$]' and table_name not like '/%' ")
+                .AppendLine(@"select table_name as ""TabName"", 'Table' AS ""TabType"",  to_char(cast(LAST_ANALYZED as DATE),'yyyy-mm-dd hh24:mi:ss') as ""CreateTime"" from SYS.ALL_tables where OWNER ='[$Schema$]' and table_name not like '#%' ")
                 .AppendLine("union all")
-                .AppendLine(@"select VIEW_NAME as ""TabName"", 'View' AS ""TabType"",  '' as ""CreateTime"" from SYS.user_views  ")
+                .AppendLine(@"select VIEW_NAME as ""TabName"", 'View' AS ""TabType"",  '' as ""CreateTime"" from SYS.all_views OWNER ='[$Schema$]' ")
 
                .AppendLine(") temp where 1=1 [$Where$]")
                .ToString();
@@ -858,9 +858,9 @@ UNION ALL
 
             _temp_getalltables_paging = new StringBuilder()
                .AppendLine(@"select * from ( select ROW_NUMBER()OVER( order by ""TabType"" ASC, ""TabName"" asc, ""CreateTime"" desc ) as row_seq ,""TABNAME"",""TABTYPE"" ,""CREATETIME"" from ( ")
-                .AppendLine(@"select table_name as ""TabName"", 'Table' AS ""TabType"",  to_char(cast(LAST_ANALYZED as DATE),'yyyy-mm-dd hh24:mi:ss') as ""CreateTime"" from SYS.user_tables where TABLESPACE_NAME ='[$Schema$]' and table_name not like '/%' ")
+                .AppendLine(@"select table_name as ""TabName"", 'Table' AS ""TabType"",  to_char(cast(LAST_ANALYZED as DATE),'yyyy-mm-dd hh24:mi:ss') as ""CreateTime"" from SYS.ALL_tables where OWNER ='[$Schema$]' and table_name not like '#%' ")
                 .AppendLine("union all")
-                .AppendLine(@"select VIEW_NAME as ""TabName"", 'View' AS ""TabType"",  '' as ""CreateTime"" from SYS.user_views  ")
+                .AppendLine(@"select VIEW_NAME as ""TabName"", 'View' AS ""TabType"",  '' as ""CreateTime"" from SYS.all_views where OWNER ='[$Schema$]' ")
 
                .AppendLine(") temp where 1=1  [$Where$] )  t WHERE row_seq > [$SeqBegin$] AND row_seq <=[$SeqEnd$]   order by row_seq ")
                .ToString();
@@ -868,9 +868,9 @@ UNION ALL
             _temp_check_table_exists =
                new StringBuilder()
               .AppendLine("select * from ( ")
-                .AppendLine(@"select table_name as ""TabName"", 'Table' AS ""TabType"",  to_char(cast(LAST_ANALYZED as DATE),'yyyy-mm-dd hh24:mi:ss') as ""CreateTime"" from SYS.user_tables where TABLESPACE_NAME ='[$Schema$]' and table_name not like '/%' ")
+                .AppendLine(@"select table_name as ""TabName"", 'Table' AS ""TabType"",  to_char(cast(LAST_ANALYZED as DATE),'yyyy-mm-dd hh24:mi:ss') as ""CreateTime"" from SYS.ALL_tables where OWNER ='[$Schema$]' and table_name not like '#%' ")
                 .AppendLine("union all")
-                .AppendLine(@"select VIEW_NAME as ""TabName"", 'View' AS ""TabType"",  '' as ""CreateTime"" from SYS.user_views  ")
+                .AppendLine(@"select VIEW_NAME as ""TabName"", 'View' AS ""TabType"",  '' as ""CreateTime"" from SYS.all_views  where OWNER ='[$Schema$]' ")
 
               .AppendLine(") temp WHERE \"TabName\" = '[$TabName$]'")
               .AppendLine("ORDER BY \"TabName\" ASC, \"CreateTime\" desc ")
@@ -881,7 +881,7 @@ UNION ALL
 
             //创建视图
             _temp_create_view = new StringBuilder()
-                .AppendLine($"CREATE VIEW [$Schema$].[$TabName$] ")
+                .AppendLine($"CREATE OR REPLACE VIEW [$Schema$].[$TabName$] ")
                 .AppendLine("   AS  ")
                 .AppendLine("[$ViewSql$]")
                 .ToString();

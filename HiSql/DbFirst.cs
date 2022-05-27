@@ -432,6 +432,7 @@ namespace HiSql
                     _sqlClient.BeginTran();
                     try
                     {
+                        _sql = idm.BuildSqlCodeBlock(_sql);
                         _sqlClient.Context.DBO.ExecCommand(_sql, null);
                         _sqlClient.CommitTran();
                         _isok = true;

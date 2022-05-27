@@ -13,19 +13,19 @@ namespace HiSql.DaMengUnitTest
         {
             //Create_Table(sqlClient); // ok
             //Demo_AddColumn(sqlClient); //ok
-            Demo_ReColumn(sqlClient);//
-            //Demo_ModiColumn(sqlClient); //
-            //Demo_DelColumn(sqlClient);//
+            //Demo_ReColumn(sqlClient);//ok
+            //Demo_ModiColumn(sqlClient); //ok
+            //Demo_DelColumn(sqlClient);//ok
 
-            // Demo_Tables(sqlClient);// 
-            // Demo_View(sqlClient);//
-            //Demo_AllTables(sqlClient);//
+            // Demo_Tables(sqlClient);// ok
+            // Demo_View(sqlClient);//ok
+            //Demo_AllTables(sqlClient);//ok
             //Demo_GlobalTables(sqlClient);//  delay
-            //Demo_ModiTable(sqlClient);///
+            //Demo_ModiTable(sqlClient);///ok
 
-            //Demo_DropView(sqlClient); //
-            //  Demo_CreateView(sqlClient);//
-            //Demo_ModiView(sqlClient);//
+            // Demo_DropView(sqlClient); //ok
+            //  Demo_CreateView(sqlClient);//ok
+            Demo_ModiView(sqlClient);//
             //Demo_IndexList(sqlClient);///
             //Demo_Index_Create(sqlClient);//
             //Demo_ReTable(sqlClient);//
@@ -270,7 +270,7 @@ namespace HiSql.DaMengUnitTest
             HiColumn column = new HiColumn()
             {
                 TabName = "htest01",
-                FieldName = "TestAddy567",
+                FieldName = "TestAdd1",
                 FieldType = HiType.VARCHAR,
                 FieldLen = 50,
                 DBDefault = HiTypeDBDefault.EMPTY,

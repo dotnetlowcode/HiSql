@@ -2695,7 +2695,7 @@ namespace HiSql
                     .Replace("[$TabName$]", $"{dbConfig.Table_Pre}{viewname}{dbConfig.Table_After}")
                     .Replace("[$ViewSql$]", viewsql)
                     ;
-                return viewsql;
+                return _tempsql;
             }
             else
                 throw new Exception($"视图名称[{viewname}]不存在无法修改");

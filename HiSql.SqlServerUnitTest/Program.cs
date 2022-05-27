@@ -72,10 +72,10 @@ namespace HiSql.UnitTest
             //Demo_Insert.Init(sqlcient);
             //DemoCodeFirst.Init(sqlcient);
             //Demo_Snro.Init(sqlcient);
-            Demo_DbCode.Init(sqlcient);
+           // Demo_DbCode.Init(sqlcient);
 
             //Demo_Cache.Init(sqlcient);
-            //SnowId();
+            SnowId();
 
 
             Console.ReadLine();
@@ -290,16 +290,17 @@ namespace HiSql.UnitTest
 
 
 
-            Snowflake.SnowType = SnowType.IdSnow;
-            Snowflake.WorkerId = 0;
+            Snowflake.SnowType = SnowType.IdWorker;
+            Snowflake.WorkerId = 10000000;
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
             for (int i = 0; i < 10000; i++)
             {
-                lst.Add(Snowflake.NextId());
+                var id = Snowflake.NextId();
+                lst.Add(id);
                 //Console.WriteLine(idWorker.NextId());
-                //Console.WriteLine(snowflake.NextId());
+                Console.WriteLine(id);
 
                 //Console.WriteLine(Snowflake.NextId());
             }
