@@ -675,6 +675,11 @@ namespace HiSql
 
             return lckInfo;
         }
+        /// <summary>
+        /// 解锁
+        /// </summary>
+        /// <param name="keys"></param>
+        /// <returns></returns>
         public override bool UnLock(params string[] keys)
         {
             if (keys.Length == 0) return true;
@@ -687,7 +692,6 @@ namespace HiSql
                 //创建key
                 if (GetCache<LckInfo>(newkey) != null)
                 {
-                    System.Threading.Monitor.Exit(GetCache<LckInfo>(newkey));
                     RemoveCache(newkey);
                     HDel(_lockhashname, newkey);
                 }

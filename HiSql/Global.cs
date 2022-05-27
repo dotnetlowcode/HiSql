@@ -21,8 +21,11 @@ namespace HiSql
 
         public static bool RedisOn
         {
-            get =>  _redison; 
-            set => _redison = value; 
+            get =>  _redison;
+            set { _redison = value;
+                CacheContext.Reset();
+
+            }
         }
         /// <summary>
         /// 启用redis缓存 
@@ -30,7 +33,10 @@ namespace HiSql
         public static RedisOptions RedisOptions
         {
             get { return redisOptions; }
-            set { redisOptions = value; }
+            set { redisOptions = value; 
+                if (_redison && redisOptions != null)
+                    CacheContext.Reset();
+            }
         }
 
     }
