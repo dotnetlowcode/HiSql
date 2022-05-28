@@ -219,7 +219,12 @@ namespace HiSql
         /// <returns></returns>
         bool CreateTable(Type type);
 
-
+        /// <summary>
+        /// 检测表或视图是否存在
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        public bool CheckTabExists(string tableName);
 
         /// <summary>
         /// 删除表

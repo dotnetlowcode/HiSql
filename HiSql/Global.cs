@@ -19,14 +19,31 @@ namespace HiSql
 
         static bool _redison = false;
 
+
+        /// <summary>
+        /// 是否开启编号
+        /// </summary>
+        static bool _snroon = false;
+
+
         public static bool RedisOn
         {
             get =>  _redison;
             set { _redison = value;
                 CacheContext.Reset();
-
             }
         }
+
+        public static bool SnroOn
+        {
+            get => _snroon;
+            set { _snroon = value;
+                
+            
+            }
+        }
+
+
         /// <summary>
         /// 启用redis缓存 
         /// </summary>
