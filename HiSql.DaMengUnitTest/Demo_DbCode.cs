@@ -25,8 +25,8 @@ namespace HiSql.DaMengUnitTest
 
             // Demo_DropView(sqlClient); //ok
             //  Demo_CreateView(sqlClient);//ok
-            Demo_ModiView(sqlClient);//
-            //Demo_IndexList(sqlClient);///
+            //Demo_ModiView(sqlClient);//ok
+                Demo_IndexList(sqlClient);///
             //Demo_Index_Create(sqlClient);//
             //Demo_ReTable(sqlClient);//
             // Demo_AllTables(sqlClient);//

@@ -723,7 +723,7 @@ namespace HiSql.Test
         {
 
             Console.WriteLine(DateTimeOffset.MaxValue);
-            CacheTest();
+           // CacheTest();
             LockTest();
 
         Console.ReadLine();

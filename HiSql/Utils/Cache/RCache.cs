@@ -711,33 +711,89 @@ namespace HiSql
             }
             return new Tuple<bool, string>(flag, msg);
         }
+        private static List<string> hashtable = new List<string>();
+        private static List<string> lockhashtable = new List<string>();
+
+        bool CkeckExists(params string[] keys)
+        {
+            bool flag = false;
+            lock (hashtable)
+            {
+                flag = keys.Intersect(hashtable).Count() > 0;
+            }
+            
+            return flag;
+        }
         public override Tuple<bool, string> LockOn(string[] keys, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
         {
-            Tuple<bool, string> tuple = new Tuple<bool, string>(false, "获取锁超时");
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            List<string> lockedKey = new List<string>();
-            int idx = 0;
-            while (!tuple.Item1 && stopwatch.Elapsed <= TimeSpan.FromSeconds(timeoutseconds) && idx < keys.Length)
+            //lock (lockhashtable)
             {
-                var lockResult = LockOn(keys[idx], lckinfo, expresseconds, timeoutseconds);
-                if (!lockResult.Item1)
+                Tuple<bool, string> tuple = new Tuple<bool, string>(false, "获取锁超时");
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                List<string> lockedKey = new List<string>();
+                int idx = 0;
+                while (keys.Length > 1 && CkeckExists(keys) && stopwatch.Elapsed <= TimeSpan.FromSeconds(timeoutseconds*3))
                 {
-                    tuple = lockResult;
-                    break;
+                    Thread.Sleep(100);
+                    if (stopwatch.Elapsed > TimeSpan.FromSeconds(timeoutseconds * 3))
+                    {
+                        return new Tuple<bool, string>(false, "等待超时。");
+                    }
                 }
+                while (!tuple.Item1 && stopwatch.Elapsed <= TimeSpan.FromSeconds(timeoutseconds) && idx < keys.Length)
+                {
+                    if (keys.Length > 1 && idx == 0)
+                    {
+                        lock (hashtable)
+                        {
+                            if (CkeckExists(keys))
+                            {
+                                Thread.Sleep(100);
+                                continue;
+                            }
+                            hashtable.AddRange(keys);
+                        }
+                    }
 
-                lockedKey.Add(keys[idx]);
-                idx++;
+                    var lockResult = LockOn(keys[idx], lckinfo, expresseconds, timeoutseconds);
+                    if (!lockResult.Item1)
+                    {
+                        tuple = lockResult;
+                        break;
+                    }
+                    
+                    lockedKey.Add(keys[idx]);
+                    idx++;
+                }
+                if (idx == keys.Length && keys.Length > 1)
+                {
+                    lock (hashtable)
+                    {
+                        for (int i = 0; i < keys.Length; i++)
+                        {
+                            if (hashtable.Contains(keys[i]))
+                            {
+                                hashtable.Remove(keys[i]);
+                            }
+                        }
+                    }
+                    return new Tuple<bool, string>(true, $"key:[{string.Join(",", keys)}]加锁成功");
+                }
+                if (keys.Length > 1)
+                {
+                    lock (hashtable)
+                    {
+                        for (int i = 0; i < keys.Length; i++)
+                        {
+                            hashtable.Remove(keys[i]);
+                        }
+                    }
+                }
+                
+                //加锁失败或超时
+                UnLock(lockedKey.ToArray());
+                return new Tuple<bool, string>(tuple.Item1, tuple.Item2);
             }
-            if (idx == keys.Length)
-            {
-                return new Tuple<bool, string>(true, $"key:[{string.Join(",", keys)}]加锁成功");
-            }
-
-            //加锁失败或超时
-            UnLock(lockedKey.ToArray());
-            return new Tuple<bool, string>(tuple.Item1, tuple.Item2);
-
         }
 
         /// <summary>
@@ -920,6 +976,10 @@ namespace HiSql
 
         public override Tuple<bool, string> LockOnExecute(string[] keys, Action action, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
         {
+            if (keys.Length == 1)
+            {
+                return LockOnExecute(keys[0], action, lckinfo, expresseconds, timeoutseconds);
+            }
             CheckRedis();
             int _max_second = int.MaxValue;//最长定锁有效期
             int _max_timeout = int.MaxValue;//最长加锁等待时间
@@ -938,7 +998,7 @@ namespace HiSql
 
             CancellationTokenSource tokenSource = new CancellationTokenSource();
             CancellationToken cancellationToken = tokenSource.Token;
-            deleLockOn _deleLock = new deleLockOn(lockOn);
+            deleLockOn _deleLock = new deleLockOn(lockOnNoWait);
             Thread threadGetlock = null;
             Thread thread = null;
             string msg = "";
@@ -1052,16 +1112,21 @@ namespace HiSql
             while (!isok)
             {
                 isok = _cache.LockTake(key, 1, TimeSpan.FromSeconds(expresseconds));
-
+                //return isok;
                 if (isok)
                 {
                     break;
                 }
-                Thread.Sleep(1);
+                Thread.Sleep(10);
             }
             return true;
         }
-
+        bool lockOnNoWait(string key, int expresseconds = 5)
+        {
+            bool isok = false;           
+            isok = _cache.LockTake(key, 1, TimeSpan.FromSeconds(expresseconds));
+            return isok;
+        }
 
         #endregion
 

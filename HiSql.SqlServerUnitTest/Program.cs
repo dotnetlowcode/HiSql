@@ -60,8 +60,8 @@ namespace HiSql.UnitTest
             HiSql.Global.RedisOn = true;//开启redis缓存
             HiSql.Global.RedisOptions = new RedisOptions { Host = "127.0.0.1", PassWord = "", Port = 6379, CacheRegion = "HRM", Database = 2 };
 
-            // StockThread();
-            HiSqlClient sqlcient = Demo_Init.GetSqlClient();
+             StockThread();
+           // HiSqlClient sqlcient = Demo_Init.GetSqlClient();
 
             // Console.WriteLine($"数据库连接id"+sqlcient.Context.ConnectedId);
 
@@ -75,7 +75,7 @@ namespace HiSql.UnitTest
            // Demo_DbCode.Init(sqlcient);
 
             //Demo_Cache.Init(sqlcient);
-            SnowId();
+           // SnowId();
 
 
             Console.ReadLine();
@@ -93,16 +93,31 @@ namespace HiSql.UnitTest
             sqlClient.Modi("H_Stock", new List<object> {
                 new { Batch="9000112112",Material="ST0021",Location="A001",st_kc=30000},
                 new { Batch="8000252241",Material="ST0080",Location="A001",st_kc=20000},
-                new { Batch="7000252241",Material="ST0026",Location="A001",st_kc=10000}
-
+                new { Batch="1000252241",Material="ST0080",Location="A001",st_kc=20000},
+                new { Batch="2000252241",Material="ST0080",Location="A001",st_kc=20000},
+                new { Batch="3000252241",Material="ST0080",Location="A001",st_kc=20000},
+                new { Batch="4000252241",Material="ST0080",Location="A001",st_kc=20000},
+                new { Batch="5000252241",Material="ST0080",Location="A001",st_kc=20000},
+                new { Batch="6000252241",Material="ST0080",Location="A001",st_kc=20000},
+                new { Batch="1100252241",Material="ST0080",Location="A001",st_kc=20000},
+                new { Batch="1200252241",Material="ST0080",Location="A001",st_kc=20000},
+                new { Batch="1300252241",Material="ST0080",Location="A001",st_kc=20000},
+                new { Batch="1400252241",Material="ST0080",Location="A001",st_kc=20000},
+                new { Batch="1500252241",Material="ST0080",Location="A001",st_kc=20000},
+                new { Batch="7000252241",Material="ST0026",Location="A001",st_kc=30000},
+                new { Batch="20000112112",Material="ST0026",Location="A001",st_kc=30000}
             }).ExecCommand();
+
             var _dt1 = sqlClient.HiSql("select * from H_Order").Take(1).Skip(1).ToTable();
             var _dt2 = sqlClient.HiSql("select * from H_Stock").Take(1).Skip(1).ToTable();
 
 
-            string[] grp_arr1 = new string[] { "9000112112" };
+            string[] grp_arr1 = new string[] { "20000112112" };
             string[] grp_arr2 = new string[] { "8000252241", "9000112112" };
-            string[] grp_arr3 = new string[] { "8000252241", "9000112112", "7000252241" };
+
+            string[] grp_arr3 = new string[] { "4000252241","8000252241", "9000112112", "7000252241", "1000252241", "2000252241", "3000252241", "5000252241", "6000252241", "1100252241", "1200252241", "1300252241", "1400252241", "1500252241" };
+            string[] grp_arr4 = new string[] { "6000252241", "1100252241", "1200252241", "1300252241", "2000252241", "3000252241", "8000252241", "9000112112", "7000252241", "1000252241",  "4000252241", "5000252241", "1400252241", "1500252241" };
+            string[] grp_arr5 = new string[] {  "5000252241", "6000252241", "1100252241", "1200252241", "1300252241","9000112112", "2000252241", "3000252241", "7000252241", "1000252241", "8000252241", "4000252241", "1400252241", "1500252241" };
 
             Stopwatch stopwatch = Stopwatch.StartNew();
             stopwatch.Start();
@@ -159,19 +174,21 @@ namespace HiSql.UnitTest
 
          
 
-            Parallel.For(0, 50, (index, y) =>
+            Parallel.For(0, 100, (index, y) =>
             {
                
-                int grpidx = index % 3;
-                string[] grparr = grp_arr3;
+                int grpidx = index % 4;
+                string[] grparr = grp_arr1;
                 if (grpidx == 0)
-                    grparr = grp_arr1;
+                    grparr = grp_arr4;
                 else if (grpidx == 1)
-                    grparr = grp_arr2;
+                    grparr = grp_arr5;
+                else if (grpidx == 2)
+                    grparr = grp_arr1;
                 else
                     grparr = grp_arr3;
 
-                //Thread.Sleep(random.Next(10) * 200);
+               // Thread.Sleep(random.Next(10) * index*50);
 
                 var radom = new Random();
 
