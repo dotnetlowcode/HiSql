@@ -79,6 +79,6 @@ namespace HiSql
         public abstract void SetCache(string key, object value);
         public abstract void SetCache(string key, object value, DateTimeOffset expiressAbsoulte);
         public abstract void SetCache(string key, object value, int second);
-        public abstract bool UnLock(params string[] keys);
+        public abstract bool UnLock(LckInfo lckinfo, params string[] keys);
     }
 }

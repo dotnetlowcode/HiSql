@@ -881,7 +881,7 @@ UNION ALL
 
             //创建视图
             _temp_create_view = new StringBuilder()
-                .AppendLine($"CREATE VIEW [$Schema$].[$TabName$] ")
+                .AppendLine($"CREATE OR REPLACE VIEW [$Schema$].[$TabName$] ")
                 .AppendLine("   AS  ")
                 .AppendLine("[$ViewSql$]")
                 .ToString();

@@ -442,6 +442,7 @@ namespace HiSql
                     _sqlClient.BeginTran();
                     try
                     {
+                        _sql = idm.BuildSqlCodeBlock(_sql);
                         _sqlClient.Context.DBO.ExecCommand(_sql, null);
                         _sqlClient.CommitTran();
                         _isok = true;
@@ -709,6 +710,15 @@ namespace HiSql
                 lsttabinfo.Add(tableInfo);
             }
             return lsttabinfo;
+        }
+
+        
+
+        public bool CheckTabExists(string tableName)
+        {
+            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
+            idm.Context = SqlClient.Context;
+            return idm.CheckTabExists(tableName);
         }
         public List<TableInfo> GetAllTables(string viewName, int pageSize, int pageIndex, out int totalCount)
         {

@@ -301,8 +301,8 @@ namespace HiSql
 
             key = GetRegionKey(key);
 
-            int _max_second = 60;//最长定锁有效期
-            int _max_timeout = 10;//最长加锁等待时间
+            int _max_second = int.MaxValue;//最长定锁有效期
+            int _max_timeout = int.MaxValue;//最长加锁等待时间
 
             expresseconds = expresseconds < 0 ? 5 : expresseconds;
             expresseconds = expresseconds > _max_second ? _max_second : expresseconds;
@@ -340,13 +340,32 @@ namespace HiSql
             return new Tuple<bool, string>(flag1, msg);
         }
 
+        //private static Hashtable hashtable = new Hashtable();
+        private static List<string> hashtable = new List<string>();
+
+        bool CkeckExists(params string[] keys)
+        {
+            return keys.Intersect(hashtable).Count() > 0;
+            return false;
+        }
+
         public override Tuple<bool, string> LockOn(string[] keys, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
         {
             Tuple<bool, string> tuple = new Tuple<bool, string>(false, "");
             Stopwatch stopwatch = Stopwatch.StartNew();
             List<string> lockedKey = new List<string>();
             int idx = 0;
-            while (!tuple.Item1 && stopwatch.Elapsed <= TimeSpan.FromSeconds(5) && idx < keys.Length)
+
+            //while (CkeckExists(keys) && stopwatch.Elapsed <= TimeSpan.FromSeconds(timeoutseconds))
+            //{
+            //    Thread.Sleep(10);
+            //    if (stopwatch.Elapsed > TimeSpan.FromSeconds(timeoutseconds))
+            //    {
+            //        return new Tuple<bool, string>(false, "等待超时。");
+            //    }
+            //}
+            
+            while (!tuple.Item1 && stopwatch.Elapsed <= TimeSpan.FromSeconds(timeoutseconds) && idx < keys.Length)
             {
                 var lockResult = LockOn(keys[idx], lckinfo, expresseconds, timeoutseconds);
                 if (!lockResult.Item1)
@@ -354,18 +373,51 @@ namespace HiSql
                     tuple = lockResult;
                     break;
                 }
-
+                if (keys.Length > 1 && idx == 0)
+                {
+                    lock (hashtable)
+                    {
+                        hashtable.AddRange(keys);
+                        for (int i = 0; i < keys.Length; i++)
+                        {
+                           // hashtable.Add(keys[i]);
+                        }
+                    }
+                    
+                }
+                
                 lockedKey.Add(keys[idx]);
                 idx++;
             }
             if (idx == keys.Length)
             {
+                lock (hashtable)
+                {
+                    for (int i = 0; i < keys.Length; i++)
+                    {
+                        if (hashtable.Contains(keys[i]))
+                        {
+                            hashtable.Remove(keys[i]);
+                        }
+                    }
+                }
                 return new Tuple<bool, string>(true, $"key:[{string.Join(",", keys)}]加锁成功");
             }
             //加锁失败或超时
             foreach (var key in lockedKey)
             {
-                UnLock(key);
+                lock (hashtable)
+                {
+                    for (int i = 0; i < keys.Length; i++)
+                    {
+                        if (hashtable.Contains(keys[i]))
+                        {
+                            hashtable.Remove(keys[i]);
+                        }
+                        
+                    }
+                }
+                UnLock(lckinfo, key);
             }
             return new Tuple<bool, string>(tuple.Item1, tuple.Item2);
 
@@ -421,8 +473,8 @@ namespace HiSql
 
             key = GetRegionKey(key);
 
-            int _max_second = 60;//最长定锁有效期
-            int _max_timeout = 10;//最长加锁等待时间
+            int _max_second = int.MaxValue;//最长定锁有效期
+            int _max_timeout = int.MaxValue;//最长加锁等待时间
 
             int _times = 5;//续锁最多次数
 
@@ -486,7 +538,7 @@ namespace HiSql
                 flag = workTask.Wait(timeoutseconds * _millsecond, cancellationToken);
                 if (flag)
                 {
-                    UnLock(key);
+                    UnLock(lckinfo, key);
                     msg = $"key:[{key}]锁定并操作业务成功!锁已自动释放";
                 }
                 else
@@ -498,7 +550,7 @@ namespace HiSql
                         {
                             if (!workTask.IsCompleted && !workTask.IsCanceled)
                             {
-                                UnLock(key);
+                                UnLock(lckinfo, key);
                                 tokenSource.Cancel();
                                 thread.Interrupt();
                             }
@@ -518,7 +570,7 @@ namespace HiSql
                             if (flag)
                             {
                                 flag = true;
-                                UnLock(key);
+                                UnLock(lckinfo, key);
                                 msg = $"key:[{key}]锁定并操作业务成功!续锁{_timesa + 1}次,锁已经自动释放";
                                 break;
                             }
@@ -549,8 +601,8 @@ namespace HiSql
         public override Tuple<bool, string> LockOnExecute(string[] keys, Action action, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
         {
 
-            int _max_second = 60;//最长定锁有效期
-            int _max_timeout = 10;//最长加锁等待时间
+            int _max_second = int.MaxValue;//最长定锁有效期
+            int _max_timeout = int.MaxValue;//最长加锁等待时间
 
             int _times = 5;//续锁最多次数
 
@@ -602,7 +654,7 @@ namespace HiSql
                 flag = workTask.Wait(timeoutseconds * _millsecond, cancellationToken);
                 if (flag)
                 {
-                    UnLock(keys);
+                    UnLock(lckinfo, keys);
                     msg = $"key:[{string.Join(",", keys)}]锁定并操作业务成功!锁已自动释放";
                 }
                 else
@@ -614,7 +666,7 @@ namespace HiSql
                         {
                             if (!workTask.IsCompleted && !workTask.IsCanceled)
                             {
-                                UnLock(keys);
+                                UnLock(lckinfo, keys);
                                 tokenSource.Cancel();
                                 thread.Interrupt();
                             }
@@ -640,7 +692,7 @@ namespace HiSql
                             flag = workTask.Wait(timeoutseconds * _millsecond, cancellationToken);
                             if (flag)
                             {
-                                UnLock(keys);
+                                UnLock(lckinfo, keys);
                                 flag = true;
                                 msg = $"key:[{string.Join(",", keys)}]锁定并操作业务成功!续锁{_timesa + 1}次,锁已经自动释放";
                                 break;
@@ -680,8 +732,9 @@ namespace HiSql
         /// </summary>
         /// <param name="keys"></param>
         /// <returns></returns>
-        public override bool UnLock(params string[] keys)
+        public override bool UnLock(LckInfo lckInfo, params string[] keys)
         {
+            if (keys.Length == 0) return true;
             foreach (string key in keys)
             {
                 var newkey = key;

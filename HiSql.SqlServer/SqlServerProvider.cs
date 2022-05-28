@@ -34,6 +34,7 @@ namespace HiSql
                         }
                     }
 
+                    
                     base._DbConnection = new SqlConnection(base.Context.CurrentConnectionConfig.ConnectionString);
                 }
 

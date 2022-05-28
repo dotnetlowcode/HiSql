@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace HiSql
     /// </summary>
     public class RCache : BaseCache,IRedis
     {
+        
         private readonly string UniqueId = Guid.NewGuid().ToString();
         private StackExchange.Redis.IDatabase _cache;
         private ConnectionMultiplexer _connectMulti;
@@ -525,17 +527,38 @@ namespace HiSql
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
 
-        public override bool UnLock(params string[] keys)
+        public override bool UnLock(LckInfo lckinfo, params string[] keys)
         {
+            if (keys.Length == 0) return true;
             CheckRedis();
+
+            Stopwatch stopwatch = Stopwatch.StartNew();
+          
+          
+            
+
             foreach (string key in keys)
             {
                 var newkey = key;
                 if (!newkey.Contains(_lockkeyPrefix))
                     newkey = _lockkeyPrefix + newkey;
                 newkey = GetRegionKey(newkey);
-                HDel(_lockhashname, newkey);
-                _cache.LockRelease(newkey, 1);
+                bool isrelease = false;
+                int idx = 0;
+                while (!isrelease && stopwatch.Elapsed <= TimeSpan.FromSeconds(1) && idx++ < 10)
+                {
+                    try
+                    {
+                        isrelease = _cache.LockRelease(newkey, lckinfo.UName);
+                        HDel(_lockhashname, newkey);
+                    }
+                    catch (Exception)
+                    {
+                        
+                    }
+                    Console.WriteLine($"释放锁：{newkey}  结果：{isrelease}");
+                   
+                }
             }
             return true;
         }
@@ -652,8 +675,8 @@ namespace HiSql
 
             key = GetRegionKey(key);
 
-            int _max_second = 60;//最长定锁有效期
-            int _max_timeout = 10;//最长加锁等待时间
+            int _max_second = int.MaxValue;//最长定锁有效期  原来是 60
+            int _max_timeout = int.MaxValue;//最长加锁等待时间 原来是 10
 
 
             expresseconds = expresseconds < 0 ? 5 : expresseconds;
@@ -661,43 +684,58 @@ namespace HiSql
 
             timeoutseconds = timeoutseconds < 0 ? 5 : timeoutseconds;
             timeoutseconds = timeoutseconds > _max_timeout ? _max_timeout : timeoutseconds;
-            Thread thread = null;
-            deleLockOn _deleLock = new deleLockOn(lockOn);
-            var workTask = Task.Run(() =>
+
+            bool islocked = false;
+            Stopwatch stopwatch = Stopwatch.StartNew(); 
+            while (!islocked && stopwatch.Elapsed <= TimeSpan.FromSeconds(timeoutseconds))
             {
-                try
-                {
-                    thread = System.Threading.Thread.CurrentThread;
-                    bool _success = _deleLock.Invoke(key, expresseconds);
-                    if (_success)
-                    {
-                        lckinfo = getLockInfo(lckinfo, expresseconds, 0);
-                        SaveLockInfo(key, lckinfo);
-                    }
-                    return _success;
-                }
-                catch (Exception ex)
-                {
-                    return false;
-                }
-            });
-            bool flag = workTask.Wait(timeoutseconds * 1000, new CancellationToken(false));
-
-
+                islocked = _cache.LockTake(key, lckinfo.UName, TimeSpan.FromSeconds(expresseconds));
+                Thread.Sleep(5);
+            }
             string msg = "";
-            if (flag)
+            Thread thread = null;
+            //deleLockOn _deleLock = new deleLockOn(lockOn);
+            //var workTask = Task.Run(() =>
+            //{
+            //    try
+            //    {
+            //        thread = System.Threading.Thread.CurrentThread;
+            //        bool _success = _deleLock.Invoke(key, expresseconds);
+            //        if (_success)
+            //        {
+            //            lckinfo = getLockInfo(lckinfo, expresseconds, 0);
+            //            SaveLockInfo(key, lckinfo);
+            //        }
+            //        return _success;
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        return false;
+            //    }
+            //});
+            //bool flag = workTask.Wait(timeoutseconds * 1000, new CancellationToken(false));
+
+
+            //
+            //if (flag)
+            //{
+            //    if (workTask.Result)
+            //    {
+            //        msg = "加锁成功";
+            //    }
+            //    else
+            //    {
+
+            //        flag = false;
+            //        msg = "加锁失败";
+            //    }
+
+            //}
+            if (islocked)
             {
-                if (workTask.Result)
-                {
-                    msg = "加锁成功";
-                }
-                else
-                {
-
-                    flag = false;
-                    msg = "加锁失败";
-                }
-
+                lckinfo = getLockInfo(lckinfo, expresseconds, 0);
+                SaveLockInfo(key, lckinfo);
+                msg = "加锁成功";
             }
             else
             {
@@ -705,35 +743,96 @@ namespace HiSql
                     thread.Interrupt();
                 msg = $"key:[{key}]锁定失败,加锁等待超过{timeoutseconds}秒!";
             }
-            return new Tuple<bool, string>(flag, msg);
+            return new Tuple<bool, string>(islocked, msg);
+        }
+        private static List<string> hashtable = new List<string>();
+        private static List<string> lockhashtable = new List<string>();
+
+        bool CkeckExists(params string[] keys)
+        {
+            bool flag = false;
+            lock (hashtable)
+            {
+                flag = keys.Intersect(hashtable).Count() > 0;
+            }
+            
+            return flag;
         }
         public override Tuple<bool, string> LockOn(string[] keys, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
         {
-            Tuple<bool, string> tuple = new Tuple<bool, string>(false, "获取锁超时");
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            List<string> lockedKey = new List<string>();
-            int idx = 0;
-            while (!tuple.Item1 && stopwatch.Elapsed <= TimeSpan.FromSeconds(timeoutseconds) && idx < keys.Length)
+
+            if (keys.Length == 1)
             {
-                var lockResult = LockOn(keys[idx], lckinfo, expresseconds, timeoutseconds);
-                if (!lockResult.Item1)
+                return LockOn(keys[0], lckinfo,  expresseconds , timeoutseconds);
+            }
+            lock (lockhashtable)
+            {
+                Tuple<bool, string> tuple = new Tuple<bool, string>(false, "获取锁超时");
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                List<string> lockedKey = new List<string>();
+                int idx = 0;
+                while (keys.Length > 1 && CkeckExists(keys) && stopwatch.Elapsed <= TimeSpan.FromSeconds(timeoutseconds*3))
                 {
-                    tuple = lockResult;
-                    break;
+                    Thread.Sleep(100);
+                    if (stopwatch.Elapsed > TimeSpan.FromSeconds(timeoutseconds * 3))
+                    {
+                        return new Tuple<bool, string>(false, "等待超时。");
+                    }
                 }
+                while (!tuple.Item1 && stopwatch.Elapsed <= TimeSpan.FromSeconds(timeoutseconds) && idx < keys.Length)
+                {
+                    if (keys.Length > 1 && idx == 0)
+                    {
+                        lock (hashtable)
+                        {
+                            if (CkeckExists(keys))
+                            {
+                                Thread.Sleep(100);
+                                continue;
+                            }
+                            hashtable.AddRange(keys);
+                        }
+                    }
 
-                lockedKey.Add(keys[idx]);
-                idx++;
+                    var lockResult = LockOn(keys[idx], lckinfo, expresseconds, timeoutseconds);
+                    if (!lockResult.Item1)
+                    {
+                        tuple = lockResult;
+                        break;
+                    }
+                    
+                    lockedKey.Add(keys[idx]);
+                    idx++;
+                }
+                if (idx == keys.Length && keys.Length > 1)
+                {
+                    lock (hashtable)
+                    {
+                        for (int i = 0; i < keys.Length; i++)
+                        {
+                            if (hashtable.Contains(keys[i]))
+                            {
+                                hashtable.Remove(keys[i]);
+                            }
+                        }
+                    }
+                    return new Tuple<bool, string>(true, $"key:[{string.Join(",", keys)}]加锁成功");
+                }
+                if (keys.Length > 1)
+                {
+                    lock (hashtable)
+                    {
+                        for (int i = 0; i < keys.Length; i++)
+                        {
+                            hashtable.Remove(keys[i]);
+                        }
+                    }
+                }
+                
+                //加锁失败或超时
+                UnLock(lckinfo, lockedKey.ToArray());
+                return new Tuple<bool, string>(tuple.Item1, tuple.Item2);
             }
-            if (idx == keys.Length)
-            {
-                return new Tuple<bool, string>(true, $"key:[{string.Join(",", keys)}]加锁成功");
-            }
-
-            //加锁失败或超时
-            UnLock(lockedKey.ToArray());
-            return new Tuple<bool, string>(tuple.Item1, tuple.Item2);
-
         }
 
         /// <summary>
@@ -804,8 +903,8 @@ namespace HiSql
 
             key = GetRegionKey(key);
 
-            int _max_second = 60;//最长定锁有效期
-            int _max_timeout = 10;//最长加锁等待时间
+            int _max_second = int.MaxValue;//最长定锁有效期
+            int _max_timeout = int.MaxValue;//最长加锁等待时间
             int _times = 5;//续锁最多次数
             int _millsecond = 900;
 
@@ -819,35 +918,51 @@ namespace HiSql
             timeoutseconds = timeoutseconds < 0 ? 5 : timeoutseconds;
             timeoutseconds = timeoutseconds > _max_timeout ? _max_timeout : timeoutseconds;
 
+            bool islocked = false;
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            while (!islocked && stopwatch.Elapsed <= TimeSpan.FromSeconds(timeoutseconds))
+            {
+                islocked = _cache.LockTake(key, lckinfo.UName, TimeSpan.FromSeconds(expresseconds));
+                if (!islocked) { Thread.Sleep(5); }
+            }
+            string msg = "";
+            Thread thread = null;
+
+
             CancellationTokenSource tokenSource = new CancellationTokenSource();
             CancellationToken cancellationToken = tokenSource.Token;
-            deleLockOn _deleLock = new deleLockOn(lockOn);
-            Thread threadGetlock = null;
-            Thread thread = null;
-            var workTaskGetLock = Task.Run(() =>
-            {
-                try
-                {
-                    threadGetlock = System.Threading.Thread.CurrentThread;
-                    bool _success = _deleLock.Invoke(key, expresseconds);
-                    if (_success)
-                    {
-                        lckinfo = getLockInfo(lckinfo, expresseconds, 0);
 
-                        SaveLockInfo(key, lckinfo);
-                    }
-                    return _success;
-                }
-                catch (Exception ex)
-                {
-                    return false;
-                }
-            });
-            bool isgetlock = workTaskGetLock.Wait(timeoutseconds * 1000, new CancellationToken(false));
-            string msg = "";
+            //deleLockOn _deleLock = new deleLockOn(lockOn);
+            //Thread threadGetlock = null;
+            //Thread thread = null;
+            //var workTaskGetLock = Task.Run(() =>
+            //{
+            //    try
+            //    {
+            //        threadGetlock = System.Threading.Thread.CurrentThread;
+            //        bool _success = _deleLock.Invoke(key, expresseconds);
+            //        if (_success)
+            //        {
+            //            lckinfo = getLockInfo(lckinfo, expresseconds, 0);
+
+            //            SaveLockInfo(key, lckinfo);
+            //        }
+            //        return _success;
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        return false;
+            //    }
+            //});
+            //bool islocked = workTaskGetLock.Wait(timeoutseconds * 1000, new CancellationToken(false));
+            //string msg = "";
+
+
             bool flag = false;
-            if (isgetlock) //获取锁成功
+            if (islocked) //获取锁成功
             {
+                lckinfo = getLockInfo(lckinfo, expresseconds, 0);
+                SaveLockInfo(key, lckinfo);
                 int _timesa = 0;
                 var workTask = Task.Run(() =>
                 {
@@ -862,7 +977,7 @@ namespace HiSql
                     }
                     finally
                     {
-                        UnLock(key);
+                        UnLock(lckinfo, key);
                     }
                 });
                 flag = workTask.Wait(expresseconds * _millsecond, cancellationToken);
@@ -878,7 +993,7 @@ namespace HiSql
                     {
                         if (!workTask.IsCompleted && !workTask.IsCanceled)
                         {
-                            UnLock(key);
+                            UnLock(lckinfo, key);
                             tokenSource.Cancel();
                             thread.Interrupt();
                         }
@@ -916,9 +1031,13 @@ namespace HiSql
 
         public override Tuple<bool, string> LockOnExecute(string[] keys, Action action, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
         {
+            if (keys.Length == 1)
+            {
+                return LockOnExecute(keys[0], action, lckinfo, expresseconds, timeoutseconds);
+            }
             CheckRedis();
-            int _max_second = 60;//最长定锁有效期
-            int _max_timeout = 10;//最长加锁等待时间
+            int _max_second = int.MaxValue;//最长定锁有效期
+            int _max_timeout = int.MaxValue;//最长加锁等待时间
             int _times = 5;//续锁最多次数
             int _millsecond = 900;
 
@@ -933,9 +1052,7 @@ namespace HiSql
             timeoutseconds = timeoutseconds > _max_timeout ? _max_timeout : timeoutseconds;
 
             CancellationTokenSource tokenSource = new CancellationTokenSource();
-            CancellationToken cancellationToken = tokenSource.Token;
-            deleLockOn _deleLock = new deleLockOn(lockOn);
-            Thread threadGetlock = null;
+            CancellationToken cancellationToken = tokenSource.Token;           
             Thread thread = null;
             string msg = "";
             bool flag = false;
@@ -962,7 +1079,7 @@ namespace HiSql
                     }
                     finally
                     {
-                        UnLock(keys);
+                        UnLock(lckinfo, keys);
                     }
                 });
                 flag = workTask.Wait(expresseconds * _millsecond, cancellationToken);
@@ -979,7 +1096,7 @@ namespace HiSql
                     {
                         if (!workTask.IsCompleted && !workTask.IsCanceled)
                         {
-                            UnLock(keys);
+                            UnLock(lckinfo, keys);
                             tokenSource.Cancel();
                             thread.Interrupt();
                         }
@@ -1039,24 +1156,30 @@ namespace HiSql
             return lckInfo;
         }
 
-        bool lockOn(string key, int expresseconds = 5)
-        {
-            expresseconds = expresseconds < 0 ? 5 : expresseconds;
-            expresseconds = expresseconds > 60 ? 60 : expresseconds;
-            //deleLockOn _deleLock=new deleLockOn ()
-            bool isok = false;
-            while (!isok)
-            {
-                isok = _cache.LockTake(key, 1, TimeSpan.FromSeconds(expresseconds));
-
-                if (isok)
-                {
-                    break;
-                }
-            }
-            return true;
-        }
-
+        //bool lockOn(string key, int expresseconds = 5)
+        //{
+        //    expresseconds = expresseconds < 0 ? 5 : expresseconds;
+        //    expresseconds = expresseconds > 60 ? 60 : expresseconds;
+        //    //deleLockOn _deleLock=new deleLockOn ()
+        //    bool isok = false;
+        //    while (!isok)
+        //    {
+        //        isok = _cache.LockTake(key, 1, TimeSpan.FromSeconds(expresseconds));
+        //        //return isok;
+        //        if (isok)
+        //        {
+        //            break;
+        //        }
+        //        Thread.Sleep(10);
+        //    }
+        //    return true;
+        //}
+        //bool lockOnNoWait(string key, int expresseconds = 5)
+        //{
+        //    bool isok = false;           
+        //    isok = _cache.LockTake(key, 1, TimeSpan.FromSeconds(expresseconds));
+        //    return isok;
+        //}
 
         #endregion
 
