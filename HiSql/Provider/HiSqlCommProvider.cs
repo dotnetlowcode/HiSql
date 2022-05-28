@@ -43,14 +43,16 @@ namespace HiSql
             string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", tabname);
             TabInfo tableInfo = null; 
             bool locked = false;
+            var lckinfo = new LckInfo() { UName = "hisql", EventName = "InitTabMaping" };
             try
             {
                 tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
                
                 if (tableInfo == null)
                 {
-                    var lockinfo = CacheContext.MCache.LockOn(_keyname, new LckInfo() { UName = "hisql", EventName = "InitTabMaping" }, 60, 60);
-                    if (lockinfo.Item1) //加锁成功
+                   
+                    var lockResult = CacheContext.MCache.LockOn(_keyname, lckinfo, 60, 60);
+                    if (lockResult.Item1) //加锁成功
                     {
                         locked = true;
                          tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
@@ -59,7 +61,7 @@ namespace HiSql
                             tableInfo = GetInfo();
                             CacheContext.MCache.SetCache(_keyname, tableInfo);
                         }
-                        CacheContext.MCache.UnLock(_keyname); 
+                        CacheContext.MCache.UnLock(lckinfo, _keyname); 
                         locked = false;
                     }
                     else
@@ -77,7 +79,7 @@ namespace HiSql
                 tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
             }
             finally {
-                if (locked) { CacheContext.MCache.UnLock(_keyname); }
+                if (locked) { CacheContext.MCache.UnLock(lckinfo, _keyname); }
                 
             }
             if (tableInfo != null)

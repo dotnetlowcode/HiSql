@@ -417,7 +417,7 @@ namespace HiSql
                         
                     }
                 }
-                UnLock(key);
+                UnLock(lckinfo, key);
             }
             return new Tuple<bool, string>(tuple.Item1, tuple.Item2);
 
@@ -538,7 +538,7 @@ namespace HiSql
                 flag = workTask.Wait(timeoutseconds * _millsecond, cancellationToken);
                 if (flag)
                 {
-                    UnLock(key);
+                    UnLock(lckinfo, key);
                     msg = $"key:[{key}]锁定并操作业务成功!锁已自动释放";
                 }
                 else
@@ -550,7 +550,7 @@ namespace HiSql
                         {
                             if (!workTask.IsCompleted && !workTask.IsCanceled)
                             {
-                                UnLock(key);
+                                UnLock(lckinfo, key);
                                 tokenSource.Cancel();
                                 thread.Interrupt();
                             }
@@ -570,7 +570,7 @@ namespace HiSql
                             if (flag)
                             {
                                 flag = true;
-                                UnLock(key);
+                                UnLock(lckinfo, key);
                                 msg = $"key:[{key}]锁定并操作业务成功!续锁{_timesa + 1}次,锁已经自动释放";
                                 break;
                             }
@@ -654,7 +654,7 @@ namespace HiSql
                 flag = workTask.Wait(timeoutseconds * _millsecond, cancellationToken);
                 if (flag)
                 {
-                    UnLock(keys);
+                    UnLock(lckinfo, keys);
                     msg = $"key:[{string.Join(",", keys)}]锁定并操作业务成功!锁已自动释放";
                 }
                 else
@@ -666,7 +666,7 @@ namespace HiSql
                         {
                             if (!workTask.IsCompleted && !workTask.IsCanceled)
                             {
-                                UnLock(keys);
+                                UnLock(lckinfo, keys);
                                 tokenSource.Cancel();
                                 thread.Interrupt();
                             }
@@ -692,7 +692,7 @@ namespace HiSql
                             flag = workTask.Wait(timeoutseconds * _millsecond, cancellationToken);
                             if (flag)
                             {
-                                UnLock(keys);
+                                UnLock(lckinfo, keys);
                                 flag = true;
                                 msg = $"key:[{string.Join(",", keys)}]锁定并操作业务成功!续锁{_timesa + 1}次,锁已经自动释放";
                                 break;
@@ -732,7 +732,7 @@ namespace HiSql
         /// </summary>
         /// <param name="keys"></param>
         /// <returns></returns>
-        public override bool UnLock(params string[] keys)
+        public override bool UnLock(LckInfo lckInfo, params string[] keys)
         {
             if (keys.Length == 0) return true;
             foreach (string key in keys)
