@@ -244,6 +244,8 @@ namespace HiSql.Extension
              });
         }
 
+
+
         /// <summary>
         /// 获取ExcelSheetNames
         /// </summary>
@@ -440,6 +442,98 @@ namespace HiSql.Extension
             //GC.WaitForPendingFinalizers();
             //Thread.Sleep(500);
 
+        }
+
+
+
+        /// <summary>
+        /// DataTable数据写入Excel
+        /// </summary>
+        /// <param name="getData"></param>
+        /// <param name="sheetName"></param>
+        /// <param name="excelpath"></param>
+        /// <param name="headerMap"></param>
+        /// <param name="headerRowNumber"></param>
+        /// <returns></returns>
+        public async Task<bool> DataTableToExcel(Func<Task<Tuple<DataTable, int>>> getData, string sheetName, string excelpath, Dictionary<string, string> headerMap, int headerRowNumber)
+        {
+            var file = new FileStream(excelpath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            var workbook = new XSSFWorkbook(file);//将文件读到内存，在内存中操作excel
+            var xssfworkbook = new SXSSFWorkbook(workbook, 1000);
+            SXSSFSheet xssfsheet = xssfworkbook.GetSheet(sheetName) as SXSSFSheet;
+            file.Close();
+            await WriteSheetData(workbook, xssfsheet, getData, headerMap, headerRowNumber);
+            using (FileStream fs = File.OpenWrite(excelpath))
+            {
+                xssfsheet.ForceFormulaRecalculation = true;
+                xssfworkbook.Write(fs);
+                xssfworkbook.Dispose();
+                xssfworkbook.Close();
+                if (fs != null) fs.Close();
+            }
+            return true;
+        }
+
+
+        public async Task WriteSheetData(XSSFWorkbook workbook, SXSSFSheet xssfsheet, Func<Task<Tuple<DataTable, int>>> getData, Dictionary<string, string> headerMap, int headerRowNumber)
+        {
+            var headerRow = xssfsheet.GetRow(headerRowNumber);
+            Type typeint = typeof(int);
+            Type typeint64 = typeof(Int64);
+            Type typefloat = typeof(float);
+            Type typedec = typeof(decimal);
+            Type typedatetime = typeof(DateTime);
+            XSSFCellStyle xSSFCellStyle1 = (XSSFCellStyle)workbook.CreateCellStyle();
+            XSSFDataFormat format = (XSSFDataFormat)workbook.CreateDataFormat();
+            while (true)
+            {
+                var dataResult = await getData();
+                if (dataResult == null)
+                {
+                    break;
+                }
+                int beginRow = dataResult.Item2;
+                var dt = dataResult.Item1;
+                for (var i = 0; i < dt.Rows.Count; i++)
+                {
+                    beginRow += 1;
+                    var excelRow = xssfsheet.CreateRow(beginRow);
+                    var dtRow = dt.Rows[i];
+                    for (int j = 0; j < headerMap.Keys.Count; j++)
+                    {
+                        var headKey = headerRow.GetCell(j).StringCellValue;
+                        var dtKey = headerMap[headKey];
+                        var dtCell = dtRow[dtKey];
+                        var dtColumn = dt.Columns[dtKey];
+                        ICell _dcell = excelRow.CreateCell(j);
+                        var _value = dtCell.ToString().Trim();
+                        if (dtColumn.DataType == typedec || dtColumn.DataType == typeint || dtColumn.DataType == typeint64 || dtColumn.DataType == typefloat)
+                        {
+                            if (_value.Length <= 10)
+                            {
+                                _dcell.SetCellType(CellType.Numeric);
+                                if (_value.IndexOf(".") > 0)
+                                    _dcell.SetCellValue(Convert.ToDouble(_value));
+                                else
+                                    _dcell.SetCellValue(Convert.ToInt64(_value));
+                            }
+                            else
+                                _dcell.SetCellValue(_value);
+                        }
+                        else if (dtColumn.DataType == typedatetime)
+                        {
+
+                            _dcell.SetCellValue(Convert.ToDateTime(_value));
+
+                            xSSFCellStyle1.DataFormat = format.GetFormat("yyyy-MM-dd");
+                            _dcell.CellStyle = xSSFCellStyle1;
+
+                        }
+                        else
+                            _dcell.SetCellValue(_value);
+                    }
+                }
+            }
         }
 
         /// <summary>
