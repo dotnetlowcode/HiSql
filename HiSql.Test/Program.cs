@@ -516,12 +516,17 @@ namespace HiSql.Test
                 });
                 int threadId = 0;
                 {
-                    Tuple<bool, string> rtn = rCache.LockOn(new string[] { _lockkey2, _lockkey3 }, new LckInfo { UName = "tansar",
-                        EventName = "Program", Ip = "127.0.0.1" }, 2000);
+                    var lckinfo = new LckInfo
+                    {
+                        UName = "tansar",
+                        EventName = "Program",
+                        Ip = "127.0.0.1"
+                    };
+                    Tuple<bool, string> rtn = rCache.LockOn(new string[] { _lockkey2, _lockkey3 }, lckinfo, 2000);
                     threadId = Thread.CurrentThread.ManagedThreadId;
                    // SpinWait.SpinUntil(() => false, 4000);
                     Console.WriteLine(rtn.Item2 + " _ " + Thread.CurrentThread.ManagedThreadId);
-                    rCache.UnLock(new string[] { _lockkey2, _lockkey3 });
+                    rCache.UnLock(lckinfo, new string[] { _lockkey2, _lockkey3 });
                 }
                 //SpinWait.SpinUntil(() => false, 4000);
                 return;
@@ -624,7 +629,8 @@ namespace HiSql.Test
                 ;
                 Parallel.For(0, 2, (x, y) =>
                 {
-                    Tuple<bool, string> rtn = rCache.LockOn( _lockkey3, new LckInfo { UName = "tansar", EventName = "Program", Ip = "127.0.0.1" });
+                    var lckinfo = new LckInfo { UName = "tansar", EventName = "Program", Ip = "127.0.0.1" };
+                    Tuple<bool, string> rtn = rCache.LockOn( _lockkey3, lckinfo);
                     Console.WriteLine(rtn.Item2 + Thread.CurrentThread.ManagedThreadId);
                     if (rtn.Item1)
                     {
@@ -634,7 +640,7 @@ namespace HiSql.Test
                         //Console.WriteLine(_rtn.Item2);
 
 
-                        bool unlck = rCache.UnLock(_lockkey3);
+                        bool unlck = rCache.UnLock(lckinfo, _lockkey3);
 
                         //if (unlck)
                         //    Console.WriteLine($"解锁成功");

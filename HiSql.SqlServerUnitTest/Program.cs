@@ -57,11 +57,11 @@ namespace HiSql.UnitTest
             //DataConvert.ToDynamic(new TDynamic(new { UserName = "tansar", Age = 33 }).ToDynamic());
             DataConvert.ToDynamic(t1.ToDynamic());
             */
-           // HiSql.Global.RedisOn = true;//开启redis缓存
-            //HiSql.Global.RedisOptions = new RedisOptions { Host = "127.0.0.1", PassWord = "", Port = 6379, CacheRegion = "HRM", Database = 2 };
+            HiSql.Global.RedisOn = true;//开启redis缓存
+            HiSql.Global.RedisOptions = new RedisOptions { Host = "127.0.0.1", PassWord = "", Port = 6379, CacheRegion = "HRM", Database = 2 };
 
-             //StockThread();
-            HiSqlClient sqlcient = Demo_Init.GetSqlClient();
+            StockThread();
+            // HiSqlClient sqlcient = Demo_Init.GetSqlClient();
 
             // Console.WriteLine($"数据库连接id"+sqlcient.Context.ConnectedId);
 
@@ -70,12 +70,12 @@ namespace HiSql.UnitTest
 
             //Demo_Delete.Init(sqlcient);
             //Demo_Insert.Init(sqlcient);
-            DemoCodeFirst.Init(sqlcient);
+            //DemoCodeFirst.Init(sqlcient);
             //Demo_Snro.Init(sqlcient);
-           // Demo_DbCode.Init(sqlcient);
+            // Demo_DbCode.Init(sqlcient);
 
             //Demo_Cache.Init(sqlcient);
-           // SnowId();
+            // SnowId();
 
 
             Console.ReadLine();
@@ -85,6 +85,18 @@ namespace HiSql.UnitTest
         {
             HiSql.Global.RedisOn = true;//开启redis缓存
             HiSql.Global.RedisOptions = new RedisOptions { Host = "127.0.0.1", PassWord = "", Port = 6379, CacheRegion = "HRM", Database = 2 };
+
+           
+
+            //sqlClient.Context.DMInitalize.GetTabStruct("H_Stock");
+            //return;
+            Parallel.For(0, 10, (index, y) =>
+            {
+                HiSqlClient sqlClient4 = Demo_Init.GetSqlClient();
+                sqlClient4.Context.DMInitalize.GetTabStruct("H_Stock");
+                sqlClient4.Context.DMInitalize.GetTabStruct("H_Order");
+            });
+            return;
 
             HiSqlClient sqlClient = Demo_Init.GetSqlClient();
             sqlClient.CodeFirst.Truncate("H_Stock");
@@ -115,18 +127,18 @@ namespace HiSql.UnitTest
             string[] grp_arr1 = new string[] { "20000112112" };
             string[] grp_arr2 = new string[] { "8000252241", "9000112112" };
 
-            string[] grp_arr3 = new string[] { "4000252241","8000252241", "9000112112", "7000252241", "1000252241", "2000252241", "3000252241", "5000252241", "6000252241", "1100252241", "1200252241", "1300252241", "1400252241", "1500252241" };
-            string[] grp_arr4 = new string[] { "6000252241", "1100252241", "1200252241", "1300252241", "2000252241", "3000252241", "8000252241", "9000112112", "7000252241", "1000252241",  "4000252241", "5000252241", "1400252241", "1500252241" };
-            string[] grp_arr5 = new string[] {  "5000252241", "6000252241", "1100252241", "1200252241", "1300252241","9000112112", "2000252241", "3000252241", "7000252241", "1000252241", "8000252241", "4000252241", "1400252241", "1500252241" };
+            string[] grp_arr3 = new string[] { "4000252241", "8000252241", "9000112112", "7000252241", "1000252241", "2000252241", "3000252241", "5000252241", "6000252241", "1100252241", "1200252241", "1300252241", "1400252241", "1500252241" };
+            string[] grp_arr4 = new string[] { "6000252241", "1100252241", "1200252241", "1300252241", "2000252241", "3000252241", "8000252241", "9000112112", "7000252241", "1000252241", "4000252241", "5000252241", "1400252241", "1500252241" };
+            string[] grp_arr5 = new string[] { "5000252241", "6000252241", "1100252241", "1200252241", "1300252241", "9000112112", "2000252241", "3000252241", "7000252241", "1000252241", "8000252241", "4000252241", "1400252241", "1500252241" };
 
             Stopwatch stopwatch = Stopwatch.StartNew();
             stopwatch.Start();
-           
+
             Random random = new Random();
 
             HiSql.Snowflake.SnowType = SnowType.IdWorker;
             Hashtable hashtable = new Hashtable();
-            int count  = 0;
+            int count = 0;
             Stopwatch stopwatch1 = Stopwatch.StartNew();
             stopwatch1.Start();
             //Parallel.For(0, 100, (index, y) =>
@@ -167,30 +179,37 @@ namespace HiSql.UnitTest
 
             //});
 
-            //Console.WriteLine(hashtable.Count + " 耗时：" + stopwatch1.ElapsedMilliseconds);
-            //return;
+            Console.WriteLine(hashtable.Count + " 耗时：" + stopwatch1.ElapsedMilliseconds);
+            return;
 
             DataTable dt = sqlClient.HiSql($"select Batch,Material,Location,st_kc from H_Stock  where  Batch in ({grp_arr1.ToSqlIn()}) and st_kc>0").ToTable();
 
-            //var lockinfo = new LckInfo
-            //{
-            //    UName = "tanar44-" + 2,
-            //    Ip = "127.0.0.1"
+            var lockinfo = new LckInfo
+            {
+                UName = "tanar44-" + 2,
+                Ip = "127.0.0.1"
 
 
-            //};
-            //HiSql.Lock.LockOn(grp_arr1, lockinfo, 60, 30);
+            };
 
 
-            //HiSql.Lock.UnLock(lockinfo,grp_arr1);
+            //HiSql.Lock.LockOn(grp_arr4, lockinfo, 60, 30);
 
-            //return;
+            //HiSql.Lock.UnLock(lockinfo, grp_arr4);
 
-            for (int index = 0; index < 100; index++)
+            // return;
+
+            bool stop = false;
+            HiSql.RCache rCache = new RCache(HiSql.Global.RedisOptions);
+            rCache.Clear();
+            for (int index = 0; index < 40 || !stop; index++)
             {
                 Thread.Sleep(200);
 
-                Task.Run(() => {
+                Task.Run(() =>
+                {
+
+
                     int grpidx = index % 4;
                     string[] grparr = grp_arr1;
                     if (grpidx == 0)
@@ -200,7 +219,7 @@ namespace HiSql.UnitTest
                     else if (grpidx == 1)
                     { grparr = grp_arr5; }
                     else if (grpidx == 2)
-                    { grparr = grp_arr1; }
+                    { grparr = grp_arr3; }
                     else
                     { grparr = grp_arr3; }
 
@@ -212,112 +231,134 @@ namespace HiSql.UnitTest
 
                     bool _flag = true;
 
-                    HiSqlClient _sqlClient = Demo_Init.GetSqlClient();
+                    
 
                     int loopcnt = 0;
-                    while (_flag && loopcnt < 100)
+                    while (_flag && loopcnt < 2)
                     {
-                        loopcnt++;
-                        Stopwatch stopwatchGetLock = Stopwatch.StartNew();
-                        var rtn = HiSql.Lock.LockOnExecute(grparr, () =>
+                       
+                        try
                         {
-                            Stopwatch stopwatch2 = Stopwatch.StartNew();
-
-                            HiSql.Snowflake.SnowType = SnowType.IdWorker;
-                            Int64 orderid = HiSql.Snowflake.NextId() + radom.Next(1000, 9999);
-                            Console.WriteLine($"时间：{stopwatch.ElapsedMilliseconds} keys:{string.Join(",", grparr)} 加锁成功-{index}-{loopcnt}-线程ID:{Thread.CurrentThread.ManagedThreadId.ToString()}, 雪花ID{orderid}");
-
-                            //_sqlClient.BeginTran(IsolationLevel.ReadUncommitted);
-
-                            //DataTable dt = _sqlClient.HiSql($"select Batch,Material,Location,st_kc from H_Stock  where  Batch in ({grparr.ToSqlIn()}) and st_kc>0").ToTable();
-
-                            //if (dt.Rows.Count > 0)
-                            //{
-                            //    List<object> lstorder = new List<object>();
-                            //    string _shop = "4301";
-                            //    _sqlClient.BeginTran();
-                            //    int s = random.Next(1,6);
-                            //    foreach (string n in grparr)
-                            //    {
-                            //        int v = _sqlClient.Update("H_Stock", new { st_kc = $"`st_kc`-{s}" }).Where($"Batch='{n}' and st_kc>={s}").ExecCommand();
-                            //        Console.WriteLine($"结果:{v}");
-                            //        if (v == 0)
-                            //        {
-                            //            _flag = false;
-                            //            Console.WriteLine($"批次:[{n}]扣减[{s}]失败");
-                            //            _sqlClient.RollBackTran();
-                            //            break;
-                            //        }
-                            //        else
-                            //        {
-                            //            DataRow _drow = dt.AsEnumerable().Where(s => s.Field<string>("Batch").Equals(n)).FirstOrDefault();
-                            //            if (_drow != null)
-                            //            {
-                            //                lstorder.Add(
-                            //                    new
-                            //                    {
-                            //                        OrderId = orderid,
-                            //                        Batch = _drow["Batch"].ToString(),
-                            //                        Material = _drow["Material"].ToString(),
-                            //                        Shop = _shop,
-                            //                        Location = _drow["Location"].ToString(),
-                            //                        SalesNum = s,
-                            //                    }
-
-                            //                    );
+                            HiSqlClient _sqlClient = Demo_Init.GetSqlClient();
+                            loopcnt++;
+                            Stopwatch stopwatchGetLock = Stopwatch.StartNew();
+                            var rtn = HiSql.Lock.LockOnExecute(grparr, () =>
+                            {
+                                Stopwatch stopwatch2 = Stopwatch.StartNew();
+                                try
+                                {
 
 
-                            //            }
-                            //            else
-                            //            {
-                            //                _flag = false;
-                            //                Console.WriteLine($"批次:[{n}]扣减[{s}]失败 未找到库存");
-                            //                _sqlClient.RollBackTran();
-                            //                break;
+                                    HiSql.Snowflake.SnowType = SnowType.IdWorker;
+                                    Int64 orderid = HiSql.Snowflake.NextId() + radom.Next(1000, 9999);
+                                    Console.WriteLine($"时间：{stopwatch.ElapsedMilliseconds} keys:{string.Join(",", grparr)} 加锁成功-{index}-{loopcnt}-线程ID:{Thread.CurrentThread.ManagedThreadId.ToString()}, 雪花ID{orderid}");
 
-                            //            }
+                                    _sqlClient.BeginTran(IsolationLevel.ReadUncommitted);
 
-                            //        }
-                            //    }
-                            //    if (_flag)
-                            //    {
-                            //        //生成订单
-                            //        //if (lstorder.Count > 0)
-                            //        //    _sqlClient.Insert("H_Order", lstorder).ExecCommand();
-                            //        _sqlClient.CommitTran();
-                            //    }
+                                    DataTable dt = _sqlClient.HiSql($"select Batch,Material,Location,st_kc from H_Stock  where  Batch in ({grparr.ToSqlIn()}) and st_kc>0").ToTable();
 
-                            //}
-                            //else
-                            //{
-                            //    _flag = false;
-                            //    Console.WriteLine($"库存不足...");
-                            //}
+                                    if (dt.Rows.Count > 0)
+                                    {
+                                        List<object> lstorder = new List<object>();
+                                        string _shop = "4301";
+                                        _sqlClient.BeginTran();
+                                        int s = random.Next(1, 6);
+                                        foreach (string n in grparr)
+                                        {
+                                            int v = _sqlClient.Update("H_Stock", new { st_kc = $"`st_kc`-{s}" }).Where($"Batch='{n}' and st_kc>={s}").ExecCommand();
+                                            Console.WriteLine($"雪花ID{orderid}Batch:{n} 结果:{v}");
+                                            if (v == 0)
+                                            {
+                                                _flag = false;
+                                                Console.WriteLine($"批次:[{n}]扣减[{s}]失败");
+                                                _sqlClient.RollBackTran();
+                                                break;
+                                            }
+                                            else
+                                            {
+                                                DataRow _drow = dt.AsEnumerable().Where(s => s.Field<string>("Batch").Equals(n)).FirstOrDefault();
+                                                if (_drow != null)
+                                                {
+                                                    lstorder.Add(
+                                                        new
+                                                        {
+                                                            OrderId = orderid,
+                                                            Batch = _drow["Batch"].ToString(),
+                                                            Material = _drow["Material"].ToString(),
+                                                            Shop = _shop,
+                                                            Location = _drow["Location"].ToString(),
+                                                            SalesNum = s,
+                                                        }
 
-                            Console.WriteLine($"时间：{stopwatch.ElapsedMilliseconds}   keys:{string.Join(",", grparr)}  业务执行完成-{index}-{loopcnt}- 线程：{Thread.CurrentThread.ManagedThreadId.ToString()} 业务执行时间： {stopwatch2.ElapsedMilliseconds}  雪花ID{orderid} ");
+                                                        );
 
-                        }, new LckInfo
+
+                                                }
+                                                else
+                                                {
+                                                    _flag = false;
+                                                    Console.WriteLine($"批次:[{n}]扣减[{s}]失败 未找到库存");
+                                                    _sqlClient.RollBackTran();
+                                                    break;
+
+                                                }
+
+                                            }
+                                        }
+                                        if (_flag)
+                                        {
+                                            //生成订单
+                                            //if (lstorder.Count > 0)
+                                            //    _sqlClient.Insert("H_Order", lstorder).ExecCommand();
+                                            _sqlClient.CommitTran();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        _flag = false;
+                                        Console.WriteLine($"库存不足...");
+                                    }
+
+                                    Console.WriteLine($"时间：{stopwatch.ElapsedMilliseconds}   keys:{string.Join(",", grparr)}  业务执行完成-{index}-{loopcnt}- 线程：{Thread.CurrentThread.ManagedThreadId.ToString()} 业务执行时间： {stopwatch2.ElapsedMilliseconds}  雪花ID{orderid} ");
+                                }
+                                catch (Exception ex)
+                                {
+
+
+                                    Console.WriteLine($"时间：{stopwatch.ElapsedMilliseconds}   对象-{index}-{loopcnt} 执行业务异常2：{ex.Message}  ");
+                                }
+                            }, new LckInfo
+                            {
+                                UName = $"tanar-{index}-{ loopcnt }",
+                                Ip = "127.0.0.1"
+
+                            }, 60, 30);
+                            if (!rtn.Item1)
+                            {
+                                Console.WriteLine($"时间：{stopwatch.ElapsedMilliseconds}  keys:{string.Join(",", grparr)}  对象-{index}-{loopcnt} 获取锁耗时：{stopwatchGetLock.ElapsedMilliseconds}  " + rtn.Item2);
+                            }
+                        }
+                        catch (Exception ex)
                         {
-                            UName = $"tanar-{index}-{ loopcnt }",
-                            Ip = "127.0.0.1"
 
-                        }, 180, 30);
-                        if (!rtn.Item1)
-                        {
-                            Console.WriteLine($"时间：{stopwatch.ElapsedMilliseconds}  keys:{string.Join(",", grparr)}  对象-{index}-{loopcnt} 获取锁耗时：{stopwatchGetLock.ElapsedMilliseconds}  " + rtn.Item2);
+                            Console.WriteLine($"时间：{stopwatch.ElapsedMilliseconds}   对象-{index}-{loopcnt} 执行业务异常：{ex.Message}  ");
                         }
                     }
+
+
+                    if (!_flag)
+                        stop = true;
                 });
             }
 
-           Parallel.For(0, 100, (index, y) =>
-            {
-               
-                //Console.WriteLine($" {index}线程Id:{Thread.CurrentThread.ManagedThreadId}\t{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}");
+            Parallel.For(0, 100, (index, y) =>
+             {
 
-                //Thread.Sleep(200);
+                 //Console.WriteLine($" {index}线程Id:{Thread.CurrentThread.ManagedThreadId}\t{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}");
 
-            });
+                 //Thread.Sleep(200);
+
+             });
         }
         static void SnowId()
         {
