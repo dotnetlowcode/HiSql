@@ -260,7 +260,10 @@ namespace HiSql
                     //说明该表不是通过工具创建的,他的表结构信息不存在于Hi_TabModel和Hi_FieldModel中
                     //那么需要通过底层SQL代码获取表结构信息 然后再添加到Hi_TabModel和Hi_FieldModel中 再进行缓存处理
                     tabInfo = TabDefinitionToEntity(dts, dbConfig.DbMapping);
-                    int rtn = this.BuildTabCreate(tabInfo);
+                    HiSqlCommProvider.LockTableExecAction(tabname, () => {
+                        int rtn = this.BuildTabCreate(tabInfo);
+                    });
+                   
                     //string _sql = this.BuildTabStructSql(tabInfo.TabModel, tabInfo.Columns).ToString();
                     //this.Context.DBO.ExecCommand(_sql);
                     //GetTabStruct(tabname);
@@ -331,44 +334,48 @@ namespace HiSql
             
             if (_lstdel.Count > 0 || _lstmodi.Count > 0)
             {
-                _client = this.Context.CloneClient();
+                HiSqlCommProvider.LockTableExecAction(tabname, () =>
+                {
+                    _client = this.Context.CloneClient();
+                    if (_lstdel.Count > 0)
+                    {
+                        try
+                        {
+                            _client.Delete(Constants.HiSysTable["Hi_FieldModel"].ToString(), _lstdel).ExecCommand();
+                        }
+                        catch (Exception e)
+                        {
+                            throw e;
+                        }
+                        finally
+                        {
+                            _client.Context.DBO.Close();
+                            _client.Context.DBO.Dispose();
+                        }
+
+
+                    }
+                    if (_lstmodi.Count > 0)
+                    {
+                        try
+                        {
+                            _client.Modi(Constants.HiSysTable["Hi_FieldModel"].ToString(), _lstmodi).ExecCommand();
+                        }
+                        catch (Exception e)
+                        {
+                            throw e;
+                        }
+                        finally
+                        {
+                            _client.Context.DBO.Close();
+                            _client.Context.DBO.Dispose();
+                        }
+                    }
+                });
                 
             }
                 
 
-            if (_lstdel.Count > 0)
-            {
-                try
-                {
-                    _client.Delete(Constants.HiSysTable["Hi_FieldModel"].ToString(), _lstdel).ExecCommand();
-                }
-                catch (Exception e)
-                {
-                    throw e;
-                }
-                finally {
-                    _client.Context.DBO.Close();
-                    _client.Context.DBO.Dispose();
-                }
-               
-               
-            } 
-            if (_lstmodi.Count > 0)
-            {
-                try
-                {
-                    _client.Modi(Constants.HiSysTable["Hi_FieldModel"].ToString(), _lstmodi).ExecCommand();
-                }
-                catch (Exception e)
-                {
-                    throw e;
-                }
-                finally
-                {
-                    _client.Context.DBO.Close();
-                    _client.Context.DBO.Dispose();
-                }
-            }
             
             return newtabinfo;
         }
