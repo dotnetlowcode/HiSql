@@ -10,12 +10,18 @@ namespace HiSql
     {
         public static void Init(HiSqlClient sqlClient)
         {
-            CodeFirst_Demo(sqlClient);
+            //CodeFirst_Demo(sqlClient);
             //Snro_Demo(sqlClient);
-
+            CodeFirst_Install(sqlClient);
             string s = Console.ReadLine();
         }
 
+
+        static void CodeFirst_Install(HiSqlClient sqlClient)
+        {
+            HiSql.Global.SnroOn = true;
+            sqlClient.CodeFirst.InstallHisql();
+        }
         static void CodeFirst_Table(HiSqlClient sqlClient)
         {
             //sqlClient.CodeFirst.CreateTable(typeof(HiSql.SNRO.Hi_Snro));
@@ -27,7 +33,7 @@ namespace HiSql
 
             //sqlClient.CodeFirst.DropTable("H_Test");
 
-            sqlClient.CodeFirst.Truncate("H_Test");
+            //sqlClient.CodeFirst.Truncate("H_Test");
         }
         static async void CodeFirst_Demo(HiSqlClient sqlClient)
         {

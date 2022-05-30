@@ -19,6 +19,17 @@ namespace HiSql
         {
             get;set;
         }
+        [HiColumn(FieldDesc = "是否雪花ID", FieldType =HiType.BOOL,   IsNull = false, SortNum = 3, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY)]
+        public bool IsSnow
+        {
+            get; set;
+        }
+
+        [HiColumn(FieldDesc = "雪花ID时间戳", FieldType = HiType.BIGINT, IsNull = false, SortNum = 4, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY)]
+        public bool SnowTick
+        {
+            get; set;
+        }
 
         /// <summary>
         /// 开始编号值

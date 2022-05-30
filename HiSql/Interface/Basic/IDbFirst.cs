@@ -173,7 +173,7 @@ namespace HiSql
         List<TableInfo> GetAllTables();
         List<TableInfo> GetAllTables(string viewName, int pageSize, int pageIndex, out int totalCount);
 
-        bool CheckTabExists(string tableName);
+     
         List<string> GetStoredProc();
        
 

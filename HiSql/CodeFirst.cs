@@ -71,8 +71,11 @@ namespace HiSql
                 { 
                     bool _has_snro= _sqlClient.DbFirst.CheckTabExists(Constants.HiSysTable["Hi_Snro"]);
                     if (!_has_snro)
-                    { 
+                    {
                         //如果不存在编号表则创建
+                        TabInfo tabinfo_field = _sqlClient.Context.DMInitalize.BuildTab(typeof(Hi_Snro));
+
+                        _sqlClient.DbFirst.CreateTable(tabinfo_field);
                     }
                 }
 

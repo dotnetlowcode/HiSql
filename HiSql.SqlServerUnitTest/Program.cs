@@ -57,11 +57,11 @@ namespace HiSql.UnitTest
             //DataConvert.ToDynamic(new TDynamic(new { UserName = "tansar", Age = 33 }).ToDynamic());
             DataConvert.ToDynamic(t1.ToDynamic());
             */
-            HiSql.Global.RedisOn = true;//开启redis缓存
-            HiSql.Global.RedisOptions = new RedisOptions { Host = "127.0.0.1", PassWord = "", Port = 6379, CacheRegion = "HRM", Database = 2 };
+           // HiSql.Global.RedisOn = true;//开启redis缓存
+            //HiSql.Global.RedisOptions = new RedisOptions { Host = "127.0.0.1", PassWord = "", Port = 6379, CacheRegion = "HRM", Database = 2 };
 
-             StockThread();
-           // HiSqlClient sqlcient = Demo_Init.GetSqlClient();
+             //StockThread();
+            HiSqlClient sqlcient = Demo_Init.GetSqlClient();
 
             // Console.WriteLine($"数据库连接id"+sqlcient.Context.ConnectedId);
 
@@ -70,7 +70,7 @@ namespace HiSql.UnitTest
 
             //Demo_Delete.Init(sqlcient);
             //Demo_Insert.Init(sqlcient);
-            //DemoCodeFirst.Init(sqlcient);
+            DemoCodeFirst.Init(sqlcient);
             //Demo_Snro.Init(sqlcient);
            // Demo_DbCode.Init(sqlcient);
 
