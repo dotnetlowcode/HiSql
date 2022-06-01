@@ -1389,6 +1389,11 @@ namespace HiSql
             return new Tuple<bool, string>(flag, msg);
         }
 
+        /// <summary>
+        /// 缓存类型
+        /// </summary>
+        public override CacheType CacheType => CacheType.RCache;
+
         #region 私有变量
         LckInfo getLockInfo(LckInfo lckInfo, int expresseconds, int times)
         {

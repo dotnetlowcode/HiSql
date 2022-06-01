@@ -85,6 +85,12 @@ namespace HiSql
         /// </summary>
         public int Count { get; }
 
+
+        /// <summary>
+        /// 缓存类型
+        /// </summary>
+        public CacheType CacheType { get;  }
+
         /// <summary>
         /// 移除一个缓存
         /// </summary>

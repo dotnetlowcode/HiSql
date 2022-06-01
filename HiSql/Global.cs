@@ -15,6 +15,7 @@ namespace HiSql
 
         static RedisOptions redisOptions = null;
 
+        static NumberOptions numberOptions = null;
 
 
         static bool _redison = false;
@@ -56,5 +57,14 @@ namespace HiSql
             }
         }
 
+        /// <summary>
+        /// 编号配置
+        /// </summary>
+
+        public static NumberOptions NumberOptions
+        {
+            get { if(  numberOptions == null) numberOptions = new NumberOptions(); return   numberOptions; }
+            set { numberOptions = value; }
+        }
     }
 }

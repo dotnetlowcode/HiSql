@@ -828,5 +828,11 @@ namespace HiSql
             }
             return lckInfos;
         }
+
+
+        /// <summary>
+        /// 缓存类型
+        /// </summary>
+        public override CacheType CacheType => CacheType.MCache;
     }
 }
