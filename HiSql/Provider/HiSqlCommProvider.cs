@@ -92,7 +92,16 @@ namespace HiSql
             //}
             return CacheContext.MCache.GetOrCreate<TabInfo>(_keyname, () =>
             {
-                return GetInfo();
+                try
+                {
+                    return GetInfo();
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+               
             });
         }
 

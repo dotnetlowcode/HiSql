@@ -5,7 +5,7 @@
 		<LangVersion>9.0</LangVersion>
 		<Version>1.0.3.8</Version>
 		<Authors>tansar</Authors>
-		<Company>Hone</Company>
+		<Company>HiSql</Company>
 		<Description>HiSql 核心包
 
 支持SqlServer,MySql,Oracle,Hana,PostGreSql 根据需要单独再引用支持的包

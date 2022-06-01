@@ -15,7 +15,14 @@ namespace HiSql
 
         static RedisOptions redisOptions = null;
 
-
+        /// <summary>
+        /// 非阻塞模式，获取锁默认等等多少毫秒
+        /// </summary>
+        public static int NoWaitModeGetLockWaitMillSeconds = 600;
+        /// <summary>
+        /// 获取锁重试的时候，等待多少毫秒
+        /// </summary>
+        public static int GetLockRetrySleepMillSeconds = 50;
 
         static bool _redison = false;
 

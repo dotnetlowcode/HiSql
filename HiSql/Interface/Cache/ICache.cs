@@ -39,8 +39,8 @@ namespace HiSql
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
-        /// <param name="expiressAbsoulte">绝对时间过期</param>
-        void SetCache(string key, object value, DateTimeOffset expiressAbsoulte);//设置绝对时间过期
+        /// <param name="expiryAbsoulte">绝对时间过期</param>
+        void SetCache(string key, object value, DateTimeOffset expiryAbsoulte);//设置绝对时间过期
 
         /// <summary>
         /// 设置一个缓存,并设置有效期

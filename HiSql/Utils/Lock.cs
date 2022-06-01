@@ -60,8 +60,6 @@ namespace HiSql
             return _lock.CheckLock(keys);
         }
 
-
-
         /// <summary>
         /// 加业务锁
         /// </summary>
@@ -73,6 +71,18 @@ namespace HiSql
         public static Tuple<bool, string> LockOnExecute(string key, Action action, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
         { 
             return _lock.LockOnExecute(key,action, lckinfo,expresseconds,timeoutseconds);  
+        }
+
+        /// <summary>
+        /// 加业务锁
+        /// </summary>
+        /// <param name="key">自定锁的KEY</param>
+        /// <param name="action">加锁后执行的业务</param>
+        /// <param name="expresseconds">锁的周期时间 单位秒</param>
+        /// <returns></returns>
+        public static Tuple<bool, string> LockOnExecuteNoWait(string key, Action action, LckInfo lckinfo, int expresseconds = 30)
+        {
+            return _lock.LockOnExecute(key, action, lckinfo, expresseconds);
         }
         /// <summary>
         /// 加业务锁，支持同时锁多个key
@@ -86,7 +96,18 @@ namespace HiSql
         { 
             return _lock.LockOnExecute(keys,action,lckinfo,expresseconds, timeoutseconds);
         }
-
+        /// <summary>
+        /// 加业务锁，支持同时锁多个key
+        /// </summary>
+        /// <param name="key">一个或多个key</param>
+        /// <param name="action">加锁后执行的业务</param>
+        /// <param name="expresseconds">锁的周期时间 单位秒</param>
+        /// <returns></returns>
+        public static Tuple<bool, string> LockOnExecuteNoWait(string[] keys, Action action, LckInfo lckinfo, int expresseconds = 305)
+        {
+            return _lock.LockOnExecuteNoWait(keys, action, lckinfo, expresseconds);
+        }
+        
         /// <summary>
         /// 移除锁，支持多个key
         /// </summary>

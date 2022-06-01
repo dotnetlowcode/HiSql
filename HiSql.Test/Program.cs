@@ -332,9 +332,39 @@ namespace HiSql.Test
             //  var rel3 = System.Threading.Monitor.TryEnter(lockObj);
             //var rel =  System.Threading.Monitor.TryEnter(lockObj);
             HiSql.RCache rCache = null;// new MCache();
-            var rCacheOptions = new RedisOptions { Host = "192.168.10.130", Port = 8379, PassWord = "",  Database = 6 };
-            rCacheOptions = new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "", Database = 3, EnableMultiCache = true, KeyspaceNotificationsEnabled = true };
+            var rCacheOptions = new RedisOptions { Host = "192.168.10.130", Port = 8379, PassWord = "", Database = 6 };
+            rCacheOptions = new RedisOptions { Host = "127.0.0.1", PassWord = "", Port = 6379, CacheRegion = "HRM", Database = 2 };
             rCache = new RCache(rCacheOptions);
+            var script2 = @"
+                local non_exist = true                
+                local r = redis.call('GET',@key)
+                non_exist = (non_exist and not r)
+                if non_exist then    
+                    redis.call('set',@key,@value)
+                    return 1
+                else
+                    return 0
+                end";
+            IRedis objIRedis = (IRedis)rCache;
+            var result = objIRedis.ExecLuaScript(script2, new { key = "test", value = "value大师傅" });
+
+            var script3 =
+                 @"
+                local i = 1
+                local cnt = 0
+                for i = 1,#ARGV
+                do
+                    redis.call('set',KEYS[i],ARGV[i])
+                    cnt = cnt + 1
+                end
+                return cnt";
+
+
+            var result2 = objIRedis.ExecLuaScript(script3, new string[] { "lua_key1", "lua_key2" }, new string[] { "lua_值1", "lua_值2" });
+
+
+            Console.WriteLine($"结果：" + result2);
+            return;
             var aa = new MCache(rCacheOptions.CacheRegion);
 
             {
@@ -729,8 +759,8 @@ namespace HiSql.Test
         {
 
             Console.WriteLine(DateTimeOffset.MaxValue);
-           // CacheTest();
-            LockTest();
+            CacheTest();
+           // LockTest();
 
         Console.ReadLine();
             return;
