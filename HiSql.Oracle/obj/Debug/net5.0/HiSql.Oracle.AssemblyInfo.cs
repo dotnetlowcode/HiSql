@@ -11,7 +11,7 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute("Hone")]
+[assembly: System.Reflection.AssemblyCompanyAttribute("HiSql")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("该包支持Oracle数据库 依赖于HiSql.dll包运行")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.3.8")]

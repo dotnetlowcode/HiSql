@@ -18,8 +18,8 @@ namespace HiSql
         Oracle=4,
         Hana=5,
         PostGreSql = 6,
-        MongoDb=7
-
+        MongoDb=7,
+        DaMeng = 8
         //Access=6,
 
     }

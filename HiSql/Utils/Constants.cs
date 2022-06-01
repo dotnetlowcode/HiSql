@@ -251,7 +251,9 @@ namespace HiSql
             { "Hi_Domain","Hi_Domain"},
             { "Hi_DataElement","Hi_DataElement"},
             { "Hi_TabModel","Hi_TabModel"},
-            { "Hi_FieldModel","Hi_FieldModel"}
+            { "Hi_FieldModel","Hi_FieldModel"},
+            
+            { "Hi_Snro","Hi_Snro"}//自定义编号
 
         };
 

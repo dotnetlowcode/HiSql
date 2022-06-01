@@ -23,7 +23,8 @@ namespace HiSql
         internal MemoryCacheOptions MemoryCacheOptions { get; }
         public override int Count => _cache.Count;
 
-        private void SetCacheRegion(string resion) {
+        private void SetCacheRegion(string resion)
+        {
             base.Init(resion);
         }
 
@@ -120,7 +121,7 @@ namespace HiSql
             object v = null;
             if (this._cache.TryGetValue(key, out v))
                 this._cache.Remove(key);
-                this._cache.Set<object>(key, value, expirationTime);
+            this._cache.Set<object>(key, value, expirationTime);
         }
 
         /// <summary>
@@ -199,7 +200,6 @@ namespace HiSql
                 entry.SetValue(objs);
                 entry.AbsoluteExpiration = time;
                 return objs;
-
             });
         }
 
@@ -291,27 +291,28 @@ namespace HiSql
         /// </summary>
         /// <param name="key"></param>
         /// <param name="lckinfo"></param>
-        /// <param name="expresseconds"></param>
-        /// <param name="timeoutseconds"></param>
+        /// <param name="expirySeconds"></param>
+        /// <param name="timeoutSeconds"></param>
         /// <returns></returns>
-        public override Tuple<bool, string> LockOn(string key, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
+        public override Tuple<bool, string> LockOn(string key, LckInfo lckinfo, int expirySeconds = 30, int timeoutSeconds = 5)
         {
+            var isBlockingMode = timeoutSeconds > 0; //是否阻塞等待模式
             if (!key.Contains(_lockkeyPrefix))
                 key = _lockkeyPrefix + key;
 
             key = GetRegionKey(key);
 
-            int _max_second = 60;//最长定锁有效期
-            int _max_timeout = 10;//最长加锁等待时间
+            int _max_second = int.MaxValue;//最长定锁有效期
+            int _max_timeout = int.MaxValue;//最长加锁等待时间
 
-            expresseconds = expresseconds < 0 ? 5 : expresseconds;
-            expresseconds = expresseconds > _max_second ? _max_second : expresseconds;
+            expirySeconds = expirySeconds < 0 ? 5 : expirySeconds;
+            expirySeconds = expirySeconds > _max_second ? _max_second : expirySeconds;
 
-            timeoutseconds = timeoutseconds < 0 ? 5 : timeoutseconds;
-            timeoutseconds = timeoutseconds > _max_timeout ? _max_timeout : timeoutseconds;
+            timeoutSeconds = timeoutSeconds < 0 ? 5 : timeoutSeconds;
+            timeoutSeconds = timeoutSeconds > _max_timeout ? _max_timeout : timeoutSeconds;
 
             string msg = "";
-            var flag1 = false;
+            var flag = false;
             //创建key
             if (GetCache<LckInfo>(key) == null)
             {
@@ -319,56 +320,131 @@ namespace HiSql
                 {
                     if (GetCache<LckInfo>(key) == null)
                     {
-                        SetCache(key, lckinfo, expresseconds);
+                        SetCache(key, lckinfo, expirySeconds);
                     }
                 }
             }
-
-            var isok = System.Threading.Monitor.TryEnter(GetCache<LckInfo>(key), TimeSpan.FromSeconds(timeoutseconds));
-            if (!isok)
+            var isgetlocked = false;
+            var getlockElapsed = TimeSpan.FromSeconds(timeoutSeconds);
+            if (!isBlockingMode)
             {
-                flag1 = false;
-                msg = $"key:[{key}]锁定失败,加锁等待超过{timeoutseconds}秒!";
+                getlockElapsed = TimeSpan.FromSeconds(Global.LockOptions.NoWaitModeGetLockWaitMillSeconds);
+            }
+            isgetlocked = System.Threading.Monitor.TryEnter(GetCache<LckInfo>(key), getlockElapsed);
+
+            if (!isgetlocked)
+            {
+                flag = false;
+                msg = $"key:[{key}]锁定失败,加锁等待超过{timeoutSeconds}秒!";
             }
             else
             {
                 SaveLockInfo(key, lckinfo);
-               
+
                 msg = "加锁成功";
-                flag1 = true;
+                flag = true;
             }
-            return new Tuple<bool, string>(flag1, msg);
+            return new Tuple<bool, string>(flag, msg);
         }
 
-        public override Tuple<bool, string> LockOn(string[] keys, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
+        //private static Hashtable hashtable = new Hashtable();
+        //private static List<string> hashtable = new List<string>();
+
+        bool CkeckExists(params string[] keys)
         {
+            bool flag = false;
+            lock (hashtable)
+            {
+                flag = keys.Intersect(hashtable).Count() > 0;
+            }
+            return flag;
+        }
+        private static List<string> hashtable = new List<string>();
+        private static List<string> lockhashtable = new List<string>();
+        public override Tuple<bool, string> LockOn(string[] keys, LckInfo lckinfo, int expirySeconds = 30, int timeoutSeconds = 5)
+        {
+            var isBlockingMode = timeoutSeconds > 0; //是否阻塞等待模式
             Tuple<bool, string> tuple = new Tuple<bool, string>(false, "");
             Stopwatch stopwatch = Stopwatch.StartNew();
+
+            if (keys.Length == 1)
+            {
+                return LockOn(keys[0], lckinfo, expirySeconds, timeoutSeconds);
+            }
+
             List<string> lockedKey = new List<string>();
             int idx = 0;
-            while (!tuple.Item1 && stopwatch.Elapsed <= TimeSpan.FromSeconds(5) && idx < keys.Length)
+            lock (lockhashtable)
             {
-                var lockResult = LockOn(keys[idx], lckinfo, expresseconds, timeoutseconds);
-                if (!lockResult.Item1)
+                var getlockElapsed = TimeSpan.FromSeconds(timeoutSeconds);
+                if (!isBlockingMode)
                 {
-                    tuple = lockResult;
-                    break;
+                    getlockElapsed = TimeSpan.FromSeconds(Global.LockOptions.NoWaitModeGetLockWaitMillSeconds);
                 }
 
-                lockedKey.Add(keys[idx]);
-                idx++;
-            }
-            if (idx == keys.Length)
-            {
-                return new Tuple<bool, string>(true, $"key:[{string.Join(",", keys)}]加锁成功");
-            }
-            //加锁失败或超时
-            foreach (var key in lockedKey)
-            {
-                UnLock(key);
-            }
-            return new Tuple<bool, string>(tuple.Item1, tuple.Item2);
+                while (keys.Length > 1 && CkeckExists(keys) && stopwatch.Elapsed <= getlockElapsed)
+                {
+                    Thread.Sleep(Global.LockOptions.GetLockRetrySleepMillSeconds);
+                    if (stopwatch.Elapsed > getlockElapsed)
+                    {
+                        return new Tuple<bool, string>(false, "准备加锁操作等待超时。");
+                    }
+                }
 
+                while (!tuple.Item1 && stopwatch.Elapsed <= getlockElapsed && idx < keys.Length)
+                {
+                    if (keys.Length > 1 && idx == 0)
+                    {
+                        lock (hashtable)
+                        {
+                            hashtable.AddRange(keys);
+                        }
+                    }
+
+                    var lockResult = LockOn(keys[idx], lckinfo, expirySeconds, timeoutSeconds);
+                    if (!lockResult.Item1)
+                    {
+                        tuple = lockResult;
+                        break;
+                    }
+
+                    lockedKey.Add(keys[idx]);
+                    idx++;
+                }
+
+                if (idx == keys.Length && keys.Length > 1)
+                {
+                    lock (hashtable)
+                    {
+                        for (int i = 0; i < keys.Length; i++)
+                        {
+                            if (hashtable.Contains(keys[i]))
+                            {
+                                hashtable.Remove(keys[i]);
+                            }
+                        }
+                    }
+                    return new Tuple<bool, string>(true, $"key:[{string.Join(",", keys)}]加锁成功");
+                }
+                if (keys.Length > 1)
+                {
+                    lock (hashtable)
+                    {
+                        for (int i = 0; i < keys.Length; i++)
+                        {
+                            hashtable.Remove(keys[i]);
+                        }
+                    }
+                }
+
+                //加锁失败或超时
+                foreach (var key in lockedKey)
+                {
+                    UnLock(lckinfo, key);
+                }
+                return new Tuple<bool, string>(tuple.Item1, tuple.Item2);
+
+            }
         }
 
         private Tuple<bool, string> CheckLock(string key)
@@ -401,7 +477,7 @@ namespace HiSql
             return new Tuple<bool, string>(_islock, _msg);
         }
 
-        
+
         public override Tuple<bool, string> CheckLock(params string[] keys)
         {
             foreach (var key in keys)
@@ -414,25 +490,32 @@ namespace HiSql
             }
             return new Tuple<bool, string>(false, $"key:[{string.Join(",", keys)}]未被锁定");
         }
-        public override Tuple<bool, string> LockOnExecute(string key, Action action, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
+        public override Tuple<bool, string> LockOnExecuteNoWait(string key, Action action, LckInfo lckinfo, int expirySeconds = 30)
         {
+            return LockOnExecute(key, action, lckinfo, expirySeconds, 0);
+        }
+
+        public override Tuple<bool, string> LockOnExecute(string key, Action action, LckInfo lckinfo, int expirySeconds = 30, int timeoutSeconds = 5)
+        {
+            var isBlockingMode = timeoutSeconds > 0; //是否阻塞等待模式
+
             if (!key.Contains(_lockkeyPrefix))
                 key = _lockkeyPrefix + key;
 
             key = GetRegionKey(key);
 
-            int _max_second = 60;//最长定锁有效期
-            int _max_timeout = 10;//最长加锁等待时间
+            int _max_second = int.MaxValue;//最长定锁有效期
+            int _max_timeout = int.MaxValue;//最长加锁等待时间
 
             int _times = 5;//续锁最多次数
 
             int _millsecond = 1000;
 
-            expresseconds = expresseconds < 0 ? 5 : expresseconds;
-            expresseconds = expresseconds > _max_second ? _max_second : expresseconds;
+            expirySeconds = expirySeconds < 0 ? 5 : expirySeconds;
+            expirySeconds = expirySeconds > _max_second ? _max_second : expirySeconds;
 
-            timeoutseconds = timeoutseconds < 0 ? 5 : timeoutseconds;
-            timeoutseconds = timeoutseconds > _max_timeout ? _max_timeout : timeoutseconds;
+            timeoutSeconds = timeoutSeconds < 0 ? 5 : timeoutSeconds;
+            timeoutSeconds = timeoutSeconds > _max_timeout ? _max_timeout : timeoutSeconds;
 
             string msg = "";
             var flag1 = false;
@@ -443,93 +526,125 @@ namespace HiSql
                 {
                     if (GetCache<LckInfo>(key) == null)
                     {
-                        SetCache(key, lckinfo, expresseconds);
+                        SetCache(key, lckinfo, expirySeconds);
                     }
                 }
             }
             bool flag = false;
 
-            var isgetlock = System.Threading.Monitor.TryEnter(GetCache<LckInfo>(key), TimeSpan.FromSeconds(timeoutseconds));
+            bool isgetlock = false;
+            var getlockElapsed = TimeSpan.FromSeconds(timeoutSeconds);
+            if (!isBlockingMode)
+            {
+                getlockElapsed = TimeSpan.FromSeconds(Global.LockOptions.NoWaitModeGetLockWaitMillSeconds);
+            }
+
+            isgetlock = System.Threading.Monitor.TryEnter(GetCache<LckInfo>(key), getlockElapsed);
+           
+
             if (!isgetlock)
             {
                 flag1 = false;
-                msg = $"key:[{key}]锁定失败,加锁等待超过{timeoutseconds}秒!";
+                msg = $"key:[{key}]锁定失败,加锁等待超过{timeoutSeconds}秒!";
             }
             else
             {
                 SaveLockInfo(key, lckinfo);
-                CancellationTokenSource tokenSource = new CancellationTokenSource();
-                CancellationToken cancellationToken = tokenSource.Token;
 
-                Thread thread = null;
-                var workTask = Task.Run(() =>
+                if (isBlockingMode)
                 {
-                    thread = System.Threading.Thread.CurrentThread;
-                    try
+                    CancellationTokenSource tokenSource = new CancellationTokenSource();
+                    CancellationToken cancellationToken = tokenSource.Token;
+
+                    Thread thread = null;
+                    var workTask = Task.Run(() =>
                     {
-                        if (action != null)
+                        thread = System.Threading.Thread.CurrentThread;
+                        try
                         {
-                            action.Invoke();
+                            if (action != null)
+                            {
+                                action.Invoke();
+                            }
+
+                        }
+                        catch (Exception ex)
+                        {
+                            //Console.WriteLine($"线程中断。。");
+                        }
+                        finally
+                        {
+                            UnLock(lckinfo, key);
+                        }
+                    });
+
+                    flag = workTask.Wait(timeoutSeconds * _millsecond, cancellationToken);
+                    if (flag)
+                    {
+                        UnLock(lckinfo, key);
+                        msg = $"key:[{key}]锁定并操作业务成功!锁已自动释放";
+                    }
+                    else
+                    {
+                        var _timesa = 0;
+                        while (!flag)
+                        {
+                            if (_timesa >= _times)
+                            {
+                                if (!workTask.IsCompleted && !workTask.IsCanceled)
+                                {
+                                    UnLock(lckinfo, key);
+                                    tokenSource.Cancel();
+                                    thread.Interrupt();
+                                }
+                                flag = false;
+                                msg = $"key:[{key}]锁定操作业务失败!超过最大[{_times}]次续锁没有完成,操作被撤销";
+                                break;
+                            }
+                            else
+                            {
+                                //续锁
+                                SetCache(key, lckinfo, expirySeconds);
+                                lckinfo = getLockInfo(lckinfo, expirySeconds, _timesa);
+
+                                SaveLockInfo(key, lckinfo);
+
+                                flag = workTask.Wait(timeoutSeconds * _millsecond, cancellationToken);
+                                if (flag)
+                                {
+                                    flag = true;
+                                    UnLock(lckinfo, key);
+                                    msg = $"key:[{key}]锁定并操作业务成功!续锁{_timesa + 1}次,锁已经自动释放";
+                                    break;
+                                }
+                            }
+                            _timesa++;
                         }
 
+                        if (!flag)
+                        {
+                            msg = $"key:[{key}]锁定操作业务失败!超过最大[{_times}]次续锁没有完成,操作被撤销";
+                        }
                     }
-                    catch (Exception ex)
-                    {
-                        //Console.WriteLine($"线程中断。。");
-                    }
-                    finally
-                    {
-                       
-                    }
-                });
-
-                flag = workTask.Wait(timeoutseconds * _millsecond, cancellationToken);
-                if (flag)
-                {
-                    UnLock(key);
-                    msg = $"key:[{key}]锁定并操作业务成功!锁已自动释放";
                 }
                 else
                 {
-                    var _timesa = 0;
-                    while (!flag)
+                    try
                     {
-                        if (_timesa >= _times)
-                        {
-                            if (!workTask.IsCompleted && !workTask.IsCanceled)
-                            {
-                                UnLock(key);
-                                tokenSource.Cancel();
-                                thread.Interrupt();
-                            }
-                            flag = false;
-                            msg = $"key:[{key}]锁定操作业务失败!超过最大[{_times}]次续锁没有完成,操作被撤销";
-                            break;
-                        }
-                        else
-                        {
-                            //续锁
-                            SetCache(key, lckinfo, expresseconds);
-                            lckinfo = getLockInfo(lckinfo, expresseconds, _timesa);
-
-                            SaveLockInfo(key, lckinfo);
-
-                            flag = workTask.Wait(timeoutseconds * _millsecond, cancellationToken);
-                            if (flag)
-                            {
-                                flag = true;
-                                UnLock(key);
-                                msg = $"key:[{key}]锁定并操作业务成功!续锁{_timesa + 1}次,锁已经自动释放";
-                                break;
-                            }
-                        }
-                        _timesa++;
+                        action.Invoke();
+                        flag = true;
+                        msg = $"key:[{key}]锁定并操作业务成功!,锁已经自动释放";
                     }
-
-                    if (!flag)
+                    catch (Exception ex)
                     {
-                        msg = $"key:[{key}]锁定操作业务失败!超过最大[{_times}]次续锁没有完成,操作被撤销";
+                        flag = false;
+                        msg = $"key:[{key}]锁定并操作业务失败!{ex}";
                     }
+                    finally
+                    {
+                        UnLock(lckinfo, key);
+                    }
+                    return new Tuple<bool, string>(flag, msg);
                 }
             }
 
@@ -543,132 +658,159 @@ namespace HiSql
         /// <param name="keys"></param>
         /// <param name="action"></param>
         /// <param name="lckinfo"></param>
-        /// <param name="expresseconds"></param>
-        /// <param name="timeoutseconds"></param>
+        /// <param name="expirySeconds"></param>
+        /// <param name="timeoutSeconds"></param>
         /// <returns></returns>
-        public override Tuple<bool, string> LockOnExecute(string[] keys, Action action, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5)
+        public override Tuple<bool, string> LockOnExecute(string[] keys, Action action, LckInfo lckinfo, int expirySeconds = 30, int timeoutSeconds = 5)
         {
-
-            int _max_second = 60;//最长定锁有效期
-            int _max_timeout = 10;//最长加锁等待时间
+            var isBlockingMode = timeoutSeconds > 0; //是否阻塞等待模式
+            if (keys.Length == 1)
+            {
+                return LockOnExecute(keys[0], action, lckinfo, expirySeconds, timeoutSeconds);
+            }
+            int _max_second = int.MaxValue;//最长定锁有效期
+            int _max_timeout = int.MaxValue;//最长加锁等待时间
 
             int _times = 5;//续锁最多次数
 
             int _millsecond = 1000;
 
-            expresseconds = expresseconds < 0 ? 5 : expresseconds;
-            expresseconds = expresseconds > _max_second ? _max_second : expresseconds;
+            expirySeconds = expirySeconds < 0 ? 5 : expirySeconds;
+            expirySeconds = expirySeconds > _max_second ? _max_second : expirySeconds;
 
-            timeoutseconds = timeoutseconds < 0 ? 5 : timeoutseconds;
-            timeoutseconds = timeoutseconds > _max_timeout ? _max_timeout : timeoutseconds;
+            timeoutSeconds = timeoutSeconds < 0 ? 5 : timeoutSeconds;
+            timeoutSeconds = timeoutSeconds > _max_timeout ? _max_timeout : timeoutSeconds;
 
             string msg = "";
-            var flag1 = false;
-
             bool flag = false;
-
-            var getlockResult = LockOn(keys, lckinfo, expresseconds, timeoutseconds);
+            var getlockResult = LockOn(keys, lckinfo, expirySeconds, timeoutSeconds);
             if (!getlockResult.Item1)
             {
-                flag1 = false;
+                flag = false;
                 msg = getlockResult.Item2;
             }
             else
             {
-
-                CancellationTokenSource tokenSource = new CancellationTokenSource();
-                CancellationToken cancellationToken = tokenSource.Token;
-                Thread thread = null;
-                var workTask = Task.Run(() =>
+                if (isBlockingMode)
                 {
-                    thread = System.Threading.Thread.CurrentThread;
-                    try
+                    CancellationTokenSource tokenSource = new CancellationTokenSource();
+                    CancellationToken cancellationToken = tokenSource.Token;
+                    Thread thread = null;
+                    var workTask = Task.Run(() =>
                     {
-                        if (action != null)
+                        thread = System.Threading.Thread.CurrentThread;
+                        try
                         {
-                            action.Invoke();
+                            if (action != null)
+                            {
+                                action.Invoke();
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            //Console.WriteLine($"线程中断。。");
+                        }
+                        finally
+                        {
+                            //UnLock(keys); 不可以再此处解锁，否则会提示跨现场错误
+                        }
+                    });
+
+                    flag = workTask.Wait(timeoutSeconds * _millsecond, cancellationToken);
+                    if (flag)
+                    {
+                        UnLock(lckinfo, keys);
+                        msg = $"key:[{string.Join(",", keys)}]锁定并操作业务成功!锁已自动释放";
+                    }
+                    else
+                    {
+                        var _timesa = 0;
+                        while (!flag)
+                        {
+                            if (_timesa >= _times)
+                            {
+                                if (!workTask.IsCompleted && !workTask.IsCanceled)
+                                {
+                                    UnLock(lckinfo, keys);
+                                    tokenSource.Cancel();
+                                    thread.Interrupt();
+                                }
+                                flag = false;
+                                msg = $"key:[{string.Join(",", keys)}]锁定操作业务失败!超过最大[{_times}]次续锁没有完成,操作被撤销";
+                                break;
+                            }
+                            else
+                            {
+                                //续锁
+                                foreach (var key in keys)
+                                {
+                                    var newKey = key;
+                                    if (!newKey.Contains(_lockkeyPrefix))
+                                        newKey = _lockkeyPrefix + newKey;
+
+                                    newKey = GetRegionKey(newKey);
+
+                                    SetCache(newKey, lckinfo, expirySeconds);
+                                    lckinfo = getLockInfo(lckinfo, expirySeconds, _timesa);
+                                    SaveLockInfo(newKey, lckinfo);
+                                }
+                                flag = workTask.Wait(timeoutSeconds * _millsecond, cancellationToken);
+                                if (flag)
+                                {
+                                    UnLock(lckinfo, keys);
+                                    flag = true;
+                                    msg = $"key:[{string.Join(",", keys)}]锁定并操作业务成功!续锁{_timesa + 1}次,锁已经自动释放";
+                                    break;
+                                }
+                            }
+                            _timesa++;
+                        }
+
+                        if (!flag)
+                        {
+                            msg = $"key:[{keys}]锁定操作业务失败!超过最大[{_times}]次续锁没有完成,操作被撤销";
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        //Console.WriteLine($"线程中断。。");
-                    }
-                    finally
-                    {
-                        //UnLock(keys); 不可以再此处解锁，否则会提示跨现场错误
-                    }
-                });
-
-                flag = workTask.Wait(timeoutseconds * _millsecond, cancellationToken);
-                if (flag)
-                {
-                    UnLock(keys);
-                    msg = $"key:[{string.Join(",", keys)}]锁定并操作业务成功!锁已自动释放";
                 }
                 else
                 {
-                    var _timesa = 0;
-                    while (!flag)
+                    try
                     {
-                        if (_timesa >= _times)
-                        {
-                            if (!workTask.IsCompleted && !workTask.IsCanceled)
-                            {
-                                UnLock(keys);
-                                tokenSource.Cancel();
-                                thread.Interrupt();
-                            }
-                            flag = false;
-                            msg = $"key:[{string.Join(",", keys)}]锁定操作业务失败!超过最大[{_times}]次续锁没有完成,操作被撤销";
-                            break;
-                        }
-                        else
-                        {
-                            //续锁
-                            foreach (var key in keys)
-                            {
-                                var newKey = key;
-                                if (!newKey.Contains(_lockkeyPrefix))
-                                    newKey = _lockkeyPrefix + newKey;
-
-                                newKey = GetRegionKey(newKey);
-
-                                SetCache(newKey, lckinfo, expresseconds);
-                                lckinfo = getLockInfo(lckinfo, expresseconds, _timesa);
-                                SaveLockInfo(newKey, lckinfo);
-                            }
-                            flag = workTask.Wait(timeoutseconds * _millsecond, cancellationToken);
-                            if (flag)
-                            {
-                                UnLock(keys);
-                                flag = true;
-                                msg = $"key:[{string.Join(",", keys)}]锁定并操作业务成功!续锁{_timesa + 1}次,锁已经自动释放";
-                                break;
-                            }
-                        }
-                        _timesa++;
+                        action.Invoke();
+                        flag = true;
+                        msg = $"key:[{keys}]锁定并操作业务成功!,锁已经自动释放";
                     }
-
-                    if (!flag)
+                    catch (Exception ex)
                     {
-                        msg = $"key:[{keys}]锁定操作业务失败!超过最大[{_times}]次续锁没有完成,操作被撤销";
+                        flag = false;
+                        msg = $"key:[{keys}]锁定并操作业务失败!{ex}";
                     }
+                    finally
+                    {
+                        UnLock(lckinfo, keys);
+                    }
+                    return new Tuple<bool, string>(flag, msg);
                 }
             }
 
             return new Tuple<bool, string>(flag, msg);
         }
-        LckInfo getLockInfo(LckInfo lckInfo, int expresseconds, int times)
+
+        public override Tuple<bool, string> LockOnExecuteNoWait(string[] keys, Action action, LckInfo lckinfo, int expirySeconds = 30)
+        {
+            return LockOnExecute(keys, action, lckinfo, expirySeconds, 0);
+        }
+        LckInfo getLockInfo(LckInfo lckInfo, int expirySeconds, int times)
         {
             if (lckInfo.LockTime == null || lckInfo.LockTime == DateTime.MinValue)
                 lckInfo.LockTime = DateTime.Now;
 
             if (lckInfo.ExpireTime == null || lckInfo.ExpireTime == DateTime.MinValue)
             {
-                lckInfo.ExpireTime = DateTime.Now.AddSeconds(expresseconds);
+                lckInfo.ExpireTime = DateTime.Now.AddSeconds(expirySeconds);
             }
             else
-                lckInfo.ExpireTime = lckInfo.ExpireTime.AddSeconds(expresseconds);
+                lckInfo.ExpireTime = lckInfo.ExpireTime.AddSeconds(expirySeconds);
 
             lckInfo.KeepTimes = times;
 
@@ -680,8 +822,9 @@ namespace HiSql
         /// </summary>
         /// <param name="keys"></param>
         /// <returns></returns>
-        public override bool UnLock(params string[] keys)
+        public override bool UnLock(LckInfo lckInfo, params string[] keys)
         {
+            if (keys.Length == 0) return true;
             foreach (string key in keys)
             {
                 var newkey = key;
@@ -689,9 +832,11 @@ namespace HiSql
                     newkey = _lockkeyPrefix + newkey;
                 newkey = GetRegionKey(newkey);
                 //创建key
-                if (GetCache<LckInfo>(newkey) != null)
+                var cacheObj = GetCache<LckInfo>(newkey);
+                if (cacheObj != null)
                 {
-                    RemoveCache(newkey);
+                    System.Threading.Monitor.Exit(cacheObj);
+                    //RemoveCache(newkey);  //不能移除缓存，否则多线程下锁对象时候，缓存可能被移除了
                     HDel(_lockhashname, newkey);
                 }
             }
@@ -759,5 +904,11 @@ namespace HiSql
             }
             return lckInfos;
         }
+
+
+        /// <summary>
+        /// 缓存类型
+        /// </summary>
+        public override CacheType CacheType => CacheType.MCache;
     }
 }

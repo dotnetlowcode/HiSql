@@ -74,3 +74,8 @@ D:\Project\OpenSource\HiSql\HiSql.HanaUnitTest\HiSql.HanaUnitTest\bin\Release\ne
 D:\Project\OpenSource\HiSql\HiSql.HanaUnitTest\HiSql.HanaUnitTest\bin\Release\net5.0\Microsoft.Extensions.FileSystemGlobbing.dll
 D:\Project\OpenSource\HiSql\HiSql.HanaUnitTest\HiSql.HanaUnitTest\bin\Release\net5.0\System.Text.Encodings.Web.dll
 D:\Project\OpenSource\HiSql\HiSql.HanaUnitTest\HiSql.HanaUnitTest\bin\Release\net5.0\System.Text.Json.dll
+D:\Project\OpenSource\HiSql\HiSql.HanaUnitTest\HiSql.HanaUnitTest\bin\Release\net5.0\Pipelines.Sockets.Unofficial.dll
+D:\Project\OpenSource\HiSql\HiSql.HanaUnitTest\HiSql.HanaUnitTest\bin\Release\net5.0\StackExchange.Redis.dll
+D:\Project\OpenSource\HiSql\HiSql.HanaUnitTest\HiSql.HanaUnitTest\bin\Release\net5.0\System.Diagnostics.PerformanceCounter.dll
+D:\Project\OpenSource\HiSql\HiSql.HanaUnitTest\HiSql.HanaUnitTest\bin\Release\net5.0\System.IO.Pipelines.dll
+D:\Project\OpenSource\HiSql\HiSql.HanaUnitTest\HiSql.HanaUnitTest\bin\Release\net5.0\runtimes\win\lib\netcoreapp2.0\System.Diagnostics.PerformanceCounter.dll

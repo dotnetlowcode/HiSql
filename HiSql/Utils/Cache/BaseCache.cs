@@ -15,6 +15,10 @@ namespace HiSql
         protected string _hsetkeyPrefix = string.Empty;
         protected string _lockhashname = string.Empty;
         protected string _lockhishashname = string.Empty;
+
+
+        private CacheType _cachetype;
+
         protected BaseCache()
         {
 
@@ -55,6 +59,8 @@ namespace HiSql
             }
         }
 
+        public abstract CacheType CacheType { get;  }
+
         public abstract int Count { get; }
 
         public abstract Tuple<bool, string> CheckLock(params string[] keys);
@@ -71,14 +77,16 @@ namespace HiSql
         public abstract bool HDel(string hashkey, string key);
         public abstract string HGet(string hashkey, string key);
         public abstract bool HSet(string hashkey, string key, string value);
-        public abstract Tuple<bool, string> LockOn(string key, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5);
-        public abstract Tuple<bool, string> LockOn(string[] keys, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5);
-        public abstract Tuple<bool, string> LockOnExecute(string key, Action action, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5);
-        public abstract Tuple<bool, string> LockOnExecute(string[] keys, Action action, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5);
+        public abstract Tuple<bool, string> LockOn(string key, LckInfo lckinfo, int expirySeconds = 30, int timeoutSeconds = 5);
+        public abstract Tuple<bool, string> LockOn(string[] keys, LckInfo lckinfo, int expirySeconds = 30, int timeoutSeconds = 5);
+        public abstract Tuple<bool, string> LockOnExecute(string key, Action action, LckInfo lckinfo, int expirySeconds = 30, int timeoutSeconds = 5);
+        public abstract Tuple<bool, string> LockOnExecute(string[] keys, Action action, LckInfo lckinfo, int expirySeconds = 30, int timeoutSeconds = 5);
+        public abstract Tuple<bool, string> LockOnExecuteNoWait(string key, Action action, LckInfo lckinfo, int expirySeconds = 30);
+        public abstract Tuple<bool, string> LockOnExecuteNoWait(string[] keys, Action action, LckInfo lckinfo, int expirySeconds = 30);
         public abstract void RemoveCache(string key);
         public abstract void SetCache(string key, object value);
-        public abstract void SetCache(string key, object value, DateTimeOffset expiressAbsoulte);
+        public abstract void SetCache(string key, object value, DateTimeOffset expiryAbsoulte);
         public abstract void SetCache(string key, object value, int second);
-        public abstract bool UnLock(params string[] keys);
+        public abstract bool UnLock(LckInfo lckinfo, params string[] keys);
     }
 }

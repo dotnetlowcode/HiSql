@@ -371,7 +371,7 @@ namespace HiSql
                         else if (hiColumn.FieldType == HiType.BOOL)
                         {
                             
-                            if (this.Context.CurrentConnectionConfig.DbType.IsIn(DBType.SqlServer, DBType.Oracle))
+                            if (this.Context.CurrentConnectionConfig.DbType.IsIn(DBType.SqlServer, DBType.Oracle, DBType.DaMeng))
                             {
                                 if (_value.ToLower().Equals("true") || _value.ToLower().Equals("1"))
                                 {
@@ -471,7 +471,7 @@ namespace HiSql
                             else if (hiColumn.FieldType == HiType.BOOL)
                             {
 
-                                if (this.Context.CurrentConnectionConfig.DbType.IsIn(DBType.SqlServer, DBType.Oracle))
+                                if (this.Context.CurrentConnectionConfig.DbType.IsIn(DBType.SqlServer, DBType.Oracle, DBType.DaMeng))
                                 {
                                     if (_value.ToLower().Equals("true") || _value.ToLower().Equals("1"))
                                     {

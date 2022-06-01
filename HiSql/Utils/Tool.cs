@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -10,6 +11,29 @@ namespace HiSql
     public class Tool
     {
 
+        public static class Net
+        {
+            /// <summary>
+            /// 获取本机IP
+            /// </summary>
+            /// <returns></returns>
+            public static string GetLocalIPAddress()
+            {
+                System.Net.IPAddress[] addressList = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
+                string strNativeIP = "";
+                string strServerIP = "";
+                if (addressList.Length > 1)
+                {
+                    strNativeIP = addressList[0].ToString();
+                    strServerIP = addressList[1].ToString();
+                }
+                else if (addressList.Length == 1)
+                {
+                    strServerIP = addressList[0].ToString();
+                }
+                return strServerIP;
+            }
+        }
         /// <summary>
         /// 正则表达式获取匹配内容
         /// \"(?<grp>[\s\S]*)\"

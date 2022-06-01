@@ -4,7 +4,6 @@ D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Release\net6.0\ref\HiSql.PostGr
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Release\net6.0\HiSql.PostGreSql.pdb
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Release\net6.0\HiSql.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\bin\Release\net6.0\HiSql.pdb
-D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Release\net6.0\HiSql.PostGreSql.csproj.AssemblyReference.cache
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Release\net6.0\HiSql.PostGreSql.Properties.Resources.resources
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Release\net6.0\HiSql.PostGreSql.csproj.GenerateResource.cache
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Release\net6.0\HiSql.PostGreSql.GeneratedMSBuildEditorConfig.editorconfig

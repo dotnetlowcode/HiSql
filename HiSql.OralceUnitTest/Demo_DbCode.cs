@@ -21,11 +21,11 @@ namespace HiSql.OralceUnitTest
             // Demo_View(sqlClient);//ok
             //Demo_AllTables(sqlClient);//ok
             //Demo_GlobalTables(sqlClient);//  delay
-            Demo_ModiTable(sqlClient);///ok
+            //Demo_ModiTable(sqlClient);///ok
 
             //Demo_DropView(sqlClient); //ok
-            //  Demo_CreateView(sqlClient);//ok
-            //Demo_ModiView(sqlClient);//ok
+              //Demo_CreateView(sqlClient);//ok
+            Demo_ModiView(sqlClient);//ok
             //Demo_IndexList(sqlClient);///ok
             //Demo_Index_Create(sqlClient);//ok
             //Demo_ReTable(sqlClient);//ok

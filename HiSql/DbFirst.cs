@@ -234,7 +234,17 @@ namespace HiSql
             return new Tuple<bool, string, string>(_isok, _msg, _sql);
         }
 
-
+        /// <summary>
+        /// 检测表或视图是否存在
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        public bool CheckTabExists(string tableName)
+        {
+            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
+            idm.Context = SqlClient.Context;
+            return idm.CheckTabExists(tableName);
+        }
         /// <summary>
         /// 创建表
         /// 可自行构建该类可实现动态创建类
@@ -432,6 +442,7 @@ namespace HiSql
                     _sqlClient.BeginTran();
                     try
                     {
+                        _sql = idm.BuildSqlCodeBlock(_sql);
                         _sqlClient.Context.DBO.ExecCommand(_sql, null);
                         _sqlClient.CommitTran();
                         _isok = true;
@@ -700,6 +711,8 @@ namespace HiSql
             }
             return lsttabinfo;
         }
+
+     
         public List<TableInfo> GetAllTables(string viewName, int pageSize, int pageIndex, out int totalCount)
         {
             IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");

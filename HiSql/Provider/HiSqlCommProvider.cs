@@ -41,55 +41,106 @@ namespace HiSql
         public static TabInfo InitTabMaping(string tabname, Func<TabInfo> GetInfo)
         {
             string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", tabname);
-            TabInfo tableInfo = null;
+            //TabInfo tableInfo = null; 
+            //bool locked = false;
+            //var lckinfo = new LckInfo() { UName = "hisql", EventName = "InitTabMaping" };
+            //try
+            //{
+            //    tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
+
+            //    if (tableInfo == null)
+            //    {
+            //        //var lockResult2 = CacheContext.MCache.LockOn(_keyname, lckinfo, 60, 60);
+            //        var lockResult = CacheContext.MCache.LockOn(_keyname, lckinfo, 60, 60);
+            //        if (lockResult.Item1) //加锁成功
+            //        {
+            //            locked = true;
+            //             tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
+            //            if (tableInfo == null)
+            //            {
+            //                tableInfo = GetInfo();
+            //                CacheContext.MCache.SetCache(_keyname, tableInfo);
+            //            }
+            //            CacheContext.MCache.UnLock(lckinfo, _keyname); 
+            //            locked = false;
+            //        }
+            //        else
+            //        {
+            //            tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
+            //            if (tableInfo == null)
+            //            {
+            //                throw new Exception("InitTabMaping获取表结构信息因为未获取到独占锁，无法创建并获取表信息");
+            //            }
+            //        }
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
+            //}
+            //finally {
+            //    if (locked) { CacheContext.MCache.UnLock(lckinfo, _keyname); }
+
+            //}
+            //if (tableInfo != null)
+            //{
+            //    return tableInfo;
+            //}
+            //else
+            //{
+            //    throw new Exception("InitTabMaping获取表结构信息因为未获取到独占锁，无法创建并获取表信息");
+            //}
+            return CacheContext.MCache.GetOrCreate<TabInfo>(_keyname, () =>
+            {
+                try
+                {
+                    return GetInfo();
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+               
+            });
+        }
+
+        /// <summary>
+        /// 锁定表对象，执行操作
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <param name="action"></param>
+        public static void LockTableExecAction(string tabname, Action  action)
+        {
+            string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", tabname);
+            
+            bool locked = false;
+            var lckinfo = new LckInfo() { UName = "hisql", EventName = "InitTabMaping" };
             try
             {
-                tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
-                if (tableInfo == null)
+                var lockResult = CacheContext.MCache.LockOn(_keyname, lckinfo, 160, 3);
+                if (lockResult.Item1) //加锁成功
                 {
-                    var lockinfo = CacheContext.MCache.LockOn(_keyname, new LckInfo() { UName = "hisql", EventName = "InitTabMaping" }, 60, 60);
-                    if (lockinfo.Item1) //加锁成功
+                    locked = true;
+                    if (action != null)
                     {
-                        tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
-                        if (tableInfo == null)
-                        {
-                            tableInfo = GetInfo();
-                            CacheContext.MCache.SetCache(_keyname, tableInfo);
-                        }
-                        CacheContext.MCache.UnLock(_keyname);
+                        action();
                     }
-                    else
-                    {
-                        tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
-                        if (tableInfo == null)
-                        {
-                            throw new Exception("InitTabMaping获取表结构信息因为未获取到独占锁，无法创建并获取表信息");
-                        }
-
-                    }
+                }
+                else  //直接返回
+                {
+                   
                 }
             }
             catch (Exception ex)
             {
-                tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
+                
             }
-            finally {
-                CacheContext.MCache.UnLock(_keyname);
-            }
-            if (tableInfo != null)
+            finally
             {
-                return tableInfo;
+                if (locked) { CacheContext.MCache.UnLock(lckinfo, _keyname); }
             }
-            else
-            {
-                throw new Exception("InitTabMaping获取表结构信息因为未获取到独占锁，无法创建并获取表信息");
-            }
-            //return CacheContext.MCache.GetOrCreate<TabInfo>(_keyname, () =>
-            //{
-            //    return GetInfo();
-            //});
         }
-
         /// <summary>
         /// 移除表结构缓存信息
         /// </summary>

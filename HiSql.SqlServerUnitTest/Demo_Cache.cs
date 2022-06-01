@@ -35,14 +35,15 @@ namespace HiSql
         {
             string _key = "4900001223";
             //LckInfo 是指加锁时需要指定的信息  UName 表示加锁人，ip表示在哪一个地址加的锁，可以通过 HiSql.Lock.GetCurrLockInfo  获取所有的详细加锁信息便于后台管理
-            var rtn = HiSql.Lock.LockOn(_key, new LckInfo { UName = "登陆名", Ip = "127.0.0.1" });
+            var lckinfo = new LckInfo { UName = "登陆名", Ip = "127.0.0.1" };
+            var rtn = HiSql.Lock.LockOn(_key, lckinfo);
             if (rtn.Item1)
             {
                 Console.WriteLine($"针对于采购订单[{_key}] 加锁成功");
                 //执行采购订单处理业务
 
                 //解锁
-                HiSql.Lock.UnLock(_key);
+                HiSql.Lock.UnLock(lckinfo, _key);
             }
 
             //同时加锁多个key 如果有一个key被其它任务加锁那么 锁定失败

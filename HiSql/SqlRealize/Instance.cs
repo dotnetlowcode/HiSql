@@ -146,6 +146,10 @@ namespace HiSql
                 {
                     return DBType.SQLite.ToString();
                 }
+                else if (_subclassName.IndexOf(DBType.DaMeng.ToString()) == 0)
+                {
+                    return DBType.DaMeng.ToString();
+                }
                 else
                 {
                     throw new Exception($"数据库实现类[{className}]不符合标准");

@@ -17,6 +17,7 @@ namespace HiSql
     {
         abstract public long NextId();
 
+        abstract public List<long> NextId(int count);
        
         
     }
@@ -26,7 +27,7 @@ namespace HiSql
         private  long workerId;
         private  long twepoch = -1L;//687888001020L; //唯一时间，这是一个避免重复的随机量，自行设定不要大于当前时间戳 
         private  long sequence = 0L;
-        private  int workerIdBits = 5; //机器码字节数。4个字节用来保存机器码(定义为Long类型会出现，最大偏移64位，所以左移64位没有意义)
+        private  int workerIdBits = 22; //机器码字节数。4个字节用来保存机器码(定义为Long类型会出现，最大偏移64位，所以左移64位没有意义)
         public  long maxWorkerId =0L; //最大机器ID
         private  int sequenceBits = 10; //计数器字节数，10个字节用来保存计数码
         private  int workerIdShift = 0; //机器码数据左移位数，就是后面计数器占用的位数
@@ -56,10 +57,30 @@ namespace HiSql
 
 
             if (workerId > maxWorkerId || workerId < 0)
-                throw new Exception(string.Format("worker Id can't be greater than {0} or less than 0 ", workerId));
+            {
+                throw new ArgumentException($"workerId不能大于{maxWorkerId}或小于0");
+            }
             this.workerId = workerId;
         }
 
+
+        /// <summary>
+        /// 生成指定数量的雪花ID
+        /// </summary>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public List<long> NextId(int count)
+        {
+            if (count <= 0)
+                throw new Exception($"生成雪花id的数量不能小于1");
+
+            List<long> lst = new List<long>();
+            for (int i = 0; i < count; i++)
+            {
+                lst.Add(NextId());
+            }
+            return lst;
+        }
         public long NextId()
         {
             lock (this)
@@ -143,11 +164,11 @@ namespace HiSql
         /// <summary>
         /// 机器码字节数。4个字节用来保存机器码(定义为Long类型会出现，最大偏移64位，所以左移64位没有意义)
         /// </summary>
-        private const int WorkerIdBits = 5;
+        private const int WorkerIdBits = 20;
         /// <summary>
         /// 数据字节数
         /// </summary>
-        private const int DatacenterIdBits = 5;
+        private const int DatacenterIdBits = 2;
         /// <summary>
         /// 计数器字节数，计数器字节数，12个字节用来保存计数码 
         /// </summary>
@@ -203,7 +224,7 @@ namespace HiSql
         /// <param name="workerId">10位的数据机器位中的高位，默认不应该超过5位(5byte) 32</param>
         /// <param name="datacenterId"> 10位的数据机器位中的低位，默认不应该超过5位(5byte) 32</param>
         /// <param name="sequence">初始序列</param>
-        public IdSnow(long workerId, long _tick = -1L, long datacenterId=5L, long sequence = 0L)
+        public IdSnow(long workerId, long _tick = -1L, long datacenterId=0L, long sequence = 0L)
         {
             WorkerId = workerId;
             DatacenterId = datacenterId;
@@ -212,23 +233,41 @@ namespace HiSql
             if (TwEpoch == -1L)
             {
                 if (_tick == -1L)
-                    TwEpoch = TimeTick(new DateTime(2021, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+                    TwEpoch = TimeTick(new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc));
                 else
                     TwEpoch = _tick;
             }
 
             if (workerId > MaxWorkerId || workerId < 0)
             {
-                throw new ArgumentException($"worker Id can't be greater than {MaxWorkerId} or less than 0");
+                throw new ArgumentException($"workerId不能大于{MaxWorkerId}或小于0");
             }
 
             if (datacenterId > MaxDatacenterId || datacenterId < 0)
             {
-                throw new ArgumentException($"datacenter Id can't be greater than {MaxDatacenterId} or less than 0");
+                throw new ArgumentException($"datacenterId不能大于{MaxDatacenterId}或小于0");
             }
         }
 
         public long CurrentId { get; private set; }
+
+
+        /// <summary>
+        /// 生成指定数量的雪花ID
+        /// </summary>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public List<long> NextId(int count)
+        {
+            if (count <= 0)
+                throw new Exception($"生成雪花id的数量不能小于1");
+            List<long> lst = new List<long>();
+            for (int i = 0; i < count; i++)
+            {
+                lst.Add(NextId());
+            }
+            return lst;
+        }
 
         /// <summary>
         /// 获取下一个Id，该方法线程安全

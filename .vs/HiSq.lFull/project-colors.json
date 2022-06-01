@@ -80,7 +80,17 @@
       "ProjectGuid": "9fe3ef44-5fc1-4468-b494-1779be3e0cd9",
       "DisplayName": "HiSql.Test",
       "ColorIndex": 14
+    },
+    "f4e42882-38c5-4c4f-b28d-4f04437d3278": {
+      "ProjectGuid": "f4e42882-38c5-4c4f-b28d-4f04437d3278",
+      "DisplayName": "HiSql.SqlServer.Test",
+      "ColorIndex": 15
+    },
+    "073266e8-9c20-4774-88b9-3f1028b148ed": {
+      "ProjectGuid": "073266e8-9c20-4774-88b9-3f1028b148ed",
+      "DisplayName": "HiSql.DaMeng",
+      "ColorIndex": 0
     }
   },
-  "NextColorIndex": 15
+  "NextColorIndex": 1
 }

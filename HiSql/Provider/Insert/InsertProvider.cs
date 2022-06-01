@@ -79,11 +79,10 @@ namespace HiSql
                         _Sql = new StringBuilder().AppendLine("do begin").AppendLine(_Sql.ToString()).AppendLine("end;");
 
                     }
-                    else if (this.Context.CurrentConnectionConfig.DbType == DBType.Oracle)
+                    else if (this.Context.CurrentConnectionConfig.DbType == DBType.Oracle || Context.CurrentConnectionConfig.DbType == DBType.DaMeng)
                     {
                         _Sql = new StringBuilder().AppendLine($"declare v_effect integer;  {Environment.NewLine}begin{Environment.NewLine}").AppendLine(_Sql.ToString()).AppendLine("end;");
                     }
-
                     i = await this.Context.DBO.ExecCommandAsync(_Sql.ToString());
                     _Sql = new StringBuilder();
                     return i;
@@ -162,7 +161,7 @@ namespace HiSql
                             //tabinfo2.TabModel.TabName = _insertTabName;
                             tabinfo2.TabModel.TabReName = _insertTabName;
                         }
-                        else if (Context.CurrentConnectionConfig.DbType == DBType.Oracle)
+                        else if (Context.CurrentConnectionConfig.DbType == DBType.Oracle || Context.CurrentConnectionConfig.DbType == DBType.DaMeng)
                         {
                             _insertTabName = $"tmp_local_{tabinfo.TabModel.TabName}_{Thread.CurrentThread.ManagedThreadId.ToString() }_{tabinfo.TabModel.TabName.GetHashCode().ToString().Substring(1)}";
                             _cacheinsertTabName = $"#{tabinfo.TabModel.TabName}";
@@ -187,14 +186,14 @@ namespace HiSql
                             //创建临时表 由于HANA插入特性，当数据量大时会分页插入，所以临时表需要分开创建
                             //int _effect = this.Context.DBO.ExecCommand(_temp_sql, null);
 
-                            if (Context.CurrentConnectionConfig.DbType == DBType.Oracle)
+                            if (Context.CurrentConnectionConfig.DbType == DBType.Oracle || Context.CurrentConnectionConfig.DbType == DBType.DaMeng)
                                 this.Context.DBO.ExecCommand(_temp_sql);//由于oralce的特性 declare begin end;需要单独创建表
                             else
                                 _lstsql.Add(_temp_sql);
                         }
                         else
                         {
-                            if (Context.CurrentConnectionConfig.DbType == DBType.Oracle)
+                            if (Context.CurrentConnectionConfig.DbType == DBType.Oracle || Context.CurrentConnectionConfig.DbType == DBType.DaMeng)
                                 this.Context.DBO.ExecCommand(_temp_sql);//由于oralce的特性 declare begin end;需要单独创建表
                             else
                                 _Sql.AppendLine(_temp_sql);
@@ -274,7 +273,7 @@ namespace HiSql
                             sb_sql.Append(_sql);
                         }
                     }
-                    if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.MySql, DBType.Oracle, DBType.Hana))
+                    if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.MySql, DBType.Oracle, DBType.DaMeng, DBType.Hana))
                         sb_sql.AppendLine(";");
 
 
@@ -345,7 +344,10 @@ namespace HiSql
                     List<string> lstcol = rtnlst[0].Keys.ToList();
 
                     string _mergesql = sqldm.BuildMergeIntoSql(_tabtarget, _tabsource, lstcol);
-                    if (this.Context.CurrentConnectionConfig.DbType == DBType.Hana || this.Context.CurrentConnectionConfig.DbType == DBType.Oracle)
+                    if (this.Context.CurrentConnectionConfig.DbType == DBType.Hana 
+                        || this.Context.CurrentConnectionConfig.DbType == DBType.Oracle
+                        || this.Context.CurrentConnectionConfig.DbType == DBType.DaMeng
+                        )
                     {
                         string _truncate = DbConfig.Delete_TrunCate.Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema).Replace("[$TabName$]", _insertTabName);
                         string _droptable = DbConfig.Drop_Table.Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema).Replace("[$TabName$]", _insertTabName);

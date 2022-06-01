@@ -11,7 +11,7 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute("Hone")]
+[assembly: System.Reflection.AssemblyCompanyAttribute("HiSql")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("HiSql 核心包\r\n\r\n支持SqlServer,MySql,Oracle,Hana,PostGreSql 根据需要单独再引用支持的包\r\n新增hisql语法 一套" +
     "sql在不同库执行")]
