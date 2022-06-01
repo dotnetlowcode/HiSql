@@ -26,7 +26,7 @@ namespace HiSql
         }
 
         [HiColumn(FieldDesc = "雪花ID时间戳", FieldType = HiType.BIGINT, IsNull = false, SortNum = 4, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY)]
-        public bool SnowTick
+        public Int64 SnowTick
         {
             get; set;
         }

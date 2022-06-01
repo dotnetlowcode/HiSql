@@ -35,20 +35,20 @@ namespace HiSql
         /// 初始加载编号数据
         /// </summary>
         /// <returns></returns>
-        bool Load(HiSqlClient sqlClient);
+        //bool Load(HiSqlClient sqlClient);
 
 
         /// <summary>
         /// 将缓存数据同步落盘
         /// </summary>
         /// <returns></returns>
-        bool SyncDisk();
+        //bool SyncDisk();
 
         /// <summary>
         /// 获取硬盘上的SNRO编号
         /// </summary>
         /// <returns></returns>
-        List<Hi_Snro> GetDiskSnro();
+        //List<Hi_Snro> GetDiskSnro();
 
     }
 }

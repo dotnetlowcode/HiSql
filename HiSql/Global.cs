@@ -15,7 +15,7 @@ namespace HiSql
       
         static RedisOptions redisOptions = null;
 
-        static NumberOptions numberOptions = null;
+        static NumberOptions numberOptions = new NumberOptions();
         static LockOptions lockOptions = new LockOptions();
         
         static bool _redison = false;
@@ -63,7 +63,7 @@ namespace HiSql
 
         public static NumberOptions NumberOptions
         {
-            get { if(  numberOptions == null) numberOptions = new NumberOptions(); return   numberOptions; }
+            get {  return   numberOptions; }
             set { numberOptions = value; }
         }
 
