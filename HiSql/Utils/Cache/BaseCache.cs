@@ -15,6 +15,10 @@ namespace HiSql
         protected string _hsetkeyPrefix = string.Empty;
         protected string _lockhashname = string.Empty;
         protected string _lockhishashname = string.Empty;
+
+
+        private CacheType _cachetype;
+
         protected BaseCache()
         {
 
@@ -54,6 +58,8 @@ namespace HiSql
                 }
             }
         }
+
+        public abstract CacheType CacheType { get;  }
 
         public abstract int Count { get; }
 

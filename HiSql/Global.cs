@@ -12,28 +12,39 @@ namespace HiSql
     /// </summary>
     public static class Global
     {
-
+      
         static RedisOptions redisOptions = null;
 
-        /// <summary>
-        /// 非阻塞模式，获取锁默认等等多少毫秒
-        /// </summary>
-        public static int NoWaitModeGetLockWaitMillSeconds = 600;
-        /// <summary>
-        /// 获取锁重试的时候，等待多少毫秒
-        /// </summary>
-        public static int GetLockRetrySleepMillSeconds = 50;
-
+        static NumberOptions numberOptions = null;
+        static LockOptions lockOptions = new LockOptions();
+        
         static bool _redison = false;
+
+
+        /// <summary>
+        /// 是否开启编号
+        /// </summary>
+        static bool _snroon = false;
+
 
         public static bool RedisOn
         {
             get =>  _redison;
             set { _redison = value;
                 CacheContext.Reset();
-
             }
         }
+
+        public static bool SnroOn
+        {
+            get => _snroon;
+            set { _snroon = value;
+                
+            
+            }
+        }
+
+
         /// <summary>
         /// 启用redis缓存 
         /// </summary>
@@ -46,5 +57,24 @@ namespace HiSql
             }
         }
 
+        /// <summary>
+        /// 编号配置
+        /// </summary>
+
+        public static NumberOptions NumberOptions
+        {
+            get { if(  numberOptions == null) numberOptions = new NumberOptions(); return   numberOptions; }
+            set { numberOptions = value; }
+        }
+
+        /// <summary>
+        /// 锁编号配置
+        /// </summary>
+
+        public static LockOptions LockOptions
+        {
+            get { return lockOptions; }
+            set { lockOptions = value; }
+        }
     }
 }

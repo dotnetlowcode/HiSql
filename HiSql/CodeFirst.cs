@@ -50,13 +50,37 @@ namespace HiSql
         {
             if (_sqlClient != null)
             {
-                IDbConfig dbConfig = Instance.CreateInstance<IDbConfig>($"{Constants.NameSpace}.{_sqlClient.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.Config.ToString()}");
+                bool _has_tabmodel = _sqlClient.DbFirst.CheckTabExists(Constants.HiSysTable["Hi_TabModel"]);
+                bool _has_tabfield = _sqlClient.DbFirst.CheckTabExists(Constants.HiSysTable["Hi_FieldModel"]); 
+                bool _has_domain = _sqlClient.DbFirst.CheckTabExists(Constants.HiSysTable["Hi_Domain"]);
+                bool _has_element = _sqlClient.DbFirst.CheckTabExists(Constants.HiSysTable["Hi_DataElement"]);
+                
+                //系统表只有要一个表不存在就需要初始化安装
+                if (!_has_tabmodel || !_has_tabfield || !_has_domain || !_has_element)
+                {
+                    IDbConfig dbConfig = Instance.CreateInstance<IDbConfig>($"{Constants.NameSpace}.{_sqlClient.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.Config.ToString()}");
 
-                string _sql = dbConfig.InitSql;
-                _sql = _sql.Replace("[$Schema$]", _sqlClient.CurrentConnectionConfig.Schema);
+                    string _sql = dbConfig.InitSql;
+                    _sql = _sql.Replace("[$Schema$]", _sqlClient.CurrentConnectionConfig.Schema);
 
-                //返回受影响的行
-                int _effect= _sqlClient.Context.DBO.ExecCommand(_sql);
+                    //返回受影响的行
+                    int _effect = _sqlClient.Context.DBO.ExecCommand(_sql);
+                }
+                //如果启用了编号那么需要安装编号配置表
+                if (Global.SnroOn)
+                { 
+                    bool _has_snro= _sqlClient.DbFirst.CheckTabExists(Constants.HiSysTable["Hi_Snro"]);
+                    if (!_has_snro)
+                    {
+                        //如果不存在编号表则创建
+                        TabInfo tabinfo_field = _sqlClient.Context.DMInitalize.BuildTab(typeof(Hi_Snro));
+
+                        _sqlClient.DbFirst.CreateTable(tabinfo_field);
+                    }
+                }
+
+
+                
             }
             else
                 throw new Exception($"请先指定数据库连接!");

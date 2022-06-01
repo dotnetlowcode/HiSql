@@ -328,7 +328,7 @@ namespace HiSql
             var getlockElapsed = TimeSpan.FromSeconds(timeoutSeconds);
             if (!isBlockingMode)
             {
-                getlockElapsed = TimeSpan.FromSeconds(Global.NoWaitModeGetLockWaitMillSeconds);
+                getlockElapsed = TimeSpan.FromSeconds(Global.LockOptions.NoWaitModeGetLockWaitMillSeconds);
             }
             isgetlocked = System.Threading.Monitor.TryEnter(GetCache<LckInfo>(key), getlockElapsed);
 
@@ -379,12 +379,12 @@ namespace HiSql
                 var getlockElapsed = TimeSpan.FromSeconds(timeoutSeconds);
                 if (!isBlockingMode)
                 {
-                    getlockElapsed = TimeSpan.FromSeconds(Global.NoWaitModeGetLockWaitMillSeconds);
+                    getlockElapsed = TimeSpan.FromSeconds(Global.LockOptions.NoWaitModeGetLockWaitMillSeconds);
                 }
 
                 while (keys.Length > 1 && CkeckExists(keys) && stopwatch.Elapsed <= getlockElapsed)
                 {
-                    Thread.Sleep(Global.GetLockRetrySleepMillSeconds);
+                    Thread.Sleep(Global.LockOptions.GetLockRetrySleepMillSeconds);
                     if (stopwatch.Elapsed > getlockElapsed)
                     {
                         return new Tuple<bool, string>(false, "准备加锁操作等待超时。");
@@ -536,7 +536,7 @@ namespace HiSql
             var getlockElapsed = TimeSpan.FromSeconds(timeoutSeconds);
             if (!isBlockingMode)
             {
-                getlockElapsed = TimeSpan.FromSeconds(Global.NoWaitModeGetLockWaitMillSeconds);
+                getlockElapsed = TimeSpan.FromSeconds(Global.LockOptions.NoWaitModeGetLockWaitMillSeconds);
             }
 
             isgetlock = System.Threading.Monitor.TryEnter(GetCache<LckInfo>(key), getlockElapsed);
@@ -904,5 +904,11 @@ namespace HiSql
             }
             return lckInfos;
         }
+
+
+        /// <summary>
+        /// 缓存类型
+        /// </summary>
+        public override CacheType CacheType => CacheType.MCache;
     }
 }

@@ -866,14 +866,14 @@ namespace HiSql
             var getlockElapsed = TimeSpan.FromSeconds(timeoutSeconds);
             if (!isBlockingMode)
             {
-                getlockElapsed = TimeSpan.FromMilliseconds(Global.NoWaitModeGetLockWaitMillSeconds);
+                getlockElapsed = TimeSpan.FromMilliseconds(Global.LockOptions.NoWaitModeGetLockWaitMillSeconds);
             }
             Stopwatch stopwatch = Stopwatch.StartNew();
             while (!getlocked && stopwatch.Elapsed <= getlockElapsed)
             {
                 getlocked = _cache.LockTake(key, lckinfo.UName, TimeSpan.FromSeconds(expirySeconds));
                 if (getlocked) break;
-                Thread.Sleep(Global.GetLockRetrySleepMillSeconds);
+                Thread.Sleep(Global.LockOptions.GetLockRetrySleepMillSeconds);
             }
             string msg = "";
             Thread thread = null;
@@ -970,7 +970,7 @@ namespace HiSql
             var getlockElapsed = TimeSpan.FromSeconds(timeoutSeconds);
             if (!isBlockingMode)
             {
-                getlockElapsed = TimeSpan.FromMilliseconds(Global.NoWaitModeGetLockWaitMillSeconds);
+                getlockElapsed = TimeSpan.FromMilliseconds(Global.LockOptions.NoWaitModeGetLockWaitMillSeconds);
             }
             Stopwatch stopwatch = Stopwatch.StartNew();
             
@@ -984,7 +984,7 @@ namespace HiSql
                 }
                 else
                 {
-                    Thread.Sleep(Global.GetLockRetrySleepMillSeconds);
+                    Thread.Sleep(Global.LockOptions.GetLockRetrySleepMillSeconds);
                 }
             }
             
@@ -1167,7 +1167,7 @@ namespace HiSql
             var getlockElapsed = TimeSpan.FromSeconds(timeoutSeconds);
             if (!isBlockingMode)
             {
-                getlockElapsed = TimeSpan.FromMilliseconds(Global.NoWaitModeGetLockWaitMillSeconds);
+                getlockElapsed = TimeSpan.FromMilliseconds(Global.LockOptions.NoWaitModeGetLockWaitMillSeconds);
             }
            
             Stopwatch stopwatch = Stopwatch.StartNew();
@@ -1176,7 +1176,7 @@ namespace HiSql
                 getlocked = _cache.LockTake(key, lckinfo.UName, TimeSpan.FromSeconds(expirySeconds));
                 if (getlocked) break;
                     
-                Thread.Sleep(Global.GetLockRetrySleepMillSeconds);
+                Thread.Sleep(Global.LockOptions.GetLockRetrySleepMillSeconds);
             }
            
             string msg = "";
@@ -1424,6 +1424,11 @@ namespace HiSql
 
             return new Tuple<bool, string>(flag, msg);
         }
+
+        /// <summary>
+        /// 缓存类型
+        /// </summary>
+        public override CacheType CacheType => CacheType.RCache;
 
         #region 私有变量
         LckInfo getLockInfo(LckInfo lckInfo, int expirySeconds, int times)

@@ -173,7 +173,7 @@ namespace HiSql
         List<TableInfo> GetAllTables();
         List<TableInfo> GetAllTables(string viewName, int pageSize, int pageIndex, out int totalCount);
 
-        bool CheckTabExists(string tableName);
+     
         List<string> GetStoredProc();
        
 
@@ -219,7 +219,12 @@ namespace HiSql
         /// <returns></returns>
         bool CreateTable(Type type);
 
-
+        /// <summary>
+        /// 检测表或视图是否存在
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        public bool CheckTabExists(string tableName);
 
         /// <summary>
         /// 删除表

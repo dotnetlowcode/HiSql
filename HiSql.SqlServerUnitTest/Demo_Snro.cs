@@ -10,7 +10,7 @@ namespace HiSql
 {
     public class Demo_Snro
     {
-         static  SNRO.Number number = new SNRO.Number();
+         static SeriNumber number = new SeriNumber();
         static List<string> lstnum = new List<string>();
         public static void Init(HiSqlClient sqlClient)
         {
@@ -58,10 +58,12 @@ namespace HiSql
                 //Thread.Sleep(new Random().Next(1000));
             }
 
-            
-            Thread.Sleep(10000);
+            Console.WriteLine($"完成...");
+
+            //Thread.Sleep(10000);
             ///落盘
             number.SyncDisk();
+            Console.WriteLine("落盘完成");
 
             //List<string> lstnum = new List<string>();
             //Stopwatch sw = new Stopwatch();
@@ -103,7 +105,7 @@ namespace HiSql
         static void Snro_Demo(HiSqlClient sqlClient)
         {
 
-            var obj = new { SNRO = "MATDOC", SNUM = 1, StartNum = "9000000", EndNum = "9999999",Length=7, CurrNum = "9000000", IsNumber = true, IsHasPre = false, CacheSpace = 10, Descript = "物料主数据编号" };
+            var obj = new { SNRO = "MATDOC", SNUM = 1, IsSnow=false, SnowTick=0, StartNum = "9000000", EndNum = "9999999",Length=7, CurrNum = "9000000", IsNumber = true, IsHasPre = false, CacheSpace = 10, Descript = "物料主数据编号" };
 
 
             sqlClient.Insert("Hi_Snro", obj).ExecCommand();
