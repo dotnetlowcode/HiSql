@@ -80,7 +80,6 @@ namespace HiSql.UnitTest
             //ThreadTest();
             // SnowId();
 
-
             Console.ReadLine();
         }
         static Object _lockerNextId = new Object();

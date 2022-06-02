@@ -214,9 +214,10 @@ namespace HiSql
                     else
                         hiTable.TabReName = hiTable.TabName.Substring(2) + "_" + System.Threading.Thread.CurrentThread.ManagedThreadId + "_" + hiTable.TabName.GetHashCode().ToString().Substring(1);
 
-
+                    
                     string _sql = Context.DMTab.BuildTabCreateSql(tabInfo.TabModel, tabInfo.GetColumns);
-                    Context.DBO.ExecCommand(_sql);
+                    int _effect = Context.DBO.ExecCommand(_sql);
+                    this.ITabName = hiTable.TabReName;
                     //int _effect=await
                     //sb_struct.AppendLine(_sql);
                 }
