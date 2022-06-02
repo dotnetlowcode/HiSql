@@ -257,7 +257,7 @@ namespace HiSql
                                 if (rtn.Item1)
                                 {
                                     _snro.CurrCacheSpace = 0;
-                                    _sqlClient.Update("Hi_Snro", _snro).Only("CurrNum", "CurrAllNum", "CurrCacheSpace").ExecCommand();
+                                    _sqlClient.Update("Hi_Snro", _snro).Only("CurrNum","PreChar", "CurrAllNum", "CurrCacheSpace").ExecCommand();
                                     _sqlClient.CommitTran();
                                     if (!_snroNumber.ContainsKey(_key))
                                         _snroNumber.Add(_key, rtn.Item3);
@@ -402,11 +402,16 @@ namespace HiSql
         //}
 
 
+        ///创建生成编号 
         private Tuple<bool, string, List<string>> Create(ref Hi_Snro snro, int nums)
         {
             int _maxlen = 20;
             List<string> dic_list = new List<string>();
             Tuple<bool, string, List<string>> rtntuple = new Tuple<bool, string, List<string>>(false, "", dic_list);
+
+            if (snro.IsSnow)
+                throw new Exception($"雪花ID编号类型不允许此规则");
+
             if (snro.SNRO.Trim() == "")
             {
                 rtntuple = new Tuple<bool, string, List<string>>(false, "编号错误", dic_list);
@@ -437,16 +442,16 @@ namespace HiSql
                 return rtntuple;
             }
 
-
-            if (snro.PreType == PreType.FixY || snro.PreType == PreType.FixYM || snro.PreType == PreType.FixYMD || snro.PreType == PreType.FixYMDH
-                || snro.PreType == PreType.FixYMDHm || snro.PreType == PreType.FixYMDHms)
+            if (snro.PreType.IsIn(PreType.None, PreType.Y, PreType.Y2, PreType.Y2M, PreType.Y2MD, PreType.Y2MDH, PreType.Y2MDHm, PreType.Y2MDHms
+                , PreType.YM, PreType.YMD, PreType.YMDH, PreType.YMDHm, PreType.YMDHms))
             {
-                if (snro.PreChar.Trim() == "")
-                {
-                    rtntuple = new Tuple<bool, string, List<string>>(false, "前置符未指定或前置类型错误", dic_list);
-                    return rtntuple;
-                }
+
             }
+            else
+                throw new Exception($"未能识别的编号类型[{snro.PreType.ToString()}]");
+
+
+       
 
 
             int curchar;
@@ -469,48 +474,57 @@ namespace HiSql
                         case PreType.Y:
                             _prestr = DateTime.Now.ToString("yyyy");
                             break;
-                        case PreType.FixY:
-                            _prestr = snro.PreChar + DateTime.Now.ToString("yyyy");
+                        case PreType.Y2:
+                            _prestr = DateTime.Now.ToString("yy");
                             break;
+                      
                         case PreType.YM:
                             _prestr = DateTime.Now.ToString("yyyyMM");
                             break;
-                        case PreType.FixYM:
-                            _prestr = snro.PreChar + DateTime.Now.ToString("yyyyMM");
+                        case PreType.Y2M:
+                            _prestr = DateTime.Now.ToString("yyMM");
                             break;
+                        
                         case PreType.YMD:
-                            _prestr = DateTime.Now.ToString("yyyyMMDD");
+                            _prestr = DateTime.Now.ToString("yyyyMMdd");
                             break;
-                        case PreType.FixYMD:
-                            _prestr = snro.PreChar + DateTime.Now.ToString("yyyyMMdd");
+                        case PreType.Y2MD:
+                            _prestr = DateTime.Now.ToString("yyMMdd");
                             break;
+                        
+                     
                         case PreType.YMDH:
-                            _prestr = DateTime.Now.ToString("yyyyMMDDHH");
+                            _prestr = DateTime.Now.ToString("yyyyMMddHH");
                             break;
-                        case PreType.FixYMDH:
-                            _prestr = snro.PreChar + DateTime.Now.ToString("yyyyMMddHH");
+                        case PreType.Y2MDH:
+                            _prestr = DateTime.Now.ToString("yyMMddHH");
                             break;
+                        
                         case PreType.YMDHm:
-                            _prestr = DateTime.Now.ToString("yyyyMMDDHHmm");
+                            _prestr = DateTime.Now.ToString("yyyyMMddHHmm");
                             break;
-                        case PreType.FixYMDHm:
-                            _prestr = snro.PreChar + DateTime.Now.ToString("yyyyMMddHHmm");
+                        case PreType.Y2MDHm:
+                            _prestr = DateTime.Now.ToString("yyMMddHHmm");
                             break;
+                       
                         case PreType.YMDHms:
                             _prestr = DateTime.Now.ToString("yyyyMMddHHmmss");
                             break;
-                        case PreType.FixYMDHms:
-                            _prestr = snro.PreChar + DateTime.Now.ToString("yyyyMMddHHmmss");
+                        case PreType.Y2MDHms:
+                            _prestr = DateTime.Now.ToString("yyMMddHHmmss");
                             break;
+                        
                         default:
 
                             break;
                     }
-                    if (_prestr.Trim() != snro.PreChar.Trim())
+                    if (string.IsNullOrEmpty(snro.PreChar) || _prestr.Trim() != snro.PreChar.Trim())
                     {
                         //当前个前置符不一致时 需要重置当前字符
 
                         snro.CurrNum = snro.StartNum;
+
+                        snro.PreChar = _prestr;
 
                     }
                     else
@@ -596,7 +610,7 @@ namespace HiSql
                 }
                 snro.CurrNum = _o_curstr.Trim();
                 //snro.PreStr = snro.PreChar.Trim() + _prestr.Trim();
-                snro.CurrAllNum = snro.PreChar.Trim() + snro.PreChar.Trim() + _o_curstr.Trim();
+                snro.CurrAllNum = string.IsNullOrEmpty(snro.FixPreChar)?  snro.PreChar.Trim() + _o_curstr.Trim(): snro.FixPreChar.Trim() + snro.PreChar.Trim() + _o_curstr.Trim();
 
 
 
