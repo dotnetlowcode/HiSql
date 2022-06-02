@@ -574,7 +574,7 @@ namespace HiSql
                         }
                         finally
                         {
-                            UnLock(lckinfo, key);
+                            //UnLock(lckinfo, key);不可以再此处解锁
                         }
                     });
 
@@ -591,12 +591,13 @@ namespace HiSql
                         {
                             if (_timesa >= _times)
                             {
-                                if (!workTask.IsCompleted && !workTask.IsCanceled)
+                                if (!workTask.IsCompleted)
                                 {
-                                    UnLock(lckinfo, key);
+                                  
                                     tokenSource.Cancel();
                                     thread.Interrupt();
                                 }
+                                UnLock(lckinfo, key);
                                 flag = false;
                                 msg = $"key:[{key}]锁定操作业务失败!超过最大[{_times}]次续锁没有完成,操作被撤销";
                                 break;
@@ -729,12 +730,12 @@ namespace HiSql
                         {
                             if (_timesa >= _times)
                             {
-                                if (!workTask.IsCompleted && !workTask.IsCanceled)
+                                if (!workTask.IsCompleted )
                                 {
-                                    UnLock(lckinfo, keys);
                                     tokenSource.Cancel();
                                     thread.Interrupt();
                                 }
+                                UnLock(lckinfo, keys);
                                 flag = false;
                                 msg = $"key:[{string.Join(",", keys)}]锁定操作业务失败!超过最大[{_times}]次续锁没有完成,操作被撤销";
                                 break;
@@ -835,7 +836,8 @@ namespace HiSql
                 var cacheObj = GetCache<LckInfo>(newkey);
                 if (cacheObj != null)
                 {
-                    System.Threading.Monitor.Exit(cacheObj);
+                    if(System.Threading.Monitor.IsEntered(cacheObj))
+                        System.Threading.Monitor.Exit(cacheObj);
                     //RemoveCache(newkey);  //不能移除缓存，否则多线程下锁对象时候，缓存可能被移除了
                     HDel(_lockhashname, newkey);
                 }

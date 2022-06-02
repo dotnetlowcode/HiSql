@@ -123,7 +123,7 @@ namespace HiSql
 
 
 
-        void Insert(string tabname);
+        string Insert(string tabname);
 
 
 

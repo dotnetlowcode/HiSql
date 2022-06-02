@@ -216,7 +216,9 @@ namespace HiSql
 
 
                     string _sql = Context.DMTab.BuildTabCreateSql(tabInfo.TabModel, tabInfo.GetColumns);
+
                     Context.DBO.ExecCommand(_sql);
+                    this.ITabName = hiTable.TabReName;
                     //int _effect=await
                     //sb_struct.AppendLine(_sql);
                 }

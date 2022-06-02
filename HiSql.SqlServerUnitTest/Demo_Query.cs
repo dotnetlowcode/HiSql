@@ -25,7 +25,7 @@ namespace HiSql.UnitTest
 
         public static void Init(HiSqlClient sqlClient)
         {
-            //Query_Demo(sqlClient);
+            Query_Demo(sqlClient);
             //QuerySlave(sqlClient);
             //Query_Demo3(sqlClient);
             //Query_Case(sqlClient);
@@ -40,7 +40,7 @@ namespace HiSql.UnitTest
             //Query_Demo11(sqlClient);
             //Query_Demo12(sqlClient);
             // Query_Demo13(sqlClient);
-            Query_Demo14(sqlClient);
+           // Query_Demo14(sqlClient);
              var s = Console.ReadLine();
         }
 
