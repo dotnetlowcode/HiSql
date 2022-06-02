@@ -16,7 +16,6 @@ namespace HiSql.DaMengUnitTest
             //Demo_ReColumn(sqlClient);//ok
             //Demo_ModiColumn(sqlClient); //ok
             //Demo_DelColumn(sqlClient);//ok
-
             // Demo_Tables(sqlClient);// ok
             // Demo_View(sqlClient);//ok
             //Demo_AllTables(sqlClient);//ok
@@ -26,15 +25,15 @@ namespace HiSql.DaMengUnitTest
             // Demo_DropView(sqlClient); //ok
             //  Demo_CreateView(sqlClient);//ok
             //Demo_ModiView(sqlClient);//ok
-                Demo_IndexList(sqlClient);///
-            //Demo_Index_Create(sqlClient);//
-            //Demo_ReTable(sqlClient);//
-            // Demo_AllTables(sqlClient);//
-            // Demo_TableDataCount(sqlClient);//
-            //Demo_TablesPaging(sqlClient);//
-            // Demo_ViewsPaging(sqlClient);//
-            // Demo_AllTablesPaging(sqlClient);//
-            //Demo_Primary_Create(sqlClient);//
+            //  Demo_IndexList(sqlClient);///ok
+            // Demo_Index_Create(sqlClient);//ok
+            //Demo_ReTable(sqlClient);//ok
+            // Demo_AllTables(sqlClient);//ok
+            // Demo_TableDataCount(sqlClient);//ok
+            //Demo_TablesPaging(sqlClient);//ok
+            //Demo_ViewsPaging(sqlClient);//ok
+            //Demo_AllTablesPaging(sqlClient);//ok
+            //Demo_Primary_Create(sqlClient);//ok
         }
         static void Demo_AllTablesPaging(HiSqlClient sqlClient)
         {
@@ -44,7 +43,6 @@ namespace HiSql.DaMengUnitTest
             {
                 Console.WriteLine($"{tableInfo.TabName}  {tableInfo.TabReName}  {tableInfo.TabDescript}  {tableInfo.TableType} 表结构:{tableInfo.HasTabStruct}");
             }
-
         }
         static void Demo_ViewsPaging(HiSqlClient sqlClient)
         {
@@ -59,7 +57,7 @@ namespace HiSql.DaMengUnitTest
         static void Demo_TablesPaging(HiSqlClient sqlClient)
         {
             int total = 0;
-            List<TableInfo> lsttales = sqlClient.DbFirst.GetTables("HI", 11, 1, out total);
+            List<TableInfo> lsttales = sqlClient.DbFirst.GetTables("HI", 2, 2, out total);
             foreach (TableInfo tableInfo in lsttales)
             {
                 Console.WriteLine($" {tableInfo.TabName}  {tableInfo.TabReName}  {tableInfo.TabDescript}  {tableInfo.TableType} 表结构:{tableInfo.HasTabStruct}");
@@ -136,7 +134,7 @@ namespace HiSql.DaMengUnitTest
         {
             //sqlClient.CodeFirst.CreateTable(typeof(Table.HTest01));
            
-            List<TabIndex> lstindex = sqlClient.DbFirst.GetTabIndexs("htest01").Where(t => string.Compare(t.IndexType , "Key_Index", true) == 0).ToList();
+            List<TabIndex> lstindex = sqlClient.DbFirst.GetTabIndexs("HTEST012").Where(t => string.Compare(t.IndexType , "Key_Index", true) == 0).ToList();
             foreach (var item in lstindex)
             {
                 var rtndel = sqlClient.DbFirst.DelPrimaryKey(item.TabName, OpLevel.Execute);
@@ -147,14 +145,14 @@ namespace HiSql.DaMengUnitTest
             }
 
             //创建主键
-            TabInfo tabInfo = sqlClient.Context.DMInitalize.GetTabStruct("htest01");
+            TabInfo tabInfo = sqlClient.Context.DMInitalize.GetTabStruct("HTEST012");
            
             List<HiColumn> hiColumns = tabInfo.Columns.Where(c => string.Compare(c.FieldName, "ModiTime", true) == 0 || string.Compare(c.FieldName, "ModiName", true) == 0).ToList();
 
             hiColumns.ForEach((c) => {
                 c.IsPrimary = true;
             });
-            var rtn = sqlClient.DbFirst.CreatePrimaryKey("htest01", hiColumns, OpLevel.Execute);
+            var rtn = sqlClient.DbFirst.CreatePrimaryKey("HTEST012", hiColumns, OpLevel.Execute);
             if (rtn.Item1)
                 Console.WriteLine(rtn.Item3);
             else
@@ -190,7 +188,7 @@ namespace HiSql.DaMengUnitTest
                 Console.WriteLine($"TabName:{tabIndex.TabName} IndexName:{tabIndex.IndexName} IndexType:{tabIndex.IndexType}");
             }
 
-            List<TabIndexDetail> lstindexdetails = sqlClient.DbFirst.GetTabIndexDetail("HI_DOMAIN", "PK_Hi_FieldModel_ed721f6b-296a-447e-ac67-7d02fd8e338c");
+            List<TabIndexDetail> lstindexdetails = sqlClient.DbFirst.GetTabIndexDetail("HI_DOMAIN", lstindex.FirstOrDefault().IndexName);
             foreach (TabIndexDetail tabIndexDetail in lstindexdetails)
             {
                 Console.WriteLine($"TabName:{tabIndexDetail.TabName} IndexName:{tabIndexDetail.IndexName} IndexType:{tabIndexDetail.IndexType} ColumnName:{tabIndexDetail.ColumnName}");

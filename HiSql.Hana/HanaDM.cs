@@ -2805,7 +2805,7 @@ namespace HiSql
                     tabIndex.ColumnIdx = Convert.ToInt32(dr["ColumnIdx"].ToString());
                     tabIndex.ColumnId = Convert.ToInt32(dr["ColumnID"].ToString());
                     tabIndex.SortType = dr["Sort"].ToString().ToLower() == "asc" ? SortType.ASC : SortType.DESC;
-                    tabIndex.IsPrimary = dr["IPrimary"].ToString() == "Y" ? true : false;
+                    tabIndex.IsPrimary = dr["IsPrimary"].ToString() == "Y" ? true : false;
                     tabIndex.IsUnique = dr["IsUnique"].ToString() == "Y" ? true : false;
 
                     lstindex.Add(tabIndex);
@@ -2900,6 +2900,8 @@ namespace HiSql
         }
         public string BuildSqlCodeBlock(string sbSql)
         {
+            if (sbSql.StartsWith("begin\r\n"))
+                return sbSql;
             sbSql = sbSql.Insert(0, "do begin\r\n");
             sbSql += "\r\nend;";
             return sbSql;

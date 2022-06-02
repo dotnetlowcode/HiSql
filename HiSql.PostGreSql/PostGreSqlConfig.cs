@@ -947,7 +947,7 @@ SET "DomainDesc" = excluded."DomainDesc";
                                             ,a.attnum as ""ColumnIdx"",a.attnum as ""ColumnID"", a.attname as ""ColumnName"", 
 	                                        case when position(a.attname in substring(pg_get_indexdef(ix.indexrelid), 'INCLUDE \((.*?)\)')) > 0 then '' else 'Y' end as ""IsIncludedColumn""
 	                                        , case position(a.attname || '"" DESC' in substring(pg_get_indexdef(ix.indexrelid), '\((.*?)\)'))  when 0 then 'asc' else 'desc' end as ""Sort""
-	                                        , case when indisprimary = 'true' then 'Y' ELSE 'N' end as  ""IPrimary""
+	                                        , case when indisprimary = 'true' then 'Y' ELSE 'N' end as  ""IsPrimary""
 	                                        ,case when indisunique = 'true' then 'Y' ELSE 'N' end as  ""IsUnique""
 	                                        , '' AS ""Ignore_dup_key""   , '' as ""Disabled""  , '' AS ""Fill_factor""  , '' AS ""Padded""
                                         from

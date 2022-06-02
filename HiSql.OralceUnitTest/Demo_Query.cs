@@ -11,16 +11,16 @@ namespace HiSql.OralceUnitTest
     {
         public static void Init(HiSqlClient sqlClient)
         {
-            //Query_Demo(sqlClient);
+           // Query_Demo(sqlClient);
             //Query_Demo1(sqlClient);
-            //Query_Demo2(sqlClient);
+            Query_Demo2(sqlClient);
             //Query_Demo3(sqlClient);
             //Query_Demo4(sqlClient);
             //Query_Demo8(sqlClient);
 
             //Query_Case(sqlClient);
             //Query_Demo9(sqlClient);
-            Query_Demo13(sqlClient);
+           // Query_Demo13(sqlClient);
         }
         //Query_Demo8(sqlClient);
 
