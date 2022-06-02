@@ -103,5 +103,36 @@ namespace HiSql
                 return idGenerate.NextId();
             }
         }
+
+        /// <summary>
+        /// 获取指定数量的雪花ID
+        /// </summary>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public static List<long> NextId(int count)
+        {
+            if (count <= 0)
+                throw new Exception($"创建雪花ID的数量不能小于或等于0");
+            if (idGenerate == null)
+            {
+                lock (lckGenerateObj)
+                {
+                    if (idGenerate == null)
+                    {
+                        idGenerate = getIdGenerate();
+                    }
+                }
+            }
+            List<long> list = new List<long>();
+            lock (lckObj)
+            { 
+                for (int i = 0; i < count; i++)
+                {
+                    list.Add(idGenerate.NextId());
+                }
+            }
+            return list;
+        }
     }
 }

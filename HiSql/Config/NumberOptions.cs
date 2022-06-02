@@ -11,8 +11,10 @@ namespace HiSql
     /// </summary>
     public class NumberOptions
     {
-        bool _multimode = true;
+        bool _multimode = false;
+        int _workid = 0;
 
+        SnowType _snowtype = SnowType.IdSnow;
 
         /// <summary>
         /// 多机模式
@@ -23,5 +25,25 @@ namespace HiSql
             set { _multimode = value; }
         }
 
+
+
+        /// <summary>
+        /// 机器节点ID
+        /// 用于雪花ID生成,每台机器的ID要设置为不一样
+        /// </summary>
+        public int WorkId
+        {
+            get => _workid;
+            set=> _workid = value;
+        }
+
+        /// <summary>
+        /// 指定雪花ID生成类型
+        /// </summary>
+        public SnowType SnowType
+        {
+            get => _snowtype;
+            set => _snowtype = value;
+        }
     }
 }
