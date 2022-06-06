@@ -76,9 +76,7 @@ namespace HiSql
 
         static void Snro_Demo2(HiSqlClient sqlClient)
         {
-            SeriNumber number = new SeriNumber();
-            number.Load(sqlClient);
-             number.NewNumber("asdf", 1);
+            
 
 
             //var snrolist = sqlClient.Query("Hi_Snro").Field("*").ToList<SNRO.Hi_Snro>();
