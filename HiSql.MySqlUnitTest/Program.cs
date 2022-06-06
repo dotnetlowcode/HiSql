@@ -13,11 +13,11 @@ namespace HiSql.MySqlUnitTest
 
            // Demo_Query.Init(sqlClient);
             //Demo_Update.Init(sqlClient);
-            //DemoCodeFirst.Init(sqlClient);
+            DemoCodeFirst.Init(sqlClient);
             //Demo_Insert.Init(sqlClient);
 
             //Demo_Delete.Init(sqlClient);
-           Demo_DbCode.Init(sqlClient);
+          Demo_DbCode.Init(sqlClient);
 
            Console.ReadKey();
         }
