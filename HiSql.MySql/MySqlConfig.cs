@@ -461,12 +461,12 @@ namespace HiSql
 
             _fieldtempmapping = new Dictionary<string, string> {
                 //样例：[TabName] [varchar](50) NOT NULL,
-                { "nvarchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  varchar([$FieldLen$]) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci [$IsNull$]  [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split} "},
-                { "varchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} varchar([$FieldLen$]) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
-                { "nchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} char([$FieldLen$]) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split} "},
-                { "char",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} char([$FieldLen$]) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
+                { "nvarchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  varchar([$FieldLen$]) CHARACTER SET utf8 COLLATE utf8_general_ci [$IsNull$]  [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split} "},
+                { "varchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} varchar([$FieldLen$]) CHARACTER SET utf8 COLLATE utf8_general_ci [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
+                { "nchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} char([$FieldLen$]) CHARACTER SET utf8 COLLATE utf8_general_ci [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split} "},
+                { "char",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} char([$FieldLen$]) CHARACTER SET utf8 COLLATE utf8_general_ci [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
                 //样例：[udescript] [text] NULL,
-                { "text",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
+                { "text",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} text CHARACTER SET utf8 COLLATE utf8_general_ci [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
 
                 { "int",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} int [$IsIdentity$] [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
                 { "bigint",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} bigint [$IsIdentity$] [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}" },
@@ -479,7 +479,7 @@ namespace HiSql
                 { "date",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} date  [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}" },
 
                 { "binary",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} binary  [$IsNull$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
-                { "uniqueidentifier",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci   [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
+                { "uniqueidentifier",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} varchar(36) CHARACTER SET utf8 COLLATE utf8_general_ci   [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
             };
 
 
@@ -565,7 +565,7 @@ namespace HiSql
                 .ToString();
             _temp_table_key2 = "[$FieldName$] ASC";//定义主键的排序方式
 
-            _temp_table_key3 = "ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;";//TEXTIMAGE_ON [PRIMARY]
+            _temp_table_key3 = "ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;";//TEXTIMAGE_ON [PRIMARY]
 
 
             _temp_field_comment = new StringBuilder()

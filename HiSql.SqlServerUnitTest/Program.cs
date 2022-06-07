@@ -281,7 +281,7 @@ namespace HiSql.UnitTest
             new { Batch="9000112112",Material="ST0080",Location="A001",st_kc=1000},
             new { Batch="9000112112",Material="ST0026",Location="A001",st_kc=1500}
 
-        }).ExecCommand();
+                    }).ExecCommand();
 
             //第一种场景 一个订单中只有一个批次
             string[] grp_arr1 = new string[] { "9000112112" };

@@ -99,7 +99,12 @@ namespace HiSql
             HiSqlCommProvider.RemoveTabInfoCache(tabname);
             //获取最新
             TabInfo tabinfo = idm.GetTabStruct(tabname);
-            return addColumn(idm, tabinfo, hiColumn, opLevel);
+            var col = addColumn(idm, tabinfo, hiColumn, opLevel);
+            //获取当前最新物理表结构信息
+            HiSqlCommProvider.RemoveTabInfoCache(tabname);
+            //获取最新
+            tabinfo = idm.GetTabStruct(tabname);
+            return col;
         }
         public Tuple<bool, string, string> CreatePrimaryKey(string tabname, List<HiColumn> columns, OpLevel opLevel)
         {
