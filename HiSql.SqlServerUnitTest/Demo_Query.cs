@@ -25,7 +25,7 @@ namespace HiSql.UnitTest
 
         public static void Init(HiSqlClient sqlClient)
         {
-            Query_Demo(sqlClient);
+            //Query_Demo(sqlClient);
             //QuerySlave(sqlClient);
             //Query_Demo3(sqlClient);
             //Query_Case(sqlClient);
@@ -34,7 +34,7 @@ namespace HiSql.UnitTest
             //Query_Demo5(sqlClient);
             //Query_Demo6(sqlClient);
             //Query_Demo7(sqlClient);
-            //Query_Demo8(sqlClient);
+            Query_Demo8(sqlClient);
             //Query_Demo9(sqlClient);
             //Query_Demo10(sqlClient);
             //Query_Demo11(sqlClient);

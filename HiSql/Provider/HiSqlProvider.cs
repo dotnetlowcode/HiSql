@@ -737,11 +737,13 @@ namespace HiSql
         public void CommitTran()
         {
             this.Context.CommitTran();
+            this.Close();
         }
 
         public void RollBackTran()
         {
             this.Context.RollBackTran();
+            this.Close();
         }
 
         
