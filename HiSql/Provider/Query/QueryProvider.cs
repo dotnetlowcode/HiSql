@@ -846,6 +846,8 @@ namespace HiSql
         /// 将查询结果写入指定的表（临时表，全局临时表，及已经定义好的变量表）
         /// </summary>
         /// <param name="tabname"></param>
+        /// <returns>返回插入的表名称</returns>
+        /// <exception cref="Exception"></exception>
         public virtual string Insert(string tabname)
         {
             if (!_queue.HasQueue("field"))

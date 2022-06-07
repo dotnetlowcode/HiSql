@@ -47,23 +47,19 @@
           "lib/netstandard2.0/BouncyCastle.Crypto.dll": {}
         }
       },
-      "Google.Protobuf/3.14.0": {
+      "Google.Protobuf/3.19.4": {
         "type": "package",
-        "dependencies": {
-          "System.Memory": "4.5.3",
-          "System.Runtime.CompilerServices.Unsafe": "4.5.2"
-        },
         "compile": {
-          "lib/netstandard2.0/Google.Protobuf.dll": {}
+          "lib/net5.0/Google.Protobuf.dll": {}
         },
         "runtime": {
-          "lib/netstandard2.0/Google.Protobuf.dll": {}
+          "lib/net5.0/Google.Protobuf.dll": {}
         }
       },
-      "K4os.Compression.LZ4/1.1.11": {
+      "K4os.Compression.LZ4/1.2.6": {
         "type": "package",
         "dependencies": {
-          "System.Memory": "4.5.3"
+          "System.Memory": "4.5.4"
         },
         "compile": {
           "lib/netstandard2.0/K4os.Compression.LZ4.dll": {}
@@ -72,17 +68,17 @@
           "lib/netstandard2.0/K4os.Compression.LZ4.dll": {}
         }
       },
-      "K4os.Compression.LZ4.Streams/1.1.11": {
+      "K4os.Compression.LZ4.Streams/1.2.6": {
         "type": "package",
         "dependencies": {
-          "K4os.Compression.LZ4": "1.1.11",
+          "K4os.Compression.LZ4": "1.2.6",
           "K4os.Hash.xxHash": "1.0.6"
         },
         "compile": {
-          "lib/netstandard2.0/K4os.Compression.LZ4.Streams.dll": {}
+          "lib/netstandard2.1/K4os.Compression.LZ4.Streams.dll": {}
         },
         "runtime": {
-          "lib/netstandard2.0/K4os.Compression.LZ4.Streams.dll": {}
+          "lib/netstandard2.1/K4os.Compression.LZ4.Streams.dll": {}
         }
       },
       "K4os.Hash.xxHash/1.0.6": {
@@ -395,28 +391,27 @@
           }
         }
       },
-      "MySql.Data/8.0.26": {
+      "MySql.Data/8.0.29": {
         "type": "package",
         "dependencies": {
           "BouncyCastle.NetCore": "1.8.5",
-          "Google.Protobuf": "3.14.0",
-          "K4os.Compression.LZ4": "1.1.11",
-          "K4os.Compression.LZ4.Streams": "1.1.11",
-          "K4os.Hash.xxHash": "1.0.6",
+          "Google.Protobuf": "3.19.4",
+          "K4os.Compression.LZ4.Streams": "1.2.6",
           "System.Buffers": "4.5.1",
           "System.Configuration.ConfigurationManager": "4.4.1",
+          "System.Runtime.CompilerServices.Unsafe": "5.0.0",
           "System.Security.Permissions": "4.7.0",
           "System.Text.Encoding.CodePages": "4.4.0"
         },
         "compile": {
           "lib/net5.0/MySql.Data.dll": {},
           "lib/net5.0/Ubiety.Dns.Core.dll": {},
-          "lib/net5.0/Zstandard.Net.dll": {}
+          "lib/net5.0/ZstdNet.dll": {}
         },
         "runtime": {
           "lib/net5.0/MySql.Data.dll": {},
           "lib/net5.0/Ubiety.Dns.Core.dll": {},
-          "lib/net5.0/Zstandard.Net.dll": {}
+          "lib/net5.0/ZstdNet.dll": {}
         }
       },
       "Newtonsoft.Json/13.0.1": {
@@ -993,7 +988,7 @@
           }
         }
       },
-      "HiSql/1.0.3.8": {
+      "HiSql/1.0.3.9": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
@@ -1009,12 +1004,12 @@
           "bin/placeholder/HiSql.dll": {}
         }
       },
-      "HiSql.MySql/1.0.3.8": {
+      "HiSql.MySql/1.0.3.9": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
-          "HiSql": "1.0.3.8",
-          "MySql.Data": "8.0.26"
+          "HiSql": "1.0.3.9",
+          "MySql.Data": "8.0.29"
         },
         "compile": {
           "bin/placeholder/HiSql.MySql.dll": {}
@@ -1023,11 +1018,11 @@
           "bin/placeholder/HiSql.MySql.dll": {}
         }
       },
-      "HiSql.Oracle/1.0.3.8": {
+      "HiSql.Oracle/1.0.3.9": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
-          "HiSql": "1.0.3.8",
+          "HiSql": "1.0.3.9",
           "Oracle.ManagedDataAccess.Core": "3.21.4",
           "System.Data.OracleClient": "1.0.8"
         },
@@ -1100,18 +1095,21 @@
         "lib/xamarinios/BouncyCastle.Crypto.xml"
       ]
     },
-    "Google.Protobuf/3.14.0": {
-      "sha512": "9AkodyGNmLI+wJJPbwpWLmh4BMHoXDQ9+8qvDPhQQi/BNsleqKMBn3OlyLwC6CALwan2kc5+Cenb8fJSITX3nQ==",
+    "Google.Protobuf/3.19.4": {
+      "sha512": "fd07/ykL4O4FhqrZIELm5lmiyOHfdPg9+o+hWr6tcfRdS7tHXnImg/2wtogLzlW2eEmr0J7j6ZrZvaWOLiJbxQ==",
       "type": "package",
-      "path": "google.protobuf/3.14.0",
+      "path": "google.protobuf/3.19.4",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "google.protobuf.3.14.0.nupkg.sha512",
+        "google.protobuf.3.19.4.nupkg.sha512",
         "google.protobuf.nuspec",
         "lib/net45/Google.Protobuf.dll",
         "lib/net45/Google.Protobuf.pdb",
         "lib/net45/Google.Protobuf.xml",
+        "lib/net5.0/Google.Protobuf.dll",
+        "lib/net5.0/Google.Protobuf.pdb",
+        "lib/net5.0/Google.Protobuf.xml",
         "lib/netstandard1.1/Google.Protobuf.dll",
         "lib/netstandard1.1/Google.Protobuf.pdb",
         "lib/netstandard1.1/Google.Protobuf.xml",
@@ -1120,14 +1118,14 @@
         "lib/netstandard2.0/Google.Protobuf.xml"
       ]
     },
-    "K4os.Compression.LZ4/1.1.11": {
-      "sha512": "RNvJw0UGkedPhCqVBNIogtfQebY+bQt0PN7xDbVe5LWLra0ZEqPfjPSl7iStj3rgDnkqkkTTpm+vCX3hU1qKmA==",
+    "K4os.Compression.LZ4/1.2.6": {
+      "sha512": "4EN8EE6bZG2U8dFfeqn+Om3UNajK3cPYHvyQROCFm4jNFVLuRB7Nl5bDkjBSAjfctS6konm+ay3u5RafBzltDA==",
       "type": "package",
-      "path": "k4os.compression.lz4/1.1.11",
+      "path": "k4os.compression.lz4/1.2.6",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "k4os.compression.lz4.1.1.11.nupkg.sha512",
+        "k4os.compression.lz4.1.2.6.nupkg.sha512",
         "k4os.compression.lz4.nuspec",
         "lib/net45/K4os.Compression.LZ4.dll",
         "lib/net45/K4os.Compression.LZ4.xml",
@@ -1139,14 +1137,14 @@
         "lib/netstandard2.0/K4os.Compression.LZ4.xml"
       ]
     },
-    "K4os.Compression.LZ4.Streams/1.1.11": {
-      "sha512": "x+BidXriYsNP4HNTHKx+5cVQguHHwbfs6nM79fDHOCOrcNwnaBms4dwzAV/ZALmKsNKcHmY74PeUZiCC4qLKwQ==",
+    "K4os.Compression.LZ4.Streams/1.2.6": {
+      "sha512": "5KMcNFRHeRrnJ9c8k5fZcfAJJEY0FndMiDiHIYa35Mx5KCMkeSNo/PEXu7YmtCoVczJagx+Vt7J/F+//S1PcJQ==",
       "type": "package",
-      "path": "k4os.compression.lz4.streams/1.1.11",
+      "path": "k4os.compression.lz4.streams/1.2.6",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "k4os.compression.lz4.streams.1.1.11.nupkg.sha512",
+        "k4os.compression.lz4.streams.1.2.6.nupkg.sha512",
         "k4os.compression.lz4.streams.nuspec",
         "lib/net45/K4os.Compression.LZ4.Streams.dll",
         "lib/net45/K4os.Compression.LZ4.Streams.xml",
@@ -1155,7 +1153,9 @@
         "lib/netstandard1.6/K4os.Compression.LZ4.Streams.dll",
         "lib/netstandard1.6/K4os.Compression.LZ4.Streams.xml",
         "lib/netstandard2.0/K4os.Compression.LZ4.Streams.dll",
-        "lib/netstandard2.0/K4os.Compression.LZ4.Streams.xml"
+        "lib/netstandard2.0/K4os.Compression.LZ4.Streams.xml",
+        "lib/netstandard2.1/K4os.Compression.LZ4.Streams.dll",
+        "lib/netstandard2.1/K4os.Compression.LZ4.Streams.xml"
       ]
     },
     "K4os.Hash.xxHash/1.0.6": {
@@ -1762,34 +1762,38 @@
         "version.txt"
       ]
     },
-    "MySql.Data/8.0.26": {
-      "sha512": "iOxE24dI01JZlZ1EObkz9WwYMzX+0RnBf5a11OkPDCOGv2Yo0tTWmwAJfVXkuuSD47XngOir7l7+xZZ56lZyAA==",
+    "MySql.Data/8.0.29": {
+      "sha512": "3I+QUbSDTknNVAWUEr8JEtXU5sk83kofwy79TROew9YMhVQAq39jZwpHQfFNG757JZFGWJ5oa5VA3tZBxJa1jw==",
       "type": "package",
-      "path": "mysql.data/8.0.26",
+      "path": "mysql.data/8.0.29",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "lib/net452/MySql.Data.dll",
         "lib/net452/MySql.Data.xml",
         "lib/net452/Ubiety.Dns.Core.dll",
-        "lib/net452/Zstandard.Net.dll",
+        "lib/net452/ZstdNet.dll",
         "lib/net48/MySql.Data.dll",
         "lib/net48/MySql.Data.xml",
         "lib/net48/Ubiety.Dns.Core.dll",
-        "lib/net48/Zstandard.Net.dll",
+        "lib/net48/ZstdNet.dll",
         "lib/net5.0/MySql.Data.dll",
         "lib/net5.0/MySql.Data.xml",
         "lib/net5.0/Ubiety.Dns.Core.dll",
-        "lib/net5.0/Zstandard.Net.dll",
+        "lib/net5.0/ZstdNet.dll",
+        "lib/net6.0/MySql.Data.dll",
+        "lib/net6.0/MySql.Data.xml",
+        "lib/net6.0/Ubiety.Dns.Core.dll",
+        "lib/net6.0/ZstdNet.dll",
         "lib/netstandard2.0/MySql.Data.dll",
         "lib/netstandard2.0/MySql.Data.xml",
         "lib/netstandard2.0/Ubiety.Dns.Core.dll",
-        "lib/netstandard2.0/Zstandard.Net.dll",
+        "lib/netstandard2.0/ZstdNet.dll",
         "lib/netstandard2.1/MySql.Data.dll",
         "lib/netstandard2.1/MySql.Data.xml",
         "lib/netstandard2.1/Ubiety.Dns.Core.dll",
-        "lib/netstandard2.1/Zstandard.Net.dll",
-        "mysql.data.8.0.26.nupkg.sha512",
+        "lib/netstandard2.1/ZstdNet.dll",
+        "mysql.data.8.0.29.nupkg.sha512",
         "mysql.data.nuspec"
       ]
     },
@@ -3609,17 +3613,17 @@
         "version.txt"
       ]
     },
-    "HiSql/1.0.3.8": {
+    "HiSql/1.0.3.9": {
       "type": "project",
       "path": "../HiSql/HiSql.csproj",
       "msbuildProject": "../HiSql/HiSql.csproj"
     },
-    "HiSql.MySql/1.0.3.8": {
+    "HiSql.MySql/1.0.3.9": {
       "type": "project",
       "path": "../HiSql.MySql/HiSql.MySql.csproj",
       "msbuildProject": "../HiSql.MySql/HiSql.MySql.csproj"
     },
-    "HiSql.Oracle/1.0.3.8": {
+    "HiSql.Oracle/1.0.3.9": {
       "type": "project",
       "path": "../HiSql.Oracle/HiSql.Oracle.csproj",
       "msbuildProject": "../HiSql.Oracle/HiSql.Oracle.csproj"
@@ -3627,9 +3631,9 @@
   },
   "projectFileDependencyGroups": {
     "net5.0": [
-      "HiSql >= 1.0.3.8",
-      "HiSql.MySql >= 1.0.3.8",
-      "HiSql.Oracle >= 1.0.3.8"
+      "HiSql >= 1.0.3.9",
+      "HiSql.MySql >= 1.0.3.9",
+      "HiSql.Oracle >= 1.0.3.9"
     ]
   },
   "packageFolders": {

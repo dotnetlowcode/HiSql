@@ -30,7 +30,6 @@ D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\Microsoft.Ident
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\Microsoft.Win32.SystemEvents.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\MySql.Data.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\Ubiety.Dns.Core.dll
-D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\Zstandard.Net.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\Newtonsoft.Json.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\Oracle.ManagedDataAccess.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\Pipelines.Sockets.Unofficial.dll
@@ -81,3 +80,4 @@ D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\obj\Debug\net5.0\HiSql.MySqlUnit
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\obj\Debug\net5.0\ref\HiSql.MySqlUnitTest.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\obj\Debug\net5.0\HiSql.MySqlUnitTest.pdb
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\obj\Debug\net5.0\HiSql.MySqlUnitTest.genruntimeconfig.cache
+D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Debug\net5.0\ZstdNet.dll

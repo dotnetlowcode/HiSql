@@ -14,7 +14,6 @@ D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Release\net461\Microsoft.Extensions.
 D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Release\net461\Microsoft.Extensions.Primitives.dll
 D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Release\net461\MySql.Data.dll
 D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Release\net461\Ubiety.Dns.Core.dll
-D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Release\net461\Zstandard.Net.dll
 D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Release\net461\Newtonsoft.Json.dll
 D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Release\net461\System.Buffers.dll
 D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Release\net461\System.Memory.dll
@@ -163,3 +162,4 @@ D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Release\net461\StackExchange.Redis.d
 D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Release\net461\System.Diagnostics.PerformanceCounter.dll
 D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Release\net461\System.IO.Pipelines.dll
 D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Release\net461\System.Threading.Channels.dll
+D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Release\net461\ZstdNet.dll

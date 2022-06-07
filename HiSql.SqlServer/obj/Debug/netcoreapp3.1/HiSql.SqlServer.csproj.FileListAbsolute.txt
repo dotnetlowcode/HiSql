@@ -12,3 +12,4 @@ D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\netcoreapp3.1\HiSql.SqlSer
 D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\netcoreapp3.1\HiSql.SqlServer.csproj.CopyComplete
 D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\netcoreapp3.1\HiSql.SqlServer.dll
 D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\netcoreapp3.1\HiSql.SqlServer.pdb
+D:\Project\OpenSource\HiSql\HiSql.SqlServer\obj\Debug\netcoreapp3.1\HiSql.SqlServer.csproj.AssemblyReference.cache

@@ -10,9 +10,8 @@ namespace HiSql.MySqlUnitTest
     {
         public static void Init(HiSqlClient sqlClient)
         {
-            //CodeFirst_Demo(sqlClient);
+            CodeFirst_Demo(sqlClient);
             Create_Table(sqlClient);
-            string s = Console.ReadLine();
         }
 
         static void Create_Table(HiSqlClient sqlClient)
@@ -31,7 +30,7 @@ namespace HiSql.MySqlUnitTest
             //tabinfo_tab.TabModel.TabName = "##" + tabinfo_tab.TabModel.TabName;
             //tabinfo_tab.TabModel.TabReName = tabinfo_tab.TabModel.TabName.Substring(2) + "_" + System.Threading.Thread.CurrentThread.ManagedThreadId + "_" + tabinfo_tab.TabModel.TabName.GetHashCode().ToString().Substring(1);
 
-            TabInfo tab_info_test = sqlClient.Context.DMInitalize.GetTabStruct("H_TEST");
+            //TabInfo tab_info_test = sqlClient.Context.DMInitalize.GetTabStruct("H_TEST");
 
             //string _sql = sqlClient.Context.DMTab.BuildTabCreateSql(tabinfo_field.TabModel, tabinfo_field.GetColumns, true);
             sqlClient.CodeFirst.InstallHisql();

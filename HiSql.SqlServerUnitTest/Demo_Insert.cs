@@ -94,16 +94,19 @@ namespace HiSql
             //Demo1_Insert7(sqlClient);
             //Demo_dynamic(sqlClient);
 
-            Demo1_Insert8(sqlClient);
+            //Demo1_Insert8(sqlClient);
             //Demo1_Insert9(sqlClient);
 
-            //Demo1_Insert11(sqlClient);
+            Demo1_Insert11(sqlClient);
         }
 
         static void Demo1_Insert11(HiSqlClient sqlClient)
         {
 
-             sqlClient.Modi("H_UType", new List<object> {
+            
+            sqlClient.BeginTran(IsolationLevel.ReadUncommitted);
+            sqlClient.BeginTran();
+            sqlClient.Modi("H_UType", new List<object> {
                 new { UTYP = "U1", UTypeName = "普通用户" },
                 new { UTYP = "U2", UTypeName = "中级用户" },
                 new { UTYP = "U3", UTypeName = "高级用户" }

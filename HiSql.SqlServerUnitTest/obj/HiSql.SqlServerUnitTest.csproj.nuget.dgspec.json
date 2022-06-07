@@ -151,7 +151,7 @@
       }
     },
     "D:\\Project\\OpenSource\\HiSql\\HiSql.SqlServer\\HiSql.SqlServer.csproj": {
-      "version": "1.0.3.8",
+      "version": "1.0.3.9",
       "restore": {
         "projectUniqueName": "D:\\Project\\OpenSource\\HiSql\\HiSql.SqlServer\\HiSql.SqlServer.csproj",
         "projectName": "HiSql.SqlServer",
@@ -325,7 +325,7 @@
       }
     },
     "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj": {
-      "version": "1.0.3.8",
+      "version": "1.0.3.9",
       "restore": {
         "projectUniqueName": "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj",
         "projectName": "HiSql",

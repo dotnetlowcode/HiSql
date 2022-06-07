@@ -60,7 +60,14 @@ namespace HiSql
 
         public readonly static string PlatformName = "LowCoder";
 
-        
+
+        /// <summary>
+        /// 锁定表创建修改的key 
+        /// </summary>
+        public readonly static string LockTablePre = "TAB:[$TabName$]";
+
+
+
         /// <summary>
         /// 用于数据库中 函数产生的日期
         /// </summary>

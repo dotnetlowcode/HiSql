@@ -64,9 +64,9 @@ namespace HiSql.MySql.Properties {
         ///   查找类似 
         ///
         ///CREATE TABLE  IF NOT EXISTS `[$Schema$]`.`Hi_TabModel` (
-        ///`TabName`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL   COMMENT &apos;表名&apos; , 
-        ///`TabReName`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL  default &apos;&apos; COMMENT &apos;表的别名&apos; , 
-        ///`TabDescript`  varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL  default &apos;&apos; COMMENT &apos;表描述&apos; , 
+        ///`TabName`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL   COMMENT &apos;表名&apos; , 
+        ///`TabReName`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL  default &apos;&apos; COMMENT &apos;表的别名&apos; , 
+        ///`TabDescript`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL  default &apos;&apos; COMMENT &apos;表描述&apos; , 
         ///`TabStoreType` int  NULL default 0 COMMENT &apos;表存储方式&apos; ,
         ///`TabType` int  NULL default 0 COMMENT &apos;表类型&apos; ,
         ///`TabCacheType` int  NULL default 0  [字符串的其余部分被截断]&quot;; 的本地化字符串。

@@ -10,7 +10,7 @@ namespace HiSql.MySqlUnitTest
     {
         public static void Init(HiSqlClient sqlClient)
         {
-            //Demo_AddColumn(sqlClient); //ok
+            Demo_AddColumn(sqlClient); //ok
             //Demo_ReColumn(sqlClient);//ok
             //Demo_ModiColumn(sqlClient); //ok
             //Demo_DelColumn(sqlClient);////ok
@@ -18,7 +18,7 @@ namespace HiSql.MySqlUnitTest
             //Demo_View(sqlClient);//ok
             //Demo_AllTables(sqlClient);//ok
             //Demo_GlobalTables(sqlClient);//  delay
-            Demo_ModiTable(sqlClient);//ok
+            //Demo_ModiTable(sqlClient);//ok
 
             //Demo_DropView(sqlClient); //ok
             //Demo_CreateView(sqlClient);//ok
@@ -260,13 +260,13 @@ namespace HiSql.MySqlUnitTest
         {
             HiColumn column = new HiColumn()
             {
-                TabName = "htest01",
-                FieldName = "TestAdd",
+                TabName = "HTest01",
+                FieldName = "TestAA",
                 FieldType = HiType.VARCHAR,
                 FieldLen = 50,
                 DBDefault = HiTypeDBDefault.EMPTY,
                 DefaultValue = "",
-                FieldDesc = "测试字段添加"
+                FieldDesc = "测试字AA段添加"
 
             };
 

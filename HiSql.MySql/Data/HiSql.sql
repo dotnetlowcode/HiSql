@@ -1,9 +1,9 @@
 ﻿
 
 CREATE TABLE  IF NOT EXISTS `[$Schema$]`.`Hi_TabModel` (
-`TabName`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL   COMMENT '表名' , 
-`TabReName`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL  default '' COMMENT '表的别名' , 
-`TabDescript`  varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL  default '' COMMENT '表描述' , 
+`TabName`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL   COMMENT '表名' , 
+`TabReName`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL  default '' COMMENT '表的别名' , 
+`TabDescript`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL  default '' COMMENT '表描述' , 
 `TabStoreType` int  NULL default 0 COMMENT '表存储方式' ,
 `TabType` int  NULL default 0 COMMENT '表类型' ,
 `TabCacheType` int  NULL default 0 COMMENT '表的缓存类型' ,
@@ -11,36 +11,36 @@ CREATE TABLE  IF NOT EXISTS `[$Schema$]`.`Hi_TabModel` (
 `IsSys` bit  NULL default 0 COMMENT '是否系统内置表' ,
 `IsEdit` bit  NULL default 0 COMMENT '是否可编辑' ,
 `IsLog` bit  NULL default 0 COMMENT '是否开启表日志' ,
-`LogTable`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL  default '' COMMENT '日志表名' , 
+`LogTable`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL  default '' COMMENT '日志表名' , 
 `LogExprireDay` int  NULL default 0 COMMENT '日志保留天数' ,
 `CreateTime` datetime  NULL default current_timestamp COMMENT '创建时间' ,
-`CreateName`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL  default '' COMMENT '创建人' , 
+`CreateName`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL  default '' COMMENT '创建人' , 
 `ModiTime` datetime  NULL default current_timestamp COMMENT '修改时间' ,
-`ModiName`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL  default '' COMMENT '修改人' , 
+`ModiName`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL  default '' COMMENT '修改人' , 
 
  PRIMARY KEY(
 `TabName` ASC
 
 )USING BTREE
 
-)ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+)ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 CREATE TABLE  IF NOT EXISTS `[$Schema$]`.`Hi_FieldModel` (
-`TabName`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL   COMMENT '表名' , 
-`FieldName`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL   COMMENT '字段名' , 
-`FieldDesc`  varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL  default '' COMMENT '字段名描述' , 
+`TabName`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL   COMMENT '表名' , 
+`FieldName`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL   COMMENT '字段名' , 
+`FieldDesc`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL  default '' COMMENT '字段名描述' , 
 `IsIdentity` bit  NULL default 0 COMMENT '是否自增ID' ,
 `IsPrimary` bit  NULL default 0 COMMENT '是否主键' ,
 `IsBllKey` bit  NULL default 0 COMMENT '是否是业务Key' ,
 `FieldType` int  NULL default 0 COMMENT '字段类型' ,
 `SortNum` int  NULL default 0 COMMENT '字段排序号' ,
-`Regex`  varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL  default '' COMMENT '正则校验表达式' , 
+`Regex`  varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NULL  default '' COMMENT '正则校验表达式' , 
 `DBDefault` int  NULL default 0 COMMENT '默认值类型' ,
-`DefaultValue`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL  default '' COMMENT '默认值' , 
+`DefaultValue`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL  default '' COMMENT '默认值' , 
 `FieldLen` int  NULL default 0 COMMENT '字段长度' ,
 `FieldDec` int  NULL default 0 COMMENT '小数点位数' ,
-`SNO` char(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL default '' COMMENT '编号名称' , 
-`SNO_NUM` char(3) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL default '' COMMENT '子编号' , 
+`SNO` char(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL default '' COMMENT '编号名称' , 
+`SNO_NUM` char(3) CHARACTER SET utf8 COLLATE utf8_general_ci NULL default '' COMMENT '子编号' , 
 `IsSys` bit  NULL default 0 COMMENT '是否系统字段' ,
 `IsNull` bit  NULL default 0 COMMENT '是否允许NULL' ,
 `IsRequire` bit  NULL default 0 COMMENT '是否必填' ,
@@ -50,15 +50,15 @@ CREATE TABLE  IF NOT EXISTS `[$Schema$]`.`Hi_FieldModel` (
 `IsSearch` bit  NULL default 0 COMMENT '是否允许搜索' ,
 `SrchMode` int  NULL default 0 COMMENT '搜索模式' ,
 `IsRefTab` bit  NULL default 0 COMMENT '是否引用表' ,
-`RefTab`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL  default '' COMMENT '引用表名' , 
-`RefField`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL  default '' COMMENT '引用的字段' , 
-`RefFields`  varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL  default '' COMMENT '引用字段清单' , 
-`RefFieldDesc`  varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL  default '' COMMENT '引用字段清单描述' , 
-`RefWhere`  varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL  default '' COMMENT '引用条件' , 
+`RefTab`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL  default '' COMMENT '引用表名' , 
+`RefField`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL  default '' COMMENT '引用的字段' , 
+`RefFields`  varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NULL  default '' COMMENT '引用字段清单' , 
+`RefFieldDesc`  varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NULL  default '' COMMENT '引用字段清单描述' , 
+`RefWhere`  varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NULL  default '' COMMENT '引用条件' , 
 `CreateTime` datetime  NULL default current_timestamp COMMENT '创建时间' ,
-`CreateName`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL  default '' COMMENT '创建人' , 
+`CreateName`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL  default '' COMMENT '创建人' , 
 `ModiTime` datetime  NULL default current_timestamp COMMENT '修改时间' ,
-`ModiName`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL  default '' COMMENT '修改人' , 
+`ModiName`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL  default '' COMMENT '修改人' , 
 
  PRIMARY KEY(
 `TabName` ASC,
@@ -66,33 +66,33 @@ CREATE TABLE  IF NOT EXISTS `[$Schema$]`.`Hi_FieldModel` (
 
 )USING BTREE
 
-)ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+)ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 
 CREATE TABLE  IF NOT EXISTS `[$Schema$]`.`Hi_Domain` (
-`Domain`  varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL   COMMENT '数据域名' , 
-`DomainDesc`  varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL  default '' COMMENT '数据域描述' , 
+`Domain`  varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL   COMMENT '数据域名' , 
+`DomainDesc`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL  default '' COMMENT '数据域描述' , 
 `CreateTime` datetime  NULL default current_timestamp COMMENT '创建时间' ,
-`CreateName`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL  default '' COMMENT '创建人' , 
+`CreateName`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL  default '' COMMENT '创建人' , 
 `ModiTime` datetime  NULL default current_timestamp COMMENT '修改时间' ,
-`ModiName`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL  default '' COMMENT '修改人' , 
+`ModiName`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL  default '' COMMENT '修改人' , 
 
  PRIMARY KEY(
 `Domain` ASC
 
 )USING BTREE
 
-)ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+)ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 CREATE TABLE  IF NOT EXISTS `[$Schema$]`.`Hi_DataElement` (
-`Domain`  varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL   COMMENT '数据域名' , 
-`ElementValue`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL   COMMENT '数据域值' , 
-`ElementDesc`  varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL  default '' COMMENT '数据域值描述' , 
+`Domain`  varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL   COMMENT '数据域名' , 
+`ElementValue`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL   COMMENT '数据域值' , 
+`ElementDesc`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL  default '' COMMENT '数据域值描述' , 
 `SortNum` int  NULL default 0 COMMENT '数据域排序号' ,
 `CreateTime` datetime  NULL default current_timestamp COMMENT '创建时间' ,
-`CreateName`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL  default '' COMMENT '创建人' , 
+`CreateName`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL  default '' COMMENT '创建人' , 
 `ModiTime` datetime  NULL default current_timestamp COMMENT '修改时间' ,
-`ModiName`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL  default '' COMMENT '修改人' , 
+`ModiName`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL  default '' COMMENT '修改人' , 
 
  PRIMARY KEY(
 `Domain` ASC,
@@ -100,7 +100,7 @@ CREATE TABLE  IF NOT EXISTS `[$Schema$]`.`Hi_DataElement` (
 
 )USING BTREE
 
-)ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+)ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 
 delete from  `[$Schema$]`.`Hi_TabModel` where TabName='Hi_TabModel';

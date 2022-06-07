@@ -19,7 +19,6 @@ D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Release\net5.0\Microsoft.Ext
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Release\net5.0\Microsoft.Win32.SystemEvents.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Release\net5.0\MySql.Data.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Release\net5.0\Ubiety.Dns.Core.dll
-D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Release\net5.0\Zstandard.Net.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Release\net5.0\Newtonsoft.Json.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Release\net5.0\System.Configuration.ConfigurationManager.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Release\net5.0\System.Data.OracleClient.dll
@@ -81,3 +80,4 @@ D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Release\net5.0\runtimes\win\
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Release\net5.0\Pipelines.Sockets.Unofficial.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Release\net5.0\StackExchange.Redis.dll
 D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Release\net5.0\System.IO.Pipelines.dll
+D:\Project\OpenSource\HiSql\HiSql.MySqlUnitTest\bin\Release\net5.0\ZstdNet.dll

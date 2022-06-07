@@ -75,7 +75,7 @@
       }
     },
     "D:\\Project\\OpenSource\\HiSql\\HiSql.MySql\\HiSql.MySql.csproj": {
-      "version": "1.0.3.8",
+      "version": "1.0.3.9",
       "restore": {
         "projectUniqueName": "D:\\Project\\OpenSource\\HiSql\\HiSql.MySql\\HiSql.MySql.csproj",
         "projectName": "HiSql.MySql",
@@ -150,7 +150,7 @@
           "dependencies": {
             "MySql.Data": {
               "target": "Package",
-              "version": "[8.0.26, )"
+              "version": "[8.0.29, )"
             }
           },
           "imports": [
@@ -175,7 +175,7 @@
           "dependencies": {
             "MySql.Data": {
               "target": "Package",
-              "version": "[8.0.26, )"
+              "version": "[8.0.29, )"
             }
           },
           "imports": [
@@ -200,7 +200,7 @@
           "dependencies": {
             "MySql.Data": {
               "target": "Package",
-              "version": "[8.0.26, )"
+              "version": "[8.0.29, )"
             }
           },
           "imports": [
@@ -225,7 +225,7 @@
           "dependencies": {
             "MySql.Data": {
               "target": "Package",
-              "version": "[8.0.26, )"
+              "version": "[8.0.29, )"
             }
           },
           "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100\\RuntimeIdentifierGraph.json"
@@ -233,7 +233,7 @@
       }
     },
     "D:\\Project\\OpenSource\\HiSql\\HiSql.Oracle\\HiSql.Oracle.csproj": {
-      "version": "1.0.3.8",
+      "version": "1.0.3.9",
       "restore": {
         "projectUniqueName": "D:\\Project\\OpenSource\\HiSql\\HiSql.Oracle\\HiSql.Oracle.csproj",
         "projectName": "HiSql.Oracle",
@@ -407,7 +407,7 @@
       }
     },
     "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj": {
-      "version": "1.0.3.8",
+      "version": "1.0.3.9",
       "restore": {
         "projectUniqueName": "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj",
         "projectName": "HiSql",
