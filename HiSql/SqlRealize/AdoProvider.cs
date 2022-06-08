@@ -12,6 +12,15 @@ using System.Threading;
 
 namespace HiSql
 {
+
+    /// <summary>
+    /// ADO 操作
+    /// 
+    /// modi by tgm date:2022.6.7 
+    /// 1.事务提交或事务回滚 自动关闭数据库连接
+    /// 2.语句执行有异常 自动关闭链接
+    /// 3.当出现多个开启事务时将会把前一个事务Commit然后在开启新的事务
+    /// </summary>
     public abstract partial class AdoProvider : AdoExtend, IDataBase
     {
 
@@ -161,6 +170,16 @@ namespace HiSql
             {
                 this.Transaction = this.Connection.BeginTransaction();
             }
+            else
+            {
+                CommitTran();//将之前的事务提前 再启开新的事务
+
+                //有可能上一个事务已经关闭 需要打开
+                TryOpen();
+                this.Transaction = this.Connection.BeginTransaction();
+            }
+
+
 
         }
         /// <summary>
@@ -172,6 +191,14 @@ namespace HiSql
             TryOpen();
             if (this.Transaction == null)
             {
+                this.Transaction = this.Connection.BeginTransaction(iso);
+            }
+            else
+            {
+                CommitTran();//将之前的事务提前 再启开新的事务
+
+                //有可能上一个事务已经关闭 需要打开
+                TryOpen();
                 this.Transaction = this.Connection.BeginTransaction(iso);
             }
 
@@ -344,6 +371,7 @@ namespace HiSql
                 CmdTyp = CommandType.Text;
                 hassError = true;
                 ExecuteError(sql, parameters, E);
+                this.Close();//有异常则关闭链接
                 _e = E;
                 //throw E;
             }
@@ -450,6 +478,7 @@ namespace HiSql
                 CmdTyp = CommandType.Text;
                 hassError = true;
                 _e = E;
+                this.Close();
                 ExecuteError(sql, null, E);
                 //throw E;
             }
@@ -560,7 +589,17 @@ namespace HiSql
             {
                 CmdTyp = CommandType.Text;
                 ExecuteError(sql, parameters, E);
+                this.Close();
                 throw E;
+                
+            }
+            finally
+            {
+                if (this.IsAutoClose())
+                {
+                    this.Close();
+                }
+                //ChooseConnectionEnd(sql);
             }
 
 
@@ -650,6 +689,8 @@ namespace HiSql
             {
                 CmdTyp = CommandType.Text;
                 ExecuteError(sql, parameters, E);
+
+                this.Close();//执行现异常关闭链接 add by tgm date;2022.6.7
                 throw E;
             }
             finally
@@ -714,6 +755,7 @@ namespace HiSql
             {
                 CmdTyp = CommandType.Text;
                 ExecuteError(sql, parameters, E);
+                this.Close();
                 throw E;
             }
             finally

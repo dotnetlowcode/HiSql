@@ -32,7 +32,7 @@ namespace HiSql
         {
 
         }
-        
+
 
 
         Tuple<bool, string, string> addColumn(IDM idm, TabInfo tabInfo, HiColumn hiColumn, OpLevel opLevel)
@@ -118,7 +118,7 @@ namespace HiSql
             idm.Context = SqlClient.Context;
 
             List<TabIndex> lstindex = idm.GetIndexs(tabname);
-            if (lstindex.Any(i => string.Equals(i.IndexType ,"Key_Index", StringComparison.OrdinalIgnoreCase)))
+            if (lstindex.Any(i => string.Equals(i.IndexType, "Key_Index", StringComparison.OrdinalIgnoreCase)))
                 _msg = $"表[{tabname}]已经存在主键";
             else
             {
@@ -133,9 +133,9 @@ namespace HiSql
                     _msg = $"创建索引字段不能是【{HiType.BINARY}】或【{HiType.TEXT}】";
                     return new Tuple<bool, string, string>(_isok, _msg, _sql);
                 }
-                
+
                 _sql = idm.CreatePrimaryKey(tabname, columns);
-                
+
                 if (idm.Context.CurrentConnectionConfig.UpperCase)
                 {
                     _sql = _sql.ToUpper();
@@ -198,7 +198,7 @@ namespace HiSql
                     return new Tuple<bool, string, string>(_isok, _msg, _sql);
                 }
 
-                if (columns.Any(t=>t.FieldType == HiType.BINARY || t.FieldType == HiType.TEXT))
+                if (columns.Any(t => t.FieldType == HiType.BINARY || t.FieldType == HiType.TEXT))
                 {
                     _msg = $"创建索引字段不能是【{HiType.BINARY}】或【{HiType.TEXT}】";
                     return new Tuple<bool, string, string>(_isok, _msg, _sql);
@@ -261,13 +261,40 @@ namespace HiSql
         {
             if (_sqlClient != null)
             {
-                return _sqlClient.Context.DMInitalize.BuildTabCreate(tabInfo) > 0;
+                if (!CheckTabExists(tabInfo.TabModel.TabName))
+                {
+                    string _key = Constants.LockTablePre.Replace("[$TabName$]", tabInfo.TabModel.TabName);
+                    var rtnlck = Lock.CheckLock(_key);
+                    if (rtnlck.Item1)
+                    {
+                        throw new Exception($"表 [{tabInfo.TabModel.TabName}]在被其他用户正在操作创建!");
+                    }
+                    else
+                    {
+                        bool isok = false;
+                        var rtnexe=  Lock.LockOnExecute(_key, () => {
+
+                            isok = _sqlClient.Context.DMInitalize.BuildTabCreate(tabInfo) > 0;
+                        }, new LckInfo { UName = _sqlClient.CurrentConnectionConfig.User,Ip=Tool.Net.GetLocalIPAddress() });
+
+                        return isok;
+                    }
+
+                     
+                }
+                else
+                    throw new Exception($"表 [{tabInfo.TabModel.TabName}] 已经存在不允许重复创建");
 
 
             }
             else
                 throw new Exception($"请先指定数据库连接!");
         }
+
+
+
+        
+
 
         /// <summary>
         /// 根据实体类型创建表
@@ -279,7 +306,8 @@ namespace HiSql
             if (_sqlClient != null)
             {
                 TabInfo tabInfo = _sqlClient.Context.DMInitalize.BuildTab(type);
-                return _sqlClient.Context.DMInitalize.BuildTabCreate(tabInfo) > 0;
+                return CreateTable(tabInfo);
+                
             }
             else
                 throw new Exception($"请先指定数据库连接!");
