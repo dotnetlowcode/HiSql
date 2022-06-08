@@ -86,7 +86,7 @@ namespace HiSql
 
         public override Task<int> BulkCopy<T>(List<T> lstobj, TabInfo tabInfo, Dictionary<string, string> columnMapping = null)
         {
-            DataTable sourceTable = DataConvert.ToTable(lstobj, tabInfo, this.Context.CurrentConnectionConfig.User);
+            DataTable sourceTable = DataConvert.ToTable(lstobj, tabInfo, this.Context.CurrentConnectionConfig.User, false);
             return BulkCopy(sourceTable, tabInfo);
             //throw new Exception($"针对DaMeng数据没有找到合适的BulkCopy的驱动暂时不支持");
         }
