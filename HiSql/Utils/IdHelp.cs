@@ -17,6 +17,7 @@ namespace HiSql
     {
         abstract public long NextId();
 
+        abstract public List<long> NextId(int count);
        
         
     }
@@ -62,6 +63,24 @@ namespace HiSql
             this.workerId = workerId;
         }
 
+
+        /// <summary>
+        /// 生成指定数量的雪花ID
+        /// </summary>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public List<long> NextId(int count)
+        {
+            if (count <= 0)
+                throw new Exception($"生成雪花id的数量不能小于1");
+
+            List<long> lst = new List<long>();
+            for (int i = 0; i < count; i++)
+            {
+                lst.Add(NextId());
+            }
+            return lst;
+        }
         public long NextId()
         {
             lock (this)
@@ -231,6 +250,24 @@ namespace HiSql
         }
 
         public long CurrentId { get; private set; }
+
+
+        /// <summary>
+        /// 生成指定数量的雪花ID
+        /// </summary>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public List<long> NextId(int count)
+        {
+            if (count <= 0)
+                throw new Exception($"生成雪花id的数量不能小于1");
+            List<long> lst = new List<long>();
+            for (int i = 0; i < count; i++)
+            {
+                lst.Add(NextId());
+            }
+            return lst;
+        }
 
         /// <summary>
         /// 获取下一个Id，该方法线程安全

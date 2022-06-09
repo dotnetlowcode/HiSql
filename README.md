@@ -34,6 +34,96 @@
 
 传统ORM框架最大的弊端就是完全要依赖于实体用lambda表达式写查询语句，但最大的问题就是如果业务场景需要动态拼接条件时只能又切换到原生数据库的sql语句进行完成，如果自行拼接开发人员还要解决防注入的问题,hisql 刚才完美的解决这些问题,Hisql底层已经对sql注入进行了处理，开发人员只要关注于业务开发
 
+
+
+
+### 2022.6.7 解决mysql低版本字符集问题
+
+在低版本的mysql下使用HiSql会报如下错误
+```c#
+One or more errors occurred.(Unknow collation:'utf8mb4_0900_ai_ci')
+```
+感谢freesql作者反馈的bug
+
+
+
+### 2022.6.1 编号服务更新
+平常业务中需要根据不同的规则生成唯一的流水号作为表中的主键，或是生成雪花id号 `HiSql` 提供流水号生成功能，该功能支持分布式唯一流水号生成
+
+详细教程请查看 [hisql 编号详细教程](https://hisql.net/guide/number.html)
+
+
+如下所示 
+1. 配置
+
+```c#
+    Global.SnroOn = true;//表示启用流水号功能
+    sqlClient.CodeFirst.InstallHisql();//启用后初始化安装时自动会创建表 Hi_Snro
+
+
+    //新增流水号配置
+    //SNRO 表示主编号名称 SNUM 表示子编号ID
+    var obj1 = new { SNRO = "MATDOC", SNUM = 1, IsSnow=false, SnowTick=0, StartNum = "9000000", EndNum = "9999999",Length=7, CurrNum = "9000000", IsNumber = true, IsHasPre = false, CacheSpace = 10, Descript = "物料主数据编号" };
+    
+    
+    //新增雪花ID生成配置
+    //SNRO 表示主编号名称 SNUM 表示子编号ID
+    var obj2 = new { SNRO = "Order", SNUM = 1, IsSnow=true, SnowTick=145444, StartNum = "", EndNum = "",Length=7, CurrNum = "", IsNumber = true, IsHasPre = false, CacheSpace = 10, Descript = "订单号雪花ID" };
+
+    List<object> list = new List<object>();
+    list.Add(obj1);
+    list.Add(obj2);
+
+    sqlClient.Modi("Hi_Snro", list).ExecCommand();
+```
+
+
+2. 使用流水号
+```c#
+    public static SeriNumber number = null;  //定义个全局变更的流水号对象
+
+```
+
+3. 设置流水号的连接
+```c#
+//sqlClient 为数据库连接对象
+    number = new SeriNumber(sqlClient);
+
+```
+
+4. 启用分布式流水号
+   
+如果项目是分布式布署的一定要启用以下代码，否则会产生重复ID
+
+```c#
+    HiSql.Global.RedisOn = true;//开启redis缓存
+    HiSql.Global.RedisOptions = new RedisOptions { Host = "172.16.80.178", PassWord = "qwe123", Port = 6379, CacheRegion = "HRM", Database = 2 };
+
+    HiSql.Global.NumberOptions.MultiMode= true;`
+```
+
+
+5. 产生流水号
+```c#
+//Order:表示主编号名称 1:表示子编号id
+
+    string num=number.NewNumber("MATDOC", 1);
+```
+
+6. 一次性产生多个流水号
+
+```c#
+// 一次产生10个流水号
+    List<string> lstnum=number.NewNumber("MATDOC", 1,10);
+```
+
+
+
+
+
+
+
+
 ### 2022.5.25 新增获取excel 的Sheet名称方法
 
 ```c#

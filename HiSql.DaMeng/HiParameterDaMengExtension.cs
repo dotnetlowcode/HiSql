@@ -1,6 +1,5 @@
 ﻿using Dm;
 using System;
-using System.Data.OracleClient;
 
 namespace HiSql
 {

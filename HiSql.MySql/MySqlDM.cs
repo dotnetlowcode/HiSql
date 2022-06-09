@@ -2581,7 +2581,7 @@ namespace HiSql
         /// <returns></returns>
         public bool CheckTabExists(string tabname = "")
         {
-            DataTable dt = Context.DBO.GetDataTable(dbConfig.Get_CheckTabExists.Replace("[$TabName$]", tabname));
+            DataTable dt = Context.DBO.GetDataTable(dbConfig.Get_CheckTabExists.Replace("[$TabName$]", tabname).Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema));
             return dt.Rows.Count > 0;
         }
 
@@ -2724,7 +2724,7 @@ namespace HiSql
                     tabIndex.ColumnIdx = Convert.ToInt32(dr["ColumnIdx"].ToString());
                     tabIndex.ColumnId = Convert.ToInt32(dr["ColumnID"].ToString());
                     tabIndex.SortType = dr["Sort"].ToString().ToLower() == "asc" ? SortType.ASC : SortType.DESC;
-                    tabIndex.IsPrimary = dr["IPrimary"].ToString() == "Y" ? true : false;
+                    tabIndex.IsPrimary = dr["IsPrimary"].ToString() == "Y" ? true : false;
                     tabIndex.IsUnique = dr["IsUnique"].ToString() == "Y" ? true : false;
 
                     lstindex.Add(tabIndex);

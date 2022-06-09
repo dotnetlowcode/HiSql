@@ -98,6 +98,7 @@ namespace HiSql
         public string ITabName
         {
             get { return _itabname; }
+            protected  set  {  _itabname = value; }
         }
 
         public virtual IDbConfig DbConfig
@@ -845,7 +846,9 @@ namespace HiSql
         /// 将查询结果写入指定的表（临时表，全局临时表，及已经定义好的变量表）
         /// </summary>
         /// <param name="tabname"></param>
-        public virtual void Insert(string tabname)
+        /// <returns>返回插入的表名称</returns>
+        /// <exception cref="Exception"></exception>
+        public virtual string Insert(string tabname)
         {
             if (!_queue.HasQueue("field"))
             {
@@ -857,7 +860,7 @@ namespace HiSql
                 string _sql = this.ToSql();
 
                 this.Context.DBO.ExecCommand(_sql, null);
-
+                return this.ITabName;
             }
 
 

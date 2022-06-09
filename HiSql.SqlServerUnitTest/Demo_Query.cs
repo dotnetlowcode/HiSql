@@ -34,13 +34,13 @@ namespace HiSql.UnitTest
             //Query_Demo5(sqlClient);
             //Query_Demo6(sqlClient);
             //Query_Demo7(sqlClient);
-            //Query_Demo8(sqlClient);
+            Query_Demo8(sqlClient);
             //Query_Demo9(sqlClient);
             //Query_Demo10(sqlClient);
             //Query_Demo11(sqlClient);
             //Query_Demo12(sqlClient);
             // Query_Demo13(sqlClient);
-            Query_Demo14(sqlClient);
+           // Query_Demo14(sqlClient);
              var s = Console.ReadLine();
         }
 

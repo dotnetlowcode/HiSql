@@ -1186,7 +1186,7 @@ namespace HiSql
                             }
 
                             //_value = "test";
-                            if (_value.LengthZH() > hiColumn.FieldLen)
+                            if (_value.LengthZH() > hiColumn.FieldLen && hiColumn.FieldLen>0)
                             {
                                 throw new Exception($"字段[{hiColumn.FieldName}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
                             }

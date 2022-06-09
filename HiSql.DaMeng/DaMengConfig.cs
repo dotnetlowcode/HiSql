@@ -714,13 +714,13 @@ UNION ALL
                 .AppendLine("	T1.COLUMN_ID AS \"FieldNo\", ")
                 .AppendLine("	T1.COLUMN_NAME AS \"FieldName\",")
                 .AppendLine("	case ")
-                .AppendLine("	    when t1.CHAR_LENGTH > 0 then t1.CHAR_LENGTH")
+                .AppendLine("	    when t1.Data_LENGTH > 0 then t1.Data_LENGTH")
                 .AppendLine("		when t1.data_precision > 0 then t1.data_precision")
                 .AppendLine("	    else 0")
                 .AppendLine("	end as \"Lens\",")
 
                 .AppendLine("	case ")
-                .AppendLine("	    when t1.CHAR_LENGTH > 0 then t1.CHAR_LENGTH")
+                .AppendLine("	    when t1.Data_LENGTH > 0 then t1.Data_LENGTH")
                 .AppendLine("		when t1.data_precision > 0 then t1.data_precision")
                 .AppendLine("	    else 0")
                 .AppendLine("	end as \"UseBytes\",")
@@ -811,7 +811,7 @@ UNION ALL
             _temp_gettables_paging = new StringBuilder()
                 .AppendLine("select * from ( ")
                  .AppendLine(@"select ROW_NUMBER()OVER( order by table_name ASC) as row_seq , table_name as ""TabName"", 'Table' AS ""TabType"",  to_char(cast(LAST_ANALYZED as DATE),'yyyy-mm-dd hh24:mi:ss') as ""CreateTime"" 
-            from SYS.SYS.ALL_tables where OWNER ='[$Schema$]' and table_name not like '#%' [$Where$]")
+            from SYS.ALL_tables where OWNER ='[$Schema$]' and table_name not like '#%' [$Where$]")
                 .AppendLine(") temp  WHERE row_seq > [$SeqBegin$] AND row_seq <=[$SeqEnd$] ")
                .AppendLine(@"  order by row_seq")
                 .ToString();
@@ -850,7 +850,7 @@ UNION ALL
                .AppendLine("select count(*) from ( ")
                 .AppendLine(@"select table_name as ""TabName"", 'Table' AS ""TabType"",  to_char(cast(LAST_ANALYZED as DATE),'yyyy-mm-dd hh24:mi:ss') as ""CreateTime"" from SYS.ALL_tables where OWNER ='[$Schema$]' and table_name not like '#%' ")
                 .AppendLine("union all")
-                .AppendLine(@"select VIEW_NAME as ""TabName"", 'View' AS ""TabType"",  '' as ""CreateTime"" from SYS.all_views OWNER ='[$Schema$]' ")
+                .AppendLine(@"select VIEW_NAME as ""TabName"", 'View' AS ""TabType"",  '' as ""CreateTime"" from SYS.all_views where OWNER ='[$Schema$]' ")
 
                .AppendLine(") temp where 1=1 [$Where$]")
                .ToString();
@@ -891,19 +891,26 @@ UNION ALL
                 .ToString();
 
             //表索引
-            _temp_get_tabindex = @"SELECT distinct TABLE_NAME as ""TableName"" , INDEX_NAME as ""IndexName"", 
-        case when UNIQUENESS='UNIQUE' AND  CONSTRAINT_INDEX ='YES' then 'Key_Index' ELSE 'Index' end as ""IndexType"" 
-, '' as ""Disabled""   FROM user_indexes WHERE ""TABLE_NAME"" = '[$TabName$]' ";
+            _temp_get_tabindex = @"
+SELECT distinct idx.TABLE_NAME as ""TableName"" , isnull(con.constraint_name, idx.INDEX_NAME)  as ""IndexName"", 
+        case when con.constraint_type = 'P' then 'Key_Index' ELSE 'Index' end as ""IndexType""
+, '' as ""Disabled""   FROM ALL_INDEXES idx
+        LEFT join ""SYS"".""ALL_CONSTRAINTS"" con on con.INDEX_NAME = idx.INDEX_NAME
+ WHERE idx.""TABLE_NAME"" = '[$TabName$]' and idx.GENERATED = 'N'";
 
 
             //表索引明细
-            _temp_get_indexdetail = @"
-select 1 as ""TableId"",  idx.TABLE_NAME as ""TableName"", 1 as IndexId , idx.INDEX_NAME as ""IndexName"",  CASE WHEN UNIQUENESS = 'UNIQUE' AND CONSTRAINT_INDEX = 'YES' then 'Key_Index' ELSE 'Index' end as ""IndexType""
+            _temp_get_indexdetail = @" select 1 as ""TableId"",  idx.TABLE_NAME as ""TableName"", 1 as IndexId , isnull(con.constraint_name, idx.INDEX_NAME)  as ""IndexName""
+,   case when con.constraint_type = 'P' then 'Key_Index' ELSE 'Index' end as ""IndexType"" 
                     , COLUMN_POSITION AS ""ColumnIdx"", COLUMN_POSITION AS ""ColumnID"", COLUMN_NAME as ""ColumnName""
                     , case when DESCEND = 'ASC' then 'asc' ELSE 'desc' end as ""Sort""
-                              , case when UNIQUENESS = 'UNIQUE' AND CONSTRAINT_INDEX = 'YES' then 'Y' ELSE 'N' end as  ""IsPrimary"" ,'' as ""IsIncludedColumn""
-                                     , case when UNIQUENESS = 'UNIQUE' then 'Y' ELSE '' end as ""IsUnique""   , '' AS ""Ignore_dup_key""  , '' as ""Disabled""  , '' AS ""Fill_factor""  , '' AS ""Padded""
-                                     from user_indexes idx join user_ind_columns idxc on idx.index_name = idxc.index_name
+                              , case when con.constraint_type = 'P' then 'Y' ELSE 'N' end as  ""IsPrimary"" 
+                              ,'' as ""IsIncludedColumn""
+                                     , case when UNIQUENESS = 'UNIQUE' then 'Y' ELSE '' end as ""IsUnique""   , '' AS ""Ignore_dup_key""  , '' as ""Disabled"" 
+, '' AS ""Fill_factor""  , '' AS ""Padded""                                    
+ from ""SYS"".""ALL_IND_COLUMNS"" idxc 
+ 	join ALL_INDEXES idx on idxc.INDEX_NAME = IDX.INDEX_NAME
+ 	LEFT join ""SYS"".""ALL_CONSTRAINTS"" con on con.INDEX_NAME = idx.INDEX_NAME 
 where idx.TABLE_NAME = '[$TabName$]' and idxc.INDEX_NAME = '[$IndexName$]' ";
 
 

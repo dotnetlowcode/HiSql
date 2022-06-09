@@ -23,18 +23,18 @@ namespace HiSql
         /// 加业务锁
         /// </summary>
         /// <param name="key">自定锁的KEY</param>
-        /// <param name="expresseconds">锁的周期时间 单位秒</param>
-        /// <param name="timeoutseconds">加锁等待超时时间 单位秒</param>
+        /// <param name="expirySeconds">锁的周期时间 单位秒</param>
+        /// <param name="timeoutSeconds">加锁等待超时时间 单位秒</param>
         /// <returns></returns>
-        public Tuple<bool, string> LockOn(string key, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5);
+        public Tuple<bool, string> LockOn(string key, LckInfo lckinfo, int expirySeconds = 30, int timeoutSeconds = 5);
         /// <summary>
         /// 加业务锁
         /// </summary>
         /// <param name="key">自定锁的KEY，支持多个key</param>
-        /// <param name="expresseconds">锁的周期时间 单位秒</param>
-        /// <param name="timeoutseconds">加锁等待超时时间 单位秒</param>
+        /// <param name="expirySeconds">锁的周期时间 单位秒</param>
+        /// <param name="timeoutSeconds">加锁等待超时时间 单位秒</param>
         /// <returns></returns>
-        public Tuple<bool, string> LockOn(string[] keys, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5);
+        public Tuple<bool, string> LockOn(string[] keys, LckInfo lckinfo, int expirySeconds = 30, int timeoutSeconds = 5);
 
 
         /// <summary>
@@ -51,19 +51,38 @@ namespace HiSql
         /// </summary>
         /// <param name="key">自定锁的KEY</param>
         /// <param name="action">加锁后执行的业务</param>
-        /// <param name="expresseconds">锁的周期时间 单位秒</param>
-        /// <param name="timeoutseconds">加锁等待超时时间 单位秒</param>
+        /// <param name="expirySeconds">锁的周期时间 单位秒</param>
+        /// <param name="timeoutSeconds">加锁等待超时时间 单位秒</param>
         /// <returns></returns>
-        public Tuple<bool, string> LockOnExecute(string key, Action action, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5);
+        public Tuple<bool, string> LockOnExecute(string key, Action action, LckInfo lckinfo, int expirySeconds = 30, int timeoutSeconds = 5);
+        /// <summary>
+        /// 加业务锁
+        /// </summary>
+        /// <param name="key">自定锁的KEY</param>
+        /// <param name="action">加锁后执行的业务</param>
+        /// <param name="expirySeconds">锁的周期时间 单位秒</param>
+        /// <param name="timeoutSeconds">加锁等待超时时间 单位秒</param>
+        /// <returns></returns>
+        public Tuple<bool, string> LockOnExecuteNoWait(string key, Action action, LckInfo lckinfo, int expirySeconds = 30);
         /// <summary>
         /// 加业务锁，支持同时锁多个key
         /// </summary>
         /// <param name="key">一个或多个key</param>
         /// <param name="action">加锁后执行的业务</param>
-        /// <param name="expresseconds">锁的周期时间 单位秒</param>
-        /// <param name="timeoutseconds">加锁等待超时时间 单位秒</param>
+        /// <param name="expirySeconds">锁的周期时间 单位秒</param>
+        /// <param name="timeoutSeconds">加锁等待超时时间 单位秒</param>
         /// <returns></returns>
-        public Tuple<bool, string> LockOnExecute(string[] keys, Action action, LckInfo lckinfo, int expresseconds = 30, int timeoutseconds = 5);
+        public Tuple<bool, string> LockOnExecute(string[] keys, Action action, LckInfo lckinfo, int expirySeconds = 30, int timeoutSeconds = 5);
+
+        /// <summary>
+        /// 加业务锁，支持同时锁多个key
+        /// </summary>
+        /// <param name="key">一个或多个key</param>
+        /// <param name="action">加锁后执行的业务</param>
+        /// <param name="expirySeconds">锁的周期时间 单位秒</param>
+        /// <param name="timeoutSeconds">加锁等待超时时间 单位秒</param>
+        /// <returns></returns>
+        public Tuple<bool, string> LockOnExecuteNoWait(string[] keys, Action action, LckInfo lckinfo, int expirySeconds = 30);
 
         /// <summary>
         /// 移除锁，支持多个key

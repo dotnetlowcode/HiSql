@@ -2,9 +2,9 @@
 
   <PropertyGroup>
 	  <TargetFrameworks>net461;net5.0;netcoreapp3.1;net6.0</TargetFrameworks>
-    <Version>1.0.3.8</Version>
+    <Version>1.0.3.9</Version>
     <Authors>tansar</Authors>
-    <Company>Hone</Company>
+    <Company>HiSql</Company>
     <Description>该包支持MySql数据库 依赖于HiSql.dll包运行</Description>
     <PackageIcon>hisql-mysql-logo.jpg</PackageIcon>
     <PackageIconUrl />
@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MySql.Data" Version="8.0.26" />
+    <PackageReference Include="MySql.Data" Version="8.0.29" />
   </ItemGroup>
 
   <ItemGroup>
