@@ -167,7 +167,7 @@ namespace HiSql.Extension
                  {
                      rowCount = top.Value;
                  }
-                 if (rowCount > 0)
+                 if (rowCount >= 0)
                  {
                      IRow firstRow = sheet.GetRow(_options.HeaderRow - 1);//第一行  
                      if (firstRow == null)
@@ -457,27 +457,43 @@ namespace HiSql.Extension
         /// <returns></returns>
         public async Task<bool> DataTableToExcel(Func<Task<Tuple<DataTable, int>>> getData, string sheetName, string excelpath, Dictionary<string, string> headerMap, int headerRowNumber)
         {
-            var file = new FileStream(excelpath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            var workbook = new XSSFWorkbook(file);//将文件读到内存，在内存中操作excel
-            var xssfworkbook = new SXSSFWorkbook(workbook, 1000);
-            SXSSFSheet xssfsheet = xssfworkbook.GetSheet(sheetName) as SXSSFSheet;
-            file.Close();
-            await WriteSheetData(workbook, xssfsheet, getData, headerMap, headerRowNumber);
-            using (FileStream fs = File.OpenWrite(excelpath))
+            var fs = new FileStream(excelpath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            var workbook = new XSSFWorkbook(fs);//将文件读到内存，在内存中操作excel
+            //var xssfworkbook = new SXSSFWorkbook(workbook, 1000);
+            ISheet xssfsheet = workbook.GetSheet(sheetName);
+            fs.Close();
+            try
             {
-                xssfsheet.ForceFormulaRecalculation = true;
-                xssfworkbook.Write(fs);
-                xssfworkbook.Dispose();
-                xssfworkbook.Close();
-                if (fs != null) fs.Close();
+                await WriteSheetData(workbook, xssfsheet, getData, headerMap, headerRowNumber);
             }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            using (FileStream stream = new FileStream(excelpath, FileMode.Create, FileAccess.Write))
+            {
+                workbook.Write(stream);
+            }
+
+            //using (FileStream fWrite = File.OpenWrite(excelpath))
+            //{
+            //    xssfsheet.ForceFormulaRecalculation = true;
+            //    xssfworkbook.Write(fWrite);
+            //    xssfworkbook.Dispose();
+            //    xssfworkbook.Close();
+            //    if (fs != null) fs.Close();
+            //}
             return true;
         }
 
 
-        public async Task WriteSheetData(XSSFWorkbook workbook, SXSSFSheet xssfsheet, Func<Task<Tuple<DataTable, int>>> getData, Dictionary<string, string> headerMap, int headerRowNumber)
+        public async Task WriteSheetData(XSSFWorkbook workbook, ISheet xssfsheet, Func<Task<Tuple<DataTable, int>>> getData, Dictionary<string, string> headerMap, int headerRowNumber)
         {
-            var headerRow = xssfsheet.GetRow(headerRowNumber);
+            var headerRow = workbook.GetSheet(xssfsheet.SheetName).GetRow(headerRowNumber); //xssfsheet.GetRow(headerRowNumber);
+            if (headerRow == null)
+            {
+                throw new Exception("缺少表头，Excel有问题！");
+            }
             Type typeint = typeof(int);
             Type typeint64 = typeof(Int64);
             Type typefloat = typeof(float);
