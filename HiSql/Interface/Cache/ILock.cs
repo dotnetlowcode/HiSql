@@ -41,7 +41,7 @@ namespace HiSql
         /// 检测key是否已经锁定，支持同时锁多个key
         /// </summary>
         /// <param name="key">自定锁的KEY，支持多个key</param>
-        /// <returns></returns>
+        /// <returns>true:已锁定   false 未锁定</returns>
         public Tuple<bool, string> CheckLock(params string[] keys);
 
 

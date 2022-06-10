@@ -36,6 +36,16 @@
 
 
 
+### 2022.6.10 hisql 新增on 的语法增强
+
+
+原语法 join on 只允许 字段=字段，现在可以支持像where一样的条件 如下所示
+
+```c#
+    var sql = sqlClient.HiSql("select a.TabName, a.FieldName from Hi_FieldModel as a left join Hi_TabModel as b on a.TabName=b.TabName and a.TabName in ('H_Test') where a.TabName=b.TabName and a.FieldType>3 ").ToSql();
+```
+
+
 
 ### 2022.6.7 解决mysql低版本字符集问题
 

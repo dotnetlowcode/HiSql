@@ -470,7 +470,7 @@ namespace HiSql
             }
             else
             {
-                DataTable sourcetable = DataConvert.ToTable(lstdata, tabInfo, Context.CurrentConnectionConfig.User);
+                DataTable sourcetable = DataConvert.ToTable(lstdata, tabInfo, Context.CurrentConnectionConfig.User, Context.CurrentConnectionConfig.DbType != DBType.DaMeng);//DaMengBulkCopy字段必须和数据库表一致 pengxy on 20220606
                 Dictionary<string, string> columnMap = new Dictionary<string, string>();
                 foreach (DataColumn dc in sourcetable.Columns)
                 {

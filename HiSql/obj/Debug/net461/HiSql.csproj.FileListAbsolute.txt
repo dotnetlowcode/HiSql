@@ -150,3 +150,4 @@ D:\Project\OpenSource\HiSql\HiSql\obj\Debug\net461\HiSql.csproj.CoreCompileInput
 D:\Project\OpenSource\HiSql\HiSql\obj\Debug\net461\HiSql.csproj.CopyComplete
 D:\Project\OpenSource\HiSql\HiSql\obj\Debug\net461\HiSql.dll
 D:\Project\OpenSource\HiSql\HiSql\obj\Debug\net461\HiSql.pdb
+D:\Project\OpenSource\HiSql\HiSql\obj\Debug\net461\HiSql.csproj.AssemblyReference.cache

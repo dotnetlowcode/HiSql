@@ -70,6 +70,8 @@ namespace HiSql
 
         IQuery On(string condition);
 
+        IQuery On(Filter onfilter);
+
         IQuery Sort(SortBy sort);
 
         //IQuery Sort(string sort);

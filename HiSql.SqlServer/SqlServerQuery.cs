@@ -381,7 +381,7 @@ namespace HiSql
             }
 
             //检测JOIN关联条件字段
-            sb_join.Append(sqlServerDM.BuildJoinSql(this.TableList, dictabinfo, this.Fields, this.Joins));
+            sb_join.Append(sqlServerDM.BuildJoinSql(this.TableList, dictabinfo, this.Fields, this.Joins, this.IsMultiSubQuery));
 
 
             // 检测where条件字段

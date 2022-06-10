@@ -114,10 +114,15 @@ namespace HiSql
         {
             string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", tabname);
             
+
             bool locked = false;
             var lckinfo = new LckInfo() { UName = "hisql", EventName = "InitTabMaping" };
             try
             {
+                if (CacheContext.MCache.CheckLock(_keyname).Item1)
+                {
+                    return;
+                }
                 var lockResult = CacheContext.MCache.LockOn(_keyname, lckinfo, 160, 3);
                 if (lockResult.Item1) //加锁成功
                 {

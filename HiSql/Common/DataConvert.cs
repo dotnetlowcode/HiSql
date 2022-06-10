@@ -281,9 +281,9 @@ namespace HiSql
         /// <typeparam name="T"></typeparam>
         /// <param name="lst"></param>
         /// <returns></returns>
-        static public DataTable ToTable<T>(List<T> lst,TabInfo tabInfo,string user="HiSql") {
+        static public DataTable ToTable<T>(List<T> lst,TabInfo tabInfo,string user="HiSql", bool ignoreStandardTimeField = true) {
 
-            DataTable table= BuildDataTable(tabInfo);
+            DataTable table= BuildDataTable(tabInfo, ignoreStandardTimeField);
             var _typname = "";
             Type _type = null ;
 
@@ -331,18 +331,22 @@ namespace HiSql
                     foreach (DataColumn dc in columns)
                     {
                         object _value = null;
-                        if (_dic.ContainsKey(dc.ColumnName))
+                        if (_dic.Keys.Any(t => t.Equals(dc.ColumnName, StringComparison.OrdinalIgnoreCase)))//pengxy 支持Age 大写小混写
                         {
-                            _value = _dic[dc.ColumnName];
+                            _value = _dic[_dic.Keys.FirstOrDefault(t => t.Equals(dc.ColumnName, StringComparison.OrdinalIgnoreCase)).ToString()]; 
                         }
-                        else if (_dic.ContainsKey(dc.ColumnName.ToLower()))
-                        {
-                            _value = _dic[dc.ColumnName.ToLower()];
-                        }
-                        else if (_dic.ContainsKey(dc.ColumnName.ToUpper()))
-                        {
-                            _value = _dic[dc.ColumnName.ToUpper()];
-                        }
+                        //if (_dic.ContainsKey(dc.ColumnName))
+                        //{
+                        //    _value = _dic[dc.ColumnName];
+                        //}
+                        //else if (_dic.ContainsKey(dc.ColumnName.ToLower()))
+                        //{
+                        //    _value = _dic[dc.ColumnName.ToLower()];
+                        //}
+                        //else if (_dic.ContainsKey(dc.ColumnName.ToUpper()))
+                        //{
+                        //    _value = _dic[dc.ColumnName.ToUpper()];
+                        //}
                         else
                         {
                             if (Constants.IsStandardUserField(dc.ColumnName))
@@ -417,18 +421,22 @@ namespace HiSql
                     foreach (DataColumn dc in columns)
                     {
                         object _value = null;
-                        if (_dic.ContainsKey(dc.ColumnName))
+                        if (_dic.Keys.Any(t => t.Equals(dc.ColumnName, StringComparison.OrdinalIgnoreCase))) //pengxy 支持Age 大写小混写
                         {
-                            _value = _dic[dc.ColumnName];
+                            _value = _dic[_dic.Keys.FirstOrDefault(t => t.Equals(dc.ColumnName, StringComparison.OrdinalIgnoreCase)).ToString()];
                         }
-                        else if (_dic.ContainsKey(dc.ColumnName.ToLower()))
-                        {
-                            _value = _dic[dc.ColumnName.ToLower()];
-                        }
-                        else if (_dic.ContainsKey(dc.ColumnName.ToUpper()))
-                        {
-                            _value = _dic[dc.ColumnName.ToUpper()];
-                        }
+                        //if (_dic.ContainsKey(dc.ColumnName))
+                        //{
+                        //    _value = _dic[dc.ColumnName];
+                        //}
+                        //else if (_dic.ContainsKey(dc.ColumnName.ToLower()))
+                        //{
+                        //    _value = _dic[dc.ColumnName.ToLower()];
+                        //}
+                        //else if (_dic.ContainsKey(dc.ColumnName.ToUpper()))
+                        //{
+                        //    _value = _dic[dc.ColumnName.ToUpper()];
+                        //}
                         else
                         {
                             if (Constants.IsStandardUserField(dc.ColumnName))
@@ -442,7 +450,7 @@ namespace HiSql
                         }
                         if (_value != null)
                         {
-                            Type _typ = _value.GetType();
+                              Type _typ = _value.GetType();
                             if (dc.DataType == Constants.StringType)
                             {
                                 drow[dc.ColumnName] = _value;
@@ -505,18 +513,22 @@ namespace HiSql
                     foreach (DataColumn dc in columns)
                     {
                         string _value = null;
-                        if (_dic.ContainsKey(dc.ColumnName))
+                        if (_dic.Keys.Any(t => t.Equals(dc.ColumnName, StringComparison.OrdinalIgnoreCase))) //pengxy 支持Age 大写小混写
                         {
-                            _value = _dic[dc.ColumnName];
+                            _value = _dic[_dic.Keys.FirstOrDefault(t => t.Equals(dc.ColumnName, StringComparison.OrdinalIgnoreCase)).ToString()]; 
                         }
-                        else if (_dic.ContainsKey(dc.ColumnName.ToLower()))
-                        {
-                            _value = _dic[dc.ColumnName.ToLower()];
-                        }
-                        else if (_dic.ContainsKey(dc.ColumnName.ToUpper()))
-                        {
-                            _value = _dic[dc.ColumnName.ToUpper()];
-                        }
+                        //if (_dic.ContainsKey(dc.ColumnName))
+                        //{
+                        //    _value = _dic[dc.ColumnName];
+                        //}
+                        //else if (_dic.ContainsKey(dc.ColumnName.ToLower()))
+                        //{
+                        //    _value = _dic[dc.ColumnName.ToLower()];
+                        //}
+                        //else if (_dic.ContainsKey(dc.ColumnName.ToUpper()))
+                        //{
+                        //    _value = _dic[dc.ColumnName.ToUpper()];
+                        //}
                         else
                         {
                             if (Constants.IsStandardUserField(dc.ColumnName))
@@ -628,7 +640,7 @@ namespace HiSql
             }
             return table;
         }
-        static public DataTable BuildDataTable(TabInfo tabInfo)
+        static public DataTable BuildDataTable(TabInfo tabInfo, bool ignoreStandardTimeField = true )
         {
             DataTable table = null;
             if (tabInfo != null)
@@ -643,7 +655,7 @@ namespace HiSql
 
                     if (Constants.IsStandardTimeField(column.FieldName))
                     {
-                        if (column.DBDefault == HiTypeDBDefault.FUNDATE)
+                        if (column.DBDefault == HiTypeDBDefault.FUNDATE && ignoreStandardTimeField)
                         {
                             continue;//说明该字段在数据中设置了默认日期
                         }

@@ -7,11 +7,15 @@ using System.Threading.Tasks;
 
 namespace HiSql.DaMengUnitTest
 {
+
     
     class Demo_Insert
     {
+        [System.Serializable]
+        [HiTable(IsEdit = true, TabName = "H_Test")]
         class H_Test
         {
+            [HiColumn(FieldDesc = "编号", IsPrimary = true, IsBllKey = true, FieldType = HiType.INT, SortNum = 1, IsSys = false, DBDefault = HiTypeDBDefault.EMPTY)]
             public int DID
             {
                 get; set;
@@ -28,13 +32,14 @@ namespace HiSql.DaMengUnitTest
         }
         public static void Init(HiSqlClient sqlClient)
         {
-            //Demo1_Insert(sqlClient);
-            //Demo1_Modi(sqlClient);
-            //Demo1_Modi2(sqlClient);
-            //Demo1_Insert2(sqlClient);
-            //Demo1_Insert3(sqlClient);
+            sqlClient.CodeFirst.CreateTable(typeof(H_Test));
+            //Demo1_Insert(sqlClient);//ok
+           // Demo1_Modi(sqlClient);//ok
+            Demo1_Modi2(sqlClient);//忽略
+            //Demo1_Insert2(sqlClient); //参数化有问题
+            //Demo1_Insert3(sqlClient);//ok
 
-            Demo4_Insert1(sqlClient);
+            // Demo4_Insert1(sqlClient); //ok
             string s = Console.ReadLine();
         }
         static void Demo4_Insert1(HiSqlClient sqlClient)
@@ -42,12 +47,11 @@ namespace HiSql.DaMengUnitTest
             TabInfo tabinfo = sqlClient.Context.DMInitalize.GetTabStruct("HTest01");
 
             List<Dictionary<string, object>> lstdata = new List<Dictionary<string, object>>();
-            int _count = 1000000;
+            int _count = 1000;
             Random random = new Random();
             for (int i = 0; i < _count; i++)
             {
                 lstdata.Add(new Dictionary<string, object> { { "SID", (i + 1) }, { "UName", $"tansar{i}" }, { "Age", 20 + (i % 50) }, { "Salary", 5000 + (i % 2000) + random.Next(10) }, { "descript", "hello world" } });
-
 
             }
 
@@ -86,7 +90,7 @@ namespace HiSql.DaMengUnitTest
             List<H_Test> lstobj = new List<H_Test>();
             for (int i = 0; i < _times; i++)
             {
-                lstobj.Add(new H_Test { UNAME = $"U{i}", UNAME2 = $"2U{i}" });
+                lstobj.Add(new H_Test { DID=i, UNAME = $"U{i}", UNAME2 = $"2U{i}" });
             }
             Stopwatch watch = Stopwatch.StartNew();
             //string _sql = sqlClient.Modi("Hi_Domain", lstobj).ToSql();

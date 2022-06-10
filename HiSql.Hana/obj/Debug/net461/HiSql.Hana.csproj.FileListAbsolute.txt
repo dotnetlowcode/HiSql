@@ -1,10 +1,3 @@
-D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\net461\HiSql.Hana.csproj.AssemblyReference.cache
-D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\net461\HiSql.Hana.Properties.Resources.resources
-D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\net461\HiSql.Hana.csproj.GenerateResource.cache
-D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\net461\HiSql.Hana.GeneratedMSBuildEditorConfig.editorconfig
-D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\net461\HiSql.Hana.AssemblyInfoInputs.cache
-D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\net461\HiSql.Hana.AssemblyInfo.cs
-D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\net461\HiSql.Hana.csproj.CoreCompileInputs.cache
 D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Debug\net461\HiSql.Hana.dll
 D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Debug\net461\HiSql.Hana.pdb
 D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Debug\net461\Azure.Core.dll
@@ -157,6 +150,13 @@ D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Debug\net461\HiSql.pdb
 D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Debug\net461\Sap.Data.Hana.v4.5.pdb
 D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Debug\net461\Sap.Data.Hana.v4.5.xml
 D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Debug\net461\Sap.Data.Hana.v4.5.dll.config
+D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\net461\HiSql.Hana.csproj.AssemblyReference.cache
+D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\net461\HiSql.Hana.Properties.Resources.resources
+D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\net461\HiSql.Hana.csproj.GenerateResource.cache
+D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\net461\HiSql.Hana.GeneratedMSBuildEditorConfig.editorconfig
+D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\net461\HiSql.Hana.AssemblyInfoInputs.cache
+D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\net461\HiSql.Hana.AssemblyInfo.cs
+D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\net461\HiSql.Hana.csproj.CoreCompileInputs.cache
 D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\net461\HiSql.Hana.csproj.CopyComplete
 D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\net461\HiSql.Hana.dll
 D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\net461\HiSql.Hana.pdb

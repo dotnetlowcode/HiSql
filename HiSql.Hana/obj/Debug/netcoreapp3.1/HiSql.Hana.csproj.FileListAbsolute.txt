@@ -1,3 +1,9 @@
+D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Debug\netcoreapp3.1\HiSql.Hana.deps.json
+D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Debug\netcoreapp3.1\HiSql.Hana.dll
+D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Debug\netcoreapp3.1\HiSql.Hana.pdb
+D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Debug\netcoreapp3.1\HiSql.dll
+D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Debug\netcoreapp3.1\Sap.Data.Hana.Core.v2.1.dll
+D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Debug\netcoreapp3.1\HiSql.pdb
 D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\netcoreapp3.1\HiSql.Hana.csproj.AssemblyReference.cache
 D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\netcoreapp3.1\HiSql.Hana.Properties.Resources.resources
 D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\netcoreapp3.1\HiSql.Hana.csproj.GenerateResource.cache
@@ -5,12 +11,6 @@ D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\netcoreapp3.1\HiSql.Hana.Genera
 D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\netcoreapp3.1\HiSql.Hana.AssemblyInfoInputs.cache
 D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\netcoreapp3.1\HiSql.Hana.AssemblyInfo.cs
 D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\netcoreapp3.1\HiSql.Hana.csproj.CoreCompileInputs.cache
-D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Debug\netcoreapp3.1\HiSql.Hana.deps.json
-D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Debug\netcoreapp3.1\HiSql.Hana.dll
-D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Debug\netcoreapp3.1\HiSql.Hana.pdb
-D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Debug\netcoreapp3.1\HiSql.dll
-D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Debug\netcoreapp3.1\Sap.Data.Hana.Core.v2.1.dll
-D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Debug\netcoreapp3.1\HiSql.pdb
 D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\netcoreapp3.1\HiSql.Hana.csproj.CopyComplete
 D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\netcoreapp3.1\HiSql.Hana.dll
 D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\netcoreapp3.1\HiSql.Hana.pdb

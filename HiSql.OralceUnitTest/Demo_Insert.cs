@@ -42,11 +42,11 @@ namespace HiSql.OralceUnitTest
             TabInfo tabinfo = sqlClient.Context.DMInitalize.GetTabStruct("HTest01");
 
             List<Dictionary<string, object>> lstdata = new List<Dictionary<string, object>>();
-            int _count = 1000000;
+            int _count = 1000;
             Random random = new Random();
             for (int i = 0; i < _count; i++)
             {
-                lstdata.Add(new Dictionary<string, object> { { "SID", (i + 1) }, { "UName", $"tansar{i}" }, { "Age", 20 + (i % 50) }, { "Salary", 5000 + (i % 2000) + random.Next(10) }, { "descript", "hello world" } });
+                lstdata.Add(new Dictionary<string, object> { { "SID", (i + 1) }, { "UNAME", $"tansar{i}" }, { "Age", 20 + (i % 50) }, { "Salary", 5000 + (i % 2000) + random.Next(10) }, { "descript", "hello world" } });
 
 
             }

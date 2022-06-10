@@ -708,13 +708,14 @@ namespace HiSql
                 if (_queue.LastQueue().IndexOf("join") >= 0)
                 {
                     _queue.Add("on");
-                    _currjoin.JoinOn.Add(new JoinOnFilterDefinition(condition));
-                    _list_join.Add(_currjoin);
+
                     if (_currjoin.Left != null)
                         mergeTable(_currjoin.Left);
 
                     if (_currjoin.Right != null)
                         mergeTable(_currjoin.Right);
+                    _currjoin.HiSqlJoinOn = condition;
+                    _list_join.Add(_currjoin);
                     _currjoin = null;
                 }
                 else if (_queue.LastQueue() == "as")
@@ -722,13 +723,16 @@ namespace HiSql
                     if (_queue.LastQueue(-1).IndexOf("join") >= 0)
                     {
                         _queue.Add("on");
-                        _currjoin.JoinOn.Add(new JoinOnFilterDefinition(condition));
-                        _list_join.Add(_currjoin);
+ 
+
                         if (_currjoin.Left != null)
                             mergeTable(_currjoin.Left);
 
                         if (_currjoin.Right != null)
                             mergeTable(_currjoin.Right);
+                        _currjoin.HiSqlJoinOn = condition;
+
+                        _list_join.Add(_currjoin);
                         _currjoin = null;
                     }
                     else
@@ -742,6 +746,57 @@ namespace HiSql
             return this;
         }
 
+
+        /// <summary>
+        /// 关联过滤条件
+        /// </summary>
+        /// <param name="onfilter"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public IQuery On(Filter onfilter) 
+        {
+            if (onfilter!=null)
+            {
+                if (_queue.LastQueue().IndexOf("join") >= 0)
+                {
+                    _queue.Add("on");
+
+                    if (_currjoin.Left != null)
+                        mergeTable(_currjoin.Left);
+
+                    if (_currjoin.Right != null)
+                        mergeTable(_currjoin.Right);
+                    _currjoin.Filter= onfilter;
+                    _list_join.Add(_currjoin);
+                    _currjoin = null;
+                }
+                else if (_queue.LastQueue() == "as")
+                {
+                    if (_queue.LastQueue(-1).IndexOf("join") >= 0)
+                    {
+                        _queue.Add("on");
+
+
+                        if (_currjoin.Left != null)
+                            mergeTable(_currjoin.Left);
+
+                        if (_currjoin.Right != null)
+                            mergeTable(_currjoin.Right);
+                        _currjoin.Filter = onfilter;
+
+                        _list_join.Add(_currjoin);
+                        _currjoin = null;
+                    }
+                    else
+                        throw new Exception($"[On]方法只能在[Join]方法后面");
+                }
+                else throw new Exception($"[On]方法只能在[Join]方法后面");
+
+            }
+            else
+                throw new Exception($"On 的连接条件  不能为空");
+            return this;
+        }
         /// <summary>
         /// 用结构化的方式定义多个排序
         /// </summary>
