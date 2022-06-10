@@ -30,12 +30,13 @@ namespace HiSql.DaMengUnitTest
 
         public static void Init(HiSqlClient sqlClient)
         {
-            Update_Demo(sqlClient);//有问题 
-            //Update_Demo4(sqlClient);//ok Domain 需要增加""
+            //Update_Demo(sqlClient);//有问题 
+            Update_Demo4(sqlClient);//ok Domain 需要增加""
         }
 
         static void Update_Demo4(HiSqlClient sqlClient)
         {
+            var sql = sqlClient.Update("Hi_Domain").Set(new { DomainDesc = "用户类型1sadfs" }).Where("Domain='UTYPE'").ToSql();
             sqlClient.Update("Hi_Domain").Set(new { DomainDesc = "用户类型1sadfs" }).Where("Domain='UTYPE'").ExecCommand();
         }
         static async void Update_Demo(HiSqlClient sqlClient)

@@ -17,9 +17,9 @@ namespace HiSql.PostGreSqlUnitTest
             //Query_Demo4(sqlClient);
             //Query_Case(sqlClient);
             //Query_Demo8(sqlClient);
-            //Query_Demo9(sqlClient);
+            Query_Demo9(sqlClient);
 
-            Query_Demo13(sqlClient);
+            //Query_Demo13(sqlClient);
         }
 
         /// <summary>
@@ -56,16 +56,13 @@ namespace HiSql.PostGreSqlUnitTest
             {
 
             }
-
         }
 
         static void Query_Demo9(HiSqlClient sqlClient)
         {
-            sqlClient.HiSql("select * from H_Test").ToTable();
+            var aa = sqlClient.HiSql("select * from Hi_FieldModel").ToTable();
         }
             
-    
-
         static void Query_Demo8(HiSqlClient sqlClient)
         {
             //string sql = sqlClient.HiSql($"select * from Hi_FieldModel  where (tabname = 'h_test') and  FieldType in (11,21,31) and tabname in (select tabname from Hi_TabModel)").ToSql();
