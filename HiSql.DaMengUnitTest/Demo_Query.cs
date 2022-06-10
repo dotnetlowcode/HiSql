@@ -11,7 +11,7 @@ namespace HiSql.DaMengUnitTest
     {
         public static void Init(HiSqlClient sqlClient)
         {
-            // Query_Demo(sqlClient); //有问题
+             Query_Demo(sqlClient); //有问题
             //Query_Demo1(sqlClient); //ok
             // Query_Demo2(sqlClient);//ok
             // Query_Demo3(sqlClient);//ok
@@ -217,14 +217,14 @@ namespace HiSql.DaMengUnitTest
 
             //PostGreSqlConfig mySqlConfig = new PostGreSqlConfig(true);
             //string _sql_schema = mySqlConfig.Get_Table_Schema.Replace("[$TabName$]", "h_test");
-            IDataReader dr = sqlClient.Context.DBO.GetDataReader("select * from \"HTEST012\" where 1=2");
+            IDataReader dr = sqlClient.Context.DBO.GetDataReader("select * from \"HI_FIELDMODEL\" where 1=2");
             DataTable dt_schema = dr.GetSchemaTable();
             dr.Close();
             //DataTable dt2 = sqlClient.Context.DBO.GetDataTable("select * from Hi_TabModel where TabName=[$TabName$]",
             //     new Dictionary<string, object> { { "[$TabName$]", "Hi_FieldModel"  } }
             //  );
 
-            DataTable dt = sqlClient.Context.DBO.GetDataTable("select * from Hi_TabModel where TabName=:TabName",
+            DataTable dt = sqlClient.Context.DBO.GetDataTable("select * from Hi_TabModel where TabName=@TabName",
 
                 new HiParameter[] {
                 new HiParameter(":TabName","Hi_TabModel")

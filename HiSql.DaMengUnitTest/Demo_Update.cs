@@ -30,8 +30,8 @@ namespace HiSql.DaMengUnitTest
 
         public static void Init(HiSqlClient sqlClient)
         {
-            //Update_Demo(sqlClient);//有问题 
-            Update_Demo4(sqlClient);//ok Domain 需要增加""
+            Update_Demo(sqlClient);//有问题 
+            //Update_Demo4(sqlClient);//ok 
         }
 
         static void Update_Demo4(HiSqlClient sqlClient)

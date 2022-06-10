@@ -20,8 +20,8 @@ namespace HiSql
         string _temp_schema_pre = "";
         string _temp_schema_after = "";
 
-        string _temp_table_pre = "\"";
-        string _temp_table_after = "\"";
+        string _temp_table_pre = "";
+        string _temp_table_after = "";
 
         string _temp_field_pre = "\"";
         string _temp_field_after = "\"";
