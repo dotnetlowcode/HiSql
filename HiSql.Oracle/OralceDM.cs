@@ -817,7 +817,8 @@ namespace HiSql
             foreach (string n in dic_value.Keys)
             {
                 var columninfo = tabinfo.Columns.Where(c => c.FieldName.ToLower() == n.ToLower()).FirstOrDefault();
-                //只有是字段类型为数字的才支撑
+                string _str = dic_value[n];
+                //只有是字段类型为数字的才支持
                 if (columninfo != null && columninfo.FieldType.IsIn<HiType>(HiType.INT, HiType.BIGINT, HiType.DECIMAL, HiType.SMALLINT))
                 {
                     ///检测是否有以字段更新字段的语法
@@ -826,16 +827,15 @@ namespace HiSql
                     {
                         //说明是基于
                         Regex regex = new Regex(Constants.REG_UPDATE);
-                        string _str = dic_value[n];
+                        
                         foreach (Dictionary<string, string> dic in _lstdic)
                         {
                             _str = regex.Replace(_str, $"{dbConfig.Field_Pre}{dic["field"].ToString()}{dbConfig.Field_After}", 1);
                         }
-                        dic_value[n] = _str;
+                        
                     }
                 }
-
-                sb_field.Append($"{dbConfig.Field_Pre}{n}{dbConfig.Field_After}={dic_value[n].ToString()}");
+                sb_field.Append($"{dbConfig.Field_Pre}{n}{dbConfig.Field_After}={_str}");
                 if (i != dic_value.Count() - 1)
                     sb_field.Append($"{dbConfig.Field_Split}");
                 i++;
@@ -1560,41 +1560,58 @@ namespace HiSql
         /// <param name="Fields"></param>
         /// <param name="Joins"></param>
         /// <returns></returns>
-        public string BuildJoinSql(List<TableDefinition> TableList, Dictionary<string, TabInfo> dictabinfo, List<FieldDefinition> Fields, List<JoinDefinition> Joins)
+        public string BuildJoinSql(List<TableDefinition> TableList, Dictionary<string, TabInfo> dictabinfo, List<FieldDefinition> Fields, List<JoinDefinition> Joins, bool issubquery = false)
         {
             StringBuilder sb_join = new StringBuilder();
             foreach (JoinDefinition joinDefinition in Joins)
             {
-                if (joinDefinition.Right != null && joinDefinition.JoinOn.Count > 0)
+                if (!joinDefinition.IsFilter)
                 {
-                    if (joinDefinition.JoinType == JoinType.Inner)
-                        sb_join.Append($" inner join");
-                    else if (joinDefinition.JoinType == JoinType.Left)
-                        sb_join.Append($" left inner join");
-                    else if (joinDefinition.JoinType == JoinType.Right)
-                        sb_join.Append($" outer join");
-                    sb_join.Append($" {dbConfig.Table_Pre}{joinDefinition.Right.TabName}{dbConfig.Table_After}   {dbConfig.Table_Pre}{joinDefinition.Right.AsTabName}{dbConfig.Table_After}");//as
-                    sb_join.Append(" on ");
-                    foreach (JoinOnFilterDefinition joinOnFilterDefinition in joinDefinition.JoinOn)
+                    if (joinDefinition.Right != null && joinDefinition.JoinOn.Count > 0)
                     {
-                        if (joinOnFilterDefinition.Left != null && joinOnFilterDefinition.Right != null)
+                        if (joinDefinition.JoinType == JoinType.Inner)
+                            sb_join.Append($" inner join");
+                        else if (joinDefinition.JoinType == JoinType.Left)
+                            sb_join.Append($" left inner join");
+                        else if (joinDefinition.JoinType == JoinType.Right)
+                            sb_join.Append($" outer join");
+                        sb_join.Append($" {dbConfig.Table_Pre}{joinDefinition.Right.TabName}{dbConfig.Table_After}   {dbConfig.Table_Pre}{joinDefinition.Right.AsTabName}{dbConfig.Table_After}");//as
+                        sb_join.Append(" on ");
+                        foreach (JoinOnFilterDefinition joinOnFilterDefinition in joinDefinition.JoinOn)
                         {
-
-                            HiColumn hiColumnL = CheckField(TableList, dictabinfo, Fields, joinOnFilterDefinition.Left);
-                            HiColumn hiColumnR = CheckField(TableList, dictabinfo, Fields, joinOnFilterDefinition.Right);
-
-                            if (hiColumnL.FieldType != hiColumnR.FieldType)
+                            if (joinOnFilterDefinition.Left != null && joinOnFilterDefinition.Right != null)
                             {
-                                throw new Exception($"join 关联表[{joinDefinition.Right.AsTabName}] 条件字段[{hiColumnL.FieldName}]与[{hiColumnR.FieldName}]类型不一致 会导致性能问题");
+
+                                HiColumn hiColumnL = CheckField(TableList, dictabinfo, Fields, joinOnFilterDefinition.Left);
+                                HiColumn hiColumnR = CheckField(TableList, dictabinfo, Fields, joinOnFilterDefinition.Right);
+
+                                if (hiColumnL.FieldType != hiColumnR.FieldType)
+                                {
+                                    throw new Exception($"join 关联表[{joinDefinition.Right.AsTabName}] 条件字段[{hiColumnL.FieldName}]与[{hiColumnR.FieldName}]类型不一致 会导致性能问题");
+                                }
+                                if (hiColumnL.FieldLen != hiColumnR.FieldLen)
+                                {
+                                    throw new Exception($"join 关联表[{joinDefinition.Right.AsTabName}] 条件字段[{hiColumnL.FieldName}]与[{hiColumnR.FieldName}]长度不一致 会导致性能问题");
+                                }
+                                sb_join.Append($"{dbConfig.Table_Pre}{joinOnFilterDefinition.Left.AsTabName}{dbConfig.Table_After}.{dbConfig.Field_Pre}{joinOnFilterDefinition.Left.AsFieldName}{dbConfig.Field_After}={dbConfig.Table_Pre}{joinOnFilterDefinition.Right.AsTabName}{dbConfig.Table_After}.{dbConfig.Field_Pre}{joinOnFilterDefinition.Right.AsFieldName}{dbConfig.Field_After}");
                             }
-                            if (hiColumnL.FieldLen != hiColumnR.FieldLen)
-                            {
-                                throw new Exception($"join 关联表[{joinDefinition.Right.AsTabName}] 条件字段[{hiColumnL.FieldName}]与[{hiColumnR.FieldName}]长度不一致 会导致性能问题");
-                            }
-                            sb_join.Append($"{dbConfig.Table_Pre}{joinOnFilterDefinition.Left.AsTabName}{dbConfig.Table_After}.{dbConfig.Field_Pre}{joinOnFilterDefinition.Left.AsFieldName}{dbConfig.Field_After}={dbConfig.Table_Pre}{joinOnFilterDefinition.Right.AsTabName}{dbConfig.Table_After}.{dbConfig.Field_Pre}{joinOnFilterDefinition.Right.AsFieldName}{dbConfig.Field_After}");
                         }
+                        //sb_join.AppendLine("");
                     }
-                    //sb_join.AppendLine("");
+                }
+                else
+                {
+                    //join on的语句与where语法一样
+                    if (joinDefinition.Filter != null)
+                    {
+                        //通过hisql语写实现的 on条件
+                        if (joinDefinition.Filter.IsHiSqlWhere && !string.IsNullOrEmpty(joinDefinition.Filter.HiSqlWhere))
+                            sb_join.Append(BuilderWhereSql(TableList, dictabinfo, Fields, joinDefinition.Filter.WhereParse.Result, issubquery));
+                        else  //通过结构化filter对象生成的on条件
+                            sb_join.Append(BuilderWhereSql(TableList, dictabinfo, Fields, joinDefinition.Filter.Elements, issubquery));
+                    }
+                    else
+                        throw new Exception($"{Constants.HiSqlSyntaxError} [{joinDefinition.Filter.HiSqlWhere}]附近出现语法错误");
                 }
             }
             return sb_join.ToString();

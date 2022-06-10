@@ -48,6 +48,23 @@ namespace HiSql.AST
             /// </summary>
             public static string REG_SELECT_JOIN = @"^\s*(?<join>\binner\s*join\b|\bleft\s*\binner\s*join|\bouter\s*\bjoin\b|\bjoin\b|\bleft\s*\bjoin\b)\s*(?<table>(?:[\s]*)(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w]+))\s*(?:\bas\b\s*(?<asname>[\w]+))?\s*(?:\bon\b)\s*";
 
+
+            /// <summary>
+            /// 左右表关联连接
+            /// </summary>
+            public static string REG_SELECT_INNERJOIN = @"^\s*inner\s*join\s*$|^\s*join\s*$";
+
+            /// <summary>
+            /// 左连接
+            /// </summary>
+            public static string REG_SELECT_LEFTJOIN = @"^\s*left\s*inner\s*join\s*$|^\s*left\s*join\s*$";
+
+            /// <summary>
+            /// 右连接
+            /// </summary>
+            public static string REG_SELECT_RIGHTJOIN = @"^\s*outer\s*join\s*$";
+
+
             public static string REG_SELECT_WHERE = @"^\s*\b(?<cmd>where)\b";
 
             public static string REG_SELECT_WHERE1 = @"^\s*\b(?<cmd>where)(?<where>[\s\S.\w]*?)(?=\border\s+\bby\b|\bgroup\s+\bby\b|\bhaving\b|\bunion\b)";
@@ -80,7 +97,7 @@ namespace HiSql.AST
 
                 //
                 new JoinGrp{
-                    JType=JoinStatementType.FieldValue,
+                    JType=JoinStatementType.Field,
                     Reg=HiSql.Constants.REG_JOINON
                 },
                 new JoinGrp{
@@ -254,9 +271,10 @@ namespace HiSql.AST
 
 
                         int _pos_idx = 0;
-                        
+                        //获取最外层的 关键词位置顺序 可能子语句中也可能包括关键字
                         List<int> lstnum = new List<int> { sql.LastIndexOf(" order "), sql.LastIndexOf(" group "), sql.LastIndexOf(" having "), sql.LastIndexOf(" union ") };
 
+                        //按大小顺序排序
                         lstnum.Sort((a,b)=> {
                             return b.CompareTo(a);
                         });
@@ -413,15 +431,24 @@ namespace HiSql.AST
                 if (rtn.Item1)
                 {
                     //说明是join
-
+                    JoinType _joinType = JoinType.Inner;
                     string _tabjoin = rtn.Item2["table"].ToString();
                     sql = rtn.Item3;
+
+                    if (Tool.RegexMatch(Constants.REG_SELECT_INNERJOIN, rtn.Item2["join"]))
+                        _joinType = JoinType.Inner;
+                    else if (Tool.RegexMatch(Constants.REG_SELECT_LEFTJOIN, rtn.Item2["join"]))
+                        _joinType = JoinType.Left;
+                    else if (Tool.RegexMatch(Constants.REG_SELECT_RIGHTJOIN, rtn.Item2["join"]))
+                        _joinType = JoinType.Right;
+
+
                     if (!string.IsNullOrEmpty(rtn.Item2["asname"].ToString()))
                     {
-                        _query.Join(_tabjoin).As(rtn.Item2["asname"].ToString());
+                        _query.Join(_tabjoin, _joinType).As(rtn.Item2["asname"].ToString());
                     }
                     else
-                        _query.Join(_tabjoin);
+                        _query.Join(_tabjoin, _joinType);
 
                     sql = parseJoinOn(sql);
 
@@ -558,62 +585,145 @@ namespace HiSql.AST
         {
             if (!string.IsNullOrEmpty(sql))
             {
-                bool _isandor = true;
-                bool _ismatch = true;
+                // 注释于2022.6.8  新增 join on 支持Hisql语法
 
-                List<string> onlist = new List<string>();
-                JoinOn joinOn = new JoinOn();
-                while (_ismatch)
+                #region 
+
+                //bool _isandor = true;
+                //bool _ismatch = true;
+
+                //List<string> onlist = new List<string>();
+                //JoinOn joinOn = new JoinOn();
+                //while (_ismatch)
+                //{
+                //    foreach (JoinGrp joinGrp in Constants.REG_GRP)
+                //    {
+                //        if (string.IsNullOrEmpty(sql.Trim())) { _ismatch = false; break; };
+                //        var rtn = Tool.RegexGrpOrReplace(joinGrp.Reg, sql);
+                //        if (rtn.Item1)
+                //        {
+                //            if (joinGrp.JType == JoinStatementType.Field)
+                //            {
+                //                if (!_isandor)
+                //                    throw new Exception($"{HiSql.Constants.HiSqlSyntaxError}语句[{sql}]缺少 逻辑操作符and,or");
+                //                _isandor = !_isandor;
+                //                _ismatch = true;
+                //                onlist.Add(rtn.Item2["0"]);
+                //            }
+                //            else if (joinGrp.JType == JoinStatementType.SubCondition)
+                //            {
+                //                _ismatch = false;
+                //                throw new Exception($"{HiSql.Constants.HiSqlSyntaxError}语句[{sql}]处有语法错误，暂时不支持该写法");
+                //            }
+                //            else if (joinGrp.JType == JoinStatementType.Symbol)
+                //            {
+
+                //                if (_isandor)
+                //                    throw new Exception($"{HiSql.Constants.HiSqlSyntaxError}语句[{sql}]缺少 不能重复指定and,or");
+                //                _isandor = !_isandor;
+                //                _ismatch = true;
+                //            }
+                //            else
+                //            {
+                //                _ismatch = false;
+                //                break;
+                //            }
+                //            sql = rtn.Item3;
+                //        }else
+                //            _ismatch = false;
+
+                //    }
+                //}
+                //if (_isandor)
+                //{
+                //    throw new Exception($"{HiSql.Constants.HiSqlSyntaxError} and,or 后一定要有表达式");
+                //}
+                //foreach (string _on in onlist)
+                //{
+                //    joinOn.Add(_on);
+                //}
+                //if(joinOn.Elements.Count>0)
+                //    _query.On(joinOn);
+
+
+                #endregion
+
+                int _pos_idx = 0;
+                //获取最外层的 关键词位置顺序 可能子语句中也可能包括关键字
+                List<int> lstnum = new List<int> { sql.LastIndexOf(" left "), sql.LastIndexOf(" inner "), sql.LastIndexOf(" join "), sql.LastIndexOf(" where "), sql.LastIndexOf(" order "), sql.LastIndexOf(" group "), sql.LastIndexOf(" having "), sql.LastIndexOf(" union ") };
+
+
+                List<int> lstnum2 = lstnum.Where(x => x >= 0).ToList();
+                if (lstnum2.Count > 0)
                 {
-                    foreach (JoinGrp joinGrp in Constants.REG_GRP)
+                    //按大小顺序排序
+                    lstnum2.Sort((a, b) =>
                     {
-                        if (string.IsNullOrEmpty(sql.Trim())) { _ismatch = false; break; };
-                        var rtn = Tool.RegexGrpOrReplace(joinGrp.Reg, sql);
-                        if (rtn.Item1)
-                        {
-                            if (joinGrp.JType == JoinStatementType.FieldValue)
-                            {
-                                if (!_isandor)
-                                    throw new Exception($"{HiSql.Constants.HiSqlSyntaxError}语句[{sql}]缺少 逻辑操作符and,or");
-                                _isandor = !_isandor;
-                                _ismatch = true;
-                                onlist.Add(rtn.Item2["0"]);
-                            }
-                            else if (joinGrp.JType == JoinStatementType.SubCondition)
-                            {
-                                _ismatch = false;
-                                throw new Exception($"{HiSql.Constants.HiSqlSyntaxError}语句[{sql}]处有语法错误，暂时不支持该写法");
-                            }
-                            else if (joinGrp.JType == JoinStatementType.Symbol)
-                            {
-
-                                if (_isandor)
-                                    throw new Exception($"{HiSql.Constants.HiSqlSyntaxError}语句[{sql}]缺少 不能重复指定and,or");
-                                _isandor = !_isandor;
-                                _ismatch = true;
-                            }
-                            else
-                            {
-                                _ismatch = false;
-                                break;
-                            }
-                            sql = rtn.Item3;
-                        }else
-                            _ismatch = false;
-
-                    }
+                        return a.CompareTo(b);
+                    });
+                    _pos_idx = lstnum2[0];
                 }
-                if (_isandor)
+
+                string _wheresql = sql;
+                if (_pos_idx > 0)
                 {
-                    throw new Exception($"{HiSql.Constants.HiSqlSyntaxError} and,or 后一定要有表达式");
+                    _wheresql = sql.Substring(0, _pos_idx);
+                    sql = sql.Substring(_pos_idx);
                 }
-                foreach (string _on in onlist)
-                {
-                    joinOn.Add(_on);
-                }
-                if(joinOn.Elements.Count>0)
-                    _query.On(joinOn);
+                else
+                    sql = "";
 
+                if (_wheresql.LastIndexOf(')') > _pos_idx)
+                {
+                    ////说明都是子语语句
+                    //var rtndic = Tool.RegexGrp(Constants.REG_SELECT_WHERE2, _wheresql);
+                    //if (rtndic.Count > 0)
+                    //{
+                    //    if (rtndic["where"].LastIndexOf(" order ") > 0)
+                    //    {
+                    //        throw new Exception($"{HiSql.Constants.HiSqlSyntaxError} 子查询语句[{rtndic["where"]}]不允许[order by]排序 ");
+                    //    }
+                    //    else
+                    //    {
+                    //        //_query.Where(rtndic["where"]);
+                    //        _wheresql = "";
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    throw new Exception($"{HiSql.Constants.HiSqlSyntaxError}语句[{_wheresql}]附近出现错误");
+                    //}
+                    _query.On(_wheresql);
+
+                }
+                else
+                {
+
+                    _query.On(_wheresql);
+
+                    //var rtndic = Tool.RegexGrp(Constants.REG_SELECT_WHERE2, _wheresql);
+                    //if (rtndic.Count > 0)
+                    //{
+                    //    if (rtndic["where"].LastIndexOf(" order ") > 0)
+                    //    {
+                    //        throw new Exception($"{HiSql.Constants.HiSqlSyntaxError} 子查询语句[{rtndic["where"]}]不允许[order by]排序 ");
+                    //    }
+                    //    else
+                    //    {
+                    //        _query.Where(rtndic["where"]);
+                    //        if (_pos_idx > 0)
+                    //            sql = sql.Substring(_pos_idx);
+                    //        else sql = "";
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    throw new Exception($"{HiSql.Constants.HiSqlSyntaxError}语句[{sql}]附近出现错误");
+                    //}
+                }
+
+
+                
                 
             }
             return sql;
