@@ -1263,7 +1263,7 @@ namespace HiSql
 
                             FieldDefinition field = new FieldDefinition(whereResult.Result["fields"].ToString());
                             HiColumn hiColumn = CheckField(TableList, dictabinfo, Fields, field);
-                            sb_sql.Append($"{dbConfig.Table_Pre}{field.AsTabName}{dbConfig.Table_After}.{dbConfig.Table_Pre}{field.AsFieldName}{dbConfig.Table_After}");
+                            sb_sql.Append($"{dbConfig.Table_Pre}{field.AsTabName}{dbConfig.Table_After}.{dbConfig.Field_Pre}{field.AsFieldName}{dbConfig.Field_After}");
 
                             if (hiColumn != null)
                             {
@@ -1299,9 +1299,9 @@ namespace HiSql
 
                             if (hiColumn != null && rhiColumn != null)
                             {
-                                sb_sql.Append($"{dbConfig.Table_Pre}{field.AsTabName}{dbConfig.Table_After}.{dbConfig.Table_Pre}{field.AsFieldName}{dbConfig.Table_After}");
+                                sb_sql.Append($"{dbConfig.Table_Pre}{field.AsTabName}{dbConfig.Table_After}.{dbConfig.Field_Pre}{field.AsFieldName}{dbConfig.Field_After}");
                                 sb_sql.Append($" {whereResult.Result["op"].ToString()} ");
-                                sb_sql.Append($"{dbConfig.Table_Pre}{rfield.AsTabName}{dbConfig.Table_After}.{dbConfig.Table_Pre}{rfield.AsFieldName}{dbConfig.Table_After}");
+                                sb_sql.Append($"{dbConfig.Table_Pre}{rfield.AsTabName}{dbConfig.Table_After}.{dbConfig.Field_Pre}{rfield.AsFieldName}{dbConfig.Field_After}");
                             }
                         }
                         else
@@ -1326,7 +1326,7 @@ namespace HiSql
 
                             FieldDefinition field = new FieldDefinition(whereResult.Result["fields"].ToString());
                             HiColumn hiColumn = CheckField(TableList, dictabinfo, Fields, field);
-                            sb_sql.Append($"{dbConfig.Table_Pre}{field.AsTabName}{dbConfig.Table_After}.{dbConfig.Table_Pre}{field.AsFieldName}{dbConfig.Table_After}");
+                            sb_sql.Append($"{dbConfig.Table_Pre}{field.AsTabName}{dbConfig.Table_After}.{dbConfig.Field_Pre}{field.AsFieldName}{dbConfig.Field_After}");
 
                             if (hiColumn != null)
                             {
@@ -1365,7 +1365,7 @@ namespace HiSql
                         {
                             FieldDefinition field = new FieldDefinition(whereResult.Result["fields"].ToString());
                             HiColumn hiColumn = CheckField(TableList, dictabinfo, Fields, field);
-                            sb_sql.Append($"{dbConfig.Table_Pre}{field.AsTabName}{dbConfig.Table_After}.{dbConfig.Table_Pre}{field.AsFieldName}{dbConfig.Table_After}");
+                            sb_sql.Append($"{dbConfig.Table_Pre}{field.AsTabName}{dbConfig.Table_After}.{dbConfig.Field_Pre}{field.AsFieldName}{dbConfig.Field_After}");
 
                             if (hiColumn == null)
                                 throw new Exception($"字段[{whereResult.Result["fields"].ToString()}]出现错误");
@@ -1472,7 +1472,7 @@ namespace HiSql
                     if (hiColumn == null)
                         throw new Exception($"字段[{filterDefinition.Field.AsFieldName}]在表[{filterDefinition.Field.AsTabName}]中不存在");
 
-                    sb_where.Append($"{dbConfig.Table_Pre}{filterDefinition.Field.AsTabName}{dbConfig.Table_After}.{dbConfig.Table_Pre}{filterDefinition.Field.AsFieldName}{dbConfig.Table_After}");
+                    sb_where.Append($"{dbConfig.Table_Pre}{filterDefinition.Field.AsTabName}{dbConfig.Table_After}.{dbConfig.Field_Pre}{filterDefinition.Field.AsFieldName}{dbConfig.Field_After}");
                     switch (filterDefinition.OpFilter)
                     {
                         case OperType.EQ:
