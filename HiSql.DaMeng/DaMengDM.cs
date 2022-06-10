@@ -581,12 +581,12 @@ namespace HiSql
             {
                 if (_i != _values.Count - 1)
                 {
-                    _sb_field.Append($"{n},");
+                    _sb_field.Append($"{dbConfig.Field_Pre}{n}{dbConfig.Field_After},");
                     _sb_value.Append($"{_values[n]},");
                 }
                 else
                 {
-                    _sb_field.Append($"{n}");
+                    _sb_field.Append($"{dbConfig.Field_Pre}{n}{dbConfig.Field_After}");
                     _sb_value.Append($"{_values[n]}");
                 }
                 _i++;

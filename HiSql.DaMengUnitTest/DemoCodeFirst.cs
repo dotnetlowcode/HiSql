@@ -10,9 +10,9 @@ namespace HiSql.DaMengUnitTest
     {
         public static void Init(HiSqlClient sqlClient)
         {
-            CodeFirst_Demo(sqlClient);
-            //Create_Table(sqlClient);
-            string s = Console.ReadLine();
+           // CodeFirst_Demo(sqlClient);
+            Create_Table(sqlClient);
+           // string s = Console.ReadLine();
         }
         static void Create_Table(HiSqlClient sqlClient)
         {

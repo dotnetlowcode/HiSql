@@ -42,12 +42,14 @@ namespace HiSql.DaMengUnitTest
         }
         public static void Init(HiSqlClient sqlClient)
         {
-            //Delete_Demo(sqlClient);
-            //Delete_Demo2(sqlClient);
-            Drop_Demo(sqlClient);
+            //Delete_Demo(sqlClient); //ok
+            //Delete_Demo2(sqlClient); //忽略
+           // Drop_Demo(sqlClient);//ok
         }
         static void Drop_Demo(HiSqlClient sqlClient)
         {
+            //sqlClient.TrunCate("H_Test").ExecCommand();
+            //sqlClient.Drop("H_Test").ExecCommand();
             string _sql = sqlClient.Drop("H_Test").ToSql();
             string _sql2 = sqlClient.TrunCate("H_Test").ToSql();
         }
@@ -84,8 +86,8 @@ namespace HiSql.DaMengUnitTest
             //int _effect2 = sqlClient.Delete("H_Test", new { DID = 99 }).ExecCommand();
             string _sql2 = delete2.ToSql();
 
-            IDelete delete3 = sqlClient.Delete("H_Test", new List<object> { new { DID = 99, UNAME2 = "user123" }, new { DID = 100, UNAME2 = "user124" } });
-            //int _effect3 = sqlClient.Delete("H_Test", new List<object> { new { DID = 99, UNAME2 = "user123" }, new { DID = 100, UNAME2 = "user124" } }).ExecCommand();
+            IDelete delete3 = sqlClient.Delete("H_Test", new List<object> { new { DID = 3, UNAME2 = "user123" }, new { DID = 4, UNAME2 = "user124" } });
+            int _effect3 = sqlClient.Delete("H_Test", new List<object> { new { DID = 3, UNAME2 = "user123" }, new { DID = 4, UNAME2 = "user124" } }).ExecCommand();
             string _sql3 = delete3.ToSql();
 
             IDelete delete4 = sqlClient.Delete("H_Test", new List<H_Test> { new H_Test { DID = 99, UNAME2 = "user123" }, new H_Test { DID = 100, UNAME2 = "user124" } });

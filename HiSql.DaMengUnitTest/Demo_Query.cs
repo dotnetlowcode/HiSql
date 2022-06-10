@@ -11,20 +11,52 @@ namespace HiSql.DaMengUnitTest
     {
         public static void Init(HiSqlClient sqlClient)
         {
-            //Query_Demo(sqlClient);
-            //Query_Demo1(sqlClient);
-            Query_Demo2(sqlClient);
-            //Query_Demo3(sqlClient);
-            //Query_Demo4(sqlClient);
-            //Query_Demo8(sqlClient);
+            // Query_Demo(sqlClient); //有问题
+            //Query_Demo1(sqlClient); //ok
+            // Query_Demo2(sqlClient);//ok
+            // Query_Demo3(sqlClient);//ok
+            // Query_Demo4(sqlClient);//ok
+            //  Query_Demo8(sqlClient);//ok
 
-            //Query_Case(sqlClient);
-           // Query_Demo9(sqlClient);
-           // Query_Demo13(sqlClient);
+            // Query_Case(sqlClient);//ok
+            Query_Demo8(sqlClient);
+            //Query_Demo9(sqlClient);//ok
+            //Query_Demo10(sqlClient);// ok
+            //Query_Demo11(sqlClient);// ok
+
+            //Query_Demo12(sqlClient);// ok
+            //Query_Demo13(sqlClient);//ok
+            //Query_Demo14(sqlClient);// ok
+            var s = Console.ReadLine();
         }
-        //Query_Demo8(sqlClient);
+        static void Query_Demo10(HiSqlClient sqlClient)
+        {
+
+            var _sql2 = sqlClient.HiSql("select * from Hi_FieldModel where FieldType between  10 and 50").ToSql();
+
+            var _sql = sqlClient.HiSql("select * from Hi_FieldModel where TabName like 'H_D%'").ToSql();
+        }
+
+        static void Query_Demo11(HiSqlClient sqlClient)
+        {
+            var _sql = sqlClient.HiSql("select * from Hi_FieldModel where TabName in (select TabName from Hi_TabModel where TabName='h_test' group by tabname ) order by fieldname").ToSql();
+            var _sql1 = sqlClient.HiSql("select * from Hi_FieldModel where TabName in (select TabName from Hi_TabModel where TabName='h_test' group by tabname )  ").ToSql();
+
+            if (string.IsNullOrEmpty(_sql1))
+            {
+
+            }
+
+        }
+        static void Query_Demo14(HiSqlClient sqlClient)
+        {
+            var iquery = sqlClient.HiSql("select a.TabName, a.FieldName from Hi_FieldModel as a inner join Hi_TabModel as b on a.TabName=b.TabName where a.TabName=b.TabName and a.FieldType>3");
+            var sql = iquery.ToSql();
+            Console.WriteLine(sql);
+            //var table = iquery.ToTable();
 
 
+        }
 
         /// <summary>
         /// distinct 
@@ -37,7 +69,7 @@ namespace HiSql.DaMengUnitTest
                 ).ToSql();
 
 
-           // var _sql2 = sqlClient.HiSql("select distinct TabName  from Hi_FieldModel where TabName='Hi_FieldModel' order by TabName ").Take(10).Skip(2).ToSql();
+            // var _sql2 = sqlClient.HiSql("select distinct TabName  from Hi_FieldModel where TabName='Hi_FieldModel' order by TabName ").Take(10).Skip(2).ToSql();
 
 
         }
@@ -63,10 +95,10 @@ namespace HiSql.DaMengUnitTest
 
         }
         static void Query_Demo9(HiSqlClient sqlClient)
-    {
-        sqlClient.HiSql("select * from H_Test").ToTable();
-    }
-    static void Query_Demo8(HiSqlClient sqlClient)
+        {
+            var tab = sqlClient.HiSql("select * from Hi_FieldModel").ToTable();
+        }
+        static void Query_Demo8(HiSqlClient sqlClient)
         {
             //string sql = sqlClient.HiSql($"select * from Hi_FieldModel  where (tabname = 'h_test') and  FieldType in (11,21,31) and tabname in (select tabname from Hi_TabModel)").ToSql();
 
@@ -166,7 +198,7 @@ namespace HiSql.DaMengUnitTest
             //DataTable dt = sqlClient.Context.DBO.GetDataTable("select * from Hi_TabModel where TabName='Hi_TabModel'");
             //DataTable dt3 = sqlClient.Query("Hi_TabModel").Field("*").ToTable();
             //DataTable DT_RESULT1 = sqlClient.Query("Hi_Domain").Field("Domain").Sort(new SortBy { { "createtime" } }).ToTable();
-           var tableName = sqlClient.Query("Hi_FieldModel").Field("*").Skip(1).Take(1000).Insert("#Hi_Domain");
+            var tableName = sqlClient.Query("Hi_FieldModel").Field("*").Skip(1).Take(1000).Insert("#Hi_Domain");
 
             Console.WriteLine(tableName);
         }
@@ -188,12 +220,17 @@ namespace HiSql.DaMengUnitTest
             IDataReader dr = sqlClient.Context.DBO.GetDataReader("select * from \"HTEST012\" where 1=2");
             DataTable dt_schema = dr.GetSchemaTable();
             dr.Close();
-            DataTable dt = sqlClient.Context.DBO.GetDataTable("select * from Hi_TabModel where TabName=@TabName",
+            //DataTable dt2 = sqlClient.Context.DBO.GetDataTable("select * from Hi_TabModel where TabName=[$TabName$]",
+            //     new Dictionary<string, object> { { "[$TabName$]", "Hi_FieldModel"  } }
+            //  );
+
+            DataTable dt = sqlClient.Context.DBO.GetDataTable("select * from Hi_TabModel where TabName=:TabName",
 
                 new HiParameter[] {
-                new HiParameter("@TabName","Hi_TabModel")
+                new HiParameter(":TabName","Hi_TabModel")
 
             });
+
 
 
 
