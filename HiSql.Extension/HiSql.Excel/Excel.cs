@@ -167,7 +167,7 @@ namespace HiSql.Extension
                  {
                      rowCount = top.Value;
                  }
-                 if (rowCount > 0)
+                 if (rowCount >= 0)
                  {
                      IRow firstRow = sheet.GetRow(_options.HeaderRow - 1);//第一行  
                      if (firstRow == null)
@@ -243,6 +243,8 @@ namespace HiSql.Extension
                  return dataTable;
              });
         }
+
+
 
         /// <summary>
         /// 获取ExcelSheetNames
@@ -440,6 +442,114 @@ namespace HiSql.Extension
             //GC.WaitForPendingFinalizers();
             //Thread.Sleep(500);
 
+        }
+
+
+
+        /// <summary>
+        /// DataTable数据写入Excel
+        /// </summary>
+        /// <param name="getData"></param>
+        /// <param name="sheetName"></param>
+        /// <param name="excelpath"></param>
+        /// <param name="headerMap"></param>
+        /// <param name="headerRowNumber"></param>
+        /// <returns></returns>
+        public async Task<bool> DataTableToExcel(Func<Task<Tuple<DataTable, int>>> getData, string sheetName, string excelpath, Dictionary<string, string> headerMap, int headerRowNumber)
+        {
+            var fs = new FileStream(excelpath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            var workbook = new XSSFWorkbook(fs);//将文件读到内存，在内存中操作excel
+            //var xssfworkbook = new SXSSFWorkbook(workbook, 1000);
+            ISheet xssfsheet = workbook.GetSheet(sheetName);
+            fs.Close();
+            try
+            {
+                await WriteSheetData(workbook, xssfsheet, getData, headerMap, headerRowNumber);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            using (FileStream stream = new FileStream(excelpath, FileMode.Create, FileAccess.Write))
+            {
+                workbook.Write(stream);
+            }
+
+            //using (FileStream fWrite = File.OpenWrite(excelpath))
+            //{
+            //    xssfsheet.ForceFormulaRecalculation = true;
+            //    xssfworkbook.Write(fWrite);
+            //    xssfworkbook.Dispose();
+            //    xssfworkbook.Close();
+            //    if (fs != null) fs.Close();
+            //}
+            return true;
+        }
+
+
+        public async Task WriteSheetData(XSSFWorkbook workbook, ISheet xssfsheet, Func<Task<Tuple<DataTable, int>>> getData, Dictionary<string, string> headerMap, int headerRowNumber)
+        {
+            var headerRow = workbook.GetSheet(xssfsheet.SheetName).GetRow(headerRowNumber); //xssfsheet.GetRow(headerRowNumber);
+            if (headerRow == null)
+            {
+                throw new Exception("缺少表头，Excel有问题！");
+            }
+            Type typeint = typeof(int);
+            Type typeint64 = typeof(Int64);
+            Type typefloat = typeof(float);
+            Type typedec = typeof(decimal);
+            Type typedatetime = typeof(DateTime);
+            XSSFCellStyle xSSFCellStyle1 = (XSSFCellStyle)workbook.CreateCellStyle();
+            XSSFDataFormat format = (XSSFDataFormat)workbook.CreateDataFormat();
+            while (true)
+            {
+                var dataResult = await getData();
+                if (dataResult == null)
+                {
+                    break;
+                }
+                int beginRow = dataResult.Item2;
+                var dt = dataResult.Item1;
+                for (var i = 0; i < dt.Rows.Count; i++)
+                {
+                    beginRow += 1;
+                    var excelRow = xssfsheet.CreateRow(beginRow);
+                    var dtRow = dt.Rows[i];
+                    for (int j = 0; j < headerMap.Keys.Count; j++)
+                    {
+                        var headKey = headerRow.GetCell(j).StringCellValue;
+                        var dtKey = headerMap[headKey];
+                        var dtCell = dtRow[dtKey];
+                        var dtColumn = dt.Columns[dtKey];
+                        ICell _dcell = excelRow.CreateCell(j);
+                        var _value = dtCell.ToString().Trim();
+                        if (dtColumn.DataType == typedec || dtColumn.DataType == typeint || dtColumn.DataType == typeint64 || dtColumn.DataType == typefloat)
+                        {
+                            if (_value.Length <= 10)
+                            {
+                                _dcell.SetCellType(CellType.Numeric);
+                                if (_value.IndexOf(".") > 0)
+                                    _dcell.SetCellValue(Convert.ToDouble(_value));
+                                else
+                                    _dcell.SetCellValue(Convert.ToInt64(_value));
+                            }
+                            else
+                                _dcell.SetCellValue(_value);
+                        }
+                        else if (dtColumn.DataType == typedatetime)
+                        {
+
+                            _dcell.SetCellValue(Convert.ToDateTime(_value));
+
+                            xSSFCellStyle1.DataFormat = format.GetFormat("yyyy-MM-dd");
+                            _dcell.CellStyle = xSSFCellStyle1;
+
+                        }
+                        else
+                            _dcell.SetCellValue(_value);
+                    }
+                }
+            }
         }
 
         /// <summary>

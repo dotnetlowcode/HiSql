@@ -17,11 +17,29 @@ namespace HiSql.PostGreSqlUnitTest
             //Query_Demo4(sqlClient);
             //Query_Case(sqlClient);
             //Query_Demo8(sqlClient);
-            Query_Demo9(sqlClient);
+            //Query_Demo9(sqlClient);
 
             //Query_Demo13(sqlClient);
+            //Query_Demo15(sqlClient);
         }
 
+
+
+        static void Query_Demo15(HiSqlClient sqlClient)
+        {
+            //var sql = sqlClient.HiSql("select a.TabName, a.FieldName from Hi_FieldModel as a left join Hi_TabModel as b on a.TabName=b.TabName and a.TabName in ('H_Test') where a.TabName=b.TabName and a.FieldType>3 ").ToSql();
+
+            //var sql = sqlClient.HiSql("select a.TabName, a.FieldName from Hi_FieldModel as a left join Hi_TabModel as b on a.TabName=b.TabName and a.TabName in ('H_Test') where a.TabName=b.TabName and a.FieldType>3 ").ToSql();
+
+            //var sql=sqlClient.HiSql("select a.tabname from hi_fieldmodel as a inner join Hi_TabModel as  b on a.tabname =b.tabname inner join Hi_TabModel as c on a.tabname=c.tabname where a.tabname='h_test'  and a.FieldType in (11,41,21)  ").ToSql();
+
+            string jsondata = sqlClient.Query("Hi_FieldModel", "A").Field("A.FieldName as Fname")
+                .Join("Hi_TabModel").As("B").On(new Filter { { "A.TabName", OperType.EQ, "Hi_FieldModel" } })
+                .Where("a.tabname = 'Hi_FieldModel' and ((a.FieldType = 11)) and a.tabname in ('h_test','Hi_FieldModel')  and a.tabname in (select a.tabname from Hi_FieldModel as a inner join Hi_TabModel as  b on a.tabname =b.tabname " +
+                " inner join Hi_TabModel as c on a.tabname=c.tabname where a.tabname='h_test' ) and a.FieldType in (11,41,21)  ")
+                .Group(new GroupBy { { "A.FieldName" } }).ToSql();
+
+        }
         /// <summary>
         /// distinct 
         /// </summary>
@@ -56,13 +74,16 @@ namespace HiSql.PostGreSqlUnitTest
             {
 
             }
+
         }
 
         static void Query_Demo9(HiSqlClient sqlClient)
         {
-            var aa = sqlClient.HiSql("select * from Hi_FieldModel").ToTable();
+            sqlClient.HiSql("select * from H_Test").ToTable();
         }
             
+    
+
         static void Query_Demo8(HiSqlClient sqlClient)
         {
             //string sql = sqlClient.HiSql($"select * from Hi_FieldModel  where (tabname = 'h_test') and  FieldType in (11,21,31) and tabname in (select tabname from Hi_TabModel)").ToSql();

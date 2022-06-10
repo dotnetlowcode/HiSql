@@ -34,14 +34,31 @@ namespace HiSql.UnitTest
             //Query_Demo5(sqlClient);
             //Query_Demo6(sqlClient);
             //Query_Demo7(sqlClient);
-            Query_Demo8(sqlClient);
+            //Query_Demo8(sqlClient);
             //Query_Demo9(sqlClient);
             //Query_Demo10(sqlClient);
             //Query_Demo11(sqlClient);
             //Query_Demo12(sqlClient);
             // Query_Demo13(sqlClient);
            // Query_Demo14(sqlClient);
+           //Query_Demo15(sqlClient);
              var s = Console.ReadLine();
+        }
+
+        static void Query_Demo15(HiSqlClient sqlClient)
+        {
+            //var sql = sqlClient.HiSql("select a.TabName, a.FieldName from Hi_FieldModel as a left join Hi_TabModel as b on a.TabName=b.TabName and a.TabName in ('H_Test') where a.TabName=b.TabName and a.FieldType>3 ").ToSql();
+
+            //var sql = sqlClient.HiSql("select a.TabName, a.FieldName from Hi_FieldModel as a left join Hi_TabModel as b on a.TabName=b.TabName and a.TabName in ('H_Test') where a.TabName=b.TabName and a.FieldType>3 ").ToSql();
+
+            //var sql=sqlClient.HiSql("select a.tabname from hi_fieldmodel as a inner join Hi_TabModel as  b on a.tabname =b.tabname inner join Hi_TabModel as c on a.tabname=c.tabname where a.tabname='h_test'  and a.FieldType in (11,41,21)  ").ToSql();
+
+            string jsondata = sqlClient.Query("Hi_FieldModel", "A").Field("A.FieldName as Fname")
+                .Join("Hi_TabModel").As("B").On(new Filter { { "A.TabName", OperType.EQ, "Hi_FieldModel" } })
+                .Where("a.tabname = 'Hi_FieldModel' and ((a.FieldType = 11)) and a.tabname in ('h_test','hi_fieldmodel')  and a.tabname in (select a.tabname from hi_fieldmodel as a inner join Hi_TabModel as  b on a.tabname =b.tabname " +
+                " inner join Hi_TabModel as c on a.tabname=c.tabname where a.tabname='h_test' ) and a.FieldType in (11,41,21)  ")
+                .Group(new GroupBy { { "A.FieldName" } }).ToSql();
+
         }
 
         static void Query_Demo14(HiSqlClient sqlClient)
