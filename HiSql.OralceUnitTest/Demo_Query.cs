@@ -11,7 +11,7 @@ namespace HiSql.OralceUnitTest
     {
         public static void Init(HiSqlClient sqlClient)
         {
-           // Query_Demo(sqlClient);
+            Query_Demo(sqlClient);
             //Query_Demo1(sqlClient);
            // Query_Demo2(sqlClient);
             //Query_Demo3(sqlClient);
@@ -21,10 +21,56 @@ namespace HiSql.OralceUnitTest
             //Query_Case(sqlClient);
             //Query_Demo9(sqlClient);
             // Query_Demo13(sqlClient);
-            Query_Demo14(sqlClient);
+            //Query_Demo14(sqlClient);
+            //Query_Demo16(sqlClient);
             var s = Console.ReadLine();
         }
 
+        static void Query_Demo16(HiSqlClient sqlClient)
+        {
+            //以下将会报错 字符串的不允许表达式条件 
+            string sql = sqlClient.Query("Hi_FieldModel", "A").Field("*")
+                .Where(new Filter {
+                    {"A.TabName", OperType.EQ, "`A.FieldName`+1"}
+                                 })
+                .Group(new GroupBy { { "A.FieldName" } }).ToSql();
+
+
+            //string sql = sqlClient.Query("Hi_FieldModel", "A").Field("*")
+            //    .Where(new Filter {
+            //        {"A.FieldType", OperType.EQ, "abc"}
+            //        //{"A.FieldName", OperType.EQ, "CreateName"},
+            //                     })
+            //    .Group(new GroupBy { { "A.FieldName" } }).ToSql();
+
+            //string sql = sqlClient.Query("Hi_FieldModel", "A").Field("*")
+            //    .Where(new Filter {
+            //        {"A.TabName", OperType.EQ, "`A.FieldName`"}
+            //                     })
+            //    .Group(new GroupBy { { "A.FieldName" } }).ToSql();
+
+            //string sql = sqlClient.Query("Hi_FieldModel", "A").Field("*")
+            //    .Where("A.TabName=`A.TabName`+1")
+            //    .Group(new GroupBy { { "A.FieldName" } }).ToSql();
+
+            //string sql = sqlClient.HiSql("select * from Hi_FieldModel as a where a.TabName=`a.TabName` and a.FieldName='11'").ToSql();
+
+        }
+        static void Query_Demo15(HiSqlClient sqlClient)
+        {
+            //var sql = sqlClient.HiSql("select a.TabName, a.FieldName from Hi_FieldModel as a left join Hi_TabModel as b on a.TabName=b.TabName and a.TabName in ('H_Test') where a.TabName=b.TabName and a.FieldType>3 ").ToSql();
+
+            //var sql = sqlClient.HiSql("select a.TabName, a.FieldName from Hi_FieldModel as a left join Hi_TabModel as b on a.TabName=b.TabName and a.TabName in ('H_Test') where a.TabName=b.TabName and a.FieldType>3 ").ToSql();
+
+            //var sql=sqlClient.HiSql("select a.tabname from hi_fieldmodel as a inner join Hi_TabModel as  b on a.tabname =b.tabname inner join Hi_TabModel as c on a.tabname=c.tabname where a.tabname='h_test'  and a.FieldType in (11,41,21)  ").ToSql();
+
+            string jsondata = sqlClient.Query("Hi_FieldModel", "A").Field("A.FieldName as Fname")
+                .Join("Hi_TabModel").As("B").On(new Filter { { "A.TabName", OperType.EQ, "Hi_FieldModel" } })
+                .Where("a.tabname = 'Hi_FieldModel' and ((a.FieldType = 11)) and a.tabname in ('h_test','hi_fieldmodel')  and a.tabname in (select a.tabname from hi_fieldmodel as a inner join Hi_TabModel as  b on a.tabname =b.tabname " +
+                " inner join Hi_TabModel as c on a.tabname=c.tabname where a.tabname='h_test' ) and a.FieldType in (11,41,21)  ")
+                .Group(new GroupBy { { "A.FieldName" } }).ToSql();
+
+        }
         static void Query_Demo14(HiSqlClient sqlClient)
         {
             var _sql = sqlClient.HiSql("select a.TabName, a.FieldName from Hi_FieldModel as a inner join Hi_TabModel as b on a.TabName=b.TabName where a.TabName=b.TabName and a.FieldType>3").ToSql();
@@ -185,6 +231,15 @@ namespace HiSql.OralceUnitTest
         static void Query_Demo(HiSqlClient sqlClient)
         {
 
+       
+            HiParameter Parm = new HiParameter("@TabName", "Hi_TabModel");
+
+            //DataTable dt= sqlClient.Context.DBO.GetDataTable("select * from dbo.Hi_FieldModel where TabName in (@TabName)", new HiParameter("@TabName",new List<string> { "Hi_TabModel' or 1=1", "Hi_FieldModel" }));
+            DataTable dt2 = sqlClient.Context.DBO.GetDataTable("select * from Hi_FieldModel where TabName = @TabName and FieldName=@TabName and FieldType=@FieldType", new HiParameter("@TabName", "Hi_TabModel"), new HiParameter("@FieldType", 11));
+
+
+            DataTable dt3 = sqlClient.Query("Hi_TabModel").Field("*").ToTable();
+            
 
             //DataTable dt = sqlClient.Context.DBO.GetDataTable("select TOP 1000 \"MATNR\",\"MTART\",\"MATKL\" FROM \"SAPHANADB\".\"MARA\"");
 

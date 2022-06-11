@@ -361,9 +361,19 @@ namespace HiSql
 
 
         /// <summary>
-        /// 表过式字段更新
+        /// 模板表达式字段 `a.user` 用`` 括起来的里面是字段
+        /// 2022.6.11 ``a.user`` 如果出现这种是转义的 不必于模板字段
         /// </summary>
-        public readonly static string REG_UPDATE = @"[`](?:[\s]*)(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w-_]+)(?:[\.]{1}))?(?<field>[\w-_]+)[`]";
+        //public readonly static string REG_TEMPLATE_FIELDS = @"[`](?:[\s]*)(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w-_]+)(?:[\.]{1}))?(?<field>[\w-_]+)[`]";
+        public readonly static string REG_TEMPLATE_FIELDS = @"(?<!`)[`](?:[\s]*)(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w-_]+)(?:[\.]{1}))?(?<field>[\w-_]+)[`](?![`])";
+
+
+        /// <summary>
+        /// 值 是否是模板字段如 `a.user` 
+        /// </summary>
+        public readonly static string REG_TEMPLATE_FIELD = @"^\s*(?<!`)[`](?:[\s]*)(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w-_]+)(?:[\.]{1}))?(?<field>[\w-_]+)[`](?![`])\s*$";
+
+
 
         /// <summary>
         /// 解析表字段关联关系

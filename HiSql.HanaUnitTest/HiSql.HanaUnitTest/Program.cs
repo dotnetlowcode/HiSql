@@ -16,7 +16,7 @@ namespace HiSql.HanaUnitTest
 
             //Demo_Update.Init(sqlClient);
             //Demo_Delete.Init(sqlClient);
-            Demo_DbCode.Init(sqlClient);
+            //Demo_DbCode.Init(sqlClient);
         }
     }
 }

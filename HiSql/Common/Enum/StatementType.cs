@@ -8,6 +8,7 @@ namespace HiSql
 {
     /// <summary>
     /// where 语句组成类型
+    /// author by  tgm 
     /// </summary>
     public enum StatementType
     {
@@ -45,6 +46,14 @@ namespace HiSql
         /// 识别运算符 and | or
         /// </summary>
         Symbol = 6,
+        
+
+        /// <summary>
+        /// 字段模板表达式 如 `a.FieldType`+1
+        /// </summary>
+        FieldTemplate=7,
+
+
 
     }
 }

@@ -13,6 +13,8 @@ namespace HiSql
     /// </summary>
     public partial class HiParameter : DbParameter
     {
+
+        private object _value;
         /// <summary>
         /// 指定参数和值
         /// </summary>
@@ -20,7 +22,11 @@ namespace HiSql
         /// <param name="value"></param>
         public HiParameter(string name, object value)
         {
-            this.Value = value;//DbParameter 中的属性
+            _value = value;
+            //var str=Newtonsoft.Json.JsonConvert.SerializeObject(value);
+            //_value=Newtonsoft.Json.JsonConvert.DeserializeObject<object>(str);
+
+            //this.Value = _value;//DbParameter 中的属性
             this.ParameterName = name;//DbParameter 中的属性
 
             if (value != null)
@@ -36,14 +42,22 @@ namespace HiSql
         /// <param name="type"></param>
         public HiParameter(string name, object value, Type type)
         {
-            this.Value = value;
+            _value = value;
+            var str = Newtonsoft.Json.JsonConvert.SerializeObject(value);
+            _value = Newtonsoft.Json.JsonConvert.DeserializeObject<object>(str);
+
+            this.Value = _value;//DbParameter 中的属性
             this.ParameterName = name;
             if (type != null)
                 ConvertDataType(type);
         }
         public HiParameter(string name, object value, Type type, ParameterDirection direction)
         {
-            this.Value = value;
+            _value = value;
+            var str = Newtonsoft.Json.JsonConvert.SerializeObject(value);
+            _value = Newtonsoft.Json.JsonConvert.DeserializeObject<object>(str);
+
+            this.Value = _value;//DbParameter 中的属性
             this.ParameterName = name;
             if (type != null)
                 ConvertDataType(type);
@@ -53,7 +67,11 @@ namespace HiSql
 
         public HiParameter(string name, object value, Type type, ParameterDirection direction, int size)
         {
-            this.Value = value;
+            _value = value;
+            var str = Newtonsoft.Json.JsonConvert.SerializeObject(value);
+            _value = Newtonsoft.Json.JsonConvert.DeserializeObject<object>(str);
+
+            this.Value = _value;//DbParameter 中的属性
             this.ParameterName = name;
             if (type != null)
                 ConvertDataType(type);
@@ -66,13 +84,21 @@ namespace HiSql
 
         public HiParameter(string name, object value, DbType type)
         {
-            this.Value = value;
+            _value = value;
+            var str = Newtonsoft.Json.JsonConvert.SerializeObject(value);
+            _value = Newtonsoft.Json.JsonConvert.DeserializeObject<object>(str);
+
+            this.Value = _value;//DbParameter 中的属性
             this.ParameterName = name;
             this.DbType = type;
         }
         public HiParameter(string name, object value, DbType type, ParameterDirection direction)
         {
-            this.Value = value;
+            _value = value;
+            var str = Newtonsoft.Json.JsonConvert.SerializeObject(value);
+            _value = Newtonsoft.Json.JsonConvert.DeserializeObject<object>(str);
+
+            this.Value = _value;//DbParameter 中的属性
             this.ParameterName = name;
             this.DbType = type;
 
@@ -81,7 +107,11 @@ namespace HiSql
 
         public HiParameter(string name, object value, DbType type, ParameterDirection direction, int size)
         {
-            this.Value = value;
+            _value = value;
+            var str = Newtonsoft.Json.JsonConvert.SerializeObject(value);
+            _value = Newtonsoft.Json.JsonConvert.DeserializeObject<object>(str);
+
+            this.Value = _value;//DbParameter 中的属性
             this.ParameterName = name;
             this.DbType = type;
 
@@ -95,7 +125,11 @@ namespace HiSql
 
         public HiParameter(string name, object value, ParameterDirection direction)
         {
-            this.Value = value;//DbParameter 中的属性
+            _value = value;
+            var str = Newtonsoft.Json.JsonConvert.SerializeObject(value);
+            _value = Newtonsoft.Json.JsonConvert.DeserializeObject<object>(str);
+
+            this.Value = _value;//DbParameter 中的属性
             this.ParameterName = name;//DbParameter 中的属性
 
             if (value != null)
@@ -113,7 +147,9 @@ namespace HiSql
         public override bool SourceColumnNullMapping { get; set; }
         public override object Value { get; set; }
 
-        public override void ResetDbType()
+        public object Values { get => _value; set=>_value=value; }
+
+    public override void ResetDbType()
         {
             this.DbType = System.Data.DbType.String;
         }

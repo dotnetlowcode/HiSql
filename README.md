@@ -35,6 +35,37 @@
 传统ORM框架最大的弊端就是完全要依赖于实体用lambda表达式写查询语句，但最大的问题就是如果业务场景需要动态拼接条件时只能又切换到原生数据库的sql语句进行完成，如果自行拼接开发人员还要解决防注入的问题,hisql 刚才完美的解决这些问题,Hisql底层已经对sql注入进行了处理，开发人员只要关注于业务开发
 
 
+### 2022.6.11 hisql 新增查询模版语法
+如下所示
+
+用`` 符号括起来就示字段
+如果是数值型的类型支持表达式
+
+```c#
+string sql = sqlClient.HiSql("select * from Hi_FieldModel as a where a.TabName=`a.TabName` and a.FieldName='11'").ToSql();
+```
+表达式模板语法
+```c#
+string sql = sqlClient.HiSql("select * from Hi_FieldModel as a where a.SortNum=`a.SortNum`+1 and a.FieldName='11'").ToSql();
+```
+
+
+以下是链式查询的语法样例
+```c#
+string sql = sqlClient.Query("Hi_FieldModel", "A").Field("*")
+    .Where(new Filter {
+        {"A.TabName", OperType.EQ, "`A.FieldName`"}
+                     })
+    .Group(new GroupBy { { "A.FieldName" } }).ToSql();
+```
+表达式模板语法
+```c#
+string sql = sqlClient.Query("Hi_FieldModel", "A").Field("*")
+    .Where(new Filter {
+        {"A.SortNum", OperType.EQ, "`A.SortNum`+1"}
+                     })
+    .Group(new GroupBy { { "A.FieldName" } }).ToSql();
+```
 
 ### 2022.6.10 hisql 新增on 的语法增强
 
