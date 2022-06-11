@@ -47,6 +47,15 @@ namespace HiSql
 
         public override string ToSql()
         {
+            sb_table = new StringBuilder();
+            sb_field = new StringBuilder();
+            sb_field_result = new StringBuilder();
+            sb_join = new StringBuilder();
+            sb_where = new StringBuilder();
+            sb_sort = new StringBuilder();
+            sb_group = new StringBuilder();
+            sb_having = new StringBuilder();
+            sb_distinct = new StringBuilder();
             // 如果有子查询应该先把子查询中的SQL语句先生成
             if (this.IsMultiSubQuery)
             {

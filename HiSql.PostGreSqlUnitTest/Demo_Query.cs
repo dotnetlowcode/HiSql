@@ -21,10 +21,40 @@ namespace HiSql.PostGreSqlUnitTest
 
             //Query_Demo13(sqlClient);
             //Query_Demo15(sqlClient);
+            Query_Demo16(sqlClient);
         }
 
 
+        static void Query_Demo16(HiSqlClient sqlClient)
+        {
+            //以下将会报错 字符串的不允许表达式条件 
+            //string sql = sqlClient.Query("Hi_FieldModel", "A").Field("*")
+            //    .Where(new Filter {
+            //        {"A.TabName", OperType.EQ, "`A.FieldName`+1"}
+            //                     })
+            //    .Group(new GroupBy { { "A.FieldName" } }).ToSql();
 
+
+            //string sql = sqlClient.Query("Hi_FieldModel", "A").Field("*")
+            //    .Where(new Filter {
+            //        {"A.FieldType", OperType.EQ, "abc"}
+            //        //{"A.FieldName", OperType.EQ, "CreateName"},
+            //                     })
+            //    .Group(new GroupBy { { "A.FieldName" } }).ToSql();
+
+            //string sql = sqlClient.Query("Hi_FieldModel", "A").Field("*")
+            //    .Where(new Filter {
+            //        {"A.TabName", OperType.EQ, "`A.FieldName`"}
+            //                     })
+            //    .Group(new GroupBy { { "A.FieldName" } }).ToSql();
+
+            //string sql = sqlClient.Query("Hi_FieldModel", "A").Field("*")
+            //    .Where("A.TabName=`A.TabName`+1")
+            //    .Group(new GroupBy { { "A.FieldName" } }).ToSql();
+
+            string sql = sqlClient.HiSql("select * from Hi_FieldModel as a where a.TabName=`a.TabName` and a.FieldName='11'").ToSql();
+
+        }
         static void Query_Demo15(HiSqlClient sqlClient)
         {
             //var sql = sqlClient.HiSql("select a.TabName, a.FieldName from Hi_FieldModel as a left join Hi_TabModel as b on a.TabName=b.TabName and a.TabName in ('H_Test') where a.TabName=b.TabName and a.FieldType>3 ").ToSql();

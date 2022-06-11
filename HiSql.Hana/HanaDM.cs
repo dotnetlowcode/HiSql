@@ -861,11 +861,11 @@ namespace HiSql
                 if (columninfo != null && columninfo.FieldType.IsIn<HiType>(HiType.INT, HiType.BIGINT, HiType.DECIMAL, HiType.SMALLINT))
                 {
                     ///检测是否有以字段更新字段的语法
-                    List<Dictionary<string, string>> _lstdic = Tool.RegexGrps(Constants.REG_UPDATE, dic_value[n]);
+                    List<Dictionary<string, string>> _lstdic = Tool.RegexGrps(Constants.REG_TEMPLATE_FIELDS, dic_value[n]);
                     if (_lstdic.Count() > 0)
                     {
                         //说明是基于
-                        Regex regex = new Regex(Constants.REG_UPDATE);
+                        Regex regex = new Regex(Constants.REG_TEMPLATE_FIELDS);
                         
                         foreach (Dictionary<string, string> dic in _lstdic)
                         {
@@ -1427,7 +1427,60 @@ namespace HiSql
                             throw new Exception("未能识别的解析结果");
 
                     }
+                    else if (whereResult.SType == StatementType.FieldTemplate)
+                    {
+                        //add by tgm date:2022.6.11 解析模版语法
+                        if (whereResult.Result.ContainsKey("fields"))
+                        {
+                            FieldDefinition field = new FieldDefinition(whereResult.Result["fields"].ToString());
+                            HiColumn hiColumn = CheckField(TableList, dictabinfo, Fields, field);
+                            sb_sql.Append($"{dbConfig.Table_Pre}{field.AsTabName}{dbConfig.Table_After}.{dbConfig.Field_Pre}{field.AsFieldName}{dbConfig.Field_After}");
 
+                            if (hiColumn == null)
+                                throw new Exception($"字段[{whereResult.Result["fields"].ToString()}]出现错误");
+
+
+                            FilterDefinition _filter = new FilterDefinition(FilterType.CONDITION);
+                            _filter.Name = whereResult.Result["fields"];
+
+                            switch (whereResult.Result["op"].ToString().ToLower())
+                            {
+                                case ">":
+                                    _filter.OpFilter = OperType.GT;
+                                    break;
+
+                                case "<":
+                                    _filter.OpFilter = OperType.LT;
+                                    break;
+                                case "=":
+                                    _filter.OpFilter = OperType.EQ;
+                                    break;
+                                case ">=":
+                                    _filter.OpFilter = OperType.GE;
+                                    break;
+                                case "<=":
+                                    _filter.OpFilter = OperType.LE;
+                                    break;
+                                case "<>":
+                                    _filter.OpFilter = OperType.NE;
+                                    break;
+                                case "!=":
+                                    _filter.OpFilter = OperType.NE;
+                                    break;
+                                default:
+                                    throw new Exception($"{HiSql.Constants.HiSqlSyntaxError} 附近语法错误[{whereResult.Statement}] 使用模板语法时不支持操作符[{whereResult.Result["op"]}]");
+
+                            }
+
+
+                            _filter.OpFilter = OperType.EQ;
+                            _filter.Value = whereResult.Result["value"];
+
+                            sb_sql.Append($" {whereResult.Result["op"].ToString()} ");
+                            sb_sql.Append(getSingleValue(issubquery, hiColumn, _filter, _filter.Value));
+                        }
+
+                    }
                     else
                         throw new Exception("暂时不支持该语法");
                 }
@@ -2408,6 +2461,61 @@ namespace HiSql
 
             return _sb_value.ToString();
         }
+        /// <summary>
+        /// 检测模板字段
+        /// </summary>
+        /// <param name="lsttemp"></param>
+        /// <param name="hiColumn"></param>
+        /// <param name="filterDefinition"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        string checkTempValue(List<Dictionary<string, string>> lsttemp, HiColumn hiColumn, FilterDefinition filterDefinition, string value, bool ischar = true)
+        {
+            //字符串字段只允许 一个模版字段 如 a.username=`b.user` 而不允许 a.username=`b.user`+1
+            if (lsttemp.Count > 1)
+            {
+                throw new Exception($"{HiSql.Constants.HiSqlSyntaxError} [{value}] 字段[{hiColumn.FieldName}]为[{hiColumn.FieldType.ToString()}] 条件不允许多个模板!");
+            }
+            else
+            {
+                if (Tool.RegexMatch(Constants.REG_TEMPLATE_FIELD, value))
+                {
+                    string nvalue = "";
+                    var dic = Tool.RegexGrp(Constants.REG_TEMPLATE_FIELD, value);
+                    if (!string.IsNullOrEmpty(dic["flag"].ToString()))
+                        nvalue = dic["flag"].ToString();
+                    if (!string.IsNullOrEmpty(dic["tab"].ToString()))
+                        nvalue = nvalue + $"{dbConfig.Table_Pre}{dic["tab"].ToString()}{dbConfig.Table_After}.{dbConfig.Field_Pre}{dic["field"].ToString()}{dbConfig.Field_After}";
+                    else
+                        nvalue = nvalue + $"{dbConfig.Field_Pre}{dic["field"].ToString()}{dbConfig.Field_After}";
+                    value = nvalue;
+                }
+                else
+                {
+                    if (ischar)
+                        throw new Exception($"{HiSql.Constants.HiSqlSyntaxError} [{value}] 字段[{hiColumn.FieldName}]为[{hiColumn.FieldType.ToString()}] 不允许表达式");
+                    else
+                    {
+                        //非字符串的允许使用表达式 
+                        Regex regex = new Regex(Constants.REG_TEMPLATE_FIELD);
+                        string nvalue = "";
+                        foreach (Dictionary<string, string> dic in lsttemp)
+                        {
+                            string _fieldv = "";
+                            if (string.IsNullOrEmpty(dic["flag"].ToString()))
+                                _fieldv = dic["flag"].ToString();
+                            if (string.IsNullOrEmpty(dic["tab"].ToString()))
+                                _fieldv = _fieldv + $"{dic["tab"].ToString()}.{dic["field"].ToString()}";
+                            nvalue = regex.Replace(nvalue, _fieldv, 1);
+                        }
+                        value = nvalue;
+                    }
+                }
+            }
+            return value;
+        }
+
         string getSingleValue(bool issubquery, HiColumn hiColumn, object value)
         {
             string _value = string.Empty;
@@ -2416,7 +2524,7 @@ namespace HiSql
                 if (hiColumn.FieldType.IsIn<HiType>(HiType.NCHAR, HiType.NVARCHAR, HiType.GUID))
                 {
                     _value = value.ToString();
-                    if (_value.Length <= hiColumn.FieldLen)
+                    if (_value.Length <= hiColumn.FieldLen || hiColumn.FieldLen < 0)
                         _value = $"'{_value.ToSqlInject()}'";
                     else
                         throw new Exception($"过滤条件字段[{hiColumn.FieldName}]指定的值超过了限定长度[{hiColumn.FieldLen}]");
@@ -2424,7 +2532,7 @@ namespace HiSql
                 else if (hiColumn.FieldType.IsIn<HiType>(HiType.VARCHAR, HiType.CHAR))
                 {
                     _value = value.ToString();
-                    if (_value.LengthZH() <= hiColumn.FieldLen)
+                    if (_value.LengthZH() <= hiColumn.FieldLen || hiColumn.FieldLen < 0)
                         _value = $"'{_value.ToSqlInject()}'";
                     else
                         throw new Exception($"过滤条件字段[{hiColumn.FieldName}]指定的值超过了限定长度[{hiColumn.FieldLen}]");
@@ -2470,27 +2578,54 @@ namespace HiSql
         string getSingleValue(bool issubquery, HiColumn hiColumn, FilterDefinition filterDefinition, object value)
         {
             string _value = string.Empty;
+            //是否是模板字段
+            bool _istempfield = false;
             if (!issubquery)
             {
+                _value = value.ToString();
+                List<Dictionary<string, string>> _lstdic = Tool.RegexGrps(Constants.REG_TEMPLATE_FIELDS, _value);
+                if (_lstdic.Count > 0) _istempfield = true;
                 if (hiColumn.FieldType.IsIn<HiType>(HiType.NCHAR, HiType.NVARCHAR, HiType.GUID))
                 {
                     _value = value.ToString();
-                    if (_value.Length <= hiColumn.FieldLen)
-                        _value = $"'{_value.ToSqlInject()}'";
-                    else
-                        throw new Exception($"过滤条件字段[{filterDefinition.Field.AsFieldName}]指定的值超过了限定长度[{hiColumn.FieldLen}]");
+                    if (!_istempfield)
+                    {
+                        if (_value.Length <= hiColumn.FieldLen || hiColumn.FieldLen < 0)
+                            _value = $"'{_value.ToSqlInject()}'";
+                        else
+                            throw new Exception($"过滤条件字段[{filterDefinition.Field.AsFieldName}]指定的值超过了限定长度[{hiColumn.FieldLen}]");
+                    }
+                    else {
+                        _value = checkTempValue(_lstdic, hiColumn, filterDefinition, _value, true);
+                    }
                 }
                 else if (hiColumn.FieldType.IsIn<HiType>(HiType.VARCHAR, HiType.CHAR))
                 {
                     _value = value.ToString();
-                    if (_value.LengthZH() <= hiColumn.FieldLen)
-                        _value = $"'{_value.ToSqlInject()}'";
+                    if (!_istempfield)
+                    {
+                        if (_value.LengthZH() <= hiColumn.FieldLen || hiColumn.FieldLen < 0)
+                            _value = $"'{_value.ToSqlInject()}'";
+                        else
+                            throw new Exception($"过滤条件字段[{filterDefinition.Field.AsFieldName}]指定的值超过了限定长度[{hiColumn.FieldLen}]");
+                    }
                     else
-                        throw new Exception($"过滤条件字段[{filterDefinition.Field.AsFieldName}]指定的值超过了限定长度[{hiColumn.FieldLen}]");
+                    {
+                        _value = checkTempValue(_lstdic, hiColumn, filterDefinition, _value, true);
+                    }
                 }
                 else if (hiColumn.FieldType.IsIn<HiType>(HiType.INT, HiType.DECIMAL, HiType.SMALLINT, HiType.BIGINT))
                 {
-                    _value = value.ToString();
+                    if (!_istempfield)
+                    {
+                        _value = value.ToString();
+                        if (!Tool.IsDecimal(_value))
+                            throw new Exception($"字段[{hiColumn.FieldName}]是[{hiColumn.FieldType}]值为[{_value}]类型不匹配有SQL注入风险");
+                    }
+                    else
+                    {
+                        _value = checkTempValue(_lstdic, hiColumn, filterDefinition, _value, false);
+                    }
                 }
                 else if (hiColumn.FieldType.IsIn<HiType>(HiType.BOOL))
                 {
@@ -2506,13 +2641,25 @@ namespace HiSql
                 }
                 else if (hiColumn.FieldType.IsIn<HiType>(HiType.DATETIME))
                 {
-                    DateTime _time = Convert.ToDateTime(value.ToString());
-                    _value = $"'{_time.ToString("yyyy-MM-dd HH:mm:ss.fff")}'";
+                    if (!_istempfield)
+                    {
+                        DateTime _time = Convert.ToDateTime(_value.ToString());
+                        _value = $"'{_time.ToString("yyyy-MM-dd HH:mm:ss.fff")}'";
+                    }
+                    else
+                    {
+                        _value = checkTempValue(_lstdic, hiColumn, filterDefinition, _value, true);
+                    }
                 }
                 else if (hiColumn.FieldType.IsIn<HiType>(HiType.DATE))
                 {
-                    DateTime _time = Convert.ToDateTime(value.ToString());
-                    _value = $"'{_time.ToString("yyyy-MM-dd")}'";
+                    if (!_istempfield)
+                    {
+                        DateTime _time = Convert.ToDateTime(_value.ToString());
+                        _value = $"'{_time.ToString("yyyy-MM-dd")}'";
+                    }
+                    else
+                        _value = checkTempValue(_lstdic, hiColumn, filterDefinition, _value, true);
                 }
                 else
                 {
