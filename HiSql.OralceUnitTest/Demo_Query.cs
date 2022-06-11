@@ -11,7 +11,7 @@ namespace HiSql.OralceUnitTest
     {
         public static void Init(HiSqlClient sqlClient)
         {
-           // Query_Demo(sqlClient);
+            Query_Demo(sqlClient);
             //Query_Demo1(sqlClient);
            // Query_Demo2(sqlClient);
             //Query_Demo3(sqlClient);
@@ -22,7 +22,7 @@ namespace HiSql.OralceUnitTest
             //Query_Demo9(sqlClient);
             // Query_Demo13(sqlClient);
             //Query_Demo14(sqlClient);
-            Query_Demo16(sqlClient);
+            //Query_Demo16(sqlClient);
             var s = Console.ReadLine();
         }
 
@@ -231,6 +231,15 @@ namespace HiSql.OralceUnitTest
         static void Query_Demo(HiSqlClient sqlClient)
         {
 
+       
+            HiParameter Parm = new HiParameter("@TabName", "Hi_TabModel");
+
+            //DataTable dt= sqlClient.Context.DBO.GetDataTable("select * from dbo.Hi_FieldModel where TabName in (@TabName)", new HiParameter("@TabName",new List<string> { "Hi_TabModel' or 1=1", "Hi_FieldModel" }));
+            DataTable dt2 = sqlClient.Context.DBO.GetDataTable("select * from Hi_FieldModel where TabName = @TabName and FieldName=@TabName and FieldType=@FieldType", new HiParameter("@TabName", "Hi_TabModel"), new HiParameter("@FieldType", 11));
+
+
+            DataTable dt3 = sqlClient.Query("Hi_TabModel").Field("*").ToTable();
+            
 
             //DataTable dt = sqlClient.Context.DBO.GetDataTable("select TOP 1000 \"MATNR\",\"MTART\",\"MATKL\" FROM \"SAPHANADB\".\"MARA\"");
 

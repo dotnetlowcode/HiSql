@@ -142,11 +142,12 @@ namespace HiSql
             }
             else
             {
-                if (param.HasValue())
-                {
-                    OracleParameter[] ipars = GetSqlParameters(param);
-                    sqlCommand.Parameters.AddRange(ipars);
-                }
+                //参数化已经统一在AdoProvider处理
+                //if (param.HasValue())
+                //{
+                //    SqlParameter[] ipars = GetSqlParameters(param);
+                //    sqlCommand.Parameters.AddRange(ipars);
+                //}
             }
 
 
