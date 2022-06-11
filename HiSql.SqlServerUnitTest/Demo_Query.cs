@@ -25,7 +25,7 @@ namespace HiSql.UnitTest
 
         public static void Init(HiSqlClient sqlClient)
         {
-            //Query_Demo(sqlClient);
+            Query_Demo(sqlClient);
             //QuerySlave(sqlClient);
             //Query_Demo3(sqlClient);
             //Query_Case(sqlClient);
@@ -42,7 +42,7 @@ namespace HiSql.UnitTest
             // Query_Demo13(sqlClient);
            // Query_Demo14(sqlClient);
            //Query_Demo15(sqlClient);
-           Query_Demo16(sqlClient);
+           //Query_Demo16(sqlClient);
              var s = Console.ReadLine();
         }
 
@@ -380,8 +380,10 @@ namespace HiSql.UnitTest
         }
         static void Query_Demo(HiSqlClient sqlClient)
         {
-            DataTable dt= sqlClient.Context.DBO.GetDataTable("select * from dbo.Hi_FieldModel where TabName in (@TabName)", new HiParameter("@TabName",new List<string> { "Hi_TabModel' or 1=1", "Hi_FieldModel" }));
-            DataTable dt2 = sqlClient.Context.DBO.GetDataTable("select * from dbo.Hi_FieldModel where TabName = @TabName", new HiParameter("@TabName", "Hi_TabModel"));
+            HiParameter Parm = new HiParameter("@TabName", "Hi_TabModel");
+
+            //DataTable dt= sqlClient.Context.DBO.GetDataTable("select * from dbo.Hi_FieldModel where TabName in (@TabName)", new HiParameter("@TabName",new List<string> { "Hi_TabModel' or 1=1", "Hi_FieldModel" }));
+            DataTable dt2 = sqlClient.Context.DBO.GetDataTable("select * from dbo.Hi_FieldModel where TabName = @TabName and FieldName=@TabName and FieldType=@FieldType", new HiParameter("@TabName", "Hi_TabModel"), new HiParameter("@FieldType", 11));
 
 
             DataTable dt3 = sqlClient.Query("Hi_TabModel").Field("*").ToTable();
