@@ -316,11 +316,11 @@ namespace HiSql
             {
                 tabname = tabname.ToSqlInject();
                 DataSet ds = new DataSet();
-                DataTable dt_model = this.Context.DBO.GetDataTable($"select * from {dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{dbConfig.Table_After} where {dbConfig.Table_Pre}TabName{dbConfig.Table_After}='{tabname}'", null);
+                DataTable dt_model = this.Context.DBO.GetDataTable($"select * from {dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{dbConfig.Table_After} where {dbConfig.Table_Pre}TabName{dbConfig.Table_After}=@TabName ", new HiParameter("@TabName", tabname));
                 dt_model.TableName = Constants.HiSysTable["Hi_TabModel"].ToString();
                 ds.Tables.Add(dt_model);
 
-                DataTable dt_struct = Context.DBO.GetDataTable($"select * from {dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{dbConfig.Table_After} where {dbConfig.Table_Pre}TabName{dbConfig.Table_After}='{tabname}' order by {dbConfig.Field_Pre}SortNum{dbConfig.Field_After} asc", null);
+                DataTable dt_struct = Context.DBO.GetDataTable($"select * from {dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{dbConfig.Table_After} where {dbConfig.Table_Pre}TabName{dbConfig.Table_After}=@TabName order by {dbConfig.Field_Pre}SortNum{dbConfig.Field_After} asc", new HiParameter("@TabName", tabname));
                 dt_struct.TableName = Constants.HiSysTable["Hi_FieldModel"].ToString();
                 ds.Tables.Add(dt_struct);
 
@@ -2725,7 +2725,7 @@ namespace HiSql
         string checkTempValue(List<Dictionary<string, string>> lsttemp, HiColumn hiColumn, FilterDefinition filterDefinition, string value, bool ischar = true)
         {
             //字符串字段只允许 一个模版字段 如 a.username=`b.user` 而不允许 a.username=`b.user`+1
-            if (lsttemp.Count > 1)
+            if (lsttemp.Count > 1 && ischar)
             {
                 throw new Exception($"{HiSql.Constants.HiSqlSyntaxError} [{value}] 字段[{hiColumn.FieldName}]为[{hiColumn.FieldType.ToString()}] 条件不允许多个模板!");
             }

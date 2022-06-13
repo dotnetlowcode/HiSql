@@ -25,7 +25,7 @@ namespace HiSql.UnitTest
 
         public static void Init(HiSqlClient sqlClient)
         {
-            Query_Demo(sqlClient);
+            //Query_Demo(sqlClient);
             //QuerySlave(sqlClient);
             //Query_Demo3(sqlClient);
             //Query_Case(sqlClient);
@@ -42,7 +42,7 @@ namespace HiSql.UnitTest
             // Query_Demo13(sqlClient);
            // Query_Demo14(sqlClient);
            //Query_Demo15(sqlClient);
-           //Query_Demo16(sqlClient);
+           Query_Demo16(sqlClient);
              var s = Console.ReadLine();
         }
 
@@ -73,7 +73,7 @@ namespace HiSql.UnitTest
             //    .Where("A.TabName=`A.TabName`+1")
             //    .Group(new GroupBy { { "A.FieldName" } }).ToSql();
 
-            string sql = sqlClient.HiSql("select * from Hi_FieldModel as a where a.TabName=`a.TabName` and a.FieldName='11'").ToSql();
+            string sql = sqlClient.HiSql("select * from Hi_FieldModel as a where a.TabName=`a.TabName`+`a.TabName` and a.FieldName='11'").ToSql();
 
         }
 
