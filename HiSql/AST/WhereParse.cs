@@ -189,8 +189,8 @@ namespace HiSql.AST
                         {
 
                             //检测是否是模版表达式  截取模版表达式的范围
-                            int _oridx = wherestr.IndexOf(" and ");
-                            int _andidx = wherestr.IndexOf(" or ");
+                            int _oridx = wherestr.IndexOf(" and ",StringComparison.OrdinalIgnoreCase);
+                            int _andidx = wherestr.IndexOf(" or ", StringComparison.OrdinalIgnoreCase);
 
                             int _posidx = _oridx > _andidx ? _oridx : _andidx;
 
