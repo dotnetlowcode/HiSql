@@ -73,7 +73,11 @@ namespace HiSql.UnitTest
             //    .Where("A.TabName=`A.TabName`+1")
             //    .Group(new GroupBy { { "A.FieldName" } }).ToSql();
 
-            string sql = sqlClient.HiSql("select * from Hi_FieldModel as a where a.TabName=`a.TabName`+`a.TabName` and a.FieldName='11'").ToSql();
+            string sql = sqlClient.HiSql(@"select * from Hi_FieldModel as a 
+Where a.TabName=`a.TabName` And
+a.fieldName='11'
+Order By a.FieldName
+").ToSql();
 
         }
 
