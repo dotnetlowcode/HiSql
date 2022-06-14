@@ -43,7 +43,9 @@ namespace HiSql
         public string HiSqlWhere
         {
             get { return _hisqlwhere; }
-            set { _hisqlwhere = value;_ishisqlwhere = true; }
+            set { _hisqlwhere = value;
+                _hisqlwhere = _hisqlwhere.Replace(System.Environment.NewLine, " ");
+                _ishisqlwhere = true; }
         }
 
         public List<FilterDefinition> Elements
