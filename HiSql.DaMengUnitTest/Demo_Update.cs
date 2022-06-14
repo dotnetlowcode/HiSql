@@ -30,7 +30,7 @@ namespace HiSql.DaMengUnitTest
 
         public static void Init(HiSqlClient sqlClient)
         {
-            Update_Demo(sqlClient);//有问题 
+            Update_Demo(sqlClient);//ok 
             //Update_Demo4(sqlClient);//ok 
         }
 
@@ -41,15 +41,15 @@ namespace HiSql.DaMengUnitTest
         }
         static async void Update_Demo(HiSqlClient sqlClient)
         {
-            //IUpdate update = sqlClient.Update("Hi_Domain", new { Domain = "UTYPE", DomainDesc = "用户类型1sadUTYPE" }).Exclude("Domain");//,
+            IUpdate update = sqlClient.Update("Hi_Domain", new { Domain = "UTYPE", DomainDesc = "用户类型1sadUTYPE" }).Exclude("Domain");//,
 
-            //int _effect = sqlClient.Update("Hi_Domain", new { Domain = "UTYPE", DomainDesc = "用户类3dUTYPE" }).Exclude("Domain").ExecCommand();
-            //string _sql = update.ToSql();
-            //Console.WriteLine(_sql);
+            int _effect = sqlClient.Update("Hi_Domain", new { Domain = "UTYPE", DomainDesc = "用户类3dUTYPE" }).Exclude("Domain").ExecCommand();
+            string _sql = update.ToSql();
+            Console.WriteLine(_sql);
 
 
             IUpdate update1 = sqlClient.Update("H_Test", new { UNAME2 = "TEST2", DID = 8 }).Where(new Filter { { "DID", OperType.GT, 8 } });
-           // int _effect1 = sqlClient.Update("H_Test").Set(new { UNAME2 = "TEST3", DID=8 }).Where(new Filter { { "DID", OperType.EQ, 8 } }).ExecCommand();
+            int _effect1 = sqlClient.Update("H_Test").Set(new { UNAME2 = "TEST3", DID=8 }).Where(new Filter { { "DID", OperType.EQ, 8 } }).ExecCommand();
 
             //行[1] 缺少字段[DID] 为必填字段”
 

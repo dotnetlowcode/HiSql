@@ -11,7 +11,7 @@ namespace HiSql.DaMengUnitTest
     {
         public static void Init(HiSqlClient sqlClient)
         {
-             Query_Demo(sqlClient); //有问题
+            //Query_Demo(sqlClient);  //ok
             //Query_Demo1(sqlClient); //ok
             // Query_Demo2(sqlClient);//ok
             // Query_Demo3(sqlClient);//ok
@@ -19,7 +19,7 @@ namespace HiSql.DaMengUnitTest
             //  Query_Demo8(sqlClient);//ok
 
             // Query_Case(sqlClient);//ok
-            Query_Demo8(sqlClient);
+            //Query_Demo8(sqlClient);//ok
             //Query_Demo9(sqlClient);//ok
             //Query_Demo10(sqlClient);// ok
             //Query_Demo11(sqlClient);// ok
@@ -273,7 +273,7 @@ namespace HiSql.DaMengUnitTest
             DataTable dt = sqlClient.Context.DBO.GetDataTable("select * from Hi_TabModel where TabName=@TabName",
 
                 new HiParameter[] {
-                new HiParameter(":TabName","Hi_TabModel")
+                new HiParameter("@TabName","Hi_TabModel")
 
             });
 

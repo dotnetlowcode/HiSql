@@ -2792,7 +2792,7 @@ namespace HiSql
         /// <returns></returns>
         public bool CheckTabExists(string tabname = "")
         {
-            DataTable dt = Context.DBO.GetDataTable(dbConfig.Get_CheckTabExists.Replace("[$TabName$]", tabname));
+            DataTable dt = Context.DBO.GetDataTable(dbConfig.Get_CheckTabExists.Replace("[$TabName$]", tabname).Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema));
             return dt.Rows.Count > 0;
         }
         public DataTable GetAllTables(string tabname = "")
