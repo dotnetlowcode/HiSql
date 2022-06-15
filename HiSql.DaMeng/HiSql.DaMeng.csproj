@@ -34,13 +34,6 @@
     </EmbeddedResource>
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="Data\hisql-oracle-logo.jpg">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-  </ItemGroup>
-
   <!--<ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
     <PackageReference Include="Oracle.ManagedDataAccess">
       <Version>21.5.0</Version>

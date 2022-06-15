@@ -34,14 +34,14 @@ namespace HiSql.UnitTest
             //Query_Demo5(sqlClient);
             //Query_Demo6(sqlClient);
             //Query_Demo7(sqlClient);
-            Query_Demo8(sqlClient);
+            //Query_Demo8(sqlClient);
             //Query_Demo9(sqlClient);
             //Query_Demo10(sqlClient);
             //Query_Demo11(sqlClient);
             //Query_Demo12(sqlClient);
             // Query_Demo13(sqlClient);
            // Query_Demo14(sqlClient);
-           //Query_Demo15(sqlClient);
+           Query_Demo15(sqlClient);
            //Query_Demo16(sqlClient);
              var s = Console.ReadLine();
         }
@@ -89,11 +89,21 @@ Order By a.fieldNamE
 
             //var sql=sqlClient.HiSql("select a.tabname from hi_fieldmodel as a inner join Hi_TabModel as  b on a.tabname =b.tabname inner join Hi_TabModel as c on a.tabname=c.tabname where a.tabname='h_test'  and a.FieldType in (11,41,21)  ").ToSql();
 
-            string jsondata = sqlClient.Query("Hi_FieldModel", "A").Field("A.FieldName as Fname")
+            //string jsondata = sqlClient.Query("Hi_FieldModel", "A").Field("A.FieldName as Fname")
+            //    .Join("Hi_TabModel").As("B").On(new Filter { { "A.TabName", OperType.EQ, "Hi_FieldModel" } })
+            //    .Where("a.tabname = 'Hi_FieldModel' and ((a.FieldType = 11)) and a.tabname in ('h_test','hi_fieldmodel')  and a.tabname in (select a.tabname from hi_fieldmodel as a inner join Hi_TabModel as  b on a.tabname =b.tabname " +
+            //    " inner join Hi_TabModel as c on a.tabname=c.tabname where a.tabname='h_test' ) and a.FieldType in (11,41,21)  ")
+            //    .Group(new GroupBy { { "A.FieldNamE" } }).ToSql();
+
+            var cols2 = sqlClient.Query("Hi_FieldModel", "A").Field("A.FieldName as Fname")
                 .Join("Hi_TabModel").As("B").On(new Filter { { "A.TabName", OperType.EQ, "Hi_FieldModel" } })
                 .Where("a.tabname = 'Hi_FieldModel' and ((a.FieldType = 11)) and a.tabname in ('h_test','hi_fieldmodel')  and a.tabname in (select a.tabname from hi_fieldmodel as a inner join Hi_TabModel as  b on a.tabname =b.tabname " +
                 " inner join Hi_TabModel as c on a.tabname=c.tabname where a.tabname='h_test' ) and a.FieldType in (11,41,21)  ")
-                .Group(new GroupBy { { "A.FieldNamE" } }).ToSql();
+                .Group(new GroupBy { { "A.FieldName" } }).ToColumns();
+
+
+            var sql = sqlClient.HiSql("select max(FieldType) as fieldtype from Hi_FieldModel").ToJson();
+            var cols = sqlClient.HiSql("select max(FieldType) as fieldtype from Hi_FieldModel").ToColumns();
 
         }
 

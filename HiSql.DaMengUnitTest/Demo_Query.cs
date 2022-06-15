@@ -75,8 +75,17 @@ namespace HiSql.DaMengUnitTest
             //    " inner join Hi_TabModel as c on a.tabname=c.tabname where a.tabname='h_test' ) and a.FieldType in (11,41,21)  ")
             //    .Group(new GroupBy { { "A.FieldName" } }).ToSql();
 
-            var _sql2 = sqlClient.HiSql("select  TabName  from Hi_FieldModel where TabName='Hi_FieldModel' order by TabName ").Take(10).Skip(2).ToSql();
+            //var _sql2 = sqlClient.HiSql("select  TabName  from Hi_FieldModel where TabName='Hi_FieldModel' order by TabName ").Take(10).Skip(2).ToSql();
+            //var _sql2 = sqlClient.HiSql("select  TabName  from Hi_FieldModel where TabName='Hi_FieldModel' order by TabName ").Take(10).Skip(1).ToJson();
 
+            //var cols = sqlClient.Query("Hi_FieldModel", "A").Field("A.FieldName as Fname")
+            //    .Join("Hi_TabModel").As("B").On(new Filter { { "A.TabName", OperType.EQ, "Hi_FieldModel" } })
+            //    .Where("a.tabname = 'Hi_FieldModel' and ((a.FieldType = 11)) and a.tabname in ('h_test','hi_fieldmodel')  and a.tabname in (select a.tabname from hi_fieldmodel as a inner join Hi_TabModel as  b on a.tabname =b.tabname " +
+            //    " inner join Hi_TabModel as c on a.tabname=c.tabname where a.tabname='h_test' ) and a.FieldType in (11,41,21)  ")
+            //    .Group(new GroupBy { { "A.FieldName" } }).ToColumns();
+
+
+            var cols = sqlClient.HiSql("select max(FieldType) as fieldtype from Hi_FieldModel").ToColumns();
         }
         static void Query_Demo10(HiSqlClient sqlClient)
         {

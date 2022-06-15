@@ -2243,27 +2243,28 @@ namespace HiSql
                                         _idx2++;
                                     }
                                 }
-                                //sb_field.Append($"[{fieldDefinition.AsTabName}].{fieldDefinition.FieldName}");
                             }
                             else
                             {
-                                //lstcol.Add(col.CloneProperoty<HiColumn>());
                                 if (hiColumn != null)
-                                    lstcol.Add(hiColumn.CloneProperoty<HiColumn>());
+                                {
+                                    var _col = hiColumn.CloneProperoty<HiColumn>();
+                                    _col.FieldName = Tool.GetDbFieldName(hiColumn, fieldDefinition);
+                                    lstcol.Add(_col);
+                                }
                                 sb_field.Append($"{dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, fieldDefinition)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, fieldDefinition)}{dbConfig.Field_After}");
                                 sb_field_result.Append($"{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, fieldDefinition)}{dbConfig.Field_After}");
                             }
-                            //}
-                            //else
-                            //{
-                            //    //当是有子查询时这些字段都是从子查询的结果的
-                            //    sb_field.Append($"[{fieldDefinition.FieldName}]");
-                            //}
+
                         }
                         else
                         {
                             if (hiColumn != null)
-                                lstcol.Add(hiColumn.CloneProperoty<HiColumn>());
+                            {
+                                var _col = hiColumn.CloneProperoty<HiColumn>();
+                                _col.FieldName = fieldDefinition.AsFieldName;
+                                lstcol.Add(_col);
+                            }
                             sb_field.Append($"{dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, fieldDefinition)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After} as {dbConfig.Field_Pre}{fieldDefinition.AsFieldName}{dbConfig.Field_After}");
                             sb_field_result.Append($"{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, fieldDefinition)}{dbConfig.Field_After}");
                         }
@@ -2310,7 +2311,7 @@ namespace HiSql
                                     {
                                         sb_field.Append($"avg({dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, fieldDefinition)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, fieldDefinition)}{dbConfig.Field_After}) as {fieldDefinition.AsFieldName}");
                                         sb_field_result.Append($"{dbConfig.Field_Pre}{fieldDefinition.AsFieldName}{dbConfig.Field_After}");
-                                        lstcol.Add(new HiColumn { FieldName = fieldDefinition.AsTabName, DBDefault = HiTypeDBDefault.EMPTY, FieldType = hiColumn.FieldType, FieldDec = hiColumn.FieldDec, FieldLen = hiColumn.FieldLen, FieldDesc = $"avg_{fieldDefinition.AsFieldName}" });
+                                        lstcol.Add(new HiColumn { FieldName = fieldDefinition.AsFieldName, DBDefault = HiTypeDBDefault.EMPTY, FieldType = hiColumn.FieldType, FieldDec = hiColumn.FieldDec, FieldLen = hiColumn.FieldLen, FieldDesc = $"avg_{fieldDefinition.AsFieldName}" });
                                     }
                                     else
                                         throw new Exception($"表[{fieldDefinition.AsTabName}]字段[{hiColumn.FieldName}]不属于数值型无法使用AVG函数");
@@ -2325,7 +2326,7 @@ namespace HiSql
                                     {
                                         sb_field.Append($"sum({dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, fieldDefinition)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, fieldDefinition)}{dbConfig.Field_After}) as {fieldDefinition.AsFieldName}");
                                         sb_field_result.Append($"{dbConfig.Field_Pre}{fieldDefinition.AsFieldName}{dbConfig.Field_After}");
-                                        lstcol.Add(new HiColumn { FieldName = fieldDefinition.AsTabName, DBDefault = HiTypeDBDefault.EMPTY, FieldType = hiColumn.FieldType, FieldDec = hiColumn.FieldDec, FieldLen = hiColumn.FieldLen, FieldDesc = $"sum_{fieldDefinition.AsFieldName}" });
+                                        lstcol.Add(new HiColumn { FieldName = fieldDefinition.AsFieldName, DBDefault = HiTypeDBDefault.EMPTY, FieldType = hiColumn.FieldType, FieldDec = hiColumn.FieldDec, FieldLen = hiColumn.FieldLen, FieldDesc = $"sum_{fieldDefinition.AsFieldName}" });
                                     }
                                     else
                                         throw new Exception($"表[{fieldDefinition.AsTabName}]字段[{hiColumn.FieldName}]不属于数值型无法使用SUM函数");
@@ -2336,7 +2337,7 @@ namespace HiSql
                                     {
                                         sb_field.Append($"max({dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, fieldDefinition)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, fieldDefinition)}{dbConfig.Field_After}) as {fieldDefinition.AsFieldName}");
                                         sb_field_result.Append($"{dbConfig.Field_Pre}{fieldDefinition.AsFieldName}{dbConfig.Field_After}");
-                                        lstcol.Add(new HiColumn { FieldName = fieldDefinition.AsTabName, DBDefault = HiTypeDBDefault.EMPTY, FieldType = hiColumn.FieldType, FieldDec = hiColumn.FieldDec, FieldLen = hiColumn.FieldLen, FieldDesc = $"max_{fieldDefinition.AsFieldName}" });
+                                        lstcol.Add(new HiColumn { FieldName = fieldDefinition.AsFieldName, DBDefault = HiTypeDBDefault.EMPTY, FieldType = hiColumn.FieldType, FieldDec = hiColumn.FieldDec, FieldLen = hiColumn.FieldLen, FieldDesc = $"max_{fieldDefinition.AsFieldName}" });
                                     }
                                     else
                                         throw new Exception($"表[{fieldDefinition.AsTabName}]字段[{hiColumn.FieldName}]不属于数值型无法使用MAX函数");
@@ -2347,7 +2348,7 @@ namespace HiSql
                                     {
                                         sb_field.Append($"min({dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, fieldDefinition)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, fieldDefinition)}{dbConfig.Field_After}) as {fieldDefinition.AsFieldName}");
                                         sb_field_result.Append($"{dbConfig.Field_Pre}{fieldDefinition.AsFieldName}{dbConfig.Field_After}");
-                                        lstcol.Add(new HiColumn { FieldName = fieldDefinition.AsTabName, DBDefault = HiTypeDBDefault.EMPTY, FieldType = hiColumn.FieldType, FieldDec = hiColumn.FieldDec, FieldLen = hiColumn.FieldLen, FieldDesc = $"min_{fieldDefinition.AsFieldName}" });
+                                        lstcol.Add(new HiColumn { FieldName = fieldDefinition.AsFieldName, DBDefault = HiTypeDBDefault.EMPTY, FieldType = hiColumn.FieldType, FieldDec = hiColumn.FieldDec, FieldLen = hiColumn.FieldLen, FieldDesc = $"min_{fieldDefinition.AsFieldName}" });
                                     }
                                     else
                                         throw new Exception($"表[{fieldDefinition.AsTabName}]字段[{hiColumn.FieldName}]不属于数值型无法使用MIN函数");
@@ -2386,12 +2387,13 @@ namespace HiSql
                                 sb_field.Append($"max({dbConfig.Field_Pre}{fieldDefinition.FieldName}{dbConfig.Field_After}) as  {dbConfig.Field_Pre}{fieldDefinition.AsFieldName}{dbConfig.Field_After}");
                                 sb_field_result.Append($"max({dbConfig.Field_Pre}{fieldDefinition.FieldName}{dbConfig.Field_After}) as  {dbConfig.Field_Pre}{fieldDefinition.AsFieldName}{dbConfig.Field_After}");
 
-
+                                lstcol.Add(new HiColumn { FieldName = fieldDefinition.AsFieldName, DBDefault = HiTypeDBDefault.EMPTY, FieldType = HiType.DECIMAL, FieldDec = 3, FieldDesc = $"max_{fieldDefinition.AsFieldName}" });
 
                                 break;
                             case DbFunction.MIN:
                                 sb_field.Append($"min({dbConfig.Field_Pre}{fieldDefinition.FieldName}{dbConfig.Field_After}) as  {dbConfig.Field_Pre}{fieldDefinition.AsFieldName}{dbConfig.Field_After}");
                                 sb_field_result.Append($"min({dbConfig.Field_Pre}{fieldDefinition.FieldName}{dbConfig.Field_After}) as  {dbConfig.Field_Pre}{fieldDefinition.AsFieldName}{dbConfig.Field_After}");
+                                lstcol.Add(new HiColumn { FieldName = fieldDefinition.AsFieldName, DBDefault = HiTypeDBDefault.EMPTY, FieldType = HiType.DECIMAL, FieldDec = 3, FieldDesc = $"min_{fieldDefinition.AsFieldName}" });
                                 break;
                             case DbFunction.SUM:
                                 sb_field.Append($"sum({dbConfig.Field_Pre}{fieldDefinition.FieldName}{dbConfig.Field_After}) as  {dbConfig.Field_Pre}{fieldDefinition.AsFieldName}{dbConfig.Field_After}");
@@ -2425,7 +2427,7 @@ namespace HiSql
                 }
                 else
                 {
-                    //表示是case字段
+                    // 表示是case字段
                     //fieldDefinition.IsCaseField==true
                     //需要解析case语法
                     if (fieldDefinition.Case != null)
@@ -2433,12 +2435,12 @@ namespace HiSql
                         string _case_str = buildCaseSql(dictabinfo, queryProvider, fieldDefinition);
                         sb_field.Append(_case_str);
                         sb_field_result.Append(_case_str);
+                        lstcol.Add(new HiColumn { FieldName = fieldDefinition.Case.EndAs.AsFieldName, DBDefault = HiTypeDBDefault.EMPTY, FieldType = HiType.NVARCHAR, FieldLen = 50, FieldDec = 0, FieldDesc = $"case_{fieldDefinition.Case.EndAs.AsFieldName}" });
                     }
                     else
                     {
                         throw new Exception($"字段[{fieldDefinition.AsFieldName}]标识了是Case条件字段但未找到值");
                     }
-
                 }
 
                 if (_idx < queryProvider.Fields.Count - 1)
