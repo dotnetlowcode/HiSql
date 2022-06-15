@@ -1075,6 +1075,14 @@ namespace HiSql
             return "";
         }
 
+        /// <summary>
+        /// 返回当前查询语句字段结构信息
+        /// </summary>
+        /// <returns></returns>
+        public virtual List<HiColumn> ToColumns()
+        {
+            return null;
+        }
 
 
         public  Task<List<ExpandoObject>> ToEObjectAsync(ref int total)

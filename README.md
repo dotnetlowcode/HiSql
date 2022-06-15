@@ -19,6 +19,7 @@
    3. HiSql.mysql.dll
    4. HiSql.oracle.dll
    5. HiSql.postgresql.dll
+   6. HiSql.dameng.dll `新支持1.0.4及以上支持`
 
 
 
@@ -34,6 +35,23 @@
 
 传统ORM框架最大的弊端就是完全要依赖于实体用lambda表达式写查询语句，但最大的问题就是如果业务场景需要动态拼接条件时只能又切换到原生数据库的sql语句进行完成，如果自行拼接开发人员还要解决防注入的问题,hisql 刚才完美的解决这些问题,Hisql底层已经对sql注入进行了处理，开发人员只要关注于业务开发
 
+
+
+
+### 2022.6.15 hisql新增国产达梦数据库支持
+
+1. 新增国产达梦数据库支持 目前`hisql`已经支持 `sqlserver`,`hana`,`mysql`,`oracle`,`posgresql`,`dameng`  六种库 涉及国际，国产 及行式存储和列式存储的数据库 下一步将会支持`sqlite`
+
+2. 优化hisql语法编译解决hisql语法大小写问题，一条hisql语句跨库运行
+
+3. 新增ToColumns()方法 返回hisql语句结果字段结构信息
+
+该功能可以用于将某查询结果集保存到一张新表中（根据这些字段结构信息可创建一张新表）
+
+```c#
+    //返回该hisql的结果字段结构信息
+    List<HiColumn> cols = sqlClient.HiSql("select max(FieldType) as fieldtype from Hi_FieldModel").ToColumns();
+```
 
 ### 2022.6.11 hisql 新增查询模版语法
 如下所示

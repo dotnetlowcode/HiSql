@@ -41,8 +41,8 @@ namespace HiSql.UnitTest
             //Query_Demo12(sqlClient);
             // Query_Demo13(sqlClient);
            // Query_Demo14(sqlClient);
-           //Query_Demo15(sqlClient);
-           Query_Demo16(sqlClient);
+           Query_Demo15(sqlClient);
+           //Query_Demo16(sqlClient);
              var s = Console.ReadLine();
         }
 
@@ -76,7 +76,7 @@ namespace HiSql.UnitTest
             string sql = sqlClient.HiSql(@"select * from Hi_FieldModel as a 
 Where a.TabName=`a.TabName` And
 a.fieldName='11'
-Order By a.FieldName
+Order By a.fieldNamE
 ").ToSql();
 
         }
@@ -89,11 +89,21 @@ Order By a.FieldName
 
             //var sql=sqlClient.HiSql("select a.tabname from hi_fieldmodel as a inner join Hi_TabModel as  b on a.tabname =b.tabname inner join Hi_TabModel as c on a.tabname=c.tabname where a.tabname='h_test'  and a.FieldType in (11,41,21)  ").ToSql();
 
-            string jsondata = sqlClient.Query("Hi_FieldModel", "A").Field("A.FieldName as Fname")
+            //string jsondata = sqlClient.Query("Hi_FieldModel", "A").Field("A.FieldName as Fname")
+            //    .Join("Hi_TabModel").As("B").On(new Filter { { "A.TabName", OperType.EQ, "Hi_FieldModel" } })
+            //    .Where("a.tabname = 'Hi_FieldModel' and ((a.FieldType = 11)) and a.tabname in ('h_test','hi_fieldmodel')  and a.tabname in (select a.tabname from hi_fieldmodel as a inner join Hi_TabModel as  b on a.tabname =b.tabname " +
+            //    " inner join Hi_TabModel as c on a.tabname=c.tabname where a.tabname='h_test' ) and a.FieldType in (11,41,21)  ")
+            //    .Group(new GroupBy { { "A.FieldNamE" } }).ToSql();
+
+            var cols2 = sqlClient.Query("Hi_FieldModel", "A").Field("A.FieldName as Fname")
                 .Join("Hi_TabModel").As("B").On(new Filter { { "A.TabName", OperType.EQ, "Hi_FieldModel" } })
                 .Where("a.tabname = 'Hi_FieldModel' and ((a.FieldType = 11)) and a.tabname in ('h_test','hi_fieldmodel')  and a.tabname in (select a.tabname from hi_fieldmodel as a inner join Hi_TabModel as  b on a.tabname =b.tabname " +
                 " inner join Hi_TabModel as c on a.tabname=c.tabname where a.tabname='h_test' ) and a.FieldType in (11,41,21)  ")
-                .Group(new GroupBy { { "A.FieldName" } }).ToSql();
+                .Group(new GroupBy { { "A.FieldName" } }).ToColumns();
+
+
+            var sql = sqlClient.HiSql("select max(FieldType) as fieldtype from Hi_FieldModel").ToJson();
+            var cols = sqlClient.HiSql("select max(FieldType) as fieldtype from Hi_FieldModel").ToColumns();
 
         }
 
@@ -184,7 +194,7 @@ Order By a.FieldName
             //   .Having("count(FieldType) > 1 and FieldName ='CreateTime'  ")
             //    .ToSql();
 
-            string sql = sqlClient.HiSql($"select FieldName,count(*) as scount  from Hi_FieldModel group by FieldName,  Having count(*) > 0   order by fieldname")
+            string sql = sqlClient.HiSql($"select FieldName,count(*) as scount  from Hi_FieldModel group by fieldName,  Having count(*) > 0   order by fieldname")
                .ToSql();
 
             int _total = 0;
@@ -345,9 +355,19 @@ Order By a.FieldName
 
         static void Query_Case(HiSqlClient sqlClient)
         {
-            string _sql=sqlClient.Query("Hi_TabModel").Field("TabName as tabname").
-                Case("TabStatus")
-                    .When("TabStatus>=1").Then("'启用'")
+            //string _sql=sqlClient.Query("Hi_TabModel").Field("TabName as tabname").
+            //    Case("TabStatus")
+            //        .When("TabStatus>=1").Then("'启用'")
+            //        .When("0").Then("'未激活'")
+            //        .Else("'未启用'")
+            //    .EndAs("Tabs", typeof(string))
+            //    .Field("IsSys")
+            //    .ToSql()
+            //    ;
+
+            string _sql = sqlClient.Query("Hi_TabModel").As("a").Field("a.TabName as tabname").
+                Case("tabStatus")
+                    .When("a.Tabstatus>=1").Then("'启用'")
                     .When("0").Then("'未激活'")
                     .Else("'未启用'")
                 .EndAs("Tabs", typeof(string))

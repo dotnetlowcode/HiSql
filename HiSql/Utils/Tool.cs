@@ -218,6 +218,38 @@ namespace HiSql
 
         }
 
+        /// <summary>
+        /// 获取数据库实际字段名称
+        /// </summary>
+        /// <param name="hiColumn"></param>
+        /// <param name="fieldDefinition"></param>
+        /// <returns></returns>
+        public static string GetDbFieldName(HiColumn hiColumn, FieldDefinition fieldDefinition)
+        {
+            if (!fieldDefinition.IsAsField && fieldDefinition.AsFieldName.Equals(hiColumn.FieldName, StringComparison.OrdinalIgnoreCase))
+                return hiColumn.FieldName;
+            else
+            {
+                if (hiColumn.FieldName.Equals(fieldDefinition.AsFieldName, StringComparison.OrdinalIgnoreCase))
+                    return hiColumn.FieldName;
+                else
+                    return fieldDefinition.AsFieldName;
+            }
+        }
+        /// <summary>
+        /// 获取数据库实际表名
+        /// </summary>
+        /// <param name="hiColumn"></param>
+        /// <param name="fieldDefinition"></param>
+        /// <returns></returns>
+        public static string GetDbTabName(HiColumn hiColumn, FieldDefinition fieldDefinition)
+        {
+            if (hiColumn.TabName.Equals(fieldDefinition.AsTabName, StringComparison.OrdinalIgnoreCase))
+                return hiColumn.TabName.ToLower();
+            else
+                return fieldDefinition.AsTabName.ToLower();//重命名的表统一改成小写
+        }
+
 
         /// <summary>
         /// 检测Having的条件字段

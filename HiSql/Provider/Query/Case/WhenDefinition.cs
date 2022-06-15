@@ -108,7 +108,7 @@ namespace HiSql
                     }
                     if (!string.IsNullOrEmpty(dic["tab"].Trim()))
                     {
-                        _fieldstr = $"{_fieldstr}.{dic["tab"].Trim()}.";
+                        _fieldstr = $"{_fieldstr}{dic["tab"].Trim()}.";
                     }
 
                     _fieldstr = $"{_fieldstr}{dic["field"].Trim()}";

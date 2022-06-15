@@ -238,6 +238,23 @@ namespace HiSql
             else
                 return sb.ToString();
         }
+
+        /// <summary>
+        /// 返回sql语句结果集的列信息
+        /// </summary>
+        /// <returns></returns>
+        public override List<HiColumn> ToColumns()
+        {
+            string sql = this.ToSql();
+            List<HiColumn> colist = this.ResultColumn;
+            foreach (HiColumn col in colist)
+            {
+                if (col.IsPrimary) col.IsPrimary = !col.IsPrimary;
+                if (col.IsIdentity) col.IsIdentity = !col.IsIdentity;
+                if (col.IsBllKey) col.IsBllKey = !col.IsBllKey;
+            }
+            return colist;
+        }
         public override IQuery WithRank(DbRank rank, DbFunction dbFunction, string field, string asname, SortType sortType)
         {
             if (field.Trim() != "*" && !string.IsNullOrEmpty(field))
@@ -333,6 +350,9 @@ namespace HiSql
             oracleDM = (OracleDM)Instance.CreateInstance<OracleDM>($"{Constants.NameSpace}.{this.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
             //IDMInitalize dMInitalize = new SqlServerDM();
             oracleDM.Context = this.Context;
+
+            TabInfo currTabInfo = null;
+
             //多表子查询的情况下 无当前查询表
             if (!this.IsMultiSubQuery)
             {
@@ -359,14 +379,19 @@ namespace HiSql
                         if (!dictabinfo.ContainsKey(table.TabName))
                             dictabinfo.Add(table.TabName, tabinfo);
 
+                        if (this.Table.TabName.Equals(table.TabName, StringComparison.OrdinalIgnoreCase))
+                            currTabInfo = tabinfo;
+
                     }
                 }
                 else
                     throw new Exception("没有指定查询的表");
 
-                sb_table.Append($"{this.Table.TabName}   {this.Table.AsTabName}");
+                
 
             }
+
+            sb_table.Append($"{dbConfig.Table_Pre}{currTabInfo.TabModel.TabName}{dbConfig.Table_After}  {dbConfig.Table_Pre}{this.Table.AsTabName.ToLower()}{dbConfig.Table_After}");
 
             //检测字段信息
 

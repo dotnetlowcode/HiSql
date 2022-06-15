@@ -237,6 +237,23 @@ namespace HiSql
             else
                 return sb.ToString();
         }
+
+        /// <summary>
+        /// 返回sql语句结果集的列信息
+        /// </summary>
+        /// <returns></returns>
+        public override List<HiColumn> ToColumns()
+        {
+            string sql = this.ToSql();
+            List<HiColumn> colist = this.ResultColumn;
+            foreach (HiColumn col in colist)
+            {
+                if (col.IsPrimary) col.IsPrimary = !col.IsPrimary;
+                if (col.IsIdentity) col.IsIdentity = !col.IsIdentity;
+                if (col.IsBllKey) col.IsBllKey = !col.IsBllKey;
+            }
+            return colist;
+        }
         public override IQuery WithRank(DbRank rank, DbFunction dbFunction, string field, string asname, SortType sortType)
         {
             if (field.Trim() != "*" && !string.IsNullOrEmpty(field))
@@ -328,10 +345,12 @@ namespace HiSql
             int _idx = 0;
             int _idx2 = 0;
             bool _flag = false;
-            DaMengDM oracleDM = null;
-            oracleDM = (DaMengDM)Instance.CreateInstance<DaMengDM>($"{Constants.NameSpace}.{this.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
+            DaMengDM damengDM = null;
+            damengDM = (DaMengDM)Instance.CreateInstance<DaMengDM>($"{Constants.NameSpace}.{this.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
             //IDMInitalize dMInitalize = new SqlServerDM();
-            oracleDM.Context = this.Context;
+            damengDM.Context = this.Context;
+            TabInfo currTabInfo = null;
+
             //多表子查询的情况下 无当前查询表
             if (!this.IsMultiSubQuery)
             {
@@ -352,35 +371,38 @@ namespace HiSql
                         else
                         {
                             //全局缓存
-                            tabinfo = oracleDM.GetTabStruct(table.TabName);
+                            tabinfo = damengDM.GetTabStruct(table.TabName);
                         }
                         //TabInfo tabinfo = dMInitalize.GetTabStruct(table.TabName);
                         if (!dictabinfo.ContainsKey(table.TabName))
                             dictabinfo.Add(table.TabName, tabinfo);
+
+                        if (this.Table.TabName.Equals(table.TabName, StringComparison.OrdinalIgnoreCase))
+                            currTabInfo = tabinfo;
 
                     }
                 }
                 else
                     throw new Exception("没有指定查询的表");
 
-                sb_table.Append($"{this.Table.TabName}   {this.Table.AsTabName}");
+                
 
             }
-
+            sb_table.Append($"{dbConfig.Table_Pre}{currTabInfo.TabModel.TabName}{dbConfig.Table_After}  {dbConfig.Table_Pre}{this.Table.AsTabName.ToLower()}{dbConfig.Table_After}");
             //检测字段信息
 
 
             //检测是否有去重关键字
             if (this.IsDistinct)
             {
-                sb_distinct = new StringBuilder().Append(oracleDM.BuilderDistinct());
+                sb_distinct = new StringBuilder().Append(damengDM.BuilderDistinct());
             }
             else
                 sb_distinct = new StringBuilder();
 
             //检测返回结果字段
 
-            Tuple<string, string, List<HiColumn>> queryresult = oracleDM.BuildQueryFieldSql(dictabinfo, (QueryProvider)this);
+            Tuple<string, string, List<HiColumn>> queryresult = damengDM.BuildQueryFieldSql(dictabinfo, (QueryProvider)this);
             sb_field.Append(queryresult.Item1);
             sb_field_result.Append(queryresult.Item2);
             this.ResultColumn = queryresult.Item3;
@@ -403,30 +425,30 @@ namespace HiSql
             }
 
             //检测JOIN关联条件字段
-            sb_join.Append(oracleDM.BuildJoinSql(this.TableList, dictabinfo, this.Fields, this.Joins));
+            sb_join.Append(damengDM.BuildJoinSql(this.TableList, dictabinfo, this.Fields, this.Joins));
 
 
             // 检测where条件字段
             if (this.Filters != null && this.Filters.IsHiSqlWhere && !string.IsNullOrEmpty(this.Filters.HiSqlWhere.Trim()))
             {
                 //this.Filters.WhereParse.Result
-                sb_where.Append(oracleDM.BuilderWhereSql(this.TableList, dictabinfo, this.Fields, this.Filters.WhereParse.Result, this.IsMultiSubQuery));
+                sb_where.Append(damengDM.BuilderWhereSql(this.TableList, dictabinfo, this.Fields, this.Filters.WhereParse.Result, this.IsMultiSubQuery));
             }
             else
-                sb_where.Append(oracleDM.BuilderWhereSql(this.TableList, dictabinfo, this.Fields, this.Wheres, this.IsMultiSubQuery));
+                sb_where.Append(damengDM.BuilderWhereSql(this.TableList, dictabinfo, this.Fields, this.Wheres, this.IsMultiSubQuery));
 
 
 
             //分组
 
-            sb_group.Append(oracleDM.BuildGroupSql(this.TableList, dictabinfo, this.Fields, this.Groups, this.IsMultiSubQuery));
+            sb_group.Append(damengDM.BuildGroupSql(this.TableList, dictabinfo, this.Fields, this.Groups, this.IsMultiSubQuery));
 
             //having
             if (this.Havings != null)
-                sb_having.Append(oracleDM.BuildHavingSql(this.TableList, dictabinfo, this.Fields, this.Havings.HavingParse.Result, this.IsMultiSubQuery));
+                sb_having.Append(damengDM.BuildHavingSql(this.TableList, dictabinfo, this.Fields, this.Havings.HavingParse.Result, this.IsMultiSubQuery));
 
             //排序字段
-            sb_sort.Append(oracleDM.BuildOrderBySql(ref sb_group, dictabinfo, (QueryProvider)this));
+            sb_sort.Append(damengDM.BuildOrderBySql(ref sb_group, dictabinfo, (QueryProvider)this));
 
 
 
