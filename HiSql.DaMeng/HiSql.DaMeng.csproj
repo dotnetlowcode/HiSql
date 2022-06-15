@@ -6,11 +6,22 @@
     <Company>HiSql</Company>
     <Version>1.0.4.0</Version>
     <Description>该包支持DaMeng数据库 依赖于HiSql.dll包运行</Description>
-    <ApplicationIcon>hisql-damang-logo.ico</ApplicationIcon>
-    <PackageIcon>hisql-damang-logo.jpg</PackageIcon>
+    <ApplicationIcon>hisql-oracle-logo.ico</ApplicationIcon>
+    <PackageIcon>hisql-oracle-logo.jpg</PackageIcon>
 	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageIconUrl />
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="hisql-oracle-logo.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\HiSql.Oracle\Data\hisql-oracle-logo.jpg">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\HiSql\HiSql.csproj" />
