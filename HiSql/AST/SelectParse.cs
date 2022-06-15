@@ -662,21 +662,21 @@ namespace HiSql.AST
                 //获取最外层的 关键词位置顺序 可能子语句中也可能包括关键字
                 List<int> lstnum = new List<int> { 
                     sql.LastIndexOf(" left ", StringComparison.OrdinalIgnoreCase),
-                    sql.LastIndexOf($" left{System.Environment.NewLine}",StringComparison.OrdinalIgnoreCase),
+                    //sql.LastIndexOf($" left{System.Environment.NewLine}",StringComparison.OrdinalIgnoreCase),
                     sql.LastIndexOf(" inner ", StringComparison.OrdinalIgnoreCase), 
-                    sql.LastIndexOf($" inner{System.Environment.NewLine}",StringComparison.OrdinalIgnoreCase), 
+                    //sql.LastIndexOf($" inner{System.Environment.NewLine}",StringComparison.OrdinalIgnoreCase), 
                     sql.LastIndexOf(" join ",StringComparison.OrdinalIgnoreCase), 
-                    sql.LastIndexOf($" join{System.Environment.NewLine}",StringComparison.OrdinalIgnoreCase), 
+                    //sql.LastIndexOf($" join{System.Environment.NewLine}",StringComparison.OrdinalIgnoreCase), 
                     sql.LastIndexOf(" where ", StringComparison.OrdinalIgnoreCase), 
-                    sql.LastIndexOf($" where{System.Environment.NewLine}", StringComparison.OrdinalIgnoreCase), 
+                    //sql.LastIndexOf($" where{System.Environment.NewLine}", StringComparison.OrdinalIgnoreCase), 
                     sql.LastIndexOf(" order ", StringComparison.OrdinalIgnoreCase), 
-                    sql.LastIndexOf($" order{System.Environment.NewLine}",StringComparison.OrdinalIgnoreCase), 
+                    //sql.LastIndexOf($" order{System.Environment.NewLine}",StringComparison.OrdinalIgnoreCase), 
                     sql.LastIndexOf(" group ", StringComparison.OrdinalIgnoreCase), 
-                    sql.LastIndexOf($" group{System.Environment.NewLine}",StringComparison.OrdinalIgnoreCase), 
+                    //sql.LastIndexOf($" group{System.Environment.NewLine}",StringComparison.OrdinalIgnoreCase), 
                     sql.LastIndexOf(" having ", StringComparison.OrdinalIgnoreCase), 
-                    sql.LastIndexOf($" having{System.Environment.NewLine}",StringComparison.OrdinalIgnoreCase), 
-                    sql.LastIndexOf(" union ", StringComparison.OrdinalIgnoreCase),
-                    sql.LastIndexOf($" union{System.Environment.NewLine}", StringComparison.OrdinalIgnoreCase)
+                    //sql.LastIndexOf($" having{System.Environment.NewLine}",StringComparison.OrdinalIgnoreCase), 
+                    sql.LastIndexOf(" union ", StringComparison.OrdinalIgnoreCase)
+                    //sql.LastIndexOf($" union{System.Environment.NewLine}", StringComparison.OrdinalIgnoreCase)
 
                 
                 };

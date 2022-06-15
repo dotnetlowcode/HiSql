@@ -21,7 +21,16 @@ namespace HiSql
         {
             dictabinfo = new Dictionary<string, TabInfo>();
             sb = new StringBuilder();
+            if (this.Data.Count > 1)
+            {
+                sb.AppendLine("begin");
+            }
             checkData();
+
+            if (this.Data.Count > 1)
+            {
+                sb.AppendLine("end;");
+            }
             return sb.ToString(); ;
 
         }
@@ -95,7 +104,15 @@ namespace HiSql
                     //{
                     //    sb.AppendLine(Context.DMTab.BuildUpdateSql(tabinfo, this.Table, result.Item1, result.Item2, sql_where));
                     //}
-                    sb.AppendLine(Context.DMTab.BuildUpdateSql(tabinfo, this.Table, rtn_check.Item1[_idx], rtn_check.Item2[_idx], sql_where));
+                    string _sql = Context.DMTab.BuildUpdateSql(tabinfo, this.Table, rtn_check.Item1[_idx], rtn_check.Item2[_idx], sql_where);
+                    if (!string.IsNullOrEmpty(_sql) && this.Data.Count > 1)
+                    {
+                        sb.AppendLine($"    execute immediate '{_sql.Replace("'", "''")}';");
+                    }
+                    else
+                    {
+                        sb.AppendLine(_sql);
+                    }
                     _idx++;
                 }
             }

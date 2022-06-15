@@ -140,22 +140,22 @@ EXECUTE IMMEDIATE 'INSERT INTO [$Schema$].Hi_FieldModel ("TabName","FieldName","
    
    
    
-   EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_TabModel.TabName  IS ''表名''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_TabModel.TabReName  IS ''表的别名''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_TabModel.TabDescript  IS ''表描述''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_TabModel.TabStoreType  IS ''表存储方式''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_TabModel.TabType  IS ''表类型''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_TabModel.TabCacheType  IS ''表的缓存类型''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_TabModel.TabStatus  IS ''表状态''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_TabModel.IsSys  IS ''是否系统内置表''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_TabModel.IsEdit  IS ''是否可编辑''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_TabModel.IsLog  IS ''是否开启表日志''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_TabModel.LogTable  IS ''日志表名''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_TabModel.LogExprireDay  IS ''日志保留天数''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_TabModel.CreateTime  IS ''创建时间''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_TabModel.CreateName  IS ''创建人''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_TabModel.ModiTime  IS ''修改时间''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_TabModel.ModiName  IS ''修改人''';
+   EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_TabModel.TabName  IS ''表名''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_TabModel.TabReName  IS ''表的别名''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_TabModel.TabDescript  IS ''表描述''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_TabModel.TabStoreType  IS ''表存储方式''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_TabModel.TabType  IS ''表类型''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_TabModel.TabCacheType  IS ''表的缓存类型''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_TabModel.TabStatus  IS ''表状态''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_TabModel.IsSys  IS ''是否系统内置表''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_TabModel.IsEdit  IS ''是否可编辑''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_TabModel.IsLog  IS ''是否开启表日志''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_TabModel.LogTable  IS ''日志表名''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_TabModel.LogExprireDay  IS ''日志保留天数''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_TabModel.CreateTime  IS ''创建时间''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_TabModel.CreateName  IS ''创建人''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_TabModel.ModiTime  IS ''修改时间''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_TabModel.ModiName  IS ''修改人''';
 
 
 
@@ -196,39 +196,39 @@ EXECUTE IMMEDIATE 'INSERT INTO [$Schema$].Hi_FieldModel ("TabName","FieldName","
 
 
 
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_FieldModel.TabName  IS ''表名''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_FieldModel.FieldName  IS ''字段名''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_FieldModel.FieldDesc  IS ''字段名描述''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_FieldModel.IsIdentity  IS ''是否自增ID''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_FieldModel.IsPrimary  IS ''是否主键''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_FieldModel.IsBllKey  IS ''是否是业务KEY''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_FieldModel.FieldType  IS ''字段类型''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_FieldModel.SortNum  IS ''字段排序号''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_FieldModel.Regex  IS ''正则校验表达式''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_FieldModel.DBDefault  IS ''默认值类型''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_FieldModel.DefaultValue  IS ''默认值''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_FieldModel.FieldLen  IS ''字段长度''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_FieldModel.FieldDec  IS ''小数点位数''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_FieldModel.SNO  IS ''编号名称''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_FieldModel.SNO_NUM  IS ''子编号''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_FieldModel.IsSys  IS ''是否系统字段''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_FieldModel.IsNull  IS ''是否允许NULL''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_FieldModel.IsRequire  IS ''是否必填''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_FieldModel.IsIgnore  IS ''是否忽略''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_FieldModel.IsObsolete  IS ''是否作废''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_FieldModel.IsShow  IS ''是否显示''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_FieldModel.IsSearch  IS ''是否允许搜索''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_FieldModel.SrchMode  IS ''搜索模式''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_FieldModel.IsRefTab  IS ''是否引用表''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_FieldModel.RefTab  IS ''引用表名''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_FieldModel.RefField  IS ''引用的字段''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_FieldModel.RefFields  IS ''引用字段清单''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_FieldModel.RefFieldDesc  IS ''引用字段清单描述''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_FieldModel.RefWhere  IS ''引用条件''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_FieldModel.CreateTime  IS ''创建时间''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_FieldModel.CreateName  IS ''创建人''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_FieldModel.ModiTime  IS ''修改时间''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_FieldModel.ModiName  IS ''修改人''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_FieldModel.TabName  IS ''表名''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_FieldModel.FieldName  IS ''字段名''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_FieldModel.FieldDesc  IS ''字段名描述''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_FieldModel.IsIdentity  IS ''是否自增ID''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_FieldModel.IsPrimary  IS ''是否主键''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_FieldModel.IsBllKey  IS ''是否是业务KEY''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_FieldModel.FieldType  IS ''字段类型''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_FieldModel.SortNum  IS ''字段排序号''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_FieldModel.Regex  IS ''正则校验表达式''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_FieldModel.DBDefault  IS ''默认值类型''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_FieldModel.DefaultValue  IS ''默认值''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_FieldModel.FieldLen  IS ''字段长度''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_FieldModel.FieldDec  IS ''小数点位数''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_FieldModel.SNO  IS ''编号名称''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_FieldModel.SNO_NUM  IS ''子编号''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_FieldModel.IsSys  IS ''是否系统字段''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_FieldModel.IsNull  IS ''是否允许NULL''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_FieldModel.IsRequire  IS ''是否必填''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_FieldModel.IsIgnore  IS ''是否忽略''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_FieldModel.IsObsolete  IS ''是否作废''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_FieldModel.IsShow  IS ''是否显示''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_FieldModel.IsSearch  IS ''是否允许搜索''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_FieldModel.SrchMode  IS ''搜索模式''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_FieldModel.IsRefTab  IS ''是否引用表''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_FieldModel.RefTab  IS ''引用表名''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_FieldModel.RefField  IS ''引用的字段''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_FieldModel.RefFields  IS ''引用字段清单''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_FieldModel.RefFieldDesc  IS ''引用字段清单描述''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_FieldModel.RefWhere  IS ''引用条件''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_FieldModel.CreateTime  IS ''创建时间''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_FieldModel.CreateName  IS ''创建人''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_FieldModel.ModiTime  IS ''修改时间''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_FieldModel.ModiName  IS ''修改人''';
 
 
 EXECUTE IMMEDIATE 'INSERT INTO [$Schema$].Hi_TabModel ("TabName","TabReName","TabDescript","TabStoreType","TabType","TabCacheType","TabStatus","IsSys","IsEdit","IsLog","LogTable","LogExprireDay") VALUES(''Hi_Domain'',''Hi_Domain'',''数据域主表'',''0'',''0'',''0'',''0'',0,1,0,'''',''0'')';
@@ -239,12 +239,12 @@ EXECUTE IMMEDIATE 'INSERT INTO [$Schema$].Hi_FieldModel ("TabName","FieldName","
 EXECUTE IMMEDIATE 'INSERT INTO [$Schema$].Hi_FieldModel ("TabName","FieldName","FieldDesc","IsIdentity","IsPrimary","IsBllKey","FieldType","SortNum","Regex","DBDefault","DefaultValue","FieldLen","FieldDec","SNO","SNO_NUM","IsSys","IsNull","IsRequire","IsIgnore","IsObsolete","IsShow","IsSearch","SrchMode","IsRefTab","RefTab","RefField","RefFields","RefFieldDesc","RefWhere")VALUES(''Hi_Domain'',''ModiTime'',''修改时间'',0,0,0,''41'',''995'','''',''20'','''',''0'',''0'','''','''',0,1,0,0,0,1,1,''10'',0,'''','''','''','''','''')';
 EXECUTE IMMEDIATE 'INSERT INTO [$Schema$].Hi_FieldModel ("TabName","FieldName","FieldDesc","IsIdentity","IsPrimary","IsBllKey","FieldType","SortNum","Regex","DBDefault","DefaultValue","FieldLen","FieldDec","SNO","SNO_NUM","IsSys","IsNull","IsRequire","IsIgnore","IsObsolete","IsShow","IsSearch","SrchMode","IsRefTab","RefTab","RefField","RefFields","RefFieldDesc","RefWhere")VALUES(''Hi_Domain'',''ModiName'',''修改人'',0,0,0,''11'',''998'','''',''10'','''',''50'',''0'','''','''',0,1,0,0,0,1,1,''10'',0,'''','''','''','''','''')';
 
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_Domain."Domain"  IS ''数据域名''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_Domain.DomainDesc  IS ''数据域描述''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_Domain.CreateTime  IS ''创建时间''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_Domain.CreateName  IS ''创建人''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_Domain.ModiTime  IS ''修改时间''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_Domain.ModiName  IS ''修改人''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_Domain."Domain"  IS ''数据域名''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_Domain.DomainDesc  IS ''数据域描述''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_Domain.CreateTime  IS ''创建时间''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_Domain.CreateName  IS ''创建人''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_Domain.ModiTime  IS ''修改时间''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_Domain.ModiName  IS ''修改人''';
 
 
 EXECUTE IMMEDIATE 'INSERT INTO [$Schema$].Hi_TabModel ("TabName","TabReName","TabDescript","TabStoreType","TabType","TabCacheType","TabStatus","IsSys","IsEdit","IsLog","LogTable","LogExprireDay") VALUES(''Hi_DataElement'',''Hi_DataElement'',''数据域明细表'',''0'',''0'',''0'',''0'',0,1,0,'''',''0'')';
@@ -258,17 +258,17 @@ EXECUTE IMMEDIATE 'INSERT INTO [$Schema$].Hi_FieldModel ("TabName","FieldName","
 EXECUTE IMMEDIATE 'INSERT INTO [$Schema$].Hi_FieldModel ("TabName","FieldName","FieldDesc","IsIdentity","IsPrimary","IsBllKey","FieldType","SortNum","Regex","DBDefault","DefaultValue","FieldLen","FieldDec","SNO","SNO_NUM","IsSys","IsNull","IsRequire","IsIgnore","IsObsolete","IsShow","IsSearch","SrchMode","IsRefTab","RefTab","RefField","RefFields","RefFieldDesc","RefWhere")VALUES(''Hi_DataElement'',''ModiName'',''修改人'',0,0,0,''11'',''998'','''',''10'','''',''50'',''0'','''','''',0,1,0,0,0,1,1,''10'',0,'''','''','''','''','''')';
 
 
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_DataElement."Domain"  IS ''数据域名''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_DataElement.ElementValue  IS ''数据域值''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_DataElement.ElementDesc  IS ''数据域值描述''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_DataElement.SortNum  IS ''数据域排序号''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_DataElement.CreateTime  IS ''创建时间''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_DataElement.CreateName  IS ''创建人''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_DataElement.ModiTime  IS ''修改时间''';
-EXECUTE IMMEDIATE 'COMMENT ON COLUMN Hi_DataElement.ModiName  IS ''修改人''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_DataElement."Domain"  IS ''数据域名''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_DataElement.ElementValue  IS ''数据域值''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_DataElement.ElementDesc  IS ''数据域值描述''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_DataElement.SortNum  IS ''数据域排序号''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_DataElement.CreateTime  IS ''创建时间''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_DataElement.CreateName  IS ''创建人''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_DataElement.ModiTime  IS ''修改时间''';
+EXECUTE IMMEDIATE 'COMMENT ON COLUMN [$Schema$].Hi_DataElement.ModiName  IS ''修改人''';
 
 
- EXECUTE IMMEDIATE 'UPDATE Hi_TabModel SET TabStatus =1,IsSys =1 WHERE TabReName IN (''Hi_TabModel'',''Hi_FieldModel'',''Hi_Domain'',''Hi_DataElement'')';
+ EXECUTE IMMEDIATE 'UPDATE  [$Schema$].Hi_TabModel SET TabStatus =1,IsSys =1 WHERE TabReName IN (''Hi_TabModel'',''Hi_FieldModel'',''Hi_Domain'',''Hi_DataElement'')';
 END;
 
 

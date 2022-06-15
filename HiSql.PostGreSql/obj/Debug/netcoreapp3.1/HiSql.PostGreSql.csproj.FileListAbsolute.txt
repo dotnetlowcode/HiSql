@@ -12,3 +12,4 @@ D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\netcoreapp3.1\HiSql.PostG
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\netcoreapp3.1\HiSql.PostGreSql.csproj.CopyComplete
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\netcoreapp3.1\HiSql.PostGreSql.dll
 D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\netcoreapp3.1\HiSql.PostGreSql.pdb
+D:\Project\OpenSource\HiSql\HiSql.PostGreSql\obj\Debug\netcoreapp3.1\HiSql.PostGreSql.csproj.AssemblyReference.cache

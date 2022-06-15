@@ -18,6 +18,9 @@ namespace HiSql
             //Snro_Demo(sqlClient);
             //Snro_Demo2(sqlClient);
             //Snro_Demo3(sqlClient);
+
+            Console.WriteLine(HiSql.Snowflake.NextId()); 
+
             string s = Console.ReadLine();
         }
 

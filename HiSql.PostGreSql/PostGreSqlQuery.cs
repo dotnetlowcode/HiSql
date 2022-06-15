@@ -319,6 +319,9 @@ namespace HiSql
             postgresqlDM = (PostGreSqlDM)Instance.CreateInstance<PostGreSqlDM>($"{Constants.NameSpace}.{this.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
             //IDMInitalize dMInitalize = new SqlServerDM();
             postgresqlDM.Context = this.Context;
+
+            TabInfo currTabInfo = null;
+
             //多表子查询的情况下 无当前查询表
             if (!this.IsMultiSubQuery)
             {
@@ -345,14 +348,19 @@ namespace HiSql
                         if (!dictabinfo.ContainsKey(table.TabName))
                             dictabinfo.Add(table.TabName, tabinfo);
 
+                        if (this.Table.TabName.Equals(table.TabName, StringComparison.OrdinalIgnoreCase))
+                            currTabInfo = tabinfo;
+
                     }
                 }
                 else
                     throw new Exception("没有指定查询的表");
 
-                sb_table.Append($"{dbConfig.Table_Pre}{this.Table.TabName}{dbConfig.Table_After} as {dbConfig.Table_Pre}{this.Table.AsTabName}{dbConfig.Table_After}");
-
+                
+                
             }
+
+            sb_table.Append($"{dbConfig.Table_Pre}{currTabInfo.TabModel.TabName}{dbConfig.Table_After} as {dbConfig.Table_Pre}{this.Table.AsTabName.ToLower()}{dbConfig.Table_After}");
 
             //检测字段信息
 

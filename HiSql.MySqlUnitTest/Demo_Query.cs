@@ -40,17 +40,18 @@ namespace HiSql.MySqlUnitTest
             //Query_Demo11(sqlClient);
             //Query_Demo12(sqlClient);
             //Query_Demo13(sqlClient);
-            Query_Demo16(sqlClient);
+            Query_Demo15(sqlClient);
+            //Query_Demo16(sqlClient);
         }
 
         static void Query_Demo16(HiSqlClient sqlClient)
         {
             //以下将会报错 字符串的不允许表达式条件 
-            string sql = sqlClient.Query("Hi_FieldModel", "A").Field("*")
-                .Where(new Filter {
-                    {"A.TabName", OperType.EQ, "`A.FieldName`+1"}
-                                 })
-                .Group(new GroupBy { { "A.FieldName" } }).ToSql();
+            //string sql = sqlClient.Query("Hi_FieldModel", "A").Field("*")
+            //    .Where(new Filter {
+            //        {"A.TabName", OperType.EQ, "`A.FieldName`+1"}
+            //                     })
+            //    .Group(new GroupBy { { "A.FieldName" } }).ToSql();
 
 
             //string sql = sqlClient.Query("Hi_FieldModel", "A").Field("*")
@@ -70,7 +71,7 @@ namespace HiSql.MySqlUnitTest
             //    .Where("A.TabName=`A.TabName`+1")
             //    .Group(new GroupBy { { "A.FieldName" } }).ToSql();
 
-            //string sql = sqlClient.HiSql("select * from Hi_FieldModel as a where a.TabName=`a.TabName` and a.FieldName='11'").ToSql();
+            string sql = sqlClient.HiSql("select * from hi_FieldModel as a where a.TabName=`a.tabName` and a.FieldName='11'").ToSql();
 
         }
 

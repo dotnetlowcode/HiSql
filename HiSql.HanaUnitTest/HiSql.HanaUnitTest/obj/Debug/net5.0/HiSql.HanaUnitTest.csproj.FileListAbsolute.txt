@@ -79,3 +79,4 @@ D:\Project\OpenSource\HiSql\HiSql.HanaUnitTest\HiSql.HanaUnitTest\obj\Debug\net5
 D:\Project\OpenSource\HiSql\HiSql.HanaUnitTest\HiSql.HanaUnitTest\obj\Debug\net5.0\ref\HiSql.HanaUnitTest.dll
 D:\Project\OpenSource\HiSql\HiSql.HanaUnitTest\HiSql.HanaUnitTest\obj\Debug\net5.0\HiSql.HanaUnitTest.pdb
 D:\Project\OpenSource\HiSql\HiSql.HanaUnitTest\HiSql.HanaUnitTest\obj\Debug\net5.0\HiSql.HanaUnitTest.genruntimeconfig.cache
+D:\Project\OpenSource\HiSql\HiSql.HanaUnitTest\HiSql.HanaUnitTest\bin\Debug\net5.0\Sap.Data.Hana.Core.v2.1.pdb

@@ -17,7 +17,7 @@ namespace HiSql.DaMengUnitTest
                          DbServer = "local-HoneBI",
                          //ConnectionString = "server=192.168.1.90,8433;uid=sa;pwd=Hone@123;database=HoneBI",
                          ConnectionString = "Server=127.0.0.1; UserId=SYSDBA; PWD=SYSDBA",//; MultipleActiveResultSets = true;
-                         Schema = "SYSDBA",
+                         Schema = "HISQL",
                          IsEncrypt = true,
                          IsAutoClose = false,
                          SqlExecTimeOut = 60000,

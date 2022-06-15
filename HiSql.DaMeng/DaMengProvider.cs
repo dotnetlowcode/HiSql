@@ -31,7 +31,9 @@ namespace HiSql
                             _connstring = base.Context.CurrentConnectionConfig.AppEvents.OnDbDecryptEvent(_connstring);
                         }
                     }
-                    base._DbConnection = new DmConnection(base.Context.CurrentConnectionConfig.ConnectionString);
+                    var _conn = new DmConnection(base.Context.CurrentConnectionConfig.ConnectionString);
+                    _conn.Schema = base.Context.CurrentConnectionConfig.Schema;
+                    base._DbConnection = _conn;
                 }
 
                 return base._DbConnection;
