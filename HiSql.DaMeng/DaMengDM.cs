@@ -754,10 +754,10 @@ namespace HiSql
 
             if (dic_primary.Count() > 0 || !string.IsNullOrEmpty(_where))
             {
-                _temp_sql = dbConfig.Update_Statement_Where;
+                _temp_sql = dbConfig.Update_Statement_Where.Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema);
             }
             else
-                _temp_sql = dbConfig.Update_Statement;
+                _temp_sql = dbConfig.Update_Statement.Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema);
 
 
             foreach (string n in dic_value.Keys)
@@ -811,10 +811,10 @@ namespace HiSql
 
             if (dic_primary.Count() > 0 || !string.IsNullOrEmpty(_where))
             {
-                _temp_sql = dbConfig.Update_Statement_Where;
+                _temp_sql = dbConfig.Update_Statement_Where.Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema);
             }
             else
-                _temp_sql = dbConfig.Update_Statement;
+                _temp_sql = dbConfig.Update_Statement.Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema);
 
 
             foreach (string n in dic_value.Keys)
@@ -909,7 +909,7 @@ namespace HiSql
             var _changesql = new StringBuilder();
             if (tabFieldAction == TabFieldAction.ADD)
             {
-                _changesql.AppendLine($"    execute immediate '{dbConfig.Add_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$TempColumn$]", _fieldsql).ToString().Replace("'", "''")}';");
+                _changesql.AppendLine($"    execute immediate '{dbConfig.Add_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema).Replace("[$TempColumn$]", _fieldsql).ToString().Replace("'", "''")}';");
 
                 if (!hiColumn.FieldDesc.IsNullOrEmpty())
                 {
@@ -919,13 +919,13 @@ namespace HiSql
 
             else if (tabFieldAction == TabFieldAction.DELETE)
             {
-                _changesql.AppendLine($"    execute immediate '{dbConfig.Del_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$FieldName$]", hiColumn.FieldName).ToString().Replace("'", "''")}';");
+                _changesql.AppendLine($"    execute immediate '{dbConfig.Del_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema).Replace("[$FieldName$]", hiColumn.FieldName).ToString().Replace("'", "''")}';");
 
             }
 
             else if (tabFieldAction == TabFieldAction.MODI)
             {
-                _changesql.AppendLine($"    execute immediate '{dbConfig.Modi_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$TempColumn$]", _fieldsql).ToString().Replace("'", "''")}';");
+                _changesql.AppendLine($"    execute immediate '{dbConfig.Modi_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema).Replace("[$TempColumn$]", _fieldsql).ToString().Replace("'", "''")}';");
 
                 if (!hiColumn.FieldDesc.IsNullOrEmpty())
                 {
@@ -935,7 +935,7 @@ namespace HiSql
 
             else if (tabFieldAction == TabFieldAction.RENAME)
             {
-                _changesql.AppendLine($"    execute immediate '{dbConfig.Re_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$ReFieldName$]", hiColumn.ReFieldName).Replace("[$FieldName$]", hiColumn.FieldName).ToString().Replace("'", "''")}';");
+                _changesql.AppendLine($"    execute immediate '{dbConfig.Re_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema).Replace("[$ReFieldName$]", hiColumn.ReFieldName).Replace("[$FieldName$]", hiColumn.FieldName).ToString().Replace("'", "''")}';");
 
                 hiColumn.FieldName = hiColumn.ReFieldName;
                 _fieldsql = BuildFieldStatement(hiTable, hiColumn);
@@ -944,7 +944,7 @@ namespace HiSql
                 {
                     _fieldsql = rtn.Item3;
                 }
-                _changesql.AppendLine($"    execute immediate '{dbConfig.Modi_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$TempColumn$]", _fieldsql).ToString().Replace("'", "''")}';");
+                _changesql.AppendLine($"    execute immediate '{dbConfig.Modi_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema).Replace("[$TempColumn$]", _fieldsql).ToString().Replace("'", "''")}';");
 
                 if (!hiColumn.FieldDesc.IsNullOrEmpty())
                 {
@@ -1060,7 +1060,7 @@ namespace HiSql
         /// <returns></returns>
         public DataTable GetTableDefinition(string tabname)
         {
-            DataTable dt = Context.DBO.GetDataTable(dbConfig.Get_Table_Schema.Replace("[$TabName$]", tabname));
+            DataTable dt = Context.DBO.GetDataTable(dbConfig.Get_Table_Schema.Replace("[$TabName$]", tabname).Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema));
             if (dt.Rows.Count == 0) throw new Exception($"表[{tabname}]不存在");
             return dt;
         }
@@ -1148,7 +1148,7 @@ namespace HiSql
                 string _sequence_str = buildSequence(_create_tabname, lstHiTable, _table_seqeuence);
                 if (!string.IsNullOrEmpty(keys))
                 {
-                    keys = dbConfig.Table_Key.Replace("[$TabName$]", _create_tabname)
+                    keys = dbConfig.Table_Key.Replace("[$TabName$]", _create_tabname).Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema)
                         .Replace("[$Keys$]", keys).Replace("[$ConnectID$]", this.Context.ConnectedId.Replace("-", ""));
 
                     keys = $"execute immediate '{keys.Replace("'", "''")}';";
@@ -1162,7 +1162,7 @@ namespace HiSql
 
 
                 }
-                _temp_create = _temp_create.Replace("[$Schema$]", string.IsNullOrEmpty(hiTable.Schema) ? " " : hiTable.Schema)
+                _temp_create = _temp_create.Replace("[$Schema$]", string.IsNullOrEmpty(hiTable.Schema) ? Context.CurrentConnectionConfig.Schema : hiTable.Schema)
                     .Replace("[$TabName$]", _create_tabname)
                     .Replace("[$Fields$]", _fields_str)
                     //.Replace("[$Keys$]", hiTable.TableType == TableType.Var ? "" : keys)
@@ -1176,7 +1176,7 @@ namespace HiSql
                     {
                         string _comment = dbConfig.Field_Comment
                                 .Replace("[$FieldDesc$]", hiColumn.FieldDesc.ToSqlInject())
-                                .Replace("[$Schema$]", string.IsNullOrEmpty(hiTable.Schema) ? " " : hiTable.Schema)
+                                .Replace("[$Schema$]", string.IsNullOrEmpty(hiTable.Schema) ? Context.CurrentConnectionConfig.Schema : hiTable.Schema)
                                 .Replace("[$TabName$]", _create_tabname)
                                 .Replace("[$FieldName$]", hiColumn.FieldName);
 
@@ -2795,7 +2795,7 @@ namespace HiSql
         /// <returns></returns>
         public bool CheckTabExists(string tabname = "")
         {
-            DataTable dt = Context.DBO.GetDataTable(dbConfig.Get_CheckTabExists.Replace("[$TabName$]", tabname));
+            DataTable dt = Context.DBO.GetDataTable(dbConfig.Get_CheckTabExists.Replace("[$TabName$]", tabname).Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema));
             return dt.Rows.Count > 0;
         }
         public DataTable GetAllTables(string tabname = "")
@@ -2926,7 +2926,7 @@ namespace HiSql
 
         public List<TabIndexDetail> GetIndexDetails(string tabname, string indexname)
         {
-            string _sql = dbConfig.Get_IndexDetail.Replace("[$TabName$]", tabname).Replace("[$IndexName$]", indexname);
+            string _sql = dbConfig.Get_IndexDetail.Replace("[$TabName$]", tabname).Replace("[$IndexName$]", indexname).Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema);
             List<TabIndexDetail> lstindex = new List<TabIndexDetail>();
             DataTable dt = Context.DBO.GetDataTable(_sql);
             if (dt.Rows.Count > 0)
@@ -2968,7 +2968,7 @@ namespace HiSql
             string keys = BuildKey(hiColumns);
             if (!string.IsNullOrEmpty(keys))
             {
-                keys = dbConfig.Table_Key.Replace("[$TabName$]", tabname)
+                keys = dbConfig.Table_Key.Replace("[$TabName$]", tabname).Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema)
                     .Replace("[$Keys$]", keys).Replace("[$ConnectID$]", this.Context.ConnectedId.Replace("-", "_"));
             }
             return "execute immediate  '" + keys + "';";
@@ -2991,7 +2991,7 @@ namespace HiSql
                         if (!dt.AsEnumerable().Any(t => t.Field<string>("FieldName").ToLower() == hiColumn.FieldName.ToLower()))
                             throw new Exception($"为表[{tabname}]创建的索引指的字段[{hiColumn.FieldName}]不存在于表[{tabname}]中");
 
-                        string _tempkey = dbConfig.Table_Key2.Replace("[$FieldName$]", hiColumn.FieldName);
+                        string _tempkey = dbConfig.Table_Key2.Replace("[$FieldName$]", hiColumn.FieldName).Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema);
                         if (i < hiColumns.Count - 1)
                             keys.AppendLine($"{_tempkey}{dbConfig.Field_Split}");
                         else
@@ -3014,7 +3014,7 @@ namespace HiSql
             if (!isPrimary)
             {
                 //暂未校验索引是否存在 由底层数据库抛出
-                string _sql = dbConfig.Get_DropIndex.Replace("[$IndexName$]", indexname);
+                string _sql = dbConfig.Get_DropIndex.Replace("[$IndexName$]", indexname).Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema);
                 return _sql;
             }
             else
@@ -3028,7 +3028,9 @@ namespace HiSql
 
         public string BuildReTableStatement(string tabname, string newtabname)
         {
-            string _sql = dbConfig.Re_Table.Replace("[$TabName$]", $"{dbConfig.Schema_Pre}{this.Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{tabname}{dbConfig.Table_After}").Replace("[$ReTabName$]", $"{dbConfig.Table_Pre}{newtabname}{dbConfig.Table_After}");
+            string _sql = dbConfig.Re_Table.Replace("[$TabName$]", $"{dbConfig.Schema_Pre}{this.Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{tabname}{dbConfig.Table_After}")
+                .Replace("[$ReTabName$]", $"{dbConfig.Table_Pre}{newtabname}{dbConfig.Table_After}")
+                .Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema);
             return _sql;
         }
 
@@ -3046,7 +3048,7 @@ namespace HiSql
 
         public int GetTableDataCount(string tabname)
         {
-            string _sql = dbConfig.Get_TableDataCount.Replace("[$TabName$]", $"{dbConfig.Schema_Pre}{this.Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{tabname}{dbConfig.Table_After}");
+            string _sql = dbConfig.Get_TableDataCount.Replace("[$TabName$]", $"{dbConfig.Table_Pre}{tabname}{dbConfig.Table_After}").Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema); 
 
             string v = this.Context.DBO.ExecScalar(_sql).ToString();
             int _effect = Convert.ToInt32(v);

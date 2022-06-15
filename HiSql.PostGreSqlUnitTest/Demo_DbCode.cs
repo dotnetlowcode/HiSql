@@ -10,7 +10,7 @@ namespace HiSql.PostGreSqlUnitTest
     {
         public static void Init(HiSqlClient sqlClient)
         {
-            //Demo_AddColumn(sqlClient); //ok
+            Demo_AddColumn(sqlClient); //ok
             //Demo_ReColumn(sqlClient);//ok
             // Demo_ModiColumn(sqlClient); //ok
             // Demo_DelColumn(sqlClient);////ok
@@ -18,7 +18,7 @@ namespace HiSql.PostGreSqlUnitTest
             //   Demo_View(sqlClient);//ok
             //Demo_AllTables(sqlClient);//ok
             //Demo_GlobalTables(sqlClient);//  delay
-            Demo_ModiTable(sqlClient);//ok
+           // Demo_ModiTable(sqlClient);//ok
 
 
             // Demo_CreateView(sqlClient);//ok
@@ -269,7 +269,7 @@ namespace HiSql.PostGreSqlUnitTest
             HiColumn column = new HiColumn()
             {
                 TabName = "HTest02",
-                FieldName = "TestAdd",
+                FieldName = "TestAdd333",
                 FieldType = HiType.VARCHAR,
                 FieldLen = 50,
                 DBDefault = HiTypeDBDefault.EMPTY,

@@ -34,9 +34,9 @@ namespace HiSql.DaMengUnitTest
         {
             sqlClient.CodeFirst.CreateTable(typeof(H_Test));
             //Demo1_Insert(sqlClient);//ok
-           // Demo1_Modi(sqlClient);//ok
-            Demo1_Modi2(sqlClient);//忽略
-            //Demo1_Insert2(sqlClient); //参数化有问题
+            // Demo1_Modi(sqlClient);//ok
+            // Demo1_Modi2(sqlClient);//ok
+            // Demo1_Insert2(sqlClient); //ok
             //Demo1_Insert3(sqlClient);//ok
 
             // Demo4_Insert1(sqlClient); //ok
@@ -119,10 +119,9 @@ namespace HiSql.DaMengUnitTest
         }
         static void Demo1_Insert2(HiSqlClient sqlClient)
         {
-            sqlClient.Context.DBO.ExecCommand("insert into H_TEST (UNAME,UNAME2,NUMS) VALUES(:UNAME,:UNAME2,:NUMS);", new HiParameter[] {
-                new HiParameter("@UNAME","TGM"),
-                new HiParameter("@UNAME2","TGM1"),
-                 new HiParameter("@NUMS",11),
+            sqlClient.Context.DBO.ExecCommand("insert into H_TEST (DID,UNAME,UNAME2) VALUES(@DID,@UNAME,@UNAME2);", new HiParameter[] {
+                new HiParameter("@UNAME","TGM"), new HiParameter("@DID","92269"),
+                new HiParameter("@UNAME2","TGM1")
             });
         }
         static async void Demo1_Insert(HiSqlClient sqlClient)

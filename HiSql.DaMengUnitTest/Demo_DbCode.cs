@@ -12,7 +12,7 @@ namespace HiSql.DaMengUnitTest
         public static void Init(HiSqlClient sqlClient)
         {
             //Create_Table(sqlClient); // ok
-            //Demo_AddColumn(sqlClient); //ok
+            Demo_AddColumn(sqlClient); //ok
             //Demo_ReColumn(sqlClient);//ok
             //Demo_ModiColumn(sqlClient); //ok
             //Demo_DelColumn(sqlClient);//ok

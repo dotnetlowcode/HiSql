@@ -77,6 +77,9 @@
 	    <Pack>True</Pack>
 	    <PackagePath>\</PackagePath>
 	  </None>
+	  <None Update="Data\HiSql.sql">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	  <None Update="hisql-DaMeng-logo.ico">
 	    <Pack>True</Pack>
 	    <PackagePath>\</PackagePath>
