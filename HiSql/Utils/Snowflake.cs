@@ -51,7 +51,7 @@ namespace HiSql
         {
             get {
                 if (_tick < 0L)
-                    _tick=(long) (new DateTime(2021, 1, 1, 0, 0, 0, DateTimeKind.Utc)- new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
+                    _tick=(long) (new DateTime(2021, 1, 1, 0, 0, 0, DateTimeKind.Utc)- new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
                 return _tick; }
             set {
                 idGenerate = getIdGenerate();

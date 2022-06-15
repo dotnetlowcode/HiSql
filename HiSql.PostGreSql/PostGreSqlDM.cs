@@ -1829,19 +1829,22 @@ namespace HiSql
             StringBuilder sb_join = new StringBuilder();
             foreach (JoinDefinition joinDefinition in Joins)
             {
-                if (joinDefinition.Right != null && joinDefinition.JoinOn.Count > 0)
+                if (joinDefinition.JoinType == JoinType.Inner)
+                    sb_join.Append($" inner join");
+                else if (joinDefinition.JoinType == JoinType.Left)
+                    sb_join.Append($" left  join");
+                else if (joinDefinition.JoinType == JoinType.Right)
+                    sb_join.Append($" outer join");
+                sb_join.Append($" {dbConfig.Table_Pre}{dictabinfo[joinDefinition.Right.TabName].TabModel.TabName}{dbConfig.Table_After} as {dbConfig.Table_Pre}{joinDefinition.Right.AsTabName.ToLower()}{dbConfig.Table_After}");
+                sb_join.Append(" on ");
+
+                if (!joinDefinition.IsFilter && joinDefinition.Filter == null)
                 {
-                    if (joinDefinition.JoinType == JoinType.Inner)
-                        sb_join.Append($" inner join");
-                    else if (joinDefinition.JoinType == JoinType.Left)
-                        sb_join.Append($" left inner join");
-                    else if (joinDefinition.JoinType == JoinType.Right)
-                        sb_join.Append($" outer join");
-                    sb_join.Append($" {dbConfig.Table_Pre}{joinDefinition.Right.TabName}{dbConfig.Table_After} as {dbConfig.Field_Pre}{joinDefinition.Right.AsTabName}{dbConfig.Field_After}");
-                    sb_join.Append(" on ");
-                    foreach (JoinOnFilterDefinition joinOnFilterDefinition in joinDefinition.JoinOn)
+
+                    if (joinDefinition.Right != null && joinDefinition.JoinOn.Count > 0)
                     {
-                        if (!joinDefinition.IsFilter)
+
+                        foreach (JoinOnFilterDefinition joinOnFilterDefinition in joinDefinition.JoinOn)
                         {
                             if (joinOnFilterDefinition.Left != null && joinOnFilterDefinition.Right != null)
                             {
@@ -1860,21 +1863,24 @@ namespace HiSql
                                 sb_join.Append($"{dbConfig.Table_Pre}{joinOnFilterDefinition.Left.AsTabName}{dbConfig.Table_After}.{dbConfig.Field_Pre}{joinOnFilterDefinition.Left.AsFieldName}{dbConfig.Field_After}={dbConfig.Table_Pre}{joinOnFilterDefinition.Right.AsTabName}{dbConfig.Table_After}.{dbConfig.Field_Pre}{joinOnFilterDefinition.Right.AsFieldName}{dbConfig.Field_After}");
                             }
                         }
-                        else {
-                            //join on的语句与where语法一样
-                            if (joinDefinition.Filter != null)
-                            {
-                                //通过hisql语写实现的 on条件
-                                if (joinDefinition.Filter.IsHiSqlWhere && !string.IsNullOrEmpty(joinDefinition.Filter.HiSqlWhere))
-                                    sb_join.Append(BuilderWhereSql(TableList, dictabinfo, Fields, joinDefinition.Filter.WhereParse.Result, issubquery));
-                                else  //通过结构化filter对象生成的on条件
-                                    sb_join.Append(BuilderWhereSql(TableList, dictabinfo, Fields, joinDefinition.Filter.Elements, issubquery));
-                            }
-                            else
-                                throw new Exception($"{Constants.HiSqlSyntaxError} [{joinDefinition.Filter.HiSqlWhere}]附近出现语法错误");
-                        }
+                        //sb_join.AppendLine("");
                     }
                 }
+                else
+                {
+                    //join on的语句与where语法一样
+                    if (joinDefinition.Filter != null)
+                    {
+                        //通过hisql语写实现的 on条件
+                        if (joinDefinition.Filter.IsHiSqlWhere && !string.IsNullOrEmpty(joinDefinition.Filter.HiSqlWhere))
+                            sb_join.Append(BuilderWhereSql(TableList, dictabinfo, Fields, joinDefinition.Filter.WhereParse.Result, issubquery));
+                        else  //通过结构化filter对象生成的on条件
+                            sb_join.Append(BuilderWhereSql(TableList, dictabinfo, Fields, joinDefinition.Filter.Elements, issubquery));
+                    }
+                    else
+                        throw new Exception($"{Constants.HiSqlSyntaxError} [{joinDefinition.Filter.HiSqlWhere}]附近出现语法错误");
+                }
+
             }
             return sb_join.ToString();
         }

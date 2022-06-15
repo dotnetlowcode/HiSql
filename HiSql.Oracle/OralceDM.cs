@@ -1618,18 +1618,21 @@ namespace HiSql
             StringBuilder sb_join = new StringBuilder();
             foreach (JoinDefinition joinDefinition in Joins)
             {
-                if (!joinDefinition.IsFilter)
+                if (joinDefinition.JoinType == JoinType.Inner)
+                    sb_join.Append($" inner join");
+                else if (joinDefinition.JoinType == JoinType.Left)
+                    sb_join.Append($" left  join");
+                else if (joinDefinition.JoinType == JoinType.Right)
+                    sb_join.Append($" outer join");
+                sb_join.Append($" {dbConfig.Table_Pre}{dictabinfo[joinDefinition.Right.TabName].TabModel.TabName}{dbConfig.Table_After}  {dbConfig.Table_Pre}{joinDefinition.Right.AsTabName.ToLower()}{dbConfig.Table_After}");
+                sb_join.Append(" on ");
+
+                if (!joinDefinition.IsFilter && joinDefinition.Filter == null)
                 {
+
                     if (joinDefinition.Right != null && joinDefinition.JoinOn.Count > 0)
                     {
-                        if (joinDefinition.JoinType == JoinType.Inner)
-                            sb_join.Append($" inner join");
-                        else if (joinDefinition.JoinType == JoinType.Left)
-                            sb_join.Append($" left inner join");
-                        else if (joinDefinition.JoinType == JoinType.Right)
-                            sb_join.Append($" outer join");
-                        sb_join.Append($" {dbConfig.Table_Pre}{joinDefinition.Right.TabName}{dbConfig.Table_After}   {dbConfig.Table_Pre}{joinDefinition.Right.AsTabName}{dbConfig.Table_After}");//as
-                        sb_join.Append(" on ");
+
                         foreach (JoinOnFilterDefinition joinOnFilterDefinition in joinDefinition.JoinOn)
                         {
                             if (joinOnFilterDefinition.Left != null && joinOnFilterDefinition.Right != null)
@@ -1666,6 +1669,7 @@ namespace HiSql
                     else
                         throw new Exception($"{Constants.HiSqlSyntaxError} [{joinDefinition.Filter.HiSqlWhere}]附近出现语法错误");
                 }
+
             }
             return sb_join.ToString();
         }

@@ -13,7 +13,7 @@ namespace HiSql.OralceUnitTest
         {
             //Query_Demo(sqlClient);
             //Query_Demo1(sqlClient);
-           // Query_Demo2(sqlClient);
+            // Query_Demo2(sqlClient);
             //Query_Demo3(sqlClient);
             //Query_Demo4(sqlClient);
             //Query_Demo8(sqlClient);
@@ -22,7 +22,8 @@ namespace HiSql.OralceUnitTest
             //Query_Demo9(sqlClient);
             // Query_Demo13(sqlClient);
             //Query_Demo14(sqlClient);
-            Query_Demo16(sqlClient);
+            Query_Demo15(sqlClient);
+            //Query_Demo16(sqlClient);
             var s = Console.ReadLine();
         }
 
