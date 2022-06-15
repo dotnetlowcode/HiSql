@@ -90,7 +90,12 @@
       "ProjectGuid": "073266e8-9c20-4774-88b9-3f1028b148ed",
       "DisplayName": "HiSql.DaMeng",
       "ColorIndex": 0
+    },
+    "5a438067-0e7a-4bcc-addf-ff2489b2bade": {
+      "ProjectGuid": "5a438067-0e7a-4bcc-addf-ff2489b2bade",
+      "DisplayName": "HiSql.DaMengUnitTest",
+      "ColorIndex": 1
     }
   },
-  "NextColorIndex": 1
+  "NextColorIndex": 2
 }

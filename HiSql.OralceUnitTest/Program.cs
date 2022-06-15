@@ -13,7 +13,7 @@ namespace HiSql.OralceUnitTest
            Demo_Query.Init(sqlClient);
             //Demo_Insert.Init(sqlClient);
             //DemoCodeFirst.Init(sqlClient);
-            //Demo_Update.Init(sqlClient);
+            Demo_Update.Init(sqlClient);
             //Demo_Delete.Init(sqlClient);
             //Demo_DbCode.Init(sqlClient);
             string s = Console.ReadLine();
