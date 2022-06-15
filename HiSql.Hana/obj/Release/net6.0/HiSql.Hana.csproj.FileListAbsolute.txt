@@ -16,3 +16,4 @@ D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Release\net6.0\HiSql.Hana.dll
 D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Release\net6.0\ref\HiSql.Hana.dll
 D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Release\net6.0\HiSql.Hana.pdb
 D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Release\net6.0\HiSql.Hana.csproj.AssemblyReference.cache
+D:\Project\OpenSource\HiSql\HiSql.Hana\bin\Release\net6.0\Sap.Data.Hana.Core.v2.1.pdb

@@ -195,6 +195,12 @@ namespace HiSql
 
 
         /// <summary>
+        /// 返回sql语句结果集的列信息
+        /// </summary>
+        /// <returns></returns>
+        List<HiColumn> ToColumns();
+
+        /// <summary>
         /// 将结果集返回指定的实体类结果集
         /// </summary>
         /// <typeparam name="T"></typeparam>
