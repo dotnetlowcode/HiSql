@@ -24,6 +24,7 @@ D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Debug\net461\Microsoft.IdentityModel
 D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Debug\net461\Microsoft.IdentityModel.Tokens.dll
 D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Debug\net461\MySql.Data.dll
 D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Debug\net461\Ubiety.Dns.Core.dll
+D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Debug\net461\ZstdNet.dll
 D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Debug\net461\Newtonsoft.Json.dll
 D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Debug\net461\Pipelines.Sockets.Unofficial.dll
 D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Debug\net461\StackExchange.Redis.dll
@@ -162,4 +163,3 @@ D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Debug\net461\HiSql.MySql.csproj.Core
 D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Debug\net461\HiSql.MySql.csproj.CopyComplete
 D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Debug\net461\HiSql.MySql.dll
 D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Debug\net461\HiSql.MySql.pdb
-D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Debug\net461\ZstdNet.dll

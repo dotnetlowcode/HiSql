@@ -11,12 +11,29 @@ namespace HiSql
         /// <summary>
         /// 数据包大小 经过测试200这个值是比较合理
         /// </summary>
-        int _bluksize = 200;
+        int _bluksize = 5000;
         int _bulkunitsize = 250000;
 
-        int _packagerecord = 3000;
+        
+        //强制拆包触发值
+        
+        /// <summary>
+        /// 记录数达到1W
+        /// </summary>
+        int _packagerecord = 10000;
+
+        /// <summary>
+        /// 列数达到40
+        /// </summary>
         int _packagecell = 40;
-        int _packagecells = 100000;
+
+
+        /// <summary>
+        /// 列*记录数 作为分包大小
+        /// </summary>
+        int _packagecells = 20000;
+
+
         string _temp_schema_pre = "`";
         string _temp_schema_after = "`";
 

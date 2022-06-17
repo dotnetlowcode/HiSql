@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Dynamic;
 using System.Linq;
 using System.Reflection;
@@ -83,7 +84,12 @@ namespace HiSql
                     {
                         _Sql = new StringBuilder().AppendLine($"declare v_effect integer;  {Environment.NewLine}begin{Environment.NewLine}").AppendLine(_Sql.ToString()).AppendLine("end;");
                     }
+
+                    //Stopwatch sw = new Stopwatch();
+                    //sw.Start();
                     i = await this.Context.DBO.ExecCommandAsync(_Sql.ToString());
+                    //sw.Stop();
+                    //Console.WriteLine($"sql单次执行耗时："+sw.Elapsed);
                     _Sql = new StringBuilder();
                     return i;
                 }
@@ -93,6 +99,8 @@ namespace HiSql
             else
             {
                 int _idx = 0;
+                //Stopwatch sw = new Stopwatch();
+                //sw.Start();
                 foreach (string n in _lstsql)
                 {
                     _idx++;
@@ -119,6 +127,9 @@ namespace HiSql
                         }
                     }
                 }
+
+                //sw.Stop();
+                //Console.WriteLine($"sql批量执行耗时：" + sw.Elapsed);
                 return i;
             }
 
@@ -229,7 +240,13 @@ namespace HiSql
                 //insert values 的方式 包大小最高不能超过1000
 
                 //List<Dictionary<string, string>> rtnlst=new List<Dictionary<string, string>> ();//=CheckAllData(tabinfo.GetColumns, this.Data);
+
+                //Stopwatch sw= Stopwatch.StartNew();
+                //sw.Start();
+
                 List<Dictionary<string, string>> rtnlst = CheckAllData(tabinfo.GetColumns, this.Data);
+                //sw.Stop();
+                //Console.WriteLine($"检测{this.Data.Count} 条数据耗时{sw.Elapsed}");
                 //foreach (var obj in this.Data)
                 //{
                 //    rtnlst.Add(CheckInsertData(_isdic, attrs, tabinfo.GetColumns, obj));
@@ -242,19 +259,35 @@ namespace HiSql
                 bool _forcepage = false;
                 int _pcount = 0;
                 int _cells = 0;
+
+
+                //如果分批次执行每个批次中的insert values块是多少
+                int _packunit = 0;
+
                 if (rtnlst.Count > 0)
                 {
 
-                    if (rtnlst[0].Count > this.DbConfig.PackageCell && rtnlst.Count> this.DbConfig.PackageRecord)
+                    if (rtnlst[0].Count > this.DbConfig.PackageCell || rtnlst.Count> this.DbConfig.PackageRecord)
                     {
                         _forcepage = true;
                         _cells = rtnlst[0].Count * rtnlst.Count;
+
+                        ///计算分批次数
                         _pcount= _cells <= this.DbConfig.PackageCells ? 1 : _cells % this.DbConfig.PackageCells == 0 ? _cells / this.DbConfig.PackageCells : _cells / this.DbConfig.PackageCells + 1;
 
-
+                        if (page > _pcount)
+                            _packunit = page / _pcount;
+                        else
+                            _packunit = 1;
                     }
                 }
 
+
+
+                int _times = 0;
+                int _currbatchidx = 0;
+                //一个insert块 200条记录 insert values...
+                // 把这块
                 for (int p = 0; p < page; p++)
                 {
                     for (int i = p * DbConfig.BlukSize; i < (p + 1) * DbConfig.BlukSize; i++)
@@ -271,6 +304,7 @@ namespace HiSql
                                 throw new Exception($"向表[{_insertTabName}]插入数据值中无任何配置的字段");
                             string _sql = sqldm.BuildInsertSql(_values, i > p * DbConfig.BlukSize).Replace("[$TabName$]", _insertTabName);//i > p * _bluksize
                             sb_sql.Append(_sql);
+                            _times++;
                         }
                     }
                     if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.MySql, DBType.Oracle, DBType.DaMeng, DBType.Hana))
@@ -310,17 +344,40 @@ namespace HiSql
 
                         sb_pcksql.AppendLine(sb_sql.ToString());
                         sb_sql = new StringBuilder();
+
+
+                        if ((p + 1) % _packunit == 0 )
+                        {
+                            _currbatchidx++;
+                            if (_currbatchidx < _pcount)
+                            {
+                                _lstsql.Add(sb_pcksql.ToString());
+                                sb_pcksql = new StringBuilder();
+                            }
+                        }
                         if (p == page - 1)
                         {
-                            _lstsql.Add(sb_pcksql.ToString());
-                        }
-                        if ((p+1) % _pcount == 0 && p>0)
-                        {
+                            _currbatchidx++;
                             _lstsql.Add(sb_pcksql.ToString());
                             sb_pcksql = new StringBuilder();
                         }
+
+                        //if (p == page - 1)
+                        //{
+                        //    _lstsql.Add(sb_pcksql.ToString());
+                        //}
+                        //if ((p+1) % _pcount == 0 && p>0)
+                        //{
+                        //    _lstsql.Add(sb_pcksql.ToString());
+                        //    sb_pcksql = new StringBuilder();
+                        //}
                     }
 
+                }
+
+                if (_times == this.Data.Count)
+                { 
+                    
                 }
                 string sql = sb_sql.ToString();
                 //sql=DbConfig.Code_Block.Replace("[$SQL$]", sql);
@@ -732,8 +789,6 @@ namespace HiSql
                 {
                     //if(!string.IsNullOrEmpty(hi.Regex))
                     dic_hash_reg.Add(hi.FieldName, new HashSet<string>());
-
-
                 }
                 int _rowidx = 0;
                 if (_isdic)
@@ -806,7 +861,7 @@ namespace HiSql
                                     #endregion
 
                                     #region 是否需要正则校验
-                                    if (arrcol.Any(h => h.FieldName == hiColumn.FieldName))
+                                    if (arrcol.Count>0 && arrcol.Any(h => h.FieldName == hiColumn.FieldName))
                                     {
                                         dic_hash_reg[hiColumn.FieldName].Add(_value);
                                     }
@@ -944,7 +999,7 @@ namespace HiSql
                         foreach (HiColumn hiColumn in hiColumns)
                         {
                             _value = "";
-                            var objprop = attrs.Where(p => p.Name.ToLower() == hiColumn.FieldName.ToLower()).FirstOrDefault();
+                            var objprop = attrs.FirstOrDefault(p => p.Name.Equals( hiColumn.FieldName.ToLower(),StringComparison.OrdinalIgnoreCase));
                             #region  判断必填 及自增长
                             if (hiColumn.IsRequire && !hiColumn.IsIdentity && objprop == null)
                             {
@@ -962,58 +1017,80 @@ namespace HiSql
                             {
                                 continue;
                             }
-                                #endregion
+                            #endregion
 
-                                if (objprop != null && objprop.GetValue(objdata) != null)
+                            if (objprop != null )
                             {
-                                #region 将值转成string 及特殊处理
-                                if (hiColumn.FieldType.IsIn<HiType>(HiType.DATE, HiType.DATETIME))
+                                object objvalue = objprop.GetValue(objdata);
+                                if (objvalue != null)
                                 {
-                                    DateTime dtime = (DateTime)objprop.GetValue(objdata);
-                                    if (dtime != null && dtime != DateTime.MinValue)
+                                    #region 将值转成string 及特殊处理
+                                    if (hiColumn.FieldType.IsIn<HiType>(HiType.DATE, HiType.DATETIME))
                                     {
-                                        _dic.Add(hiColumn.FieldName, dtime.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+                                        DateTime dtime = (DateTime)objvalue;
+                                        if (dtime != null && dtime != DateTime.MinValue)
+                                        {
+                                            _dic.Add(hiColumn.FieldName, dtime.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+                                        }
+                                        else
+                                            _dic.Add(hiColumn.FieldName, DateTime.MinValue.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+                                    }
+                                    else if (hiColumn.FieldType.IsIn<HiType>(HiType.BOOL))
+                                    {
+                                        if ((bool)objvalue == true)
+                                        {
+                                            _dic.Add(hiColumn.FieldName, "1");
+                                        }
+                                        else
+                                            _dic.Add(hiColumn.FieldName, "0");
                                     }
                                     else
-                                        _dic.Add(hiColumn.FieldName, DateTime.MinValue.ToString("yyyy-MM-dd HH:mm:ss.fff"));
-                                }
-                                else if (hiColumn.FieldType.IsIn<HiType>(HiType.BOOL))
-                                {
-                                    if ((bool)objprop.GetValue(objdata) == true)
                                     {
-                                        _dic.Add(hiColumn.FieldName, "1");
+                                        if (hiColumn.FieldType.IsIn<HiType>(HiType.INT))
+                                        {
+                                            _dic.Add(hiColumn.FieldName, ((int)objvalue).ToString());
+                                        }
+                                        else
+                                            _dic.Add(hiColumn.FieldName, objvalue.ToString());
                                     }
-                                    else
-                                        _dic.Add(hiColumn.FieldName, "0");
+                                    _value = _dic[hiColumn.FieldName];
+                                    #endregion
+
+
+                                    #region 是否需要正则校验
+                                    if (arrcol.Count>0 && arrcol.Any(h => h.FieldName == hiColumn.FieldName))
+                                    {
+                                        dic_hash_reg[hiColumn.FieldName].Add(_dic[hiColumn.FieldName]);
+                                    }
+
+                                    #endregion
+
+                                    #region 通用数据有效性校验
+                                    var result = checkFieldValue(hiColumn, _rowidx, _value);
+                                    if (result.Item1)
+                                    {
+                                        _rowdic.Add(hiColumn.FieldName, result.Item2);
+                                    }
+                                    #endregion
                                 }
                                 else
                                 {
-                                    if (hiColumn.FieldType.IsIn<HiType>(HiType.INT))
+                                    #region 未赋值数据处理
+                                    if (!hiColumn.IsNull && hiColumn.DBDefault == HiTypeDBDefault.NONE && !hiColumn.IsIdentity)
                                     {
-                                        _dic.Add(hiColumn.FieldName, ((int)objprop.GetValue(objdata)).ToString());
+                                        throw new Exception($"行[{_rowidx}] 字段[{hiColumn.FieldName}]不允许为空数据库中未设置默认值 且插入数据值中未指定值");
                                     }
-                                    else
-                                        _dic.Add(hiColumn.FieldName, objprop.GetValue(objdata).ToString());
-                                }
-                                _value = _dic[hiColumn.FieldName];
-                                #endregion
-
-
-                                #region 是否需要正则校验
-                                if (arrcol.Any(h => h.FieldName == hiColumn.FieldName))
-                                {
-                                    dic_hash_reg[hiColumn.FieldName].Add(_dic[hiColumn.FieldName]);
+                                    else if (Constants.IsStandardField(hiColumn.FieldName))
+                                    {
+                                        var result = checkFieldValue(hiColumn, _rowidx, "");
+                                        if (result.Item1)
+                                        {
+                                            _rowdic.Add(hiColumn.FieldName, result.Item2);
+                                        }
+                                    }
+                                    #endregion
                                 }
 
-                                #endregion
-
-                                #region 通用数据有效性校验
-                                var result = checkFieldValue(hiColumn, _rowidx, _value);
-                                if (result.Item1)
-                                {
-                                    _rowdic.Add(hiColumn.FieldName, result.Item2);
-                                }
-                                #endregion
                             }
                             else
                             {
@@ -1052,22 +1129,24 @@ namespace HiSql
 
 
                 #region 正则校验匹配 是否合法
-                foreach (HiColumn hiColumn in arrcol_reg)
+                if (arrcol_reg.Count > 0)
                 {
-                    Regex _regex = new Regex(hiColumn.Regex, RegexOptions.IgnoreCase | RegexOptions.Multiline);
-                    if (dic_hash_reg.ContainsKey(hiColumn.FieldName))
+                    foreach (HiColumn hiColumn in arrcol_reg)
                     {
-                        foreach (string n in dic_hash_reg[hiColumn.FieldName])
+                        Regex _regex = new Regex(hiColumn.Regex, RegexOptions.IgnoreCase | RegexOptions.Multiline);
+                        if (dic_hash_reg.ContainsKey(hiColumn.FieldName))
                         {
-                            if (!_regex.Match(n).Success)
+                            foreach (string n in dic_hash_reg[hiColumn.FieldName])
                             {
-                                throw new Exception($@"列[{hiColumn.FieldName}]值[{n}] 不符合业务配置 {hiColumn.Regex} 要求");
+                                if (!_regex.Match(n).Success)
+                                {
+                                    throw new Exception($@"列[{hiColumn.FieldName}]值[{n}] 不符合业务配置 {hiColumn.Regex} 要求");
+                                }
                             }
-                        }
 
+                        }
                     }
                 }
-
 
                 //表关联配置校验
                 if (arrcol_tab.Count > 0)

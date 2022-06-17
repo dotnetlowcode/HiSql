@@ -17,6 +17,15 @@ namespace HiSql
         /// </summary>
         int _bluksize = 200;
         int _bulkunitsize = 250000;
+
+
+        int _packagerecord = 3000;
+        int _packagecell = 40;
+        /// <summary>
+        /// 列*记录数 作为分包大小
+        /// </summary>
+        int _packagecells = 100000;
+
         string _temp_schema_pre = "[";
         string _temp_schema_after = "]";
 
@@ -219,9 +228,6 @@ namespace HiSql
 
 
 
-        int _packagerecord = 3000;
-        int _packagecell = 40;
-        int _packagecells = 100000;
 
 
 
