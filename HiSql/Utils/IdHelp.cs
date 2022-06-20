@@ -27,7 +27,7 @@ namespace HiSql
         private  long workerId;
         private  long twepoch = -1L;//687888001020L; //唯一时间，这是一个避免重复的随机量，自行设定不要大于当前时间戳 
         private  long sequence = 0L;
-        private  int workerIdBits = 22; //机器码字节数。4个字节用来保存机器码(定义为Long类型会出现，最大偏移64位，所以左移64位没有意义)
+        private  int workerIdBits = 5; //机器码字节数。4个字节用来保存机器码(定义为Long类型会出现，最大偏移64位，所以左移64位没有意义)
         public  long maxWorkerId =0L; //最大机器ID
         private  int sequenceBits = 10; //计数器字节数，10个字节用来保存计数码
         private  int workerIdShift = 0; //机器码数据左移位数，就是后面计数器占用的位数
@@ -164,7 +164,7 @@ namespace HiSql
         /// <summary>
         /// 机器码字节数。4个字节用来保存机器码(定义为Long类型会出现，最大偏移64位，所以左移64位没有意义)
         /// </summary>
-        private const int WorkerIdBits = 20;
+        private const int WorkerIdBits = 5;
         /// <summary>
         /// 数据字节数
         /// </summary>
