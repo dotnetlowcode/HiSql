@@ -2,7 +2,6 @@ D:\Project\OpenSource\HiSql\HiSql\bin\Debug\net6.0\HiSql.deps.json
 D:\Project\OpenSource\HiSql\HiSql\bin\Debug\net6.0\HiSql.dll
 D:\Project\OpenSource\HiSql\HiSql\bin\Debug\net6.0\ref\HiSql.dll
 D:\Project\OpenSource\HiSql\HiSql\bin\Debug\net6.0\HiSql.pdb
-D:\Project\OpenSource\HiSql\HiSql\obj\Debug\net6.0\HiSql.csproj.AssemblyReference.cache
 D:\Project\OpenSource\HiSql\HiSql\obj\Debug\net6.0\HiSql.GeneratedMSBuildEditorConfig.editorconfig
 D:\Project\OpenSource\HiSql\HiSql\obj\Debug\net6.0\HiSql.AssemblyInfoInputs.cache
 D:\Project\OpenSource\HiSql\HiSql\obj\Debug\net6.0\HiSql.AssemblyInfo.cs

@@ -27,163 +27,21 @@ namespace HiSql
             set { cache = value; }
         }
 
-
         Dictionary<string, List<string>> _snroNumber = new Dictionary<string, List<string>>();
         Dictionary<string, object> _snroKey = new Dictionary<string, object>();
 
         Dictionary<string, IdGenerate> _snowId = new Dictionary<string, IdGenerate>();
-
-
-
         public SeriNumber(HiSqlClient sqlClient)
         {
             SqlClient = sqlClient.Context.CloneClient();
-
             if (Global.NumberOptions.MultiMode)
             {
                 if (!Global.RedisOn)
                     throw new Exception($"开启了编号多机模式,请启动Redis缓存");
             }
-
             cache=new MCache("SNRO", null);
         }
 
-        /// <summary>
-        /// 初始加载编号缓存数据
-        /// </summary>
-        /// <returns></returns> 
-        //public bool Load(HiSqlClient sqlClient)
-        //{
-
-        //    //var snrolist = sqlClient.Query("Hi_Snro").Field("*").ToList<Hi_Snro>();
-
-        //    SqlClient = sqlClient;
-        //    List<Hi_Snro> lst_snro = new List<Hi_Snro>();
-
-        //    //全局锁定编号
-        //    var rtnsnro = Lock.LockOnExecute("SNRO", () => {
-        //        var snrolist = sqlClient.Query("Hi_Snro").Field("*").ToList<Hi_Snro>();
-        //        // 有编号文件说明系统是正常停止的
-        //    //如果文件中的编号值大于数据库中的编号值那么优先取文件中的值
-        //    foreach (Hi_Snro snro in snrolist)
-        //        {
-        //            string _key = $"{_prestr}:{snro.SNRO}:{snro.SNUM}";
-        //            Hi_Snro _snro = cache.GetOrCreate<Hi_Snro>(_key, () => {
-
-        //                return snro;
-        //            });
-        //            listsnro.Add(_key);
-        //            lst_snro.Add(_snro);
-        //        }
-
-        //    }, new LckInfo { UName = sqlClient.CurrentConnectionConfig.User, Ip = Tool.Net.GetLocalIPAddress() });
-
-        //    if (!rtnsnro.Item1)
-        //        throw new Exception($"初始化编号失败:");
-            
-
-            
-            
-        //    //if (!System.IO.Directory.Exists(snropath))
-        //    //    System.IO.Directory.CreateDirectory(snropath);
-
-            
-
-           
-        //    //List<Hi_Snro> lst_snro = GetDiskSnro();
-
-        //    foreach (string key in listsnro)
-        //    {
-        //        var _key = key.Replace(":", "-");
-        //        if (cache.CacheType == CacheType.MCache)
-        //        {
-        //            #region 使用的是内存缓存 单机
-        //            Hi_Snro snro = cache.GetCache<Hi_Snro>(key);
-                    
-        //            lock (snro)
-        //            {
-
-        //                var _snro = lst_snro.Where(s => s.SNRO == snro.SNRO && s.SNUM == snro.SNUM).FirstOrDefault();
-        //                if (_snro != null)
-        //                {
-        //                    //数据库中的编号大于文件缓存中的编号大小，有可能是手工中数据库中修改了编号值 那么以数据库中的为准
-        //                    //数据库中的编号小于文件缓存中的编号大小，说明是缓存中的编号还没有达到缓存值大小值 应以文件缓存为准
-        //                    if (snro.CurrNum.Compare(_snro.CurrNum) == -1)
-        //                    {
-        //                        snro.CurrNum = _snro.CurrNum;
-        //                        snro.CurrAllNum = _snro.CurrAllNum;
-        //                        snro.CurrCacheSpace = _snro.CurrCacheSpace;
-        //                    }
-        //                    //用完后删除
-        //                    System.IO.File.Delete($"{snropath}\\{_key}.snro");
-        //                }
-        //                else
-        //                {
-        //                    //在文件中没有 可能是程序非正常退出那么需要跳一下缓存大小的号
-        //                    if (snro.CacheSpace > 0)
-        //                    {
-        //                        _snro = snro;
-        //                        Tuple<bool, string, List<string>> rtn = Create(ref snro, snro.CacheSpace);
-        //                        if (rtn.Item1)
-        //                        {
-        //                            snro.CurrNum = _snro.CurrNum;
-        //                            snro.CurrAllNum = _snro.CurrAllNum;
-        //                            if (_snro.CacheSpace == _snro.CurrCacheSpace)
-        //                                snro.CurrCacheSpace = 0;
-        //                            SqlClient.Update("Hi_Snro", snro).Only("CurrNum", "CurrAllNum", "CurrCacheSpace").ExecCommand();
-        //                        }
-        //                    }
-        //                }
-        //            }
-        //            #endregion 
-        //        }
-        //        else if (cache.CacheType == CacheType.RCache)
-        //        {
-        //            Lock.LockOnExecute(key, () => {
-        //                Hi_Snro snro = cache.GetCache<Hi_Snro>(key);
-        //                var _snro = lst_snro.Where(s => s.SNRO == snro.SNRO && s.SNUM == snro.SNUM).FirstOrDefault();
-        //                if (_snro != null)
-        //                {
-        //                    //数据库中的编号大于文件缓存中的编号大小，有可能是手工中数据库中修改了编号值 那么以数据库中的为准
-        //                    //数据库中的编号小于文件缓存中的编号大小，说明是缓存中的编号还没有达到缓存值大小值 应以文件缓存为准
-        //                    if (snro.CurrNum.Compare(_snro.CurrNum) == -1)
-        //                    {
-        //                        snro.CurrNum = _snro.CurrNum;
-        //                        snro.CurrAllNum = _snro.CurrAllNum;
-        //                        snro.CurrCacheSpace = _snro.CurrCacheSpace;
-        //                    }
-        //                    //用完后删除
-        //                    System.IO.File.Delete($"{snropath}\\{_key}.snro");
-        //                }
-        //                else
-        //                {
-        //                    //在文件中没有 可能是程序非正常退出那么需要跳一下缓存大小的号
-        //                    if (snro.CacheSpace > 0)
-        //                    {
-        //                        _snro = snro;
-        //                        Tuple<bool, string, List<string>> rtn = Create(ref snro, snro.CacheSpace);
-        //                        if (rtn.Item1)
-        //                        {
-        //                            snro.CurrNum = _snro.CurrNum;
-        //                            snro.CurrAllNum = _snro.CurrAllNum;
-        //                            if (_snro.CacheSpace == _snro.CurrCacheSpace)
-        //                                snro.CurrCacheSpace = 0;
-        //                            SqlClient.Update("Hi_Snro", snro).Only("CurrNum", "CurrAllNum", "CurrCacheSpace").ExecCommand();
-        //                        }
-        //                    }
-        //                }
-
-        //            },new LckInfo { UName= sqlClient.CurrentConnectionConfig.User,Ip="127.0.0.1"});
-        //        }
-        //        else
-        //            throw new Exception($"未能识别的缓存类型:{cache.CacheType}");
-        //    }
-
-
-
-
-        //    return true;
-        //}
 
         /// <summary>
         /// 产生一个新的编号数据
@@ -198,8 +56,6 @@ namespace HiSql
             else return "";
         }
 
-
-       
 
         /// <summary>
         /// 产生指定数量的编号数据
@@ -222,21 +78,11 @@ namespace HiSql
             if (!_snroKey.ContainsKey(_key))
                 _snroKey.Add(_key, new object());
             
-                //_snro = cache.GetOrCreate<Hi_Snro>(_key, () =>
-                //{
-                //    Hi_Snro _sn = getCurrSnro(snro, snum);
-                //    return _sn;
-                //});
-                //本地没有缓存
-
-                //非雪花ID
                 
             lock (_snroKey[_key])
             {
-
                 if (!_snroNumber.ContainsKey(_key) || _snroNumber[_key].Count < count)
                 {
-                    
                     if (!_snowId.ContainsKey(_key))
                     {
                         HiSqlClient _sqlClient = SqlClient.Context.CloneClient();
@@ -271,7 +117,6 @@ namespace HiSql
                                                 throw new Exception($"编号:{snro}-{snum} 生成了重复的号码:{n} 请检查编号配置");
                                         }
                                     }
-
                                 }
                                 else
                                 {
@@ -307,9 +152,6 @@ namespace HiSql
                                     lstnumber.Add(id.ToString()); ;
                                 }
                             }
-
-
-
                         }, new LckInfo { UName = _sqlClient.CurrentConnectionConfig.User, Ip = Tool.Net.GetLocalIPAddress() });
 
                         if (!rtn.Item1)
@@ -329,10 +171,6 @@ namespace HiSql
                         }
                     }
                 }
-
-
-
-
                 if (lstnumber.Count == 0)
                 {
                     for (int i = 0; i < count; i++)
@@ -343,63 +181,8 @@ namespace HiSql
                 }
 
             }
-               
-
-            
-
-         
-
-           
             return lstnumber;
-          
-            
-
-            
         }
-
-
-        /// <summary>
-        /// 将当前缓存数据落盘到磁盘
-        /// </summary>
-        /// <returns></returns>
-        //public bool SyncDisk()
-        //{
-        //    //编号缓存目录 如果不存在就删除
-        //    if (!System.IO.Directory.Exists(snropath))
-        //        System.IO.Directory.CreateDirectory(snropath);
-
-        //    foreach (string key in listsnro)
-        //    {
-        //        Hi_Snro _snro = cache.GetCache<Hi_Snro>(key);
-        //        if (_snro != null)
-        //        {
-        //            var _key = key;
-        //            _key = _key.Replace(":", "-");
-        //            lock (_snro)
-        //            {
-        //                Serialize<Hi_Snro>.ToFile(_snro, $"{snropath}\\{_key}.snro");
-        //            }
-        //        }
-        //    }
-        //    return true;
-        //}
-
-        /// <summary>
-        /// 获取落盘的编号缓存
-        /// </summary>
-        /// <returns></returns>
-        //public List<Hi_Snro> GetDiskSnro()
-        //{
-        //    List<Hi_Snro> lst_snro = new List<Hi_Snro>();
-        //    foreach (string key in listsnro)
-        //    {
-        //        var _key = key;
-        //        _key = _key.Replace(":", "-");
-        //        if (System.IO.File.Exists($"{snropath}\\{_key}.snro"))
-        //            lst_snro.Add(Serialize<Hi_Snro>.GetFile($"{snropath}\\{_key}.snro"));
-        //    }
-        //    return lst_snro;
-        //}
 
 
         ///创建生成编号 
@@ -458,9 +241,7 @@ namespace HiSql
             bool isexit = false;
             string _o_curstr = "";
             string _prestr = "";
-            //防止其它线程更新给其加上锁
-            //lock (snro)
-            //{
+
 
             for (int j = 0; j < nums; j++) //创建多少个编号
             {
@@ -623,7 +404,6 @@ namespace HiSql
                 _prestr = "";
 
             }
-            //}
             rtntuple = new Tuple<bool, string, List<string>>(true, _o_curstr, dic_list);
             return rtntuple;
         }
