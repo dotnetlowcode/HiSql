@@ -245,7 +245,12 @@ namespace HiSql
         public static string GetDbTabName(HiColumn hiColumn, FieldDefinition fieldDefinition)
         {
             if (hiColumn.TabName.Equals(fieldDefinition.AsTabName, StringComparison.OrdinalIgnoreCase))
-                return hiColumn.TabName.ToLower();
+            {
+                if (!string.IsNullOrEmpty(hiColumn.TabName))
+                    return hiColumn.TabName.ToLower();
+                else
+                    throw new Exception($"字段[{fieldDefinition.FieldName}]在表[{fieldDefinition.AsTabName}]不存在!");
+            }
             else
                 return fieldDefinition.AsTabName.ToLower();//重命名的表统一改成小写
         }

@@ -1267,10 +1267,9 @@ namespace HiSql
 
                             FieldDefinition field = new FieldDefinition(whereResult.Result["fields"].ToString());
                             HiColumn hiColumn = CheckField(TableList, dictabinfo, Fields, field);
-                            sb_sql.Append($"{dbConfig.Table_Pre}{ Tool.GetDbTabName(hiColumn, field)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{ Tool.GetDbFieldName(hiColumn, field)}{dbConfig.Field_After}");
-
                             if (hiColumn != null)
                             {
+                                sb_sql.Append($"{dbConfig.Table_Pre}{ Tool.GetDbTabName(hiColumn, field)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{ Tool.GetDbFieldName(hiColumn, field)}{dbConfig.Field_After}");
                                 string _value = whereResult.Result["value"].ToString();
                                 if (hiColumn != null)
                                 {
