@@ -380,10 +380,31 @@ namespace HiSql
         {
             return _context.HiSql(hisql, dbMasterSlave);
         }
-        public IQuery HiSql(string hisql, Dictionary<string, object> dicparma, DbMasterSlave dbMasterSlave = DbMasterSlave.Default)
+        /// <summary>
+        /// hisql 参数化,防注入
+        /// </summary>
+        /// <param name="hisql"></param>
+        /// <param name="dicparma"></param>
+        /// <param name="dbMasterSlave"></param>
+        /// <returns></returns>
+        //public IQuery HiSql(string hisql, Dictionary<string, object> dicparma, DbMasterSlave dbMasterSlave = DbMasterSlave.Default)
+        //{
+        //    return _context.HiSql(hisql, dicparma, dbMasterSlave);
+        //}
+
+        /// <summary>
+        /// hisql 参数化,防注入
+        /// </summary>
+        /// <param name="hisql">hisql语句</param>
+        /// <param name="objparm">参数化对象如new {}</param>
+        /// <param name="dbMasterSlave"></param>
+        /// <returns></returns>
+
+        public IQuery HiSql(string hisql, object objparm, DbMasterSlave dbMasterSlave = DbMasterSlave.Default)
         {
-            return _context.HiSql(hisql, dicparma, dbMasterSlave);
+            return _context.HiSql(hisql, objparm, dbMasterSlave);
         }
+
         #endregion
 
         #region 数据插入操作

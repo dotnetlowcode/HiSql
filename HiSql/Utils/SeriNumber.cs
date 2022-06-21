@@ -30,6 +30,8 @@ namespace HiSql
         Dictionary<string, List<string>> _snroNumber = new Dictionary<string, List<string>>();
         Dictionary<string, object> _snroKey = new Dictionary<string, object>();
 
+        private static object _snroKeyLock = new object();
+
         Dictionary<string, IdGenerate> _snowId = new Dictionary<string, IdGenerate>();
         public SeriNumber(HiSqlClient sqlClient)
         {
@@ -75,10 +77,19 @@ namespace HiSql
             if (!Global.SnroOn)
                 throw new Exception($"未启用编号服务");
 
+
             if (!_snroKey.ContainsKey(_key))
-                _snroKey.Add(_key, new object());
-            
-                
+            {
+                lock (_snroKeyLock)
+                {
+                    if (!_snroKey.ContainsKey(_key))
+                    {
+                        _snroKey.Add(_key, new object());
+                    }
+                }
+            }
+              
+
             lock (_snroKey[_key])
             {
                 if (!_snroNumber.ContainsKey(_key) || _snroNumber[_key].Count < count)
@@ -86,7 +97,7 @@ namespace HiSql
                     if (!_snowId.ContainsKey(_key))
                     {
                         HiSqlClient _sqlClient = SqlClient.Context.CloneClient();
-                        var rtn = Lock.LockOnExecute(_key, () =>
+                        var rtn = Lock.LockOnExecuteNoWait(_key, () =>
                         {
                             Hi_Snro _snro = null;
                             _sqlClient.BeginTran();
@@ -152,7 +163,7 @@ namespace HiSql
                                     lstnumber.Add(id.ToString()); ;
                                 }
                             }
-                        }, new LckInfo { UName = _sqlClient.CurrentConnectionConfig.User, Ip = Tool.Net.GetLocalIPAddress() });
+                        }, new LckInfo { UName = _sqlClient.CurrentConnectionConfig.User });
 
                         if (!rtn.Item1)
                             throw new Exception($"编号:{snro}-{snum} 错误:{rtn.Item2} ");

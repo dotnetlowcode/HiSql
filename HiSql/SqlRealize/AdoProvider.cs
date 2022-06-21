@@ -44,7 +44,7 @@ namespace HiSql
         /// </summary>
         public virtual HiSqlProvider Context { get; set; }
 
-        private string _keyParameter = "@";
+        private string _keyParameter = HiSql.Constants.KeyParameterPre;
 
         private CommandType _cmdtype = CommandType.Text;
         private bool _isDisabledMasterSlave = false;//是否禁用主从库

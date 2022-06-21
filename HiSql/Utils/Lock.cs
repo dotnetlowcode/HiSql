@@ -82,7 +82,7 @@ namespace HiSql
         /// <returns></returns>
         public static Tuple<bool, string> LockOnExecuteNoWait(string key, Action action, LckInfo lckinfo, int expresseconds = 30)
         {
-            return _lock.LockOnExecute(key, action, lckinfo, expresseconds);
+            return _lock.LockOnExecuteNoWait(key, action, lckinfo, expresseconds);
         }
         /// <summary>
         /// 加业务锁，支持同时锁多个key

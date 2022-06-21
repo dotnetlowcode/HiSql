@@ -16,3 +16,4 @@ D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\net6.0\HiSql.Hana.csproj.CopyCo
 D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\net6.0\HiSql.Hana.dll
 D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\net6.0\ref\HiSql.Hana.dll
 D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\net6.0\HiSql.Hana.pdb
+D:\Project\OpenSource\HiSql\HiSql.Hana\obj\Debug\net6.0\HiSql.Hana.csproj.AssemblyReference.cache

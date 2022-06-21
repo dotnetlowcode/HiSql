@@ -23,6 +23,41 @@ namespace HiSql
             return reval;
         }
 
+
+        /// <summary>
+        /// 是否是匿名类对象
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static bool IsAnonClass(this Type type)
+        {
+            return type.Name.Contains("<>f__AnonymousType");
+        }
+
+        /// <summary>
+        /// 是否是 Dictionary<string, string> 字典
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static bool IsDicStringClass(this Type type)
+        {
+            Type _typ_dic = typeof(Dictionary<string, string>);
+      
+            return type == _typ_dic;
+        }
+
+        /// <summary>
+        /// 是否是 Dictionary<string, object> 字典
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static bool IsDicObjectClass(this Type type)
+        {
+          
+            Type _typ_dic_obj = typeof(Dictionary<string, object>);
+            return type == _typ_dic_obj; ;
+        }
+
         public static bool IsNullOrEmpty(this IEnumerable<object> thisValue)
         {
             if (thisValue == null || thisValue.Count() == 0) return true;

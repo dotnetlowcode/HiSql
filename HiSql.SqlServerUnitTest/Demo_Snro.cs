@@ -17,17 +17,17 @@ namespace HiSql
 
             //Snro_Demo(sqlClient);
             //Snro_Demo2(sqlClient);
-            //Snro_Demo3(sqlClient);
+            Snro_Demo3(sqlClient);
 
             //HiSql.Snowflake.TickTick = (long)(new DateTime(2021, 1, 1, 0, 0, 0, DateTimeKind.Utc) - new DateTime(1970, 3, 2, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
 
             //HiSql.Snowflake.SnowType = SnowType.IdWorker;
 
-            for (int i = 0; i < 1000; i++)
-            {
-                System.Threading.Thread.Sleep(1000);
-                Console.WriteLine(HiSql.Snowflake.NextId());
-            }
+            //for (int i = 0; i < 1000; i++)
+            //{
+            //    System.Threading.Thread.Sleep(1000);
+            //    Console.WriteLine(HiSql.Snowflake.NextId());
+            //}
 
             string s = Console.ReadLine();
         }
@@ -40,10 +40,10 @@ namespace HiSql
 
             List<object> list = new List<object>();
 
-            HiSql.Global.RedisOn = true;//开启redis缓存
-            HiSql.Global.RedisOptions = new RedisOptions { Host = "172.16.80.178", PassWord = "qwe123", Port = 6379, CacheRegion = "HRM", Database = 2 };
+            //HiSql.Global.RedisOn = true;//开启redis缓存
+            //HiSql.Global.RedisOptions = new RedisOptions { Host = "172.16.80.178", PassWord = "qwe123", Port = 6379, CacheRegion = "HRM", Database = 2 };
 
-            HiSql.Global.NumberOptions.MultiMode = true;
+            //HiSql.Global.NumberOptions.MultiMode = true;
 
 
             ///工作流编号配置

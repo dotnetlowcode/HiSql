@@ -846,7 +846,7 @@
           }
         }
       },
-      "HiSql/1.0.4": {
+      "HiSql/1.0.4.1": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v3.1",
         "dependencies": {
@@ -1716,7 +1716,7 @@
           "lib/net461/System.ValueTuple.dll": {}
         }
       },
-      "HiSql/1.0.4": {
+      "HiSql/1.0.4.1": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.6.1",
         "dependencies": {
@@ -2573,7 +2573,7 @@
           }
         }
       },
-      "HiSql/1.0.4": {
+      "HiSql/1.0.4.1": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
@@ -3426,7 +3426,7 @@
           }
         }
       },
-      "HiSql/1.0.4": {
+      "HiSql/1.0.4.1": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v6.0",
         "dependencies": {
@@ -6017,7 +6017,7 @@
         "version.txt"
       ]
     },
-    "HiSql/1.0.4": {
+    "HiSql/1.0.4.1": {
       "type": "project",
       "path": "../HiSql/HiSql.csproj",
       "msbuildProject": "../HiSql/HiSql.csproj"
@@ -6025,19 +6025,19 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v3.1": [
-      "HiSql >= 1.0.4",
+      "HiSql >= 1.0.4.1",
       "MySql.Data >= 8.0.29"
     ],
     ".NETFramework,Version=v4.6.1": [
-      "HiSql >= 1.0.4",
+      "HiSql >= 1.0.4.1",
       "MySql.Data >= 8.0.29"
     ],
     "net5.0": [
-      "HiSql >= 1.0.4",
+      "HiSql >= 1.0.4.1",
       "MySql.Data >= 8.0.29"
     ],
     "net6.0": [
-      "HiSql >= 1.0.4",
+      "HiSql >= 1.0.4.1",
       "MySql.Data >= 8.0.29"
     ]
   },
@@ -6047,7 +6047,7 @@
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
-    "version": "1.0.4",
+    "version": "1.0.4.1",
     "restore": {
       "projectUniqueName": "D:\\Project\\OpenSource\\HiSql\\HiSql.MySql\\HiSql.MySql.csproj",
       "projectName": "HiSql.MySql",
