@@ -72,6 +72,8 @@ namespace HiSql
         /// </summary>
         void BeginTran();
 
+        void BeginTran(IsolationLevel iso);
+
         /// <summary>
         /// 提交事务
         /// </summary>
@@ -93,6 +95,20 @@ namespace HiSql
         //int BulkCopyExecCommand(TabInfo tabInfo, List<object> lstdata);
 
         //int BulkCopyExecCommand(TabInfo tabInfo, DataTable lstdata);
+
+        /// <summary>
+        /// 创建工作单元
+        /// </summary>
+        /// <returns></returns>
+        HiSqlClient CreateUnitOfWork();
+
+
+
+        HiSqlProvider Context { get; }
+
+        ConnectionConfig CurrentConnectionConfig { get; }
+
+        ConnectionConfig SlaveConnectionConfig { get; }
 
     }
 }

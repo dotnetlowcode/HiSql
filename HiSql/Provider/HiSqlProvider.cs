@@ -181,6 +181,20 @@ namespace HiSql
             return new HiSqlClient(_currentConnectionConfig);
         }
 
+        /// <summary>
+        /// 创建工作单元
+        /// 默认开始事务,业务处理完成需要进行Commit 
+        /// </summary>
+        /// <returns></returns>
+        public HiSqlClient CreateUnitOfWork()
+        {
+            var client = CloneClient();
+            //连接不能自动关闭 因为自动关闭时事务会自动提交
+            client.CurrentConnectionConfig.IsAutoClose = false;
+            client.BeginTran();
+            return client;
+        }
+
 
 
 
@@ -746,7 +760,14 @@ namespace HiSql
             this.Close();
         }
 
-        
+        public void BeginTran(IsolationLevel iso)
+        {
+            this.Context.BeginTran(iso);
+        }
+
+       
+
+
 
 
 

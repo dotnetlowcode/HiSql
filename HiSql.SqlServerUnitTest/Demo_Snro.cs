@@ -19,7 +19,15 @@ namespace HiSql
             //Snro_Demo2(sqlClient);
             //Snro_Demo3(sqlClient);
 
-            Console.WriteLine(HiSql.Snowflake.NextId()); 
+            //HiSql.Snowflake.TickTick = (long)(new DateTime(2021, 1, 1, 0, 0, 0, DateTimeKind.Utc) - new DateTime(1970, 3, 2, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
+
+            //HiSql.Snowflake.SnowType = SnowType.IdWorker;
+
+            for (int i = 0; i < 1000; i++)
+            {
+                System.Threading.Thread.Sleep(1000);
+                Console.WriteLine(HiSql.Snowflake.NextId());
+            }
 
             string s = Console.ReadLine();
         }

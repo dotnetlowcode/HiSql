@@ -632,6 +632,19 @@ namespace HiSql
 
             _temp_create_table = new StringBuilder()
                 //样例：CREATE TABLE [dbo].[H_TEST_USER]
+
+
+                //2022.6.17 add by tgm 
+                .AppendLine("do $$")
+                .AppendLine("begin ")
+                .AppendLine("if not exists(select count(*) tabcount from ( ")
+                .AppendLine("SELECT tablename as \"TabName\", 'Table' as \"TabType\",'' as \"CreateTime\" FROM pg_tables where schemaname='[$Schema$]'")
+                .AppendLine("union all")
+                .AppendLine("SELECT viewname as \"TabName\", 'View' as \"TabType\" ,'' as \"CreateTime\" FROM pg_views where schemaname='[$Schema$]'")
+                .AppendLine(")as temp  WHERE lower(\"TabName\") = lower('[$TabName$]')) then ")
+
+
+
                 .AppendLine("[$Sequence$]")
                 .AppendLine($"CREATE TABLE  IF NOT EXISTS {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} (")
                 .AppendLine("[$Fields$]")
@@ -640,12 +653,16 @@ namespace HiSql
 
                 .AppendLine("[$Primary$]")
                 .AppendLine("[$Comment$]")
+
+
+                .AppendLine("end if;")//2022.6.17增加
+
                 .AppendLine($"delete from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{_temp_table_after} where {_temp_field_pre}TabName{_temp_field_after}='[$TabName$]';")
                 .AppendLine($"delete from  {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{_temp_table_after} where {_temp_field_pre}TabName{_temp_field_after}='[$TabName$]';")
 
                 .AppendLine("[$TabStruct$]")
                 
-             
+                .AppendLine("end; $$") //add by tgm date:2022.6.17
                 .ToString();
 
             _temp_create_temp_global_table = new StringBuilder()
@@ -902,7 +919,7 @@ SET "DomainDesc" = excluded."DomainDesc";
                .AppendLine("union all")
                 .AppendLine($@"SELECT viewname as {_temp_field_pre}TabName{_temp_field_after}, 'View' as {_temp_field_pre}TabType{ _temp_field_after}
                         ,'' as {_temp_field_pre}CreateTime{_temp_field_after} FROM pg_views where schemaname='[$Schema$]'")
-              .AppendLine(")as temp  WHERE \"TabName\" = '[$TabName$]'")
+              .AppendLine(")as temp  WHERE lower(\"TabName\") = lower('[$TabName$]')")
               .AppendLine("ORDER BY \"TabName\" ASC, \"CreateTime\" desc ")
               .ToString();
 
