@@ -4,6 +4,7 @@ D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net6.0\ref\HiSql.Oracle.dll
 D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net6.0\HiSql.Oracle.pdb
 D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net6.0\HiSql.dll
 D:\Project\OpenSource\HiSql\HiSql.Oracle\bin\Debug\net6.0\HiSql.pdb
+D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Debug\net6.0\HiSql.Oracle.csproj.AssemblyReference.cache
 D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Debug\net6.0\HiSql.Oracle.Properties.Resources.resources
 D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Debug\net6.0\HiSql.Oracle.csproj.GenerateResource.cache
 D:\Project\OpenSource\HiSql\HiSql.Oracle\obj\Debug\net6.0\HiSql.Oracle.GeneratedMSBuildEditorConfig.editorconfig

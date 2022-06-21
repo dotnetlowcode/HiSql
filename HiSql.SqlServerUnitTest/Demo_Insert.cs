@@ -97,7 +97,19 @@ namespace HiSql
             //Demo1_Insert8(sqlClient);
             //Demo1_Insert9(sqlClient);
 
-            Demo1_Insert11(sqlClient);
+            //Demo1_Insert11(sqlClient);
+            Demo1_Insert12(sqlClient);
+        }
+
+
+        static void Demo1_Insert12(HiSqlClient sqlClient)
+        {
+            ///工作单
+            using (var client = sqlClient.CreateUnitOfWork())
+            {
+                client.Insert("H_UType", new { UTYP = "U4", UTypeName = "高级用户" }).ExecCommand();
+                client.RollBackTran();
+            }
         }
 
         static void Demo1_Insert11(HiSqlClient sqlClient)

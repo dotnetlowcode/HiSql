@@ -189,15 +189,29 @@ namespace HiSql
         #endregion
 
 
-        #region 线程缓存
+        
         HiSqlProvider CloneClient()
         {
             var provider = new HiSqlProvider(this.CurrentConnectionConfig);
-
-
             return provider;
         }
 
+        /// <summary>
+        /// 创建工作单元
+        /// 默认开始事务,业务处理完成需要进行Commit 
+        /// </summary>
+        /// <returns></returns>
+        public HiSqlClient CreateUnitOfWork()
+        {
+            var client=this.Context.CloneClient();
+            //连接不能自动关闭 因为自动关闭时事务会自动提交
+            client.CurrentConnectionConfig.IsAutoClose = false;
+            client.BeginTran();
+            return client;
+
+        }
+
+        #region 线程缓存
         /// <summary>
         /// 缓存到静态变更中。
         /// </summary>
