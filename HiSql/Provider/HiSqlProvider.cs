@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Data;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 
 namespace HiSql
 {

@@ -235,6 +235,23 @@ namespace HiSql
                 Type type = this.Data[0].GetType();
                 bool _isdic = type == typeof(Dictionary<string, string>) || type == typeof(Dictionary<string, object>);
                 List<PropertyInfo> attrs = type.GetProperties().Where(p => p.MemberType == MemberTypes.Property && p.CanRead == true).ToList();
+
+                if (this.Data.Count > DbConfig.PackageRecord/10)
+                {
+                    if (attrs.Count < 10)
+                        DbConfig.BlukSize = DbConfig.BlukSize;
+                    else if (attrs.Count >= 10 && attrs.Count < 20)
+                        DbConfig.BlukSize = DbConfig.BlukSize - (DbConfig.BlukSize / 5);
+                    else if (attrs.Count >= 20 && attrs.Count < 30)
+                        DbConfig.BlukSize = DbConfig.BlukSize - (DbConfig.BlukSize / 5) * 2;
+                    else if (attrs.Count >= 30 && attrs.Count < 40)
+                        DbConfig.BlukSize = DbConfig.BlukSize - (DbConfig.BlukSize / 5) * 3;
+                    else if (attrs.Count >= 50)
+                        DbConfig.BlukSize = DbConfig.BlukSize - (DbConfig.BlukSize / 5) * 4;
+                    else
+                        DbConfig.BlukSize = DbConfig.BlukSize;
+                }
+
                 int page = this.Data.Count <= DbConfig.BlukSize ? 1 : this.Data.Count % DbConfig.BlukSize == 0 ? this.Data.Count / DbConfig.BlukSize : this.Data.Count / DbConfig.BlukSize + 1;
                 //分数据包 包的大小决定了数据插入的性能问题
                 //insert values 的方式 包大小最高不能超过1000
@@ -773,8 +790,20 @@ namespace HiSql
                 Type _typ_dic = typeof(Dictionary<string, string>);
                 Type _typ_dic_obj = typeof(Dictionary<string, object>);
 
+                Dictionary<string, PropertyInfo> dicprop= new Dictionary<string, PropertyInfo>(StringComparer.OrdinalIgnoreCase);
+
+
                 bool _isdic = type == _typ_dic || type == _typ_dic_obj;
                 List<PropertyInfo> attrs = type.GetProperties().Where(p => p.MemberType == MemberTypes.Property && p.CanRead == true).ToList();
+
+                foreach (PropertyInfo pt in attrs)
+                {
+                    if(!dicprop.ContainsKey(pt.Name))
+                        dicprop.Add(pt.Name, pt);
+                    else
+                        dicprop[pt.Name]= pt;
+
+                }
 
                 //将有配正则校验的列去重统计
                 Dictionary<string, HashSet<string>> dic_hash_reg = new Dictionary<string, HashSet<string>>();
@@ -999,7 +1028,7 @@ namespace HiSql
                         foreach (HiColumn hiColumn in hiColumns)
                         {
                             _value = "";
-                            var objprop = attrs.FirstOrDefault(p => p.Name.Equals( hiColumn.FieldName.ToLower(),StringComparison.OrdinalIgnoreCase));
+                            var objprop = dicprop[hiColumn.FieldName];
                             #region  判断必填 及自增长
                             if (hiColumn.IsRequire && !hiColumn.IsIdentity && objprop == null)
                             {
