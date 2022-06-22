@@ -3,7 +3,6 @@ D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Release\netcoreapp3.1\HiSql.MySql.dl
 D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Release\netcoreapp3.1\HiSql.MySql.pdb
 D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Release\netcoreapp3.1\HiSql.dll
 D:\Project\OpenSource\HiSql\HiSql.MySql\bin\Release\netcoreapp3.1\HiSql.pdb
-D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Release\netcoreapp3.1\HiSql.MySql.csproj.AssemblyReference.cache
 D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Release\netcoreapp3.1\HiSql.MySql.Properties.Resources.resources
 D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Release\netcoreapp3.1\HiSql.MySql.csproj.GenerateResource.cache
 D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Release\netcoreapp3.1\HiSql.MySql.GeneratedMSBuildEditorConfig.editorconfig
@@ -13,3 +12,4 @@ D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Release\netcoreapp3.1\HiSql.MySql.cs
 D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Release\netcoreapp3.1\HiSql.MySql.csproj.CopyComplete
 D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Release\netcoreapp3.1\HiSql.MySql.dll
 D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Release\netcoreapp3.1\HiSql.MySql.pdb
+D:\Project\OpenSource\HiSql\HiSql.MySql\obj\Release\netcoreapp3.1\HiSql.MySql.csproj.AssemblyReference.cache
