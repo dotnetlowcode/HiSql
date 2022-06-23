@@ -330,11 +330,16 @@ namespace HiSql
                 ds.Tables.Add(dt_struct);
 
                 TabInfo tabInfo = HiSqlCommProvider.TabToEntity(ds);
-                tabname = tabInfo.TabModel.TabName;
+                tabname = tabInfo!=null? tabInfo.TabModel.TabName:tabname;
                 //获取表结构信息因为可能数据库中的物理表结构可能会有变更,需要与缓存表中的数据进行比对
                 DataTable dts = GetTableDefinition(tabname);
-                if(dts==null || dts.Rows.Count==0)
+                if (dts == null || dts.Rows.Count == 0)
                     throw new Exception($"表[{tabname}]不存在");
+                else
+                {
+                    if (tabInfo == null)
+                        tabname = dts.Rows[0]["TabName"].ToString();
+                }
                 dts.TableName = tabname;
 
                 if (tabInfo == null)
