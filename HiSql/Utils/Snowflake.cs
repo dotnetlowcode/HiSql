@@ -50,12 +50,20 @@ namespace HiSql
         public static long TickTick
         {
             get {
-                if (_tick < 0L)
-                    _tick=(long) (new DateTime(2021, 1, 1, 0, 0, 0, DateTimeKind.Utc)- new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
+                if (_tick <= 0L)
+                {
+                    //_tick = 15000;
+                    _tick = (long)(new DateTime(2021, 1, 1, 0, 0, 0, DateTimeKind.Utc) - new DateTime(1970, 3, 2, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
+                    //_tick = (long)(new DateTime(Convert.ToInt32(DateTime.Now.ToString("yyyy")), 1, 1, 0, 0, 0, DateTimeKind.Utc) - new DateTime(1970, 3, 2, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
+                }
                 return _tick; }
             set {
-                idGenerate = getIdGenerate();
                 _tick = value;
+                if (value > 0L)
+                    idGenerate = getIdGenerate();
+                else
+                    throw new Exception($"TickTick值必须大于0");
+                
             }
         }
 

@@ -508,7 +508,7 @@ namespace HiSql
 
 
             _temp_sequence = new StringBuilder()
-                .AppendLine($"select count(*) into v_secout from user_sequences where SEQUENCE_NAME = upper('[$TabName$]_[$FieldName$]_SEQ'); ")
+                .AppendLine($"select count(*) into v_secout from ALL_sequences where SEQUENCE_OWNER = '[$Schema$]' AND SEQUENCE_NAME = upper('[$TabName$]_[$FieldName$]_SEQ'); ")
                 .AppendLine($"IF v_secout > 0 then")
                 .AppendLine($"   execute immediate 'drop sequence [$TabName$]_[$FieldName$]_SEQ';")
                 .AppendLine($"end if;")
@@ -516,7 +516,7 @@ namespace HiSql
                 .ToString();
 
             _temp_sequence_temp = new StringBuilder()
-                .AppendLine($"select count(*) into v_secout from user_sequences where SEQUENCE_NAME = upper('[$TabName$]_[$FieldName$]_SEQ'); ")
+                .AppendLine($"select count(*) into v_secout from ALL_sequences where SEQUENCE_NAME = upper('[$TabName$]_[$FieldName$]_SEQ'); ")
                 .AppendLine($"IF v_secout > 0 then")
                 .AppendLine($"   execute immediate 'drop sequence [$TabName$]_[$FieldName$]_SEQ';")
                 .AppendLine($"end if;")
@@ -728,8 +728,8 @@ UNION ALL
                 .AppendLine("	0 AS \"IsIdentity\",")
                 .AppendLine("	case ")
                 .AppendLine("	    when (select count(col.column_name)")
-                .AppendLine("		    from user_constraints con,  user_cons_columns col")
-                .AppendLine("			where con.constraint_name = col.constraint_name")
+                .AppendLine("		    from ALL_constraints con,  ALL_cons_columns col")
+                .AppendLine("			where con.constraint_name = col.constraint_name and con.OWNER='[$Schema$]'")
                 .AppendLine("			and con.constraint_type='P'")
                 .AppendLine("		    and col.table_name = T1.TABLE_NAME and T1.COLUMN_NAME= col.column_name ) = 1 then 1")
                 .AppendLine("	    else 0")
@@ -762,10 +762,10 @@ UNION ALL
                 .AppendLine("	END AS \"IsNull\",")
                 .AppendLine("	t1.DATA_DEFAULT AS \"DbDefault\",")
                 .AppendLine("	T2.COMMENTS as \"FieldDesc\"")
-                .AppendLine("	FROM USER_TAB_COLS T1, USER_COL_COMMENTS T2")
+                .AppendLine("	FROM ALL_TAB_COLS T1, ALL_COL_COMMENTS T2")
                 .AppendLine("	WHERE T1.TABLE_NAME = T2.TABLE_NAME")
                 .AppendLine("	    AND T1.COLUMN_NAME = T2.COLUMN_NAME")
-                .AppendLine("	    AND T1.TABLE_NAME =upper('[$TabName$]') ")
+                .AppendLine("	    AND T1.TABLE_NAME =upper('[$TabName$]') AND T1.OWNER ='[$Schema$]' and T2.SCHEMA_NAME ='[$Schema$]' ")
                 .ToString();
 
 
@@ -789,9 +789,9 @@ UNION ALL
             //表更新 带条件 
             _temp_update_where = $"update {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} set [$Fields$] where [$Where$]";
 
-            _temp_delete = $"delete {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} ";
+            _temp_delete = $"delete {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after}; ";
 
-            _temp_delete_where = $"delete {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} where [$Where$] ";
+            _temp_delete_where = $"delete {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} where [$Where$]; ";
 
             //删除不会留下任何痕迹
             _temp_truncate = $"execute immediate 'TRUNCATE TABLE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after}';";

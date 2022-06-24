@@ -61,6 +61,14 @@ namespace HiSql
         public readonly static string PlatformName = "LowCoder";
 
 
+
+        /// <summary>
+        /// 参数化前辍
+        /// 用于跨生原生sql及hisql的参数化
+        /// </summary>
+        public readonly static string KeyParameterPre = "@";
+
+
         /// <summary>
         /// 锁定表创建修改的key 
         /// </summary>
@@ -361,9 +369,19 @@ namespace HiSql
 
 
         /// <summary>
-        /// 表过式字段更新
+        /// 模板表达式字段 `a.user` 用`` 括起来的里面是字段
+        /// 2022.6.11 ``a.user`` 如果出现这种是转义的 不必于模板字段
         /// </summary>
-        public readonly static string REG_UPDATE = @"[`](?:[\s]*)(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w-_]+)(?:[\.]{1}))?(?<field>[\w-_]+)[`]";
+        //public readonly static string REG_TEMPLATE_FIELDS = @"[`](?:[\s]*)(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w-_]+)(?:[\.]{1}))?(?<field>[\w-_]+)[`]";
+        public readonly static string REG_TEMPLATE_FIELDS = @"(?<!`)[`](?:[\s]*)(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w-_]+)(?:[\.]{1}))?(?<field>[\w-_]+)[`](?![`])";
+
+
+        /// <summary>
+        /// 值 是否是模板字段如 `a.user` 
+        /// </summary>
+        public readonly static string REG_TEMPLATE_FIELD = @"^\s*(?<!`)[`](?:[\s]*)(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w-_]+)(?:[\.]{1}))?(?<field>[\w-_]+)[`](?![`])\s*$";
+
+
 
         /// <summary>
         /// 解析表字段关联关系
@@ -423,5 +441,10 @@ namespace HiSql
         /// 参数模版是否在in()中
         /// </summary>
         public readonly static string REG_HISQL_IN_PARAM = @"\bin\s*[\(]\s*\[\$(?<param>\w+)\$\]\s*[\)]";
+
+        /// <summary>
+        /// in(@name)
+        /// </summary>
+        public readonly static string REG_HISQL_IN_PARAM2 = @"\bin\s*[\(]\s*(?<param>@\w+)\s*[\)]";
     }
 }

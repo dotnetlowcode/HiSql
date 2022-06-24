@@ -1231,7 +1231,10 @@ namespace HiSql
                             {
                                 UnLock(lckinfo, key);
                                 tokenSource.Cancel();
-                                thread.Interrupt();
+                                if (thread != null)
+                                {
+                                    thread.Interrupt();
+                                }
                             }
                             flag = false;
                             msg = $"key:[{key}]锁定操作业务失败!超过最大[{_times}]次续锁没有完成,操作被撤销";

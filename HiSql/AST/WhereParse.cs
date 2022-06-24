@@ -13,6 +13,8 @@ namespace HiSql.AST
     /// 
     /// 这里涉及比较复杂的正则表达式 不要随便修改
     /// add by tgm  date:2021.12.1 email:tansar@126.com
+    /// 
+    /// author tgm 2022.6.11 新增 条件模版语法支持 
     /// </summary>
     public class WhereParse
     {
@@ -20,6 +22,12 @@ namespace HiSql.AST
 
         public static class  Constants
         {
+
+            public static readonly string REG_FIELDTEMPLATE = new StringBuilder()
+                .Append(@"^(?:[\s]*)[`]?(?<fields>(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w]+)(?:[\.]{1}))?(?<field>[\w]+))\s*[`]?[\s]*")
+                .Append(@"(?<op>=|\>(?![\=\>\<\!])|like|\<(?![\=\>\<\!])|\!\=|\<\>|[\>\<]{1}[=]{1})[\s]*")
+                .Append(@"(?:(?<value>[\s\S\w]+))")
+                .ToString();
 
 
             public static  List<WhereGrp> REG_WHERE = new List<WhereGrp> {
@@ -81,6 +89,7 @@ namespace HiSql.AST
                     .Append(")").ToString()
                    
                 }
+                
 
             };
         }
@@ -144,7 +153,7 @@ namespace HiSql.AST
                     foreach (WhereGrp _expr in Constants.REG_WHERE)
                     {
                         _idx++;
-                        var result = Tool. RegexGrpOrReplace(_expr.Reg, wherestr);
+                        var result = Tool.RegexGrpOrReplace(_expr.Reg, wherestr);
                         if (result.Item1)
                         {
                             //已经全面支持 in,not in ,between and  （20220309增加 ）语法
@@ -177,7 +186,45 @@ namespace HiSql.AST
                         _checkok = false;
                         //Console.WriteLine($"语句{wherestr} 附近出现语法错误!");
                         if(_isallmatch)
-                            throw new Exception($"{HiSql.Constants.HiSqlSyntaxError}语句 {wherestr} 附近出现语法错误!");
+                        {
+
+                            //检测是否是模版表达式  截取模版表达式的范围
+                            int _oridx = wherestr.IndexOf(" and ",StringComparison.OrdinalIgnoreCase);
+                            int _andidx = wherestr.IndexOf(" or ", StringComparison.OrdinalIgnoreCase);
+
+                            int _posidx = _oridx > _andidx ? _oridx : _andidx;
+
+                            string _tempfield = wherestr;
+
+                            if (_posidx>0)
+                            { 
+                                _tempfield=wherestr.Substring(0, _posidx);
+                                
+                            }
+                            else
+                                _tempfield=wherestr;
+
+                            if (Tool.RegexMatch(HiSql.Constants.REG_TEMPLATE_FIELDS, _tempfield))
+                            {
+                                //说明是模板字段
+                                _checkok = true;
+                                 WhereResult whereResult = new WhereResult();
+                                whereResult.SType = StatementType.FieldTemplate;
+                                whereResult.Statement = _tempfield;
+                                
+                                whereResult.Result = Tool.RegexGrp(Constants.REG_FIELDTEMPLATE, _tempfield);
+
+                                listresult.Add(whereResult);
+                                if (_posidx > 0)
+                                    wherestr = wherestr.Substring(_posidx);
+                                else
+                                    wherestr = "";
+
+                            }
+                            else
+                                throw new Exception($"{HiSql.Constants.HiSqlSyntaxError}语句 {wherestr} 附近出现语法错误!");
+                        }
+                            
                         
                         
                     }

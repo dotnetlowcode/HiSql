@@ -44,7 +44,7 @@ namespace HiSql
         /// </summary>
         public virtual HiSqlProvider Context { get; set; }
 
-        private string _keyParameter = "@";
+        private string _keyParameter = HiSql.Constants.KeyParameterPre;
 
         private CommandType _cmdtype = CommandType.Text;
         private bool _isDisabledMasterSlave = false;//是否禁用主从库
@@ -773,6 +773,8 @@ namespace HiSql
             lock (this.Context)
             {
                 deleGetTable _deleGetTable = new deleGetTable(getDataTable);
+
+             
                 var workTask = Task.Run(() => _deleGetTable.Invoke(sql, parameters));
                 bool flag = workTask.Wait(this.Context.CurrentConnectionConfig.SqlExecTimeOut, new CancellationToken(false));
                 if (flag)
@@ -932,48 +934,86 @@ namespace HiSql
         #region 解析参数
         void ResolveParameter(ref string sql, HiParameter[] parameters)
         {
-            if (parameters.HasValue())
+            if (parameters!=null && parameters.HasValue())
             {
-                foreach (var item in parameters)
+                foreach (HiParameter item in parameters)
                 {
 
-                    Type type = item.Value.GetType();
-                    if ((type != Constants.ByteArrayType && type.IsArray == false && item.IsArray == false) || type.FullName.IsList())
+                    Type type = item.Values.GetType();
+                    string value = "";
+                    if (Tool.RegexMatch($@"{this._keyParameter}\w+", item.ParameterName))
                     {
-                        var newValues = new List<string>();
-                        foreach (var inData in item.Value as IEnumerable)
+                        if (Tool.RegexMatch($@"{item.ParameterName}\b", sql))
                         {
-                            newValues.Add(inData.ObjToString());
-                        }
+                            if ( type.FullName.IsList())
+                            {
+                                var newValues = new List<string>();
+                                foreach (var inData in item.Values as IEnumerable)
+                                {
+                                    newValues.Add(inData.ObjToString());
+                                }
 
-                        //newValues = item.Value.ObjToString().Split(',').ToList<string>();
+                                //newValues = item.Value.ObjToString().Split(',').ToList<string>();
 
-                        if (newValues.IsNullOrEmpty())
-                        {
-                            newValues.Add("-1");
-                        }
+                                if (newValues.IsNullOrEmpty())
+                                {
+                                    //newValues.Add("-1");
+                                    throw new Exception($"参数[{item.ParameterName}]的值为空");
+                                }
 
-                        //参数前辍仅支持@
-                        //其实也可以用正则表达式匹配
-                        if (item.ParameterName.Substring(0, 1) == this._keyParameter && !type.FullName.IsList())
-                        {
-                            sql = sql.Replace(this._keyParameter + item.ParameterName.Substring(1), string.Join("", newValues.ToArray()).ToSqlValue());
-                            ;
-                        }
-                        else if (item.ParameterName.Substring(0, 1) == this._keyParameter && type.FullName.IsList())
-                        {
-                            sql = sql.Replace(this._keyParameter + item.ParameterName.Substring(1), newValues.ToArray().ToSqlIn());
+                                //参数前辍仅支持@
+                                //其实也可以用正则表达式匹配
+                                if (item.ParameterName.Substring(0, 1) == this._keyParameter && !type.FullName.IsList())
+                                {
+                                    sql = sql.Replace(this._keyParameter + item.ParameterName.Substring(1), string.Join("", newValues.ToArray()).ToSqlValue());
+                                    ;
+                                }
+                                else if (item.ParameterName.Substring(0, 1) == this._keyParameter && type.FullName.IsList())
+                                {
+                                    sql = sql.Replace(this._keyParameter + item.ParameterName.Substring(1), newValues.ToArray().ToSqlIn());
+                                }
+                                else
+                                {
+                                    sql = sql.Replace(item.ParameterName, newValues.ToArray().ToSqlIn());
+                                }
+                                item.Values = DBNull.Value;
+                            }else if (type.IsIn(HiSql.Constants.IntType, HiSql.Constants.DecType, HiSql.Constants.ShortType,
+                                HiSql.Constants.LongType, HiSql.Constants.FloatType))
+                            {
+                                value = item.Values.ToString();
+
+                            }
+                            else if (type.IsIn(HiSql.Constants.DateTimeOffsetType, HiSql.Constants.DateType))
+                            {
+                                value = $"'{Convert.ToDateTime(item.Values.ToString()).ToString("yyyy-MM-dd HH:mm:ss.fff")}'";
+
+                            }
+                            else if (type.IsIn(HiSql.Constants.BoolType))
+                            {
+                                if ((bool)item.Values)
+                                {
+                                    value = "1";
+                                }
+                                else
+                                    value = "0";
+                            }
+                            else
+                            {
+                                value = $"'{item.Values.ToString().ToSqlInject()}'";
+                            }
+
+                            Regex regex = new Regex($@"{item.ParameterName}\b",RegexOptions.IgnoreCase);
+                            sql = regex.Replace(sql, value);
                         }
                         else
-                        {
-                            sql = sql.Replace(item.ParameterName, newValues.ToArray().ToSqlIn());
-                        }
-                        item.Value = DBNull.Value;
+                            throw new Exception($"语句[{sql}]未匹配参数[{item.ParameterName}]");
+
                     }
-
-
-
+                    else
+                        throw new Exception($"参数化名称[{item.ParameterName}]错误!格式为【@+名称】如@TabName");
                 }
+                if (Context.CurrentConnectionConfig.UpperCase)
+                    sql = sql.ToUpper();
             }
         }
 

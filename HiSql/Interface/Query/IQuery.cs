@@ -70,6 +70,8 @@ namespace HiSql
 
         IQuery On(string condition);
 
+        IQuery On(Filter onfilter);
+
         IQuery Sort(SortBy sort);
 
         //IQuery Sort(string sort);
@@ -191,6 +193,12 @@ namespace HiSql
         /// <returns></returns>
         string ToSql();
 
+
+        /// <summary>
+        /// 返回sql语句结果集的列信息
+        /// </summary>
+        /// <returns></returns>
+        List<HiColumn> ToColumns();
 
         /// <summary>
         /// 将结果集返回指定的实体类结果集

@@ -21,7 +21,9 @@ namespace HiSql.DaMengUnitTest
         static void CodeFirst_Demo(HiSqlClient sqlClient)
         {
 
-            sqlClient.CodeFirst.InstallHisql();
+           var task =  sqlClient.CodeFirst.InstallHisql();
+           // return;
+           // task.Wait();
 
             //Tuple<HiTable, List<HiColumn>> tabomdel = sqlClient.Context.DMInitalize.BuildTabStru(typeof(Hi_TabModel));
             //Tuple<HiTable, List<HiColumn>> fieldomdel = sqlClient.Context.DMInitalize.BuildTabStru(typeof(Hi_FieldModel));

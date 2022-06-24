@@ -6,19 +6,60 @@ using System.Threading.Tasks;
 
 namespace HiSql
 {
+
+    /// <summary>
+    /// Join的语句类型
+    /// </summary>
     public enum JoinStatementType
     {
+        ///// <summary>
+        ///// 识别运算符
+        ///// </summary>
+        //Symbol=1,
+        ///// <summary>
+        ///// join关联条件 on
+        ///// </summary>
+        //Field=2,
+        ///// <summary>
+        ///// 关联条件分组()
+        ///// </summary>
+        //SubCondition=3,
+
+
+
         /// <summary>
-        /// 识别运算符
+        /// 字段值如 username='hisql'
         /// </summary>
-        Symbol=1,
+        FieldValue = 0,
+
         /// <summary>
-        /// join关联条件 on
+        /// 如  (usertype='a' or usertype='b')
         /// </summary>
-        FieldValue=2,
+        SubCondition = 1,
         /// <summary>
-        /// 关联条件分组()
+        /// 如 username in ('hisql','hi')
         /// </summary>
-        SubCondition=3,
+        In = 2,
+
+        /// <summary>
+        /// 如 a.username=b.user
+        /// </summary>
+        Field = 3,
+
+        /// <summary>
+        /// 如 usertype in (select utype from usertype)
+        /// </summary>
+        //InSelect=4,
+
+        /// <summary>
+        /// 如 userage between 20 and 30 
+        /// </summary>
+        FieldBetweenValue = 5,
+
+
+        /// <summary>
+        /// 识别运算符 and | or
+        /// </summary>
+        Symbol = 6,
     }
 }

@@ -30,25 +30,29 @@ namespace HiSql.DaMengUnitTest
 
         public static void Init(HiSqlClient sqlClient)
         {
-            //Update_Demo(sqlClient);
-            Update_Demo4(sqlClient);
+            Update_Demo(sqlClient);//ok 
+            //Update_Demo4(sqlClient);//ok 
         }
 
         static void Update_Demo4(HiSqlClient sqlClient)
         {
-            sqlClient.Update("H_Test").Set(new { UNAME = "UTYPE" }).Where("DID=1").ExecCommand();
+            var sql = sqlClient.Update("Hi_Domain").Set(new { DomainDesc = "用户类型1sadfs" }).Where("Domain='UTYPE'").ToSql();
+            sqlClient.Update("Hi_Domain").Set(new { DomainDesc = "用户类型1sadfs" }).Where("Domain='UTYPE'").ExecCommand();
         }
         static async void Update_Demo(HiSqlClient sqlClient)
         {
-            IUpdate update = sqlClient.Update("H_Test", new { DID = 1, UNAME = "UTYPE", UNAME2 = "user123" }).Exclude("UNAME");//,
+            IUpdate update = sqlClient.Update("Hi_Domain", new { Domain = "UTYPE", DomainDesc = "用户类型1sadUTYPE" }).Exclude("Domain");//,
 
-            int _effect = sqlClient.Update("H_Test", new { DID = 1, UNAME = "UTYPE", UNAME2 = "user123" }).Exclude("UNAME").ExecCommand();
+            int _effect = sqlClient.Update("Hi_Domain", new { Domain = "UTYPE", DomainDesc = "用户类3dUTYPE" }).Exclude("Domain").ExecCommand();
             string _sql = update.ToSql();
             Console.WriteLine(_sql);
 
 
-            IUpdate update1 = sqlClient.Update("H_Test").Set(new { UNAME2 = "TEST" }).Where(new Filter { { "DID", OperType.GT, 8 } });
-            int _effect1 = sqlClient.Update("H_Test").Set(new { UNAME2 = "TEST" }).Where(new Filter { { "DID", OperType.GT, 8 } }).ExecCommand();
+            IUpdate update1 = sqlClient.Update("H_Test", new { UNAME2 = "TEST2", DID = 8 }).Where(new Filter { { "DID", OperType.GT, 8 } });
+            int _effect1 = sqlClient.Update("H_Test").Set(new { UNAME2 = "TEST3", DID=8 }).Where(new Filter { { "DID", OperType.EQ, 8 } }).ExecCommand();
+
+            //行[1] 缺少字段[DID] 为必填字段”
+
             string _sql1 = update1.ToSql();
             Console.WriteLine(_sql1);
 

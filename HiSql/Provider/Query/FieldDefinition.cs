@@ -150,6 +150,26 @@ namespace HiSql
         }
 
         /// <summary>
+        /// 判断是否是重命名字段
+        /// 如果是当前字段是case，虚拟字段,函数统一返回true
+        /// </summary>
+        public bool IsAsField
+        {
+            get {
+                if ((!IsCaseField || _casedefinition==null) && !IsVirtualFeild   && !IsFun)
+                {
+                    if (AsFieldName.Equals(FieldName, StringComparison.OrdinalIgnoreCase))
+                        return false;
+                    else
+                        return true;
+                }
+                else
+                    return true;
+            }
+        }
+
+
+        /// <summary>
         ///HISQL语法 字段（未解析的）
         /// </summary>
         public string SqlName

@@ -19,6 +19,7 @@
    3. HiSql.mysql.dll
    4. HiSql.oracle.dll
    5. HiSql.postgresql.dll
+   6. HiSql.dameng.dll `新支持1.0.4及以上支持`
 
 
 
@@ -34,6 +35,98 @@
 
 传统ORM框架最大的弊端就是完全要依赖于实体用lambda表达式写查询语句，但最大的问题就是如果业务场景需要动态拼接条件时只能又切换到原生数据库的sql语句进行完成，如果自行拼接开发人员还要解决防注入的问题,hisql 刚才完美的解决这些问题,Hisql底层已经对sql注入进行了处理，开发人员只要关注于业务开发
 
+
+### 2022.6.21 新增hisql参数化查询
+
+
+注意：不管底层用的哪一种库hisql的参数化写法是一致的
+
+```c#
+    string sql1= sqlClient.HiSql("select * from hi_tabmodel where tabname=@tabname ", new { TabName="H_test" ,FieldName="DID"}).ToSql();
+    string sql2= sqlClient.HiSql("select * from hi_tabmodel where tabname=@tabname or TabType in( @TabType)", new { TabName="H_test" , TabType =new List<int> { 1,2,3,4} }).ToSql();
+
+    string sql3 = sqlClient.HiSql("select * from hi_tabmodel where tabname=@tabname ", new Dictionary<string, object> { { "TabName", "H_test" } }).ToSql();
+
+```
+原先参数写法也同样支持(但不建议使用,以后可能会删除以下语法)
+
+
+```c#
+    string sql4 = sqlClient.HiSql("select * from hi_tabmodel where tabname=[$tabname$] ", new Dictionary<string, object> { { "[$tabname$]", "H_test" } }).ToSql();
+```
+
+
+### 2022.6.21 新增工作单元模式
+
+`CreateUnitOfWork` 默认是开始事务,在工作单元执行完成默认会执行`Commit` 事务提交，如果需要回滚请使用`RollBackTran` 进行事务回滚
+
+```c#
+    using (var client = sqlClient.CreateUnitOfWork())
+    {
+        client.Insert("H_UType", new { UTYP = "U4", UTypeName = "高级用户" }).ExecCommand();
+
+        //client.RollBackTran();
+        
+
+    }
+```
+
+
+### 2022.6.15 hisql新增国产达梦数据库支持
+
+1. 新增国产达梦数据库支持 目前`hisql`已经支持 `sqlserver`,`hana`,`mysql`,`oracle`,`posgresql`,`dameng`  六种库 涉及国际，国产 及行式存储和列式存储的数据库 下一步将会支持`sqlite`
+
+2. 优化hisql语法编译解决hisql语法大小写问题，一条hisql语句跨库运行
+
+3. 新增ToColumns()方法 返回hisql语句结果字段结构信息
+
+该功能可以用于将某查询结果集保存到一张新表中（根据这些字段结构信息可创建一张新表）
+
+```c#
+    //返回该hisql的结果字段结构信息
+    List<HiColumn> cols = sqlClient.HiSql("select max(FieldType) as fieldtype from Hi_FieldModel").ToColumns();
+```
+
+### 2022.6.11 hisql 新增查询模版语法
+如下所示
+
+用`` 符号括起来就示字段
+如果是数值型的类型支持表达式
+
+```c#
+string sql = sqlClient.HiSql("select * from Hi_FieldModel as a where a.TabName=`a.TabName` and a.FieldName='11'").ToSql();
+```
+表达式模板语法
+```c#
+string sql = sqlClient.HiSql("select * from Hi_FieldModel as a where a.SortNum=`a.SortNum`+1 and a.FieldName='11'").ToSql();
+```
+
+
+以下是链式查询的语法样例
+```c#
+string sql = sqlClient.Query("Hi_FieldModel", "A").Field("*")
+    .Where(new Filter {
+        {"A.TabName", OperType.EQ, "`A.FieldName`"}
+                     })
+    .Group(new GroupBy { { "A.FieldName" } }).ToSql();
+```
+表达式模板语法
+```c#
+string sql = sqlClient.Query("Hi_FieldModel", "A").Field("*")
+    .Where(new Filter {
+        {"A.SortNum", OperType.EQ, "`A.SortNum`+1"}
+                     })
+    .Group(new GroupBy { { "A.FieldName" } }).ToSql();
+```
+
+### 2022.6.10 hisql 新增on 的语法增强
+
+
+原语法 join on 只允许 字段=字段，现在可以支持像where一样的条件 如下所示
+
+```c#
+    var sql = sqlClient.HiSql("select a.TabName, a.FieldName from Hi_FieldModel as a left join Hi_TabModel as b on a.TabName=b.TabName and a.TabName in ('H_Test') where a.TabName=b.TabName and a.FieldType>3 ").ToSql();
+```
 
 
 

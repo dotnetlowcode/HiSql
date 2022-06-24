@@ -54,6 +54,15 @@ namespace HiSql
         
         public override string ToSql()
         {
+            sb_table = new StringBuilder();
+            sb_field = new StringBuilder();
+            sb_field_result = new StringBuilder();
+            sb_join = new StringBuilder();
+            sb_where = new StringBuilder();
+            sb_sort = new StringBuilder();
+            sb_group = new StringBuilder();
+            sb_having = new StringBuilder();
+            sb_distinct = new StringBuilder();
             // 如果有子查询应该先把子查询中的SQL语句先生成
             if (this.IsMultiSubQuery)
             {
@@ -209,6 +218,25 @@ namespace HiSql
             else
                 return sb.ToString();
         }
+
+
+        /// <summary>
+        /// 返回sql语句结果集的列信息
+        /// </summary>
+        /// <returns></returns>
+        public override List<HiColumn> ToColumns()
+        {
+            string sql = this.ToSql();
+            List<HiColumn> colist = this.ResultColumn;
+            foreach (HiColumn col in colist)
+            {
+                if (col.IsPrimary) col.IsPrimary = !col.IsPrimary;
+                if (col.IsIdentity) col.IsIdentity = !col.IsIdentity;
+                if (col.IsBllKey) col.IsBllKey = !col.IsBllKey;
+            }
+            return colist;
+        }
+
         public override IQuery WithRank(DbRank rank, DbFunction dbFunction, string field, string asname, SortType sortType)
         {
             if (field.Trim() != "*" && !string.IsNullOrEmpty(field))
@@ -304,6 +332,9 @@ namespace HiSql
             sqlServerDM = (SqlServerDM)Instance.CreateInstance<SqlServerDM>($"{Constants.NameSpace}.{this.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
             //IDMInitalize dMInitalize = new SqlServerDM();
             sqlServerDM.Context = this.Context;
+
+            TabInfo currTabInfo = null;
+
             //多表子查询的情况下 无当前查询表
             if (!this.IsMultiSubQuery)
             {
@@ -330,12 +361,15 @@ namespace HiSql
                         if(!dictabinfo.ContainsKey(table.TabName))
                             dictabinfo.Add(table.TabName, tabinfo);
 
+                        if (this.Table.TabName.Equals(table.TabName, StringComparison.OrdinalIgnoreCase))
+                            currTabInfo = tabinfo;
+
                     }
                 }
                 else
                     throw new Exception("没有指定查询的表");
 
-                sb_table.Append($"[{this.Table.TabName}] as [{this.Table.AsTabName}]");
+                sb_table.Append($"[{currTabInfo.TabModel.TabName}] as [{this.Table.AsTabName}]");
 
                 if (this.WithLockMode != LockMode.NONE)
                 {
@@ -381,7 +415,7 @@ namespace HiSql
             }
 
             //检测JOIN关联条件字段
-            sb_join.Append(sqlServerDM.BuildJoinSql(this.TableList, dictabinfo, this.Fields, this.Joins));
+            sb_join.Append(sqlServerDM.BuildJoinSql(this.TableList, dictabinfo, this.Fields, this.Joins, this.IsMultiSubQuery));
 
 
             // 检测where条件字段

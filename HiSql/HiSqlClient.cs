@@ -189,15 +189,29 @@ namespace HiSql
         #endregion
 
 
-        #region 线程缓存
+        
         HiSqlProvider CloneClient()
         {
             var provider = new HiSqlProvider(this.CurrentConnectionConfig);
-
-
             return provider;
         }
 
+        /// <summary>
+        /// 创建工作单元
+        /// 默认开始事务,业务处理完成需要进行Commit 
+        /// </summary>
+        /// <returns></returns>
+        public HiSqlClient CreateUnitOfWork()
+        {
+            var client=this.Context.CloneClient();
+            //连接不能自动关闭 因为自动关闭时事务会自动提交
+            client.CurrentConnectionConfig.IsAutoClose = false;
+            client.BeginTran();
+            return client;
+
+        }
+
+        #region 线程缓存
         /// <summary>
         /// 缓存到静态变更中。
         /// </summary>
@@ -366,10 +380,31 @@ namespace HiSql
         {
             return _context.HiSql(hisql, dbMasterSlave);
         }
-        public IQuery HiSql(string hisql, Dictionary<string, object> dicparma, DbMasterSlave dbMasterSlave = DbMasterSlave.Default)
+        /// <summary>
+        /// hisql 参数化,防注入
+        /// </summary>
+        /// <param name="hisql"></param>
+        /// <param name="dicparma"></param>
+        /// <param name="dbMasterSlave"></param>
+        /// <returns></returns>
+        //public IQuery HiSql(string hisql, Dictionary<string, object> dicparma, DbMasterSlave dbMasterSlave = DbMasterSlave.Default)
+        //{
+        //    return _context.HiSql(hisql, dicparma, dbMasterSlave);
+        //}
+
+        /// <summary>
+        /// hisql 参数化,防注入
+        /// </summary>
+        /// <param name="hisql">hisql语句</param>
+        /// <param name="objparm">参数化对象如new {}</param>
+        /// <param name="dbMasterSlave"></param>
+        /// <returns></returns>
+
+        public IQuery HiSql(string hisql, object objparm, DbMasterSlave dbMasterSlave = DbMasterSlave.Default)
         {
-            return _context.HiSql(hisql, dicparma, dbMasterSlave);
+            return _context.HiSql(hisql, objparm, dbMasterSlave);
         }
+
         #endregion
 
         #region 数据插入操作

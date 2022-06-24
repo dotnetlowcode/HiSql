@@ -31,7 +31,9 @@ namespace HiSql
                             _connstring = base.Context.CurrentConnectionConfig.AppEvents.OnDbDecryptEvent(_connstring);
                         }
                     }
-                    base._DbConnection = new DmConnection(base.Context.CurrentConnectionConfig.ConnectionString);
+                    var _conn = new DmConnection(base.Context.CurrentConnectionConfig.ConnectionString);
+                    _conn.Schema = base.Context.CurrentConnectionConfig.Schema;
+                    base._DbConnection = _conn;
                 }
 
                 return base._DbConnection;
@@ -86,7 +88,7 @@ namespace HiSql
 
         public override Task<int> BulkCopy<T>(List<T> lstobj, TabInfo tabInfo, Dictionary<string, string> columnMapping = null)
         {
-            DataTable sourceTable = DataConvert.ToTable(lstobj, tabInfo, this.Context.CurrentConnectionConfig.User);
+            DataTable sourceTable = DataConvert.ToTable(lstobj, tabInfo, this.Context.CurrentConnectionConfig.User, false);
             return BulkCopy(sourceTable, tabInfo);
             //throw new Exception($"针对DaMeng数据没有找到合适的BulkCopy的驱动暂时不支持");
         }
@@ -138,11 +140,12 @@ namespace HiSql
             }
             else
             {
-                if (param.HasValue())
-                {
-                    DmParameter[] ipars = GetSqlParameters(param);
-                    sqlCommand.Parameters.AddRange(ipars);
-                }
+                //参数化已经统一在AdoProvider处理
+                //if (param.HasValue())
+                //{
+                //    SqlParameter[] ipars = GetSqlParameters(param);
+                //    sqlCommand.Parameters.AddRange(ipars);
+                //}
             }
 
 
