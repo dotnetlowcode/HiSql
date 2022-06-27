@@ -20,11 +20,17 @@ namespace HiSql.PostGreSqlUnitTest
             //Query_Demo9(sqlClient);
 
             //Query_Demo13(sqlClient);
-            Query_Demo15(sqlClient);
+            //Query_Demo15(sqlClient);
             //Query_Demo16(sqlClient);
+            Query_Demo18(sqlClient);
         }
 
+        static void Query_Demo18(HiSqlClient sqlClient)
+        {
+            string sql = sqlClient.HiSql("select FieldName, count(FieldName) as NAME_count,max(FieldType) as LBLAB_max from Hi_FieldModel  group by FieldName").ToSql();
+            List<HiColumn> lst = sqlClient.HiSql("select FieldName, count(FieldName) as NAME_count,max(FieldType) as LBLAB_max from Hi_FieldModel  group by FieldName").ToColumns();
 
+        }
         static void Query_Demo16(HiSqlClient sqlClient)
         {
             //以下将会报错 字符串的不允许表达式条件 
