@@ -1028,7 +1028,11 @@ namespace HiSql
                         foreach (HiColumn hiColumn in hiColumns)
                         {
                             _value = "";
-                            var objprop = dicprop[hiColumn.FieldName];
+
+
+                            PropertyInfo objprop = null;
+                            if(dicprop.ContainsKey(hiColumn.FieldName))
+                                objprop=dicprop[hiColumn.FieldName];
                             #region  判断必填 及自增长
                             if (hiColumn.IsRequire && !hiColumn.IsIdentity && objprop == null)
                             {

@@ -15,11 +15,11 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("HiSql 核心包\r\n\r\n支持SqlServer,MySql,Oracle,Hana,PostGreSql 根据需要单独再引用支持的包\r\n新增hisql语法 一套" +
     "sql在不同库执行")]
-[assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.4.2")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.4.2")]
+[assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.4.4")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.4.4")]
 [assembly: System.Reflection.AssemblyProductAttribute("HiSql")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HiSql")]
-[assembly: System.Reflection.AssemblyVersionAttribute("1.0.4.2")]
+[assembly: System.Reflection.AssemblyVersionAttribute("1.0.4.4")]
 
 // 由 MSBuild WriteCodeFragment 类生成。
 

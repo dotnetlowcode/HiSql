@@ -628,7 +628,9 @@ namespace HiSql
                     var rowidx = 0;
                     foreach (DataColumn dc in columns)
                     {
-                        var pinfo = dic[dc.ColumnName];
+                        PropertyInfo pinfo = null;
+                        if(dic.ContainsKey(dc.ColumnName))
+                            pinfo= dic[dc.ColumnName];
                         if (pinfo != null)
                         {
                             var obj = pinfo.GetValue(lst[i]);
