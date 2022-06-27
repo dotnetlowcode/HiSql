@@ -1994,7 +1994,7 @@ namespace HiSql
                                 case DbFunction.AVG:
                                     if (hiColumn.FieldType.IsIn<HiType>(HiType.BIGINT, HiType.DECIMAL, HiType.INT, HiType.SMALLINT))
                                     {
-                                        sb_field.Append($"avg({dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, fieldDefinition)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, fieldDefinition)}{dbConfig.Field_After}) as {fieldDefinition.AsFieldName}");
+                                        sb_field.Append($"avg({dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, fieldDefinition)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}) as {fieldDefinition.AsFieldName}");
                                         sb_field_result.Append($"{dbConfig.Field_Pre}{fieldDefinition.AsFieldName}{dbConfig.Field_After}");
                                         lstcol.Add(new HiColumn { FieldName = fieldDefinition.AsFieldName, DBDefault = HiTypeDBDefault.EMPTY, FieldType = hiColumn.FieldType, FieldDec = hiColumn.FieldDec, FieldLen = hiColumn.FieldLen, FieldDesc = $"avg_{fieldDefinition.AsFieldName}" });
                                     }
@@ -2009,7 +2009,7 @@ namespace HiSql
                                 case DbFunction.SUM:
                                     if (hiColumn.FieldType.IsIn<HiType>(HiType.BIGINT, HiType.DECIMAL, HiType.INT, HiType.SMALLINT))
                                     {
-                                        sb_field.Append($"sum({dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, fieldDefinition)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, fieldDefinition)}{dbConfig.Field_After}) as {fieldDefinition.AsFieldName}");
+                                        sb_field.Append($"sum({dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, fieldDefinition)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}) as {fieldDefinition.AsFieldName}");
                                         sb_field_result.Append($"{dbConfig.Field_Pre}{fieldDefinition.AsFieldName}{dbConfig.Field_After}");
                                         lstcol.Add(new HiColumn { FieldName = fieldDefinition.AsFieldName, DBDefault = HiTypeDBDefault.EMPTY, FieldType = hiColumn.FieldType, FieldDec = hiColumn.FieldDec, FieldLen = hiColumn.FieldLen, FieldDesc = $"sum_{fieldDefinition.AsFieldName}" });
                                     }
@@ -2020,7 +2020,7 @@ namespace HiSql
                                     if (hiColumn.FieldType.IsIn<HiType>(HiType.BIGINT, HiType.DECIMAL, HiType.INT, HiType.SMALLINT, HiType.NVARCHAR, HiType.VARCHAR, HiType.NCHAR, HiType.CHAR, HiType.DATE,
                                         HiType.DATETIME))
                                     {
-                                        sb_field.Append($"max({dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, fieldDefinition)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, fieldDefinition)}{dbConfig.Field_After}) as {fieldDefinition.AsFieldName}");
+                                        sb_field.Append($"max({dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, fieldDefinition)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}) as {fieldDefinition.AsFieldName}");
                                         sb_field_result.Append($"{dbConfig.Field_Pre}{fieldDefinition.AsFieldName}{dbConfig.Field_After}");
                                         lstcol.Add(new HiColumn { FieldName = fieldDefinition.AsFieldName, DBDefault = HiTypeDBDefault.EMPTY, FieldType = hiColumn.FieldType, FieldDec = hiColumn.FieldDec, FieldLen = hiColumn.FieldLen, FieldDesc = $"max_{fieldDefinition.AsFieldName}" });
                                     }
@@ -2031,7 +2031,7 @@ namespace HiSql
                                     if (hiColumn.FieldType.IsIn<HiType>(HiType.BIGINT, HiType.DECIMAL, HiType.INT, HiType.SMALLINT, HiType.NVARCHAR, HiType.VARCHAR, HiType.NCHAR, HiType.CHAR, HiType.DATE,
                                         HiType.DATETIME))
                                     {
-                                        sb_field.Append($"min({dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, fieldDefinition)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, fieldDefinition)}{dbConfig.Field_After}) as {fieldDefinition.AsFieldName}");
+                                        sb_field.Append($"min({dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, fieldDefinition)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}) as {fieldDefinition.AsFieldName}");
                                         sb_field_result.Append($"{dbConfig.Field_Pre}{fieldDefinition.AsFieldName}{dbConfig.Field_After}");
                                         lstcol.Add(new HiColumn { FieldName = fieldDefinition.AsFieldName, DBDefault = HiTypeDBDefault.EMPTY, FieldType = hiColumn.FieldType, FieldDec = hiColumn.FieldDec, FieldLen = hiColumn.FieldLen, FieldDesc = $"min_{fieldDefinition.AsFieldName}" });
                                     }

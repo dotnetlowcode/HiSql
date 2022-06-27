@@ -43,11 +43,19 @@ namespace HiSql.UnitTest
             // Query_Demo14(sqlClient);
             //Query_Demo15(sqlClient);
             //Query_Demo16(sqlClient);
-            Query_Demo17(sqlClient);
+            //Query_Demo17(sqlClient);
+            Query_Demo18(sqlClient);
             var s = Console.ReadLine();
         }
 
 
+
+        static void Query_Demo18(HiSqlClient sqlClient)
+        {
+            string sql = sqlClient.HiSql("select FieldName, count(FieldName) as NAME_count,max(FieldType) as LBLAB_max from Hi_FieldModel  group by FieldName").ToSql();
+            List<HiColumn> lst= sqlClient.HiSql("select FieldName, count(FieldName) as NAME_count,max(FieldType) as LBLAB_max from Hi_FieldModel  group by FieldName").ToColumns();
+
+        }
 
         static void Query_Demo17(HiSqlClient sqlClient)
         {
