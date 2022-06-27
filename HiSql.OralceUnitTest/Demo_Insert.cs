@@ -39,6 +39,7 @@ namespace HiSql.OralceUnitTest
         }
         static void Demo4_Insert1(HiSqlClient sqlClient)
         {
+            sqlClient.CodeFirst.CreateTable(typeof(Table.HTest01));
             TabInfo tabinfo = sqlClient.Context.DMInitalize.GetTabStruct("HTest01");
 
             List<Dictionary<string, object>> lstdata = new List<Dictionary<string, object>>();

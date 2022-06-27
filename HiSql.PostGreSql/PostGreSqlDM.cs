@@ -18,7 +18,28 @@ namespace HiSql
         public PostGreSqlDM()
         {
         }
+        MCache mcache = new MCache(typeof(PostGreSqlDM).FullName);
+        public DBVersion DBVersion()
+        {
 
+            var version = mcache.GetOrCreate(typeof(PostGreSqlDM).FullName + "_DBVersion", () =>
+            {
+                var _version = new DBVersion() { Version = new Version() };
+
+                var table = Context.DBO.GetDataTable(dbConfig.GetVersion);
+                if (table.Rows.Count > 0)
+                {
+                    var str = table.Rows[0][0]?.ToString();
+                    if (!str.IsNullOrEmpty())
+                    {
+                        _version.VersionDesc = str;
+                        _version.Version = new Version(str.Split(',')[0].Split(' ')[1]);
+                    }
+                }
+                return _version;
+            });
+            return version;
+        }
         #region IDMInitalize接口实现
         public TabInfo BuildTab(Type type)
         {

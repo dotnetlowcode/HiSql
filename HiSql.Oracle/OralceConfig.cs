@@ -295,7 +295,7 @@ namespace HiSql
         public string Sequence_Temp { get => _temp_sequence_temp; }
 
 
-
+        public string GetVersion { get => "select * from product_component_version"; }
 
 
         /// <summary>
@@ -653,7 +653,7 @@ namespace HiSql
 
             //表创建时的KEY模版
             _temp_tabel_key = new StringBuilder()
-                .Append($"alter table [$TabName$]  add constraint {_temp_table_pre}PK_[$TabName$]_[$ConnectID$]{_temp_table_after} primary key ([$Keys$])")
+                .Append($"alter table [$TabName$]  add constraint {_temp_table_pre}PK_[$TabName$][$ConnectID$]{_temp_table_after} primary key ([$Keys$])")
                 .ToString();
             _temp_table_key2 = "[$FieldName$] ";//定义主键的排序方式
 
@@ -801,17 +801,17 @@ UNION ALL
             //获取当前库所有的表
             _temp_gettables = new StringBuilder()
                 .AppendLine("select * from ( ")
-                 .AppendLine(@"select table_name as ""TabName"", 'Table' AS ""TabType"",  to_char(cast(LAST_ANALYZED as DATE),'yyyy-mm-dd hh24:mi:ss') as ""CreateTime"" from SYS.user_tables where TABLESPACE_NAME ='[$Schema$]' and table_name not like '/%' [$Where$]")
+                 .AppendLine(@"select table_name as ""TabName"", 'Table' AS ""TabType"",  to_char(cast(LAST_ANALYZED as DATE),'yyyy-mm-dd hh24:mi:ss') as ""CreateTime"" from SYS.ALL_tables where OWNER ='[$Schema$]' and table_name not like '/%' [$Where$]")
 
                 .AppendLine(") temp")
                 .AppendLine("ORDER BY \"TabName\" ASC, \"CreateTime\" desc ")
                 .ToString();
 
-            _temp_gettables_pagingcount = "select count(*) from SYS.user_tables where TABLESPACE_NAME ='[$Schema$]' and table_name not like '/%' [$Where$]";
+            _temp_gettables_pagingcount = "select count(*) from SYS.ALL_tables where OWNER ='[$Schema$]' and table_name not like '/%' [$Where$]";
             _temp_gettables_paging = new StringBuilder()
                 .AppendLine("select * from ( ")
                  .AppendLine(@"select ROW_NUMBER()OVER( order by table_name ASC) as row_seq , table_name as ""TabName"", 'Table' AS ""TabType"",  to_char(cast(LAST_ANALYZED as DATE),'yyyy-mm-dd hh24:mi:ss') as ""CreateTime"" 
-            from SYS.user_tables where TABLESPACE_NAME ='[$Schema$]' and table_name not like '/%' [$Where$]")
+            from SYS.ALL_tables where OWNER ='[$Schema$]' and table_name not like '/%' [$Where$]")
                 .AppendLine(") temp  WHERE row_seq > [$SeqBegin$] AND row_seq <=[$SeqEnd$] ")
                .AppendLine(@"  order by row_seq")
                 .ToString();
@@ -838,7 +838,7 @@ UNION ALL
 
             _temp_getalltables = new StringBuilder()
                .AppendLine("select * from ( ")
-                .AppendLine(@"select table_name as ""TabName"", 'Table' AS ""TabType"",  to_char(cast(LAST_ANALYZED as DATE),'yyyy-mm-dd hh24:mi:ss') as ""CreateTime"" from SYS.user_tables where TABLESPACE_NAME ='[$Schema$]' and table_name not like '/%' ")
+                .AppendLine(@"select table_name as ""TabName"", 'Table' AS ""TabType"",  to_char(cast(LAST_ANALYZED as DATE),'yyyy-mm-dd hh24:mi:ss') as ""CreateTime"" from SYS.ALL_tables where OWNER ='[$Schema$]' and table_name not like '/%' ")
                 .AppendLine("union all")
                 .AppendLine(@"select VIEW_NAME as ""TabName"", 'View' AS ""TabType"",  '' as ""CreateTime"" from SYS.user_views  ")
 
@@ -848,7 +848,7 @@ UNION ALL
 
             _temp_getalltables_pagingcount = new StringBuilder()
                .AppendLine("select count(*) from ( ")
-                .AppendLine(@"select table_name as ""TabName"", 'Table' AS ""TabType"",  to_char(cast(LAST_ANALYZED as DATE),'yyyy-mm-dd hh24:mi:ss') as ""CreateTime"" from SYS.user_tables where TABLESPACE_NAME ='[$Schema$]' and table_name not like '/%' ")
+                .AppendLine(@"select table_name as ""TabName"", 'Table' AS ""TabType"",  to_char(cast(LAST_ANALYZED as DATE),'yyyy-mm-dd hh24:mi:ss') as ""CreateTime"" from SYS.ALL_tables where OWNER ='[$Schema$]' and table_name not like '/%' ")
                 .AppendLine("union all")
                 .AppendLine(@"select VIEW_NAME as ""TabName"", 'View' AS ""TabType"",  '' as ""CreateTime"" from SYS.user_views  ")
 
@@ -858,7 +858,7 @@ UNION ALL
 
             _temp_getalltables_paging = new StringBuilder()
                .AppendLine(@"select * from ( select ROW_NUMBER()OVER( order by ""TabType"" ASC, ""TabName"" asc, ""CreateTime"" desc ) as row_seq ,""TABNAME"",""TABTYPE"" ,""CREATETIME"" from ( ")
-                .AppendLine(@"select table_name as ""TabName"", 'Table' AS ""TabType"",  to_char(cast(LAST_ANALYZED as DATE),'yyyy-mm-dd hh24:mi:ss') as ""CreateTime"" from SYS.user_tables where TABLESPACE_NAME ='[$Schema$]' and table_name not like '/%' ")
+                .AppendLine(@"select table_name as ""TabName"", 'Table' AS ""TabType"",  to_char(cast(LAST_ANALYZED as DATE),'yyyy-mm-dd hh24:mi:ss') as ""CreateTime"" from SYS.ALL_tables where OWNER ='[$Schema$]' and table_name not like '/%' ")
                 .AppendLine("union all")
                 .AppendLine(@"select VIEW_NAME as ""TabName"", 'View' AS ""TabType"",  '' as ""CreateTime"" from SYS.user_views  ")
 
@@ -868,7 +868,7 @@ UNION ALL
             _temp_check_table_exists =
                new StringBuilder()
               .AppendLine("select * from ( ")
-                .AppendLine(@"select table_name as ""TabName"", 'Table' AS ""TabType"",  to_char(cast(LAST_ANALYZED as DATE),'yyyy-mm-dd hh24:mi:ss') as ""CreateTime"" from SYS.user_tables where TABLESPACE_NAME ='[$Schema$]' and table_name not like '/%' ")
+                .AppendLine(@"select table_name as ""TabName"", 'Table' AS ""TabType"",  to_char(cast(LAST_ANALYZED as DATE),'yyyy-mm-dd hh24:mi:ss') as ""CreateTime"" from SYS.ALL_tables where OWNER ='[$Schema$]' and table_name not like '/%' ")
                 .AppendLine("union all")
                 .AppendLine(@"select VIEW_NAME as ""TabName"", 'View' AS ""TabType"",  '' as ""CreateTime"" from SYS.user_views  ")
 
@@ -916,7 +916,7 @@ where idx.TABLE_NAME = '[$TabName$]' and idxc.INDEX_NAME = '[$IndexName$]' ";
                 .ToString();
             _temp_tabel_primarykey_drop = $"ALTER TABLE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} DROP CONSTRAINT {_temp_table_pre}[$IndexName$]{_temp_table_after}";
 
-            _temp_tabel_primarykey_create = $@"ALTER TABLE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} add constraint {_temp_table_pre}PK_[$TabName$]_[$ConnectID$]{_temp_table_after} primary key ([$Keys$]) ";
+            _temp_tabel_primarykey_create = $@"ALTER TABLE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} add constraint {_temp_table_pre}PK_[$TabName$][$ConnectID$]{_temp_table_after} primary key ([$Keys$]) ";
 
         }
     }

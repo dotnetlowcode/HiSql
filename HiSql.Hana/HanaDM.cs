@@ -12,7 +12,27 @@ namespace HiSql
 {
     public class HanaDM : IDM
     {
+        
         public HiSqlProvider Context { get; set; }
+
+        MCache mcache = new MCache(typeof(HanaDM).FullName);
+        public DBVersion DBVersion() {
+
+            var version = mcache.GetOrCreate(typeof(HanaDM).FullName + "_DBVersion", () =>
+            {
+                var _version = new DBVersion() { Version = new Version() };
+
+                var table = Context.DBO.GetDataTable(dbConfig.GetVersion);
+                if (table.Rows.Count > 0)
+                {
+                    _version.VersionDesc = table.Rows[0]["SYSTEM_ID"]?.ToString();
+                    _version.Version = new Version(table.Rows[0]["VERSION"]?.ToString());
+                }
+                return _version;
+            });
+            return version;
+        }
+
         HanaConfig dbConfig = new HanaConfig(true);
         public HanaDM()
         {

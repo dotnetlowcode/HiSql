@@ -166,7 +166,7 @@ namespace HiSql
                         {
                             //hana 的全局临时表 与标准表的命名规则是一样的
                             //mysql没有全局临时表的概念
-                            _insertTabName = $"tmp_global_{tabinfo.TabModel.TabName}_{Thread.CurrentThread.ManagedThreadId.ToString() }_{tabinfo.TabModel.TabName.GetHashCode().ToString().Substring(1)}";
+                            _insertTabName = $"tmp_g_{tabinfo.TabModel.TabName}{Thread.CurrentThread.ManagedThreadId.ToString() }{tabinfo.TabModel.TabName.GetHashCode().ToString().Substring(1,3)}";
                             _cacheinsertTabName = $"##{tabinfo.TabModel.TabName}";
                             tabinfo2.TabModel.TabName = $"##{tabinfo.TabModel.TabName}";
                             //tabinfo2.TabModel.TabName = _insertTabName;
@@ -174,7 +174,7 @@ namespace HiSql
                         }
                         else if (Context.CurrentConnectionConfig.DbType == DBType.Oracle || Context.CurrentConnectionConfig.DbType == DBType.DaMeng)
                         {
-                            _insertTabName = $"tmp_local_{tabinfo.TabModel.TabName}_{Thread.CurrentThread.ManagedThreadId.ToString() }_{tabinfo.TabModel.TabName.GetHashCode().ToString().Substring(1)}";
+                            _insertTabName = $"tmp_l_{tabinfo.TabModel.TabName}{Thread.CurrentThread.ManagedThreadId.ToString() }{tabinfo.TabModel.TabName.GetHashCode().ToString().Substring(1, 3)}";
                             _cacheinsertTabName = $"#{tabinfo.TabModel.TabName}";
                             tabinfo2.TabModel.TabName = $"#{tabinfo.TabModel.TabName}";
                             //tabinfo2.TabModel.TabName = _insertTabName;

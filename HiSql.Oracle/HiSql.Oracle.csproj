@@ -69,6 +69,12 @@
 	<ItemGroup Condition="'$(TargetFramework)' == 'net45' or '$(TargetFramework)' == 'net461'">
 		<PackageReference Include="Oracle.ManagedDataAccess" Version="19.13.0" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Data\HiSql.sql">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
 	
 
 

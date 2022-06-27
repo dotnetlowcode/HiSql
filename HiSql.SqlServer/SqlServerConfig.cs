@@ -230,6 +230,7 @@ namespace HiSql
 
 
 
+        public string GetVersion { get => "SELECT @@VERSION"; }
 
 
         /// <summary>

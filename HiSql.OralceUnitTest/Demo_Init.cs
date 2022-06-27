@@ -18,6 +18,8 @@ namespace HiSql.OralceUnitTest
                          //ConnectionString = "server=192.168.1.90,8433;uid=sa;pwd=Hone@123;database=HoneBI",
                          ConnectionString = "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=orcl)));User Id=SYSTEM;Password=root",//; MultipleActiveResultSets = true;
                          Schema = "SYSTEM",
+                         //ConnectionString = "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.10.172)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=helowinXDB)));User Id=test;Password=test",//; MultipleActiveResultSets = true;
+                         //Schema = "test",
                          IsEncrypt = true,
                          IsAutoClose = false,
                          SqlExecTimeOut = 60000,
@@ -61,6 +63,7 @@ namespace HiSql.OralceUnitTest
                      }
                      );
 
+            Console.WriteLine($" 版本号：{sqlclient.Context.DMTab.DBVersion().Version}  版本描述：{sqlclient.Context.DMTab.DBVersion().VersionDesc}");
             return sqlclient;
         }
     }

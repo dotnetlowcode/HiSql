@@ -21,7 +21,28 @@ namespace HiSql
         public SqlServerDM()
         {
         }
+        MCache mcache = new MCache(typeof(SqlServerDM).FullName);
+        public DBVersion DBVersion()
+        {
 
+            var version = mcache.GetOrCreate(typeof(SqlServerDM).FullName + "_DBVersion", () =>
+            {
+                var _version = new DBVersion() { Version = new Version() };
+
+                var table = Context.DBO.GetDataTable(dbConfig.GetVersion);
+                if (table.Rows.Count > 0)
+                {
+                    var str = table.Rows[0][0]?.ToString();
+                    if (!str.IsNullOrEmpty())
+                    {
+                        _version.VersionDesc = str.Split(new string[] { " - " }, StringSplitOptions.None)[0];
+                        _version.Version = new Version(str.Split(new string[] { " - " }, StringSplitOptions.None)[1].Split(' ')[0]);
+                    }
+                }
+                return _version;
+            });
+            return version;
+        }
         #region IDMInitalize接口实现
         public TabInfo BuildTab(Type type)
         {
