@@ -163,7 +163,7 @@ namespace HiSql
                                     lstnumber.Add(id.ToString()); ;
                                 }
                             }
-                        }, new LckInfo { UName = _sqlClient.CurrentConnectionConfig.User, Ip = Tool.Net.GetLocalIPAddress() });
+                        }, new LckInfo { UName = _sqlClient.CurrentConnectionConfig.User });
 
                         if (!rtn.Item1)
                             throw new Exception($"编号:{snro}-{snum} 错误:{rtn.Item2} ");

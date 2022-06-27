@@ -610,6 +610,16 @@ namespace HiSql
                 Type type = lst[0].GetType();
                 PropertyInfo[] properties = type.GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
 
+                Dictionary<string,PropertyInfo> dic = new Dictionary<string,PropertyInfo>( StringComparer.OrdinalIgnoreCase);
+                foreach (PropertyInfo prop in properties)
+                {
+                    if(!dic.ContainsKey(prop.Name))
+                        dic.Add(prop.Name, prop);
+                    else
+                        dic[prop.Name]=prop;
+
+                }
+
                 var columns = table.Columns;
                 for (int i = 0; i < lst.Count; i++)
                 {
@@ -618,7 +628,9 @@ namespace HiSql
                     var rowidx = 0;
                     foreach (DataColumn dc in columns)
                     {
-                        var pinfo = properties.Where(p => p.Name.ToLower() == dc.ColumnName.ToLower()).FirstOrDefault();
+                        PropertyInfo pinfo = null;
+                        if(dic.ContainsKey(dc.ColumnName))
+                            pinfo= dic[dc.ColumnName];
                         if (pinfo != null)
                         {
                             var obj = pinfo.GetValue(lst[i]);
@@ -676,7 +688,7 @@ namespace HiSql
                     }
                     else if (column.FieldType.IsIn<HiType>(HiType.BOOL))
                     {
-                        dc.DataType = typeof(DateTime);
+                        dc.DataType = typeof(Boolean);
                     }
                     else if (column.FieldType.IsIn<HiType>(HiType.INT, HiType.SMALLINT))
                     {

@@ -61,6 +61,14 @@ namespace HiSql
         public readonly static string PlatformName = "LowCoder";
 
 
+
+        /// <summary>
+        /// 参数化前辍
+        /// 用于跨生原生sql及hisql的参数化
+        /// </summary>
+        public readonly static string KeyParameterPre = "@";
+
+
         /// <summary>
         /// 锁定表创建修改的key 
         /// </summary>
@@ -433,5 +441,10 @@ namespace HiSql
         /// 参数模版是否在in()中
         /// </summary>
         public readonly static string REG_HISQL_IN_PARAM = @"\bin\s*[\(]\s*\[\$(?<param>\w+)\$\]\s*[\)]";
+
+        /// <summary>
+        /// in(@name)
+        /// </summary>
+        public readonly static string REG_HISQL_IN_PARAM2 = @"\bin\s*[\(]\s*(?<param>@\w+)\s*[\)]";
     }
 }

@@ -5,6 +5,10 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using System.Data;
+using System.Reflection;
+using System.Text.RegularExpressions;
+using System.Diagnostics;
+
 namespace HiSql
 {
     /// <summary>
@@ -290,50 +294,271 @@ namespace HiSql
         /// <param name="hisql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public IQuery HiSql(string hisql, Dictionary<string, object> dicparma, DbMasterSlave dbMasterSlave = DbMasterSlave.Default)
+        //public IQuery HiSql(string hisql, Dictionary<string, object> dicparma, DbMasterSlave dbMasterSlave = DbMasterSlave.Default)
+        //{
+        //    //[$name$]=tgm
+        //    //[$age$]=21
+        //    //select * from useradmin where username='[$name$]' and age>[$age$]
+
+        //    string _sql = hisql;
+
+        //    if (!Tool.RegexMatch("[\'\\\"]+", _sql))
+        //    {
+        //        if (dicparma.Count > 0)
+        //        {
+        //            foreach (string n in dicparma.Keys)
+        //            {
+        //                if (Tool.RegexMatch(Constants.REG_HISQL_PARAM, n))
+        //                {
+        //                    if (_sql.IndexOf(n) >= 0)
+        //                    {
+        //                        Type type = dicparma[n].GetType();
+        //                        if (type.IsIn<Type>(Constants.ShortType, Constants.LongType, Constants.DecType, Constants.IntType, Constants.FloatType, Constants.DobType))
+        //                        {
+        //                            _sql = _sql.Replace(n, dicparma[n].ToString());
+        //                        }
+        //                        else if (type == Constants.BoolType)
+        //                        {
+        //                            if (dicparma[n].ToString().ToLower().Trim() == "true")
+        //                                _sql = _sql.Replace(n, "1");
+        //                            else
+        //                                _sql = _sql.Replace(n, "0");
+        //                        }
+        //                        else if (type.IsIn<Type>(Constants.DateType, Constants.DateTimeOffsetType))
+        //                        {
+        //                            DateTime dtime = Convert.ToDateTime(dicparma[n]);
+        //                            _sql = _sql.Replace(n, $"'{dtime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+        //                        }
+        //                        else if (type.IsIn<Type>(Constants.StringType, Constants.GuidType))
+        //                        {
+        //                            _sql = _sql.Replace(n, $"'{dicparma[n].ToString().ToSqlInject().ToSqlEnChar()}'");
+        //                        }
+        //                        else if (type.FullName.IndexOf("List") > 0)
+        //                        {
+
+        //                            var _dic_p1 = Tool.RegexGrps(Constants.REG_HISQL_PARAM2, _sql);
+        //                            var _dic_p2 = Tool.RegexGrps(Constants.REG_HISQL_IN_PARAM, _sql);
+        //                            string _insql = "";
+        //                            if (_dic_p1.Count > 0 && _dic_p1.Count == _dic_p2.Count)
+        //                            {
+        //                                //foreach(var _o in )
+
+        //                                var _typ_string = typeof(List<string>);
+        //                                var _typ_int = typeof(List<int>);
+        //                                var _typ_decimal = typeof(List<decimal>);
+
+        //                                if (type == _typ_string)
+        //                                {
+        //                                    var list = dicparma[n] as List<string>;
+        //                                    _insql=AdoExtensions.ToSqlIn<string>(list.ToArray(), true);
+        //                                }
+        //                                else if (type == _typ_int)
+        //                                {
+        //                                    var list = dicparma[n] as List<int>;
+        //                                    _insql = AdoExtensions.ToSqlIn<int>(list.ToArray(), false);
+        //                                }
+        //                                else if (type == _typ_decimal)
+        //                                {
+        //                                    var list = dicparma[n] as List<decimal>;
+        //                                    _insql = AdoExtensions.ToSqlIn<decimal>(list.ToArray(), false);
+        //                                }
+        //                                else
+        //                                {
+        //                                    throw new Exception($"类型[{type.FullName}]不在允许的in集合内,仅允许List<string>,List<int>,List<decimal> 三种类型");
+        //                                }
+
+
+        //                                _sql = _sql.Replace(n, $"{_insql}");
+        //                            }
+        //                            else
+        //                            {
+        //                                throw new Exception($"参数 {n} 是集合 中能放在in ({n})中");
+        //                            }
+
+
+
+        //                        }
+        //                        else if (type.IsIn<Type>(Constants.ObjType))
+        //                        {
+        //                            _sql = _sql.Replace(n, $"'{dicparma[n].ToString().ToSqlInject().ToSqlEnChar()}'");
+        //                        }
+        //                        else
+        //                        {
+        //                            _sql = _sql.Replace(n, $"'{dicparma[n].ToString().ToSqlInject().ToSqlEnChar()}'");
+        //                        }
+        //                    }
+        //                    else
+        //                        throw new Exception($"参数 {n} 设置多余在参数化hisql中未使用");
+
+        //                }
+        //                else
+        //                {
+        //                    throw new Exception($"参数 {n} 不符合参数规则 规则为[$参数名$]");
+        //                }
+        //            }
+        //        }
+        //        else
+        //        {
+        //            throw new Exception($"模版参数为不能为空");
+        //        }
+        //    }
+        //    else
+        //    {
+        //        throw new Exception($"参数化SQL语句中不能出现[\'\"]单引号和又引号这种特殊字段");
+        //    }
+        //    IQuery result = null;
+        //    result = Instance.GetQuery(this.Context.CurrentConnectionConfig);
+
+
+
+        //    result.Context = this.Context;
+        //    result.HiSql(_sql, result);
+        //    return result;
+
+        //}
+
+
+        /// <summary>
+        /// hisql 参数化,防注入
+        /// </summary>
+        /// <param name="sql">hisql语句</param>
+        /// <param name="objparm">参数化对象如new {}</param>
+        /// <param name="dbMasterSlave"></param>
+        /// <returns></returns>
+        public IQuery HiSql(string sql, object objparm, DbMasterSlave dbMasterSlave = DbMasterSlave.Default)
         {
-            //[$name$]=tgm
-            //[$age$]=21
-            //select * from useradmin where username='[$name$]' and age>[$age$]
 
-            string _sql = hisql;
-
-            if (!Tool.RegexMatch("[\'\\\"]+", _sql))
+            Type type = objparm.GetType();
+            if (!Tool.RegexMatch("[\'\\\"]+", sql))
             {
-                if (dicparma.Count > 0)
+               
+                Dictionary<string, object> dicparam = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+
+                #region 参数解析
+                if (type.IsAnonClass())
                 {
-                    foreach (string n in dicparma.Keys)
+                    List<PropertyInfo> attrs = type.GetProperties().Where(p => p.MemberType == MemberTypes.Property && p.CanRead == true).ToList();
+                    if (attrs.Count() > 0)
                     {
-                        if (Tool.RegexMatch(Constants.REG_HISQL_PARAM, n))
+                        foreach (PropertyInfo p in attrs)
                         {
-                            if (_sql.IndexOf(n) >= 0)
+                            if (dicparam.ContainsKey(p.Name))
+                                dicparam[p.Name] = p.GetValue(objparm);
+                            else
+                                dicparam.Add(p.Name, p.GetValue(objparm));
+
+                        }
+                    }
+                }
+                else if (type.IsDicStringClass())
+                {
+                    //字典对象
+                    Dictionary<string, string> _dic = objparm as Dictionary<string, string>;
+                    foreach (string key in _dic.Keys)
+                    {
+                        if (dicparam.ContainsKey(key))
+                            dicparam[key] = _dic[key];
+                        else
+                            dicparam.Add(key, _dic[key]);
+                    }
+
+
+                }
+                else if (type.IsDicObjectClass())
+                {
+                    Dictionary<string, object> _dic = objparm as Dictionary<string, object>;
+                    foreach (string key in _dic.Keys)
+                    {
+                        if (dicparam.ContainsKey(key))
+                            dicparam[key] = _dic[key];
+                        else
+                            dicparam.Add(key, _dic[key]);
+                    }
+                }
+                else if (type == typeof(List<HiParameter>))
+                {
+                    //参数化对象
+
+                    List<HiParameter> lstparam = objparm as List<HiParameter>;
+
+                    foreach (HiParameter p in lstparam)
+                    {
+                        if (dicparam.ContainsKey(p.ParameterName))
+                            dicparam[p.ParameterName] = p.Values;
+                        else
+                            dicparam.Add(p.ParameterName, p.Values);
+                    }
+
+                }
+                else
+                {
+                    //实体类对象
+                    List<PropertyInfo> attrs = type.GetProperties().Where(p => p.MemberType == MemberTypes.Property && p.CanRead == true).ToList();
+                    if (attrs.Count() > 0)
+                    {
+                        foreach (PropertyInfo p in attrs)
+                        {
+                            if (dicparam.ContainsKey(p.Name))
+                                dicparam[p.Name] = p.GetValue(objparm);
+                            else
+                                dicparam.Add(p.Name, p.GetValue(objparm));
+
+                        }
+                    }
+                }
+
+                #endregion 
+
+
+                if (dicparam.Count() == 0)
+                    throw new Exception($"未传任何参数");
+
+
+                //先判断是否有参数化
+                if (Tool.RegexMatch($@"{Constants.KeyParameterPre}\w+", sql))
+                {
+                    //表示参数为@name 格式
+                    #region 解析@name 参数格式
+
+                    if (!Tool.RegexMatch(Constants.REG_HISQL_PARAM2, sql))
+                    {
+
+                        var lstdic = Tool.RegexGrps($@"{Constants.KeyParameterPre}(?<pname>\w+)\b", sql);
+
+                        foreach (Dictionary<string, string> _dic in lstdic)
+                        {
+                            if (dicparam.ContainsKey(_dic["pname"]))
                             {
-                                Type type = dicparma[n].GetType();
+                                string n = _dic["pname"];
+                                Type _type = dicparam[n].GetType();
+                                Regex regex = new Regex(@$"@{n}\b",RegexOptions.IgnoreCase);
+
                                 if (type.IsIn<Type>(Constants.ShortType, Constants.LongType, Constants.DecType, Constants.IntType, Constants.FloatType, Constants.DobType))
                                 {
-                                    _sql = _sql.Replace(n, dicparma[n].ToString());
+                                    sql = regex.Replace(sql, dicparam[n].ToString());
                                 }
-                                else if (type == Constants.BoolType)
+                                else if (_type == Constants.BoolType)
                                 {
-                                    if (dicparma[n].ToString().ToLower().Trim() == "true")
-                                        _sql = _sql.Replace(n, "1");
+                                    
+                                    if (dicparam[n].ToString().ToLower().Trim() == "true")
+                                        sql = regex.Replace(sql, "1");
                                     else
-                                        _sql = _sql.Replace(n, "1");
+                                        sql = regex.Replace(sql, "0");
                                 }
-                                else if (type.IsIn<Type>(Constants.DateType, Constants.DateTimeOffsetType))
+                                else if (_type.IsIn<Type>(Constants.DateType, Constants.DateTimeOffsetType))
                                 {
-                                    DateTime dtime = Convert.ToDateTime(dicparma[n]);
-                                    _sql = _sql.Replace(n, $"'{dtime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                                    DateTime dtime = Convert.ToDateTime(dicparam[n]);
+                                    sql = regex.Replace(sql, $"'{dtime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
                                 }
-                                else if (type.IsIn<Type>(Constants.StringType, Constants.GuidType))
+                                else if (_type.IsIn<Type>(Constants.StringType, Constants.GuidType))
                                 {
-                                    _sql = _sql.Replace(n, $"'{dicparma[n].ToString().ToSqlInject().ToSqlEnChar()}'");
+                                    sql = regex.Replace(sql, $"'{dicparam[n].ToString().ToSqlInject().ToSqlEnChar()}'");
                                 }
-                                else if (type.FullName.IndexOf("List") > 0)
+                                else if (_type.FullName.IndexOf("List") > 0)
                                 {
 
-                                    var _dic_p1 = Tool.RegexGrps(Constants.REG_HISQL_PARAM2, _sql);
-                                    var _dic_p2 = Tool.RegexGrps(Constants.REG_HISQL_IN_PARAM, _sql);
+                                    var _dic_p1 = Tool.RegexGrps($@"{Constants.KeyParameterPre}(?<pname>\w+)\b", sql);
+                                    var _dic_p2 = Tool.RegexGrps(Constants.REG_HISQL_IN_PARAM2, sql);
                                     string _insql = "";
                                     if (_dic_p1.Count > 0 && _dic_p1.Count == _dic_p2.Count)
                                     {
@@ -343,77 +568,175 @@ namespace HiSql
                                         var _typ_int = typeof(List<int>);
                                         var _typ_decimal = typeof(List<decimal>);
 
-                                        if (type == _typ_string)
+                                        if (_type == _typ_string)
                                         {
-                                            var list = dicparma[n] as List<string>;
-                                            _insql=AdoExtensions.ToSqlIn<string>(list.ToArray(), true);
+                                            var list = dicparam[n] as List<string>;
+                                            _insql = AdoExtensions.ToSqlIn<string>(list.ToArray(), true);
                                         }
-                                        else if (type == _typ_int)
+                                        else if (_type == _typ_int)
                                         {
-                                            var list = dicparma[n] as List<int>;
+                                            var list = dicparam[n] as List<int>;
                                             _insql = AdoExtensions.ToSqlIn<int>(list.ToArray(), false);
                                         }
-                                        else if (type == _typ_decimal)
+                                        else if (_type == _typ_decimal)
                                         {
-                                            var list = dicparma[n] as List<decimal>;
+                                            var list = dicparam[n] as List<decimal>;
                                             _insql = AdoExtensions.ToSqlIn<decimal>(list.ToArray(), false);
                                         }
                                         else
                                         {
-                                            throw new Exception($"类型[{type.FullName}]不在允许的in集合内,仅允许List<string>,List<int>,List<decimal> 三种类型");
+                                            throw new Exception($"类型[{_type.FullName}]不在允许的in集合内,仅允许List<string>,List<int>,List<decimal> 三种类型");
                                         }
 
-
-                                        _sql = _sql.Replace(n, $"{_insql}");
+                                        sql = regex.Replace(sql, $"{_insql}");
                                     }
                                     else
                                     {
-                                        throw new Exception($"参数 {n} 是集合 中能放在in ({n})中");
+                                        throw new Exception($"参数 {n} 是集合 只能放在in ({n})中");
                                     }
-
-
-
                                 }
                                 else if (type.IsIn<Type>(Constants.ObjType))
                                 {
-                                    _sql = _sql.Replace(n, $"'{dicparma[n].ToString().ToSqlInject().ToSqlEnChar()}'");
+                                    sql = regex.Replace(sql, $"'{dicparam[n].ToString().ToSqlInject().ToSqlEnChar()}'");
                                 }
                                 else
                                 {
-                                    _sql = _sql.Replace(n, $"'{dicparma[n].ToString().ToSqlInject().ToSqlEnChar()}'");
+                                    sql = regex.Replace(sql, $"'{dicparam[n].ToString().ToSqlInject().ToSqlEnChar()}'");
                                 }
                             }
                             else
-                                throw new Exception($"参数 {n} 设置多余在参数化hisql中未使用");
-
-                        }
-                        else
-                        {
-                            throw new Exception($"参数 {n} 不符合参数规则 规则为[$参数名$]");
+                            {
+                                throw new Exception($"参数 {_dic["pname"]} 未设置");
+                            }
                         }
                     }
+                    else
+                        throw new Exception($"参数化名称不能使用@name 又用[$name$] 格式");
+                    #endregion
+
                 }
-                else
+                else if (Tool.RegexMatch(Constants.REG_HISQL_PARAM2, sql))
                 {
-                    throw new Exception($"模版参数为不能为空");
+                    //表示参数模式为[$name$] 格式
+                    #region 解析 [$name$] 参数格式
+
+                    if (dicparam.Count > 0)
+                    {
+                        foreach (string n in dicparam.Keys)
+                        {
+                            if (Tool.RegexMatch(Constants.REG_HISQL_PARAM, n))
+                            {
+                                if (sql.IndexOf(n) >= 0)
+                                {
+                                    Type _type = dicparam[n].GetType();
+                                    if (type.IsIn<Type>(Constants.ShortType, Constants.LongType, Constants.DecType, Constants.IntType, Constants.FloatType, Constants.DobType))
+                                    {
+                                        sql = sql.Replace(n, dicparam[n].ToString());
+                                    }
+                                    else if (_type == Constants.BoolType)
+                                    {
+                                        if (dicparam[n].ToString().ToLower().Trim() == "true")
+                                            sql = sql.Replace(n, "1");
+                                        else
+                                            sql = sql.Replace(n, "0");
+                                    }
+                                    else if (_type.IsIn<Type>(Constants.DateType, Constants.DateTimeOffsetType))
+                                    {
+                                        DateTime dtime = Convert.ToDateTime(dicparam[n]);
+                                        sql = sql.Replace(n, $"'{dtime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                                    }
+                                    else if (_type.IsIn<Type>(Constants.StringType, Constants.GuidType))
+                                    {
+                                        sql = sql.Replace(n, $"'{dicparam[n].ToString().ToSqlInject().ToSqlEnChar()}'");
+                                    }
+                                    else if (_type.FullName.IndexOf("List") > 0)
+                                    {
+
+                                        var _dic_p1 = Tool.RegexGrps(Constants.REG_HISQL_PARAM2, sql);
+                                        var _dic_p2 = Tool.RegexGrps(Constants.REG_HISQL_IN_PARAM, sql);
+                                        string _insql = "";
+                                        if (_dic_p1.Count > 0 && _dic_p1.Count == _dic_p2.Count)
+                                        {
+                                            //foreach(var _o in )
+
+                                            var _typ_string = typeof(List<string>);
+                                            var _typ_int = typeof(List<int>);
+                                            var _typ_decimal = typeof(List<decimal>);
+
+                                            if (_type == _typ_string)
+                                            {
+                                                var list = dicparam[n] as List<string>;
+                                                _insql = AdoExtensions.ToSqlIn<string>(list.ToArray(), true);
+                                            }
+                                            else if (_type == _typ_int)
+                                            {
+                                                var list = dicparam[n] as List<int>;
+                                                _insql = AdoExtensions.ToSqlIn<int>(list.ToArray(), false);
+                                            }
+                                            else if (_type == _typ_decimal)
+                                            {
+                                                var list = dicparam[n] as List<decimal>;
+                                                _insql = AdoExtensions.ToSqlIn<decimal>(list.ToArray(), false);
+                                            }
+                                            else
+                                            {
+                                                throw new Exception($"类型[{_type.FullName}]不在允许的in集合内,仅允许List<string>,List<int>,List<decimal> 三种类型");
+                                            }
+
+
+                                            sql = sql.Replace(n, $"{_insql}");
+                                        }
+                                        else
+                                        {
+                                            throw new Exception($"参数 {n} 是集合 只能放在in ({n})中");
+                                        }
+
+
+
+                                    }
+                                    else if (type.IsIn<Type>(Constants.ObjType))
+                                    {
+                                        sql = sql.Replace(n, $"'{dicparam[n].ToString().ToSqlInject().ToSqlEnChar()}'");
+                                    }
+                                    else
+                                    {
+                                        sql = sql.Replace(n, $"'{dicparam[n].ToString().ToSqlInject().ToSqlEnChar()}'");
+                                    }
+                                }
+                                else
+                                    throw new Exception($"参数 {n} 设置多余在参数化hisql中未使用");
+
+                            }
+                            else
+                            {
+                                throw new Exception($"参数 {n} 不符合参数规则 规则为[$参数名$]");
+                            }
+
+
+                        }
+                    }
+
+                    #endregion
                 }
+
+
+
             }
             else
-            {
                 throw new Exception($"参数化SQL语句中不能出现[\'\"]单引号和又引号这种特殊字段");
-            }
+
+
             IQuery result = null;
             result = Instance.GetQuery(this.Context.CurrentConnectionConfig);
 
 
 
             result.Context = this.Context;
-            result.HiSql(_sql, result);
+            result.HiSql(sql, result);
             return result;
-
         }
-        
-        #endregion
+
+ 
 
 
         #region 数据插入
@@ -461,7 +784,7 @@ namespace HiSql
             return result;
         }
 
-
+        #endregion
 
         /// <summary>
         /// 批量写入

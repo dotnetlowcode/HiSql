@@ -15,8 +15,8 @@ namespace HiSql
         /// <summary>
         /// 数据包大小 经过测试200这个值是比较合理
         /// </summary>
-        int _bluksize = 200;
-        int _bulkunitsize = 250000;
+        int _bluksize = 200;// 这是一个基准值，根据不同的列进行换算
+        int _bulkunitsize = 300000;//用于BulkCopy拆包
 
 
         int _packagerecord = 3000;
@@ -24,7 +24,7 @@ namespace HiSql
         /// <summary>
         /// 列*记录数 作为分包大小
         /// </summary>
-        int _packagecells = 100000;
+        int _packagecells = 100000;//100000
 
         string _temp_schema_pre = "[";
         string _temp_schema_after = "]";
