@@ -284,11 +284,22 @@ namespace HiSql.AST
                             sql.LastIndexOf($" union{System.Environment.NewLine}",StringComparison.OrdinalIgnoreCase) ,
                         };
 
+                        List<int> lstnum2 = lstnum.Where(x => x >= 0).ToList();
+                        if (lstnum2.Count > 0)
+                        {
+                            //按大小顺序排序
+                            lstnum2.Sort((a, b) =>
+                            {
+                                return a.CompareTo(b);
+                            });
+                            _pos_idx = lstnum2[0];
+                        }
+
                         //按大小顺序排序
-                        lstnum.Sort((a,b)=> {
-                            return b.CompareTo(a);
-                        });
-                        _pos_idx = lstnum[0];
+                        //lstnum.Sort((a,b)=> {
+                        //    return b.CompareTo(a);
+                        //});
+                        //_pos_idx = lstnum[0];
                         
 
 
