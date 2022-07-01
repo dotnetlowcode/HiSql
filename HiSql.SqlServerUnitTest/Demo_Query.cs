@@ -44,11 +44,27 @@ namespace HiSql.UnitTest
             //Query_Demo15(sqlClient);
             //Query_Demo16(sqlClient);
             //Query_Demo17(sqlClient);
-            Query_Demo18(sqlClient);
+            //Query_Demo18(sqlClient);
+            Query_Demo19(sqlClient);
             var s = Console.ReadLine();
         }
 
 
+
+        static void Query_Demo19(HiSqlClient sqlClient)
+        {
+            //string sql = sqlClient.Query("Hi_FieldModel").As("A").Field("A.FieldType")
+            //    .Join("Hi_TabModel").As("B").On(new HiSql.JoinOn() { { "A.TabName", "B.TabName" } })
+            //    .Where("A.TabName='GD_UniqueCodeInfo'").Group(new GroupBy { { "A.FieldType" } })
+            //    .Sort("A.FieldType asc","A.TabName asc")
+            //    .Take(2).Skip(2)
+            //    .ToSql();
+
+
+            string sql2 = sqlClient.HiSql("select A.FieldType from Hi_FieldModel as a inner join Hi_TabModel as b on a.tabname=b.tabname where A.TabName='GD_UniqueCodeInfo' group by a.fieldtype order by a.fieldtype  asc ").Take(2).Skip(2)
+                .ToSql();
+
+        }
 
         static void Query_Demo18(HiSqlClient sqlClient)
         {
