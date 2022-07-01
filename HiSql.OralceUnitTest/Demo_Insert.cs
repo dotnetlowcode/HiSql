@@ -51,7 +51,7 @@ namespace HiSql.OralceUnitTest
 
 
             }
-
+            sqlClient.DbFirst.Truncate("HTest01");
             sqlClient.CodeFirst.Truncate("HTest01");
             //string _josn = DataConvert.ToCSV(lstdata, tabinfo, DBType.MySql, true, "tansar");
 

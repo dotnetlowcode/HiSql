@@ -12,11 +12,12 @@ namespace HiSql
 {
     public class HanaDM : IDM
     {
-        
+
         public HiSqlProvider Context { get; set; }
 
         MCache mcache = new MCache(typeof(HanaDM).FullName);
-        public DBVersion DBVersion() {
+        public DBVersion DBVersion()
+        {
 
             var version = mcache.GetOrCreate(typeof(HanaDM).FullName + "_DBVersion", () =>
             {
@@ -26,7 +27,8 @@ namespace HiSql
                 if (table.Rows.Count > 0)
                 {
                     _version.VersionDesc = table.Rows[0]["SYSTEM_ID"]?.ToString();
-                    _version.Version = new Version(table.Rows[0]["VERSION"]?.ToString());
+                    string versionStr = table.Rows[0]["VERSION"]?.ToString();
+                    _version.Version = new Version(String.Join(".", versionStr.Split('.').Take(3).ToArray()));
                 }
                 return _version;
             });
@@ -513,8 +515,8 @@ namespace HiSql
                 .Append(',')
                 .Append(hiTable.IsLog == true ? "True" : "False")
                 .Append(',')
-                .Append($"'{ hiTable.LogTable}',")
-                .Append($"'{ hiTable.LogExprireDay}'")
+                .Append($"'{hiTable.LogTable}',")
+                .Append($"'{hiTable.LogExprireDay}'")
                 .Append($");").AppendLine("")
                 ;
 
@@ -891,12 +893,12 @@ namespace HiSql
                     {
                         //说明是基于
                         Regex regex = new Regex(Constants.REG_TEMPLATE_FIELDS);
-                        
+
                         foreach (Dictionary<string, string> dic in _lstdic)
                         {
                             _str = regex.Replace(_str, $"{dbConfig.Field_Pre}{dic["field"].ToString()}{dbConfig.Field_After}", 1);
                         }
-         
+
                     }
                 }
 
@@ -1286,10 +1288,10 @@ namespace HiSql
 
                             FieldDefinition field = new FieldDefinition(whereResult.Result["fields"].ToString());
                             HiColumn hiColumn = CheckField(TableList, dictabinfo, Fields, field);
-                            
+
                             if (hiColumn != null)
                             {
-                                sb_sql.Append($"{dbConfig.Table_Pre}{ Tool.GetDbTabName(hiColumn, field)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{ Tool.GetDbFieldName(hiColumn, field)}{dbConfig.Field_After}");
+                                sb_sql.Append($"{dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, field)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, field)}{dbConfig.Field_After}");
                                 string _value = whereResult.Result["value"].ToString();
                                 if (hiColumn != null)
                                 {
@@ -2642,7 +2644,8 @@ namespace HiSql
                         else
                             throw new Exception($"过滤条件字段[{filterDefinition.Field.AsFieldName}]指定的值超过了限定长度[{hiColumn.FieldLen}]");
                     }
-                    else {
+                    else
+                    {
                         _value = checkTempValue(_lstdic, hiColumn, filterDefinition, _value, true, TableList, dictabinfo);
                     }
                 }
