@@ -40,10 +40,24 @@ namespace HiSql.MySqlUnitTest
             //Query_Demo11(sqlClient);
             //Query_Demo12(sqlClient);
             //Query_Demo13(sqlClient);
-            Query_Demo15(sqlClient);
+            //Query_Demo15(sqlClient);
             //Query_Demo16(sqlClient);
+            Query_Demo18(sqlClient);
         }
 
+
+        static void Query_Demo18(HiSqlClient sqlClient)
+        {
+            string sql = sqlClient.HiSql("select FieldName, count(FieldName) as NAME_count,max(FieldType) as FieldType_max from Hi_FieldModel  group by FieldName").ToSql();
+
+            string sql_having = sqlClient.HiSql("select FieldName, count(FieldName) as NAME_count,max(FieldType) as FieldType_max from Hi_FieldModel  group by FieldName having count(FieldName) > 1").ToSql();
+
+
+            int _total = 0;
+            var data = sqlClient.HiSql("select FieldName, count(FieldName) as NAME_count,max(FieldType) as FieldType_max from Hi_FieldModel  group by FieldName having count(FieldName) > 1").Take(2).Skip(2).ToTable(ref _total);
+            List<HiColumn> lst = sqlClient.HiSql("select FieldName, count(FieldName) as NAME_count,max(FieldType) as FieldType_max from Hi_FieldModel  group by FieldName").ToColumns();
+
+        }
         static void Query_Demo16(HiSqlClient sqlClient)
         {
             //以下将会报错 字符串的不允许表达式条件 
@@ -157,6 +171,7 @@ namespace HiSql.MySqlUnitTest
         }
         static void Query_Demo9(HiSqlClient sqlClient)
         {
+            var _sql = sqlClient.HiSql("select * from HTest01 where  CreateTime>='2022-02-17 09:27:50' and CreateTime<='2022-03-22 09:27:50'").ToSql();
             //int _effect3 = sqlClient.Modi("Hi_Domain", new List<object> { new { Domain = "10097", DomainDesc = "用户类型10097" }, new { Domain = "10098", DomainDesc = "用户类型10098" } }).ExecCommand();
             DataTable dt= sqlClient.HiSql("select * from h_test").ToTable() ;
         }
