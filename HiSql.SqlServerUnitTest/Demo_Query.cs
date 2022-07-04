@@ -54,17 +54,25 @@ namespace HiSql.UnitTest
 
         static void Query_Demo20(HiSqlClient sqlClient)
         {
-            Filter filters = new Filter();
-            filters.Add("menu.status", OperType.EQ, 0);
-            filters.Add("role.status", OperType.EQ, 0);
-            filters.Add("userRole.user_id", OperType.EQ, 122);
+            //Filter filters = new Filter();
+            //filters.Add("menu.status", OperType.EQ, 0);
+            //filters.Add("role.status", OperType.EQ, 0);
+            //filters.Add("userRole.user_id", OperType.EQ, 122);
+            ////filters.AddIf(11 > 12, "userRole.user_id", OperType.EQ, 122);
 
-            var sql=sqlClient.HiSql(@"select menu.* from sys_menu as  menu 
-                    join sys_role_menu as roleMenu on menu.menuId = roleMenu.menu_id 
-                    join sys_user_role as userRole on userRole.Role_id = roleMenu.Role_id
-                    join sys_role as role on role.RoleId = userRole.role_id
-                 order by menu.parentId, menu.orderNum
-                ").Where(filters).ToSql();
+            //var sql=sqlClient.HiSql(@"select menu.*,userRole.user_id from sys_menu as  menu 
+            //        join sys_role_menu as roleMenu on menu.menuId = roleMenu.menu_id 
+            //        join sys_user_role as userRole on userRole.Role_id = roleMenu.Role_id
+            //        join sys_role as role on role.RoleId = userRole.role_id
+            //     order by menu.parentId, menu.orderNum
+            //    ").Where(filters).ToSql();
+
+
+            var  sql=sqlClient.Query("sys_menu", "a").Field("a.*").Join("sys_role_menu", JoinType.Left).As("b").On(new Filter { { "a.menuId", OperType.EQ, "`b.menu_id`" } })
+                .Sort("a.menuId").ToSql();
+                ;
+
+
         }
 
         static void Query_Demo19(HiSqlClient sqlClient)

@@ -138,7 +138,31 @@ namespace HiSql
             return this;
         }
 
+        /// <summary>
+        /// 添加条件满足时才会增加条件
+        /// </summary>
+        /// <param name="isNotNull"></param>
+        /// <param name="fieldName"></param>
+        /// <param name="opfileter"></param>
+        /// <param name="fieldValue"></param>
+        /// <returns></returns>
+        public virtual  Filter AddIf( bool isNotNull, string fieldName, OperType opfileter, object fieldValue)
+        {
+            if (isNotNull)
+            {
+                this.Add(fieldName, opfileter, fieldValue);
+            }
 
+            return this;
+        }
+        public virtual Filter AddIf(bool isNotNull, string filter)
+        {
+            if (isNotNull)
+            {
+                this.Add(filter);
+            }
+            return this;
+        }
         public virtual Filter Add(LogiType logtype, object value)
         {
             _elements.Add(new FilterDefinition(FilterType.CONDITION) { LogiType = logtype, Value = value });
