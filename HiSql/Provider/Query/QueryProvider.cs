@@ -876,11 +876,9 @@ namespace HiSql
                 Dictionary<string, string> _dic_sort = Tool.RegexGrp(Constants.REG_SORT, s);
                 if (_dic_sort.Count() > 0)
                 {
-                    if (string.IsNullOrEmpty(_dic_sort["field"].ToString()))
-                        sortby.Add(_dic_sort["field"].ToString(), SortType.ASC);
-                    else
+                    if (!string.IsNullOrEmpty(_dic_sort["field"].ToString()))
                     {
-                        sortby.Add(_dic_sort["field"].ToString(), _dic_sort["sort"].ToString().ToLower() == "asc" ? SortType.ASC : SortType.DESC);
+                        sortby.Add(_dic_sort["field"].ToString(), _dic_sort["sort"].ToString().ToLower() == "desc" ? SortType.DESC : SortType.ASC);
                     }
                 }
                 else
