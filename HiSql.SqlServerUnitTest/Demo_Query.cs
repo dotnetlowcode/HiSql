@@ -45,11 +45,27 @@ namespace HiSql.UnitTest
             //Query_Demo16(sqlClient);
             //Query_Demo17(sqlClient);
             //Query_Demo18(sqlClient);
-            Query_Demo19(sqlClient);
+            //Query_Demo19(sqlClient);
+            Query_Demo20(sqlClient);
             var s = Console.ReadLine();
         }
 
 
+
+        static void Query_Demo20(HiSqlClient sqlClient)
+        {
+            Filter filters = new Filter();
+            filters.Add("menu.status", OperType.EQ, 0);
+            filters.Add("role.status", OperType.EQ, 0);
+            filters.Add("userRole.user_id", OperType.EQ, 122);
+
+            var sql=sqlClient.HiSql(@"select menu.* from sys_menu as  menu 
+                    join sys_role_menu as roleMenu on menu.menuId = roleMenu.menu_id 
+                    join sys_user_role as userRole on userRole.Role_id = roleMenu.Role_id
+                    join sys_role as role on role.RoleId = userRole.role_id
+                 order by menu.parentId, menu.orderNum
+                ").Where(filters).ToSql();
+        }
 
         static void Query_Demo19(HiSqlClient sqlClient)
         {

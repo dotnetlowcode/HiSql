@@ -43,6 +43,25 @@ namespace HiSql
 
         IUpdate Update<T>(string tabname, List<T> lstobj);
 
+        //IUpdate As(string retabname);
+        //IUpdate Join(JoinDefinition join);
+
+        //IUpdate Join(string tabname, string retabname, JoinType joinType = JoinType.Inner);
+
+        //IUpdate Join(string tabname, JoinType joinType = JoinType.Inner);
+
+        ///// <summary>
+        ///// ON
+        ///// </summary>
+        ///// <param name="joinon"></param>
+        ///// <returns></returns>
+        //IUpdate On(JoinOn joinon);
+        //IUpdate On(string leftCondition, string rightCcondition);
+
+        //IUpdate On(string condition);
+
+        //IUpdate On(Filter onfilter);
+
         /// <summary>
         /// 只更新哪一些字段
         /// </summary>
