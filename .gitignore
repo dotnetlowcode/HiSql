@@ -307,3 +307,5 @@ __pycache__/
 *.v1
 .vs
 /HiSql-dameng.zip
+/HiSql.SQLiteUnitTest
+/HiSql.SQLite
