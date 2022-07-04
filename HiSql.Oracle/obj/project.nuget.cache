@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "OCkru2OI9DojG8Y7l0/1GSY2i56+ah0IEAXfwC3XPPHWVs6Jm2ehIWIx52CXN5sXHJdxkKbTR1lkFgqnE+nhJg==",
+  "dgSpecHash": "aArp7yC5IMLgTQEu1OnuF2cOvyZb8O13PJrpfmQSXFKo0k4/CVJn29/F0CsCPuJKqt4oLlP/kW3Kv6xNK3AplA==",
   "success": true,
-  "projectFilePath": "D:\\Project\\OpenSource\\HiSql\\HiSql.Oracle\\HiSql.Oracle.csproj",
+  "projectFilePath": "D:\\Project\\OpenSource\\HiSql-new\\HiSql\\HiSql.Oracle\\HiSql.Oracle.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\admin\\.nuget\\packages\\azure.core\\1.6.0\\azure.core.1.6.0.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\azure.identity\\1.3.0\\azure.identity.1.3.0.nupkg.sha512",

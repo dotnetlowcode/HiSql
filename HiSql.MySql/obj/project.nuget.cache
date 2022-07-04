@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "U8fWxxwK08wEypy3obaj81z8yXUN5LXQRLPhvzUD6q+FhdnaTEmiy3gGhlix6UFwyuNrZCmSNAyz7jZcKIYCcA==",
+  "dgSpecHash": "DqOYa7hQVukYWYzSgZG5iS3Yq6PO32BWgOXHrAt+VbgfNHmZVbS6l1npQtrqe9tWqf+8Nz7YREyB1Kavmw5bWA==",
   "success": true,
-  "projectFilePath": "D:\\Project\\OpenSource\\HiSql\\HiSql.MySql\\HiSql.MySql.csproj",
+  "projectFilePath": "D:\\Project\\OpenSource\\HiSql-new\\HiSql\\HiSql.MySql\\HiSql.MySql.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\admin\\.nuget\\packages\\azure.core\\1.6.0\\azure.core.1.6.0.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\azure.identity\\1.3.0\\azure.identity.1.3.0.nupkg.sha512",

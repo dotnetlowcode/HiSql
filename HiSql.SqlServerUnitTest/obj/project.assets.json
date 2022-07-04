@@ -3049,11 +3049,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Project\\OpenSource\\HiSql\\HiSql.SqlServerUnitTest\\HiSql.SqlServerUnitTest.csproj",
+      "projectUniqueName": "D:\\Project\\OpenSource\\HiSql-new\\HiSql\\HiSql.SqlServerUnitTest\\HiSql.SqlServerUnitTest.csproj",
       "projectName": "HiSql.SqlServerUnitTest",
-      "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.SqlServerUnitTest\\HiSql.SqlServerUnitTest.csproj",
+      "projectPath": "D:\\Project\\OpenSource\\HiSql-new\\HiSql\\HiSql.SqlServerUnitTest\\HiSql.SqlServerUnitTest.csproj",
       "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-      "outputPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.SqlServerUnitTest\\obj\\",
+      "outputPath": "D:\\Project\\OpenSource\\HiSql-new\\HiSql\\HiSql.SqlServerUnitTest\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
@@ -3076,11 +3076,11 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "D:\\Project\\OpenSource\\HiSql\\HiSql.SqlServer\\HiSql.SqlServer.csproj": {
-              "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.SqlServer\\HiSql.SqlServer.csproj"
+            "D:\\Project\\OpenSource\\HiSql-new\\HiSql\\HiSql.SqlServer\\HiSql.SqlServer.csproj": {
+              "projectPath": "D:\\Project\\OpenSource\\HiSql-new\\HiSql\\HiSql.SqlServer\\HiSql.SqlServer.csproj"
             },
-            "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj": {
-              "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj"
+            "D:\\Project\\OpenSource\\HiSql-new\\HiSql\\HiSql\\HiSql.csproj": {
+              "projectPath": "D:\\Project\\OpenSource\\HiSql-new\\HiSql\\HiSql\\HiSql.csproj"
             }
           }
         }

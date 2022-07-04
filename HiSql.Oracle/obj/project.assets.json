@@ -6501,11 +6501,11 @@
   "project": {
     "version": "1.0.4.4",
     "restore": {
-      "projectUniqueName": "D:\\Project\\OpenSource\\HiSql\\HiSql.Oracle\\HiSql.Oracle.csproj",
+      "projectUniqueName": "D:\\Project\\OpenSource\\HiSql-new\\HiSql\\HiSql.Oracle\\HiSql.Oracle.csproj",
       "projectName": "HiSql.Oracle",
-      "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.Oracle\\HiSql.Oracle.csproj",
+      "projectPath": "D:\\Project\\OpenSource\\HiSql-new\\HiSql\\HiSql.Oracle\\HiSql.Oracle.csproj",
       "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-      "outputPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.Oracle\\obj\\",
+      "outputPath": "D:\\Project\\OpenSource\\HiSql-new\\HiSql\\HiSql.Oracle\\obj\\",
       "projectStyle": "PackageReference",
       "crossTargeting": true,
       "fallbackFolders": [
@@ -6532,32 +6532,32 @@
         "netcoreapp3.1": {
           "targetAlias": "netcoreapp3.1",
           "projectReferences": {
-            "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj": {
-              "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj"
+            "D:\\Project\\OpenSource\\HiSql-new\\HiSql\\HiSql\\HiSql.csproj": {
+              "projectPath": "D:\\Project\\OpenSource\\HiSql-new\\HiSql\\HiSql\\HiSql.csproj"
             }
           }
         },
         "net5.0": {
           "targetAlias": "net5.0",
           "projectReferences": {
-            "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj": {
-              "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj"
+            "D:\\Project\\OpenSource\\HiSql-new\\HiSql\\HiSql\\HiSql.csproj": {
+              "projectPath": "D:\\Project\\OpenSource\\HiSql-new\\HiSql\\HiSql\\HiSql.csproj"
             }
           }
         },
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj": {
-              "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj"
+            "D:\\Project\\OpenSource\\HiSql-new\\HiSql\\HiSql\\HiSql.csproj": {
+              "projectPath": "D:\\Project\\OpenSource\\HiSql-new\\HiSql\\HiSql\\HiSql.csproj"
             }
           }
         },
         "net461": {
           "targetAlias": "net461",
           "projectReferences": {
-            "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj": {
-              "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj"
+            "D:\\Project\\OpenSource\\HiSql-new\\HiSql\\HiSql\\HiSql.csproj": {
+              "projectPath": "D:\\Project\\OpenSource\\HiSql-new\\HiSql\\HiSql\\HiSql.csproj"
             }
           }
         }

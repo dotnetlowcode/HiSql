@@ -3644,11 +3644,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Project\\OpenSource\\HiSql\\HiSql.MySqlUnitTest\\HiSql.MySqlUnitTest.csproj",
+      "projectUniqueName": "D:\\Project\\OpenSource\\HiSql-new\\HiSql\\HiSql.MySqlUnitTest\\HiSql.MySqlUnitTest.csproj",
       "projectName": "HiSql.MySqlUnitTest",
-      "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.MySqlUnitTest\\HiSql.MySqlUnitTest.csproj",
+      "projectPath": "D:\\Project\\OpenSource\\HiSql-new\\HiSql\\HiSql.MySqlUnitTest\\HiSql.MySqlUnitTest.csproj",
       "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-      "outputPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.MySqlUnitTest\\obj\\",
+      "outputPath": "D:\\Project\\OpenSource\\HiSql-new\\HiSql\\HiSql.MySqlUnitTest\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
@@ -3671,14 +3671,14 @@
         "net5.0": {
           "targetAlias": "net5.0",
           "projectReferences": {
-            "D:\\Project\\OpenSource\\HiSql\\HiSql.MySql\\HiSql.MySql.csproj": {
-              "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.MySql\\HiSql.MySql.csproj"
+            "D:\\Project\\OpenSource\\HiSql-new\\HiSql\\HiSql.MySql\\HiSql.MySql.csproj": {
+              "projectPath": "D:\\Project\\OpenSource\\HiSql-new\\HiSql\\HiSql.MySql\\HiSql.MySql.csproj"
             },
-            "D:\\Project\\OpenSource\\HiSql\\HiSql.Oracle\\HiSql.Oracle.csproj": {
-              "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql.Oracle\\HiSql.Oracle.csproj"
+            "D:\\Project\\OpenSource\\HiSql-new\\HiSql\\HiSql.Oracle\\HiSql.Oracle.csproj": {
+              "projectPath": "D:\\Project\\OpenSource\\HiSql-new\\HiSql\\HiSql.Oracle\\HiSql.Oracle.csproj"
             },
-            "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj": {
-              "projectPath": "D:\\Project\\OpenSource\\HiSql\\HiSql\\HiSql.csproj"
+            "D:\\Project\\OpenSource\\HiSql-new\\HiSql\\HiSql\\HiSql.csproj": {
+              "projectPath": "D:\\Project\\OpenSource\\HiSql-new\\HiSql\\HiSql\\HiSql.csproj"
             }
           }
         }
