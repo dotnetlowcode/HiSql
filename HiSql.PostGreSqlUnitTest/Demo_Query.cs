@@ -23,18 +23,30 @@ namespace HiSql.PostGreSqlUnitTest
             //Query_Demo13(sqlClient);
             //Query_Demo15(sqlClient);
             //Query_Demo16(sqlClient);
-            Query_Demo18(sqlClient);
-            //Query_Demo19(sqlClient);
+            //Query_Demo18(sqlClient);
+            Query_Demo19(sqlClient);
         }
         static void Query_Demo19(HiSqlClient sqlClient)
         {
-            string sql = sqlClient.Query("Hi_FieldModel").As("A").Field("A.FieldType")
-                .Join("Hi_TabModel").As("B").On(new HiSql.JoinOn() { { "A.TabName", "B.TabName" } })
+            //string sql = sqlClient.Query("Hi_FieldModel").As("A").Field("A.FieldType")
+            //    .Join("Hi_TabModel").As("B").On(new HiSql.JoinOn() { { "A.TabName", "B.TabName" } })
+            //    .Where("A.TabName='GD_UniqueCodeInfo'").Group(new GroupBy { { "A.FieldType" } })
+            //    .Sort("A.FieldType asc", "A.TabName asc")
+            //    .Take(2).Skip(2)
+            //    .ToSql();
+
+
+            string sql = sqlClient.HiSql("select A.FieldType from Hi_FieldModel as A ")
                 .Where("A.TabName='GD_UniqueCodeInfo'").Group(new GroupBy { { "A.FieldType" } })
                 .Sort("A.FieldType asc", "A.TabName asc")
                 .Take(2).Skip(2)
                 .ToSql();
 
+
+
+            //var sql = sqlClient.HiSql("select a.tabname from hi_fieldmodel as a inner join Hi_TabModel as  b on a.tabname =b.tabname inner join Hi_TabModel as c on a.tabname=c.tabname where a.tabname='h_test'  and a.FieldType in (11,41,21)  ").ToSql();
+
+            //var sql = sqlClient.HiSql("select a.tabname from hi_fieldmodel as a inner join Hi_TabModel as  b on a.tabname =b.tabname inner join Hi_TabModel as c on a.tabname=c.tabname where a.tabname='h_test'  and a.FieldType in (11,41,21)  order by a.FieldType ").Take(2).Skip(2).ToSql();
 
             Stopwatch sw = new Stopwatch();
             sw.Start();

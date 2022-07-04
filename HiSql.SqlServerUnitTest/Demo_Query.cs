@@ -44,8 +44,8 @@ namespace HiSql.UnitTest
             //Query_Demo15(sqlClient);
             //Query_Demo16(sqlClient);
             //Query_Demo17(sqlClient);
-            Query_Demo18(sqlClient);
-            //Query_Demo19(sqlClient);
+            //Query_Demo18(sqlClient);
+            Query_Demo19(sqlClient);
             var s = Console.ReadLine();
         }
 
@@ -59,6 +59,11 @@ namespace HiSql.UnitTest
             //    .Sort("A.FieldType asc","A.TabName asc")
             //    .Take(2).Skip(2)
             //    .ToSql();
+
+
+            //var sql = sqlClient.HiSql("select a.tabname from hi_fieldmodel as a inner join Hi_TabModel as  b on a.tabname =b.tabname inner join Hi_TabModel as c on a.tabname=c.tabname where a.tabname='h_test'  and a.FieldType in (11,41,21)  ").ToSql();
+
+            var sql = sqlClient.HiSql("select a.tabname from hi_fieldmodel as a inner join Hi_TabModel as  b on a.tabname =b.tabname inner join Hi_TabModel as c on a.tabname=c.tabname where a.tabname='h_test'  and a.FieldType in (11,41,21)  order by a.FieldType ").Take(2).Skip(2).ToSql();
 
 
             string sql2 = sqlClient.HiSql("select A.FieldType from Hi_FieldModel as a inner join Hi_TabModel as b on a.tabname=b.tabname where A.TabName='GD_UniqueCodeInfo' group by a.fieldtype order by a.fieldtype  asc ").Take(2).Skip(2)

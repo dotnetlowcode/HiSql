@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -42,10 +43,35 @@ namespace HiSql.MySqlUnitTest
             //Query_Demo13(sqlClient);
             //Query_Demo15(sqlClient);
             //Query_Demo16(sqlClient);
-            Query_Demo18(sqlClient);
+            //Query_Demo18(sqlClient);
+            Query_Demo19(sqlClient);
         }
 
+        static void Query_Demo19(HiSqlClient sqlClient)
+        {
+            //string sql = sqlClient.Query("Hi_FieldModel").As("A").Field("A.FieldType")
+            //    .Join("Hi_TabModel").As("B").On(new HiSql.JoinOn() { { "A.TabName", "B.TabName" } })
+            //    .Where("A.TabName='GD_UniqueCodeInfo'").Group(new GroupBy { { "A.FieldType" } })
+            //    .Sort("A.FieldType asc", "A.TabName asc")
+            //    .Take(2).Skip(2)
+            //    .ToSql();
 
+
+            var sql = sqlClient.HiSql("select a.tabname from hi_fieldmodel as a inner join Hi_TabModel as  b on a.tabname =b.tabname inner join Hi_TabModel as c on a.tabname=c.tabname where a.tabname='h_test'  and a.FieldType in (11,41,21)  order by a.FieldType ").Take(2).Skip(2).ToSql();
+            //var sql = sqlClient.HiSql("select a.tabname from hi_fieldmodel as a inner join Hi_TabModel as  b on a.tabname =b.tabname inner join Hi_TabModel as c on a.tabname=c.tabname where a.tabname='h_test'  and a.FieldType in (11,41,21)  ").ToSql();
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
+            string sql2 = sqlClient.HiSql("select A.FieldType from Hi_FieldModel as a inner join Hi_TabModel as b on a.tabname=b.tabname where A.TabName='GD_UniqueCodeInfo' group by a.fieldtype order by a.fieldtype  asc ").Take(2).Skip(2)
+                .ToSql();
+
+            sw.Stop();
+            Console.WriteLine($"语句编译 耗时{sw.Elapsed}");
+
+            //string sql3 = sqlClient.HiSql("select  a.UniqueCode,a.BarCode,a.CategoryId from GD_UniqueCodeInfo as a").ToSql();
+
+        }
         static void Query_Demo18(HiSqlClient sqlClient)
         {
             string sql = sqlClient.HiSql("select FieldName, count(FieldName) as NAME_count,max(FieldType) as FieldType_max from Hi_FieldModel  group by FieldName").ToSql();
