@@ -18,7 +18,33 @@ namespace HiSql
         public DaMengDM()
         {
         }
+        MCache mcache = new MCache(typeof(DaMengDM).FullName);
+        public DBVersion DBVersion()
+        {
+            var version = mcache.GetOrCreate(typeof(DaMengDM).FullName + "_DBVersion", () =>
+            {
+                var _version = new DBVersion() { Version = new Version() };
 
+                var table = Context.DBO.GetDataTable(dbConfig.GetVersion);
+                if (table.Rows.Count > 0)
+                {
+                    var id_code = table.Rows[0]["id_code"]?.ToString();
+                    var Desc = table.Rows[0]["BANNER"]?.ToString();
+                    string versionStr = "";
+                    Match match = Regex.Match(Desc, @"V(?<ver>\d)", RegexOptions.ECMAScript);
+                    if (match.Success )
+                    {
+                        versionStr = match.Groups["ver"].Value +"."+ (id_code.Substring(0, id_code.IndexOf("."))).Replace("-",".");
+                    }
+                    match = Regex.Match(Desc, @"V(?<ver>\d)", RegexOptions.ECMAScript);
+
+                    _version.VersionDesc = table.Rows[0]["BANNER"]?.ToString();
+                    _version.Version = new Version(String.Join(".", versionStr.Split('.').Take(3).ToArray()));
+                }
+                return _version;
+            });
+            return version;
+        }
         #region IDMInitalize接口实现
         public TabInfo BuildTab(Type type)
         {

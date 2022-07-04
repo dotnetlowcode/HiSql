@@ -583,16 +583,26 @@ namespace HiSql
                                             var list = dicparam[n] as List<decimal>;
                                             _insql = AdoExtensions.ToSqlIn<decimal>(list.ToArray(), false);
                                         }
+                                        else if (_type == typeof(string[]))
+                                        {
+                                            var list = dicparam[n] as string[];
+                                            _insql = AdoExtensions.ToSqlIn<string>(list, true);
+                                        }
+                                        else if (_type == typeof(List<long>))
+                                        {
+                                            var list = dicparam[n] as List<long>;
+                                            _insql = AdoExtensions.ToSqlIn<long>(list.ToArray(), false);
+                                        }
                                         else
                                         {
-                                            throw new Exception($"类型[{_type.FullName}]不在允许的in集合内,仅允许List<string>,List<int>,List<decimal> 三种类型");
+                                            throw new HiSqlException($"类型[{_type.FullName}]不在允许的in集合内,仅允许string[],List<string>,List<int>,List<long>,List<decimal> 类型");
                                         }
 
                                         sql = regex.Replace(sql, $"{_insql}");
                                     }
                                     else
                                     {
-                                        throw new Exception($"参数 {n} 是集合 只能放在in ({n})中");
+                                        throw new HiSqlException($"参数 {n} 是集合 只能放在in ({n})中");
                                     }
                                 }
                                 else if (type.IsIn<Type>(Constants.ObjType))
@@ -606,12 +616,12 @@ namespace HiSql
                             }
                             else
                             {
-                                throw new Exception($"参数 {_dic["pname"]} 未设置");
+                                throw new HiSqlException($"参数 {_dic["pname"]} 未设置");
                             }
                         }
                     }
                     else
-                        throw new Exception($"参数化名称不能使用@name 又用[$name$] 格式");
+                        throw new HiSqlException($"参数化名称不能使用@name 又用[$name$] 格式");
                     #endregion
 
                 }
@@ -668,6 +678,7 @@ namespace HiSql
                                                 var list = dicparam[n] as List<string>;
                                                 _insql = AdoExtensions.ToSqlIn<string>(list.ToArray(), true);
                                             }
+                                            
                                             else if (_type == _typ_int)
                                             {
                                                 var list = dicparam[n] as List<int>;
@@ -678,9 +689,20 @@ namespace HiSql
                                                 var list = dicparam[n] as List<decimal>;
                                                 _insql = AdoExtensions.ToSqlIn<decimal>(list.ToArray(), false);
                                             }
+                                            else if (_type == typeof(string[]))
+                                            {
+                                                var list = dicparam[n] as string[];
+                                                _insql = AdoExtensions.ToSqlIn<string>(list, true);
+                                            }
+                                            else if (_type == typeof(List<long>))
+                                            {
+                                                var list = dicparam[n] as List<long>;
+                                                _insql = AdoExtensions.ToSqlIn<long>(list.ToArray(), false);
+                                            }
+                                            
                                             else
                                             {
-                                                throw new Exception($"类型[{_type.FullName}]不在允许的in集合内,仅允许List<string>,List<int>,List<decimal> 三种类型");
+                                                throw new HiSqlException($"类型[{_type.FullName}]不在允许的in集合内,仅允许string[],List<string>,List<int>,List<long>,List<decimal> 类型");
                                             }
 
 
@@ -688,7 +710,7 @@ namespace HiSql
                                         }
                                         else
                                         {
-                                            throw new Exception($"参数 {n} 是集合 只能放在in ({n})中");
+                                            throw new HiSqlException($"参数 {n} 是集合 只能放在in ({n})中");
                                         }
 
 
@@ -704,12 +726,12 @@ namespace HiSql
                                     }
                                 }
                                 else
-                                    throw new Exception($"参数 {n} 设置多余在参数化hisql中未使用");
+                                    throw new HiSqlException($"参数 {n} 设置多余在参数化hisql中未使用");
 
                             }
                             else
                             {
-                                throw new Exception($"参数 {n} 不符合参数规则 规则为[$参数名$]");
+                                throw new HiSqlException($"参数 {n} 不符合参数规则 规则为[$参数名$]");
                             }
 
 

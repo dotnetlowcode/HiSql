@@ -239,6 +239,7 @@ namespace HiSql
         public int PackageCells { get => _packagecells; set => _packagecells = value; }
 
 
+        public string GetVersion { get => "Select * from \"SYS\".\"M_DATABASE\""; }
         public string Schema_Pre { get => _temp_schema_pre; }
         public string Schema_After { get => _temp_schema_after; }
         public string Table_Pre { get => _temp_table_pre; }

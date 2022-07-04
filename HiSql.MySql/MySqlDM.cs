@@ -18,7 +18,25 @@ namespace HiSql
         public MySqlDM()
         {
         }
+        MCache mcache = new MCache(typeof(MySqlDM).FullName);
+        public DBVersion DBVersion()
+        {
 
+            var version = mcache.GetOrCreate(typeof(MySqlDM).FullName + "_DBVersion", () =>
+            {
+                var _version = new DBVersion() { Version = new Version() };
+
+                var tablerows = Context.DBO.GetDataTable(dbConfig.GetVersion).Rows;
+                if (tablerows.Count > 0)
+                {
+                    _version.VersionDesc = tablerows[0][0]?.ToString();
+
+                    _version.Version = new Version(tablerows[0][0]?.ToString());
+                }
+                return _version;
+            });
+            return version;
+        }
         #region IDMInitalize接口实现
         public TabInfo BuildTab(Type type)
         {

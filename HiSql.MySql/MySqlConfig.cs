@@ -208,6 +208,7 @@ namespace HiSql
 
         List<DefMapping> _lstdefmapping = new List<DefMapping>();
 
+        public string GetVersion { get => "select version();"; }
         public List<DefMapping> DbDefMapping
         {
             get => _lstdefmapping;

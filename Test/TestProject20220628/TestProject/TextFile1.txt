@@ -1,0 +1,175 @@
+﻿Type type = lstobj[0].GetType();
+            List<PropertyInfo> attrs = type.GetProperties().Where(p => p.MemberType == MemberTypes.Property && p.CanRead == true).ToList();
+
+
+            // 将有配正则校验的列去重统计
+                Dictionary<string, HashSet<string>> dic_hash_reg = new Dictionary<string, HashSet<string>>();
+            Dictionary<string, HashSet<string>> dic_hash_tab = new Dictionary<string, HashSet<string>>();
+
+
+            var arrcol_reg = tabinfo.Columns.Where(h => !string.IsNullOrEmpty(h.Regex)).ToList();
+            var arrcol_tab = tabinfo.Columns.Where(h => h.IsRefTab).ToList();
+
+            var arrcol = tabinfo.Columns.Where(h => !string.IsNullOrEmpty(h.Regex) || h.IsRefTab).ToList();
+
+
+            int _rowidx = 0;
+            string _value = "";
+            List<Dictionary<string, string>> rtnlst = new List<Dictionary<string, string>>();
+            foreach (var o in lstobj)
+            {
+                _rowidx++;
+                Dictionary<string, string> _dic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                Dictionary<string, string> _rowdic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                foreach (HiColumn hiColumn in tabinfo.Columns)
+                {
+                    
+
+                    
+
+                    var objprop = attrs.FirstOrDefault(p => p.Name.Equals(hiColumn.FieldName, StringComparison.OrdinalIgnoreCase));
+                    #region  判断必填 及自增长
+                    if (hiColumn.IsRequire && !hiColumn.IsIdentity && objprop == null)
+                    {
+                        throw new Exception($"行[{_rowidx}] 缺少字段[{hiColumn.FieldName}] 为必填字段");
+                    }
+                    if (hiColumn.IsIdentity && _dic.ContainsKey(hiColumn.FieldName))
+                    {
+                        _value = _dic[hiColumn.FieldName].ToString();
+                        if (_value == "0" || string.IsNullOrEmpty(_value))
+                            continue;
+                        else
+                            throw new Exception($"行[{_rowidx}] 字段[{hiColumn.FieldName}] 为自增长字段 不需要外部赋值");
+                    }
+                    else if (hiColumn.IsIdentity)
+                    {
+                        continue;
+                    }
+                    #endregion
+
+                    if (objprop != null)
+                    {
+                        object objvalue = objprop.GetValue(o);
+                        if(objvalue != null)
+                        {
+                            //#region 将值转成string 及特殊处理
+                            if (hiColumn.FieldType.IsIn<HiType>(HiType.DATE, HiType.DATETIME))
+                            {
+                                DateTime dtime = (DateTime)objvalue;
+                                if (dtime != null && dtime != DateTime.MinValue)
+                                {
+                                    _dic.Add(hiColumn.FieldName, dtime.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+                                }
+                                else
+                                    _dic.Add(hiColumn.FieldName, DateTime.MinValue.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+                            }
+                            else if (hiColumn.FieldType.IsIn<HiType>(HiType.BOOL))
+                            {
+                                if ((bool)objvalue == true)
+                                {
+                                    _dic.Add(hiColumn.FieldName, "1");
+                                }
+                                else
+                                    _dic.Add(hiColumn.FieldName, "0");
+                            }
+                            else
+                            {
+                                if (hiColumn.FieldType.IsIn<HiType>(HiType.INT))
+                                {
+                                    _dic.Add(hiColumn.FieldName, ((int)objvalue).ToString());
+                                }
+                                else
+                                    _dic.Add(hiColumn.FieldName, objvalue.ToString());
+                            }
+                            _value = _dic[hiColumn.FieldName];
+                            //#endregion
+
+                            #region 是否需要正则校验
+                            if (arrcol.Count>0 && arrcol.Any(h => h.FieldName == hiColumn.FieldName))
+                            {
+                                dic_hash_reg[hiColumn.FieldName].Add(_dic[hiColumn.FieldName]);
+                            }
+
+                            #endregion
+
+                            #region 通用数据有效性校验
+                            var result = checkFieldValue(hiColumn, _rowidx, objvalue.ToString(), sqlClient);
+                            if (result.Item1)
+                            {
+                                _rowdic.Add(hiColumn.FieldName, result.Item2);
+                            }
+                            #endregion
+
+
+                        }
+
+                    }
+                }
+
+                if (_rowdic.Count > 0)
+                {
+                    rtnlst.Add(_rowdic);
+                }
+                else
+                    throw new Exception($"行[{_rowidx}] 无可插入的字段数据");
+
+                //foreach (PropertyInfo p1 in attrs)
+                //{
+                //    object value = p1.GetValue(o);
+                //}
+
+                //List<PropertyInfo> attrs = type.GetProperties().Where(p => p.MemberType == MemberTypes.Property && p.CanRead == true).ToList();
+
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            HiSqlClient sqlClient = Demo_Init.GetMySqlClient();
+
+            TabInfo tabinfo= sqlClient.Context.DMInitalize.GetTabStruct("HTest01");
+
+
+            List<object> lstobj21 = new List<object>();
+            List<object> lstobj22 = new List<object>();
+            List<object> lstobj23 = new List<object>();
+            List<object> lstobj24 = new List<object>();
+            int _count2 = 10000;
+            Random random2 = new Random();
+            //插入的参数值都随机产生 以免数据库执行相同SQL时会有缓存影响测试结果
+            for (int i = 0; i < _count; i++)
+            {
+                //hisql可以用实体类也可以用匿名类
+                lstobj21.Add(new { SID = (i + 1), UName = $"hisql{i}", Age = 20 + (i % 50), Salary = 5000 + (i % 2000) + random2.Next(10), Descript = $"hisql初始创建" });
+                lstobj22.Add(new { SID = (i + 1), UName = $"hisql{i}", Age = 20 + (i % 50), Salary = 5000 + (i % 2000) + random2.Next(10), Descript = $"hisql初始创建" });
+                lstobj23.Add(new { SID = (i + 1), UName = $"hisql{i}", Age = 20 + (i % 50), Salary = 5000 + (i % 2000) + random2.Next(10), Descript = $"hisql初始创建" });
+                lstobj24.Add(new { SID = (i + 1), UName = $"hisql{i}", Age = 20 + (i % 50), Salary = 5000 + (i % 2000) + random2.Next(10), Descript = $"hisql初始创建" });
+            }
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            var rtnlist = CheckAllData(tabinfo.Columns, lstobj, sqlClient);
+            sw.Stop();
+            Console.WriteLine($"a耗时:{sw.Elapsed}");
+
+            sw.Reset();
+
+
+            sw.Start();
+            CheckData(tabinfo.Columns, lstobj, sqlClient);
+
+            sw.Stop();
+            Console.WriteLine($"b耗时:{sw.Elapsed}");

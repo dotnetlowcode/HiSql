@@ -20,6 +20,25 @@ namespace HiSql
         }
 
         #region IDMInitalize接口实现
+        MCache mcache = new MCache(typeof(OracleDM).FullName);
+        public DBVersion DBVersion()
+        {
+
+            var version = mcache.GetOrCreate(typeof(OracleDM).FullName + "_DBVersion", () =>
+            {
+                var _version = new DBVersion() { Version = new Version() };
+
+                var tablerows = Context.DBO.GetDataTable(dbConfig.GetVersion).Select("product like '%Oracle%'");
+                if (tablerows.Length > 0)
+                {
+                    _version.VersionDesc = tablerows[0][0]?.ToString();
+                    
+                    _version.Version = new Version(String.Join(".", tablerows[0][1].ToString().Split('.').Take(3).ToArray()));
+                }
+                return _version;
+            });
+            return version;
+        }
         public TabInfo BuildTab(Type type)
         {
             TabInfo tabInfo = new TabInfo();
@@ -1089,7 +1108,7 @@ namespace HiSql
                 string _temp = sequence_temp;
                 _temp = _temp.Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema)
                     .Replace("[$TabName$]", tabname)
-                    .Replace("[$ConnectID$]",Context.CurrentConnectionConfig.ConfigId.Replace("-","").Substring(8))
+                    .Replace("[$ConnectID$]", GetKeyID())
                     .Replace("[$FieldName$]", hiColumn.FieldName);
                 sb.AppendLine(
                     _temp
@@ -1150,7 +1169,7 @@ namespace HiSql
                 if (!string.IsNullOrEmpty(keys))
                 {
                     keys = dbConfig.Table_Key.Replace("[$TabName$]", _create_tabname)
-                        .Replace("[$Keys$]", keys).Replace("[$ConnectID$]", this.Context.ConnectedId.Replace("-",""));
+                        .Replace("[$Keys$]", keys).Replace("[$ConnectID$]", GetKeyID());
 
                     keys = $"execute immediate '{keys.Replace("'","''")}';";
                 }
@@ -2985,6 +3004,17 @@ namespace HiSql
             else
                 return new List<TabIndexDetail>();
         }
+        private string GetKeyID()
+        {
+            if (DBVersion().Version < new Version("19.0"))
+            {
+                return DateTime.Now.ToString("f");
+            }
+            else
+            {
+                return DateTime.Now.ToString("yyMMddHHmmssfff");
+            }
+        }
         /// <summary>
         /// 创建主键
         /// </summary>
@@ -3003,7 +3033,7 @@ namespace HiSql
             if (!string.IsNullOrEmpty(keys))
             {
                 keys = dbConfig.Table_Key.Replace("[$TabName$]", tabname)
-                    .Replace("[$Keys$]", keys).Replace("[$ConnectID$]", this.Context.ConnectedId.Replace("-", "_"));
+                    .Replace("[$Keys$]", keys).Replace("[$ConnectID$]", GetKeyID());
             }
             return "execute immediate  '" + keys + "';";
         }
