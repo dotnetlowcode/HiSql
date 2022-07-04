@@ -166,9 +166,7 @@ namespace HiSql
                         sb.AppendLine($" group by {sb_group.ToString()}");
 
                     if (!string.IsNullOrEmpty(sb_having.ToString()))
-                    {
-                        sb_total.AppendLine($" having {sb_having.ToString()}");
-                    }
+                        sb.AppendLine($" having {sb_having.ToString()}");
 
                     if (!string.IsNullOrEmpty(sb_sort.ToString()))
                         sb.AppendLine($" order by  {sb_sort.ToString()}");
@@ -188,9 +186,7 @@ namespace HiSql
                     sb.AppendLine($" group by {sb_group.ToString()}");
 
                 if (!string.IsNullOrEmpty(sb_having.ToString()))
-                {
-                    sb_total.AppendLine($" having {sb_having.ToString()}");
-                }
+                    sb.AppendLine($" having {sb_having.ToString()}");
 
                 if (!string.IsNullOrEmpty(sb_sort.ToString()))
                     sb.AppendLine($" order by  {sb_sort.ToString()}");
