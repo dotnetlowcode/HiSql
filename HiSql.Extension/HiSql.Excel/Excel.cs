@@ -610,8 +610,8 @@ namespace HiSql.Extension
                     }
                     else if (dt.Columns[j].DataType == typedatetime)
                     {
-
-                        _dcell.SetCellValue(Convert.ToDateTime(_value));
+                        if(!string.IsNullOrEmpty(_value))
+                            _dcell.SetCellValue(Convert.ToDateTime(_value));
 
                         xSSFCellStyle1.DataFormat = format.GetFormat("yyyy-MM-dd");
                         _dcell.CellStyle = xSSFCellStyle1;
