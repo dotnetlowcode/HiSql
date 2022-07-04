@@ -3,7 +3,7 @@
   <PropertyGroup>
 	  <TargetFrameworks>net461;net5.0;netcoreapp3.1;net6.0</TargetFrameworks>
     <Authors>tansar</Authors>
-    <Version>1.0.4.4</Version>
+    <Version>1.0.4.5</Version>
     <Company>HiSql</Company>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
    

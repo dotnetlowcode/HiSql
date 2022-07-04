@@ -168,9 +168,8 @@ namespace HiSql
                         sb.AppendLine($" group by {sb_group.ToString()}");
 
                     if (!string.IsNullOrEmpty(sb_having.ToString()))
-                    {
-                        sb_total.AppendLine($" having {sb_having.ToString()}");
-                    }
+                        sb.AppendLine($" having {sb_having.ToString()}");
+
 
                     if (!string.IsNullOrEmpty(sb_sort.ToString()))
                         sb.AppendLine($" order by  {sb_sort.ToString()}");
@@ -190,9 +189,7 @@ namespace HiSql
                     sb.AppendLine($" group by {sb_group.ToString()}");
 
                 if (!string.IsNullOrEmpty(sb_having.ToString()))
-                {
-                    sb_total.AppendLine($" having {sb_having.ToString()}");
-                }
+                    sb.AppendLine($" having {sb_having.ToString()}");
 
                 if (!string.IsNullOrEmpty(sb_sort.ToString()))
                     sb.AppendLine($" order by  {sb_sort.ToString()}");
@@ -436,6 +433,9 @@ namespace HiSql
 
             sb_group.Append(mysqlDM.BuildGroupSql(this.TableList, dictabinfo, this.Fields, this.Groups, this.IsMultiSubQuery));
 
+            //having
+            if (this.Havings != null)
+                sb_having.Append(mysqlDM.BuildHavingSql(this.TableList, dictabinfo, this.Fields, this.Havings.HavingParse.Result, this.IsMultiSubQuery));
 
             //排序字段
             sb_sort.Append(mysqlDM.BuildOrderBySql(ref sb_group, dictabinfo, (QueryProvider)this));
