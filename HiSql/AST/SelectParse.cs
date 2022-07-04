@@ -145,7 +145,7 @@ namespace HiSql.AST
         public SelectParse(string sql, HiSqlProvider context, bool _singlefield = false)
         {
             this._sql = sql;
-            sql = sql.Replace(System.Environment.NewLine, " ").Replace(@"\n"," ");
+            sql = sql.Replace(System.Environment.NewLine, " ").Replace("\n"," ");
             
 
             Context = context;
@@ -155,7 +155,7 @@ namespace HiSql.AST
 
         public SelectParse(string sql, IQuery query)
         {
-            sql = sql.Replace(System.Environment.NewLine, " ").Replace(@"\n", " ");
+            sql = sql.Replace(System.Environment.NewLine, " ").Replace("\n", " ");
             this._sql = sql;
             _query = query;
             if (_query == null) throw new Exception($"context 为Null");
