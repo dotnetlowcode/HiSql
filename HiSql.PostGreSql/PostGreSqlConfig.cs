@@ -280,6 +280,8 @@ namespace HiSql
         public string Get_Table_Schema { get => _temp_get_table_schema; }
 
 
+        public string GetVersion { get => "SELECT version();"; }
+
         public string Insert_StateMent { get => _temp_insert_statement; }
 
         public string Insert_StateMentv2 { get => _temp_insert_statementv2; }

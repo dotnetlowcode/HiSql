@@ -145,6 +145,9 @@ namespace HiSql.AST
         public SelectParse(string sql, HiSqlProvider context, bool _singlefield = false)
         {
             this._sql = sql;
+            sql = sql.Replace(System.Environment.NewLine, " ").Replace("\n"," ");
+            
+
             Context = context;
             if (context == null) throw new Exception($"context 为Null");
             parseSelect(sql, _singlefield);
@@ -152,7 +155,7 @@ namespace HiSql.AST
 
         public SelectParse(string sql, IQuery query)
         {
-            sql = sql.Replace(System.Environment.NewLine, " ");
+            sql = sql.Replace(System.Environment.NewLine, " ").Replace("\n", " ");
             this._sql = sql;
             _query = query;
             if (_query == null) throw new Exception($"context 为Null");
@@ -284,11 +287,22 @@ namespace HiSql.AST
                             sql.LastIndexOf($" union{System.Environment.NewLine}",StringComparison.OrdinalIgnoreCase) ,
                         };
 
+                        List<int> lstnum2 = lstnum.Where(x => x >= 0).ToList();
+                        if (lstnum2.Count > 0)
+                        {
+                            //按大小顺序排序
+                            lstnum2.Sort((a, b) =>
+                            {
+                                return a.CompareTo(b);
+                            });
+                            _pos_idx = lstnum2[0];
+                        }
+
                         //按大小顺序排序
-                        lstnum.Sort((a,b)=> {
-                            return b.CompareTo(a);
-                        });
-                        _pos_idx = lstnum[0];
+                        //lstnum.Sort((a,b)=> {
+                        //    return b.CompareTo(a);
+                        //});
+                        //_pos_idx = lstnum[0];
                         
 
 
@@ -661,13 +675,13 @@ namespace HiSql.AST
                 int _pos_idx = 0;
                 //获取最外层的 关键词位置顺序 可能子语句中也可能包括关键字
                 List<int> lstnum = new List<int> { 
-                    sql.LastIndexOf(" left ", StringComparison.OrdinalIgnoreCase),
+                    sql.IndexOf(" left ", StringComparison.OrdinalIgnoreCase),
                     //sql.LastIndexOf($" left{System.Environment.NewLine}",StringComparison.OrdinalIgnoreCase),
-                    sql.LastIndexOf(" inner ", StringComparison.OrdinalIgnoreCase), 
+                    sql.IndexOf(" inner ", StringComparison.OrdinalIgnoreCase), 
                     //sql.LastIndexOf($" inner{System.Environment.NewLine}",StringComparison.OrdinalIgnoreCase), 
-                    sql.LastIndexOf(" join ",StringComparison.OrdinalIgnoreCase), 
+                    sql.IndexOf(" join ",StringComparison.OrdinalIgnoreCase), 
                     //sql.LastIndexOf($" join{System.Environment.NewLine}",StringComparison.OrdinalIgnoreCase), 
-                    sql.LastIndexOf(" where ", StringComparison.OrdinalIgnoreCase), 
+                    sql.IndexOf(" where ", StringComparison.OrdinalIgnoreCase), 
                     //sql.LastIndexOf($" where{System.Environment.NewLine}", StringComparison.OrdinalIgnoreCase), 
                     sql.LastIndexOf(" order ", StringComparison.OrdinalIgnoreCase), 
                     //sql.LastIndexOf($" order{System.Environment.NewLine}",StringComparison.OrdinalIgnoreCase), 
@@ -675,7 +689,7 @@ namespace HiSql.AST
                     //sql.LastIndexOf($" group{System.Environment.NewLine}",StringComparison.OrdinalIgnoreCase), 
                     sql.LastIndexOf(" having ", StringComparison.OrdinalIgnoreCase), 
                     //sql.LastIndexOf($" having{System.Environment.NewLine}",StringComparison.OrdinalIgnoreCase), 
-                    sql.LastIndexOf(" union ", StringComparison.OrdinalIgnoreCase)
+                    sql.IndexOf(" union ", StringComparison.OrdinalIgnoreCase)
                     //sql.LastIndexOf($" union{System.Environment.NewLine}", StringComparison.OrdinalIgnoreCase)
 
                 

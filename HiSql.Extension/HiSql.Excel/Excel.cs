@@ -272,20 +272,15 @@ namespace HiSql.Extension
             FileStream file = new FileStream(newfile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
 
-            IWorkbook workbook = new XSSFWorkbook(file);//将文件读到内存，在内存中操作excel
 
-            //if (newfile.IndexOf(".xlsx") > 0)
-            //    workbook2 = new XSSFWorkbook(file);
-            //// 2003版本  
-            //else if (newfile.IndexOf(".xls") > 0)
-            //    workbook2 = new HSSFWorkbook(file);
-            //SXSSFWorkbook xssfworkbook = new SXSSFWorkbook(workbook, 1000);
-            //int _actidx = xssfworkbook.ActiveSheetIndex;
+            XSSFWorkbook workbook = new XSSFWorkbook(file);//将文件读到内存，在内存中操作excel
 
+            SXSSFWorkbook xssfworkbook = new SXSSFWorkbook(workbook, 1000);
             int _actidx = workbook.ActiveSheetIndex;
-            //SXSSFSheet xssfsheet = null;
+            SXSSFSheet xssfsheet = xssfworkbook.GetSheetAt(_actidx) as SXSSFSheet;
+            file.Close();
 
-            ISheet xssfsheet = null;
+
 
 
 
@@ -294,35 +289,6 @@ namespace HiSql.Extension
 
             List<IName> lstsheets = new List<IName>();
 
-            if (!string.IsNullOrEmpty(sheetname))
-            {
-                lstsheets = (List<IName>)workbook.GetAllNames();
-
-                if (lstsheets.Any(n => n.SheetName.Equals(sheetname)))
-                {
-                    xssfsheet = workbook.GetSheet(sheetname) as SXSSFSheet; ;
-                }
-                else
-                {
-                    xssfsheet = workbook.CreateSheet(sheetname) as SXSSFSheet;
-                    xssfsheet.SetActive(true);
-                }
-            }
-            else
-            {
-                //xssfworkbook.CreateSheet(sheetname);
-                xssfsheet = workbook.GetSheetAt(_actidx);//as SXSSFSheet;
-            }
-
-            file.Close();
-            //var pages = Math.Ceiling(Convert.ToDouble(count) / PageSize);
-            //将内存数据写到文件
-
-            //for (int pageIndex = 1; pageIndex <= pages; pageIndex++)
-            //{
-            //    var startRow = (pageIndex - 1) * PageSize + 1;
-            //    var endRow = pageIndex * PageSize;
-            //    var dt = GetPagedTable(dtable, pageIndex);
 
             var beginRow = _options.BeginRow - 1;//+ startRow - 1;//这里的beginRow这么处理，是因为我的Excel标题是在第三行
 
@@ -399,17 +365,16 @@ namespace HiSql.Extension
             }
 
             //保存抬头数据
+ 
+
             using (FileStream fs = File.OpenWrite(newfile))
             {
-                xssfsheet.ForceFormulaRecalculation = false;
-                workbook.Write(fs);
-                //workbook2.Dispose();
-
-                workbook.Close();
+                xssfsheet.ForceFormulaRecalculation = true;
+                xssfworkbook.Write(fs);
+                xssfworkbook.Dispose();
+                xssfworkbook.Close();
                 if (fs != null) fs.Close();
             }
-
-
 
 
 
@@ -584,49 +549,57 @@ namespace HiSql.Extension
             XSSFCellStyle xSSFCellStyle1 = (XSSFCellStyle)workbook.CreateCellStyle();
             XSSFDataFormat format = (XSSFDataFormat)workbook.CreateDataFormat();
 
-            for (var i = 0; i < dt.Rows.Count; i++)
+            if (dt.Rows.Count > 0)
             {
-                beginRow = beginRow + 1;
-                var excelRow = xssfsheet.CreateRow(beginRow);
-
-                for (int j = 0; j < dt.Columns.Count; j++)
+                for (var i = 0; i < dt.Rows.Count; i++)
                 {
-                    ICell _dcell = excelRow.CreateCell(j);
-                    var _value = dt.Rows[i][j].ToString().Trim();
-                    if (dt.Columns[j].DataType == typedec || dt.Columns[j].DataType == typeint || dt.Columns[j].DataType == typeint64 || dt.Columns[j].DataType == typefloat)
+                    beginRow = beginRow + 1;
+                    var excelRow = xssfsheet.CreateRow(beginRow);
+
+                    for (int j = 0; j < dt.Columns.Count; j++)
                     {
-                        if (_value.Length <= 10)
+                        ICell _dcell = excelRow.CreateCell(j);
+                        var _value = dt.Rows[i][j].ToString().Trim();
+                        if (dt.Columns[j].DataType == typedec || dt.Columns[j].DataType == typeint || dt.Columns[j].DataType == typeint64 || dt.Columns[j].DataType == typefloat)
                         {
-                            _dcell.SetCellType(CellType.Numeric);
-                            if (_value.IndexOf(".") > 0)
-                                _dcell.SetCellValue(Convert.ToDouble(_value));
+                            if (_value.Length <= 10)
+                            {
+                                _dcell.SetCellType(CellType.Numeric);
+                                if (_value.IndexOf(".") > 0)
+                                    _dcell.SetCellValue(Convert.ToDouble(_value));
+                                else
+                                    _dcell.SetCellValue(Convert.ToInt64(_value));
+                            }
                             else
-                                _dcell.SetCellValue(Convert.ToInt64(_value));
+                                _dcell.SetCellValue(_value);
+
+
+                        }
+                        else if (dt.Columns[j].DataType == typedatetime)
+                        {
+                            if (!string.IsNullOrEmpty(_value))
+                                _dcell.SetCellValue(Convert.ToDateTime(_value));
+
+                            xSSFCellStyle1.DataFormat = format.GetFormat("yyyy-MM-dd");
+                            _dcell.CellStyle = xSSFCellStyle1;
+
                         }
                         else
                             _dcell.SetCellValue(_value);
 
 
-                    }
-                    else if (dt.Columns[j].DataType == typedatetime)
-                    {
 
-                        _dcell.SetCellValue(Convert.ToDateTime(_value));
 
-                        xSSFCellStyle1.DataFormat = format.GetFormat("yyyy-MM-dd");
-                        _dcell.CellStyle = xSSFCellStyle1;
 
                     }
-                    else
-                        _dcell.SetCellValue(_value);
-
-
-
-
-
                 }
-            }
 
+            }
+            else
+            {
+                beginRow = beginRow + 1;
+                var excelRow = xssfsheet.CreateRow(beginRow);
+            }
             using (FileStream fs = File.OpenWrite(excelpath))
             {
                 xssfsheet.ForceFormulaRecalculation = true;

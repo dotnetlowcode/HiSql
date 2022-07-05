@@ -14,7 +14,8 @@ namespace HiSql
     /// </summary>
     public interface IDMTab
     {
-
+       
+       
         HiSqlProvider Context { get; set; }
         /// <summary>
         /// 表创建
@@ -69,6 +70,14 @@ namespace HiSql
         /// <returns></returns>
         DataTable GetViewList(string viewname = "");
         DataTable GetViewList(string viewname, int pageSize, int pageIndex, out int totalCount);
+
+
+
+        /// <summary>
+        /// 获取版本
+        /// </summary>
+        /// <returns></returns>
+        DBVersion DBVersion();
 
 
         /// <summary>

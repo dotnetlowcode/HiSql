@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -40,10 +41,49 @@ namespace HiSql.MySqlUnitTest
             //Query_Demo11(sqlClient);
             //Query_Demo12(sqlClient);
             //Query_Demo13(sqlClient);
-            Query_Demo15(sqlClient);
+            //Query_Demo15(sqlClient);
             //Query_Demo16(sqlClient);
+            //Query_Demo18(sqlClient);
+            Query_Demo19(sqlClient);
         }
 
+        static void Query_Demo19(HiSqlClient sqlClient)
+        {
+            //string sql = sqlClient.Query("Hi_FieldModel").As("A").Field("A.FieldType")
+            //    .Join("Hi_TabModel").As("B").On(new HiSql.JoinOn() { { "A.TabName", "B.TabName" } })
+            //    .Where("A.TabName='GD_UniqueCodeInfo'").Group(new GroupBy { { "A.FieldType" } })
+            //    .Sort("A.FieldType asc", "A.TabName asc")
+            //    .Take(2).Skip(2)
+            //    .ToSql();
+
+
+            var sql = sqlClient.HiSql("select a.tabname from hi_fieldmodel as a inner join Hi_TabModel as  b on a.tabname =b.tabname inner join Hi_TabModel as c on a.tabname=c.tabname where a.tabname='h_test'  and a.FieldType in (11,41,21)  order by a.FieldType ").Take(2).Skip(2).ToSql();
+            //var sql = sqlClient.HiSql("select a.tabname from hi_fieldmodel as a inner join Hi_TabModel as  b on a.tabname =b.tabname inner join Hi_TabModel as c on a.tabname=c.tabname where a.tabname='h_test'  and a.FieldType in (11,41,21)  ").ToSql();
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
+            string sql2 = sqlClient.HiSql("select A.FieldType from Hi_FieldModel as a inner join Hi_TabModel as b on a.tabname=b.tabname where A.TabName='GD_UniqueCodeInfo' group by a.fieldtype order by a.fieldtype  asc ").Take(2).Skip(2)
+                .ToSql();
+
+            sw.Stop();
+            Console.WriteLine($"语句编译 耗时{sw.Elapsed}");
+
+            //string sql3 = sqlClient.HiSql("select  a.UniqueCode,a.BarCode,a.CategoryId from GD_UniqueCodeInfo as a").ToSql();
+
+        }
+        static void Query_Demo18(HiSqlClient sqlClient)
+        {
+            string sql = sqlClient.HiSql("select FieldName, count(FieldName) as NAME_count,max(FieldType) as FieldType_max from Hi_FieldModel  group by FieldName").ToSql();
+
+            string sql_having = sqlClient.HiSql("select FieldName, count(FieldName) as NAME_count,max(FieldType) as FieldType_max from Hi_FieldModel  group by FieldName having count(FieldName) > 1").ToSql();
+
+
+            int _total = 0;
+            var data = sqlClient.HiSql("select FieldName, count(FieldName) as NAME_count,max(FieldType) as FieldType_max from Hi_FieldModel  group by FieldName having count(FieldName) > 1").Take(2).Skip(2).ToTable(ref _total);
+            List<HiColumn> lst = sqlClient.HiSql("select FieldName, count(FieldName) as NAME_count,max(FieldType) as FieldType_max from Hi_FieldModel  group by FieldName").ToColumns();
+
+        }
         static void Query_Demo16(HiSqlClient sqlClient)
         {
             //以下将会报错 字符串的不允许表达式条件 
@@ -157,6 +197,7 @@ namespace HiSql.MySqlUnitTest
         }
         static void Query_Demo9(HiSqlClient sqlClient)
         {
+            var _sql = sqlClient.HiSql("select * from HTest01 where  CreateTime>='2022-02-17 09:27:50' and CreateTime<='2022-03-22 09:27:50'").ToSql();
             //int _effect3 = sqlClient.Modi("Hi_Domain", new List<object> { new { Domain = "10097", DomainDesc = "用户类型10097" }, new { Domain = "10098", DomainDesc = "用户类型10098" } }).ExecCommand();
             DataTable dt= sqlClient.HiSql("select * from h_test").ToTable() ;
         }

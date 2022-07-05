@@ -218,6 +218,7 @@ namespace HiSql
             }
         }
 
+        public string GetVersion { get => "select id_code,* from v$version where BANNER LIKE 'DM Database%';"; }
         public List<DefMapping> DbDefMapping
         {
             get => _lstdefmapping;

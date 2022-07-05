@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.0.123" />
+    <PackageReference Include="DapperExtensions" Version="1.7.0" />
+    <PackageReference Include="FreeSql" Version="3.2.664" />
+    <PackageReference Include="FreeSql.Provider.MySql" Version="3.2.664" />
+    <PackageReference Include="FreeSql.Provider.Oracle" Version="3.2.664" />
+    <PackageReference Include="FreeSql.Provider.PostgreSQL" Version="3.2.664" />
+    <PackageReference Include="FreeSql.Provider.SqlServer" Version="3.2.664" />
+    <PackageReference Include="HiSql" Version="1.0.4.4" />
+    <PackageReference Include="HiSql.MySql" Version="1.0.4.3" />
+    <PackageReference Include="HiSql.Oracle" Version="1.0.4.3" />
+    <PackageReference Include="HiSql.PostGreSql" Version="1.0.4.3" />
+    <PackageReference Include="HiSql.SqlServer" Version="1.0.4.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.17" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.17">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="6.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="SqlSugarCore" Version="5.0.9.1" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
+    <PackageReference Include="Z.Dapper.Plus" Version="4.0.30" />
+    <PackageReference Include="Zack.EFCore.Batch" Version="1.5.15" />
+  </ItemGroup>
+
+</Project>
