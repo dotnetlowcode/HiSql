@@ -11,52 +11,9 @@
 *.userprefs
 
 # Build results
-[Dd]ebug/
-[Dd]ebugPublic/
-[Rr]elease/
-[Rr]eleases/
-x64/
-x86/
-bld/
-[Bb]in/
-[Oo]bj/
-[Ll]og/
-HiSql/[Bb]in/
-HiSql/[Oo]bj/
-HiSql.Hana/[Bb]in/
-HiSql.Hana/[Oo]bj/
-HiSql.HanaUnitTest/HiSql.HanaUnitTest/[Bb]in/
-HiSql.HanaUnitTest/HiSql.HanaUnitTest/[Oo]bj/
-
-HiSql.MySql/[Bb]in/
-HiSql.MySql/[Oo]bj/
-HiSql.MySqlUnitTest/[Bb]in/
-HiSql.MySqlUnitTest/[Oo]bj/
-
-HiSql.Oracle/[Bb]in/
-HiSql.Oracle/[Oo]bj/
-HiSql.OralceUnitTest/[Bb]in/
-HiSql.OralceUnitTest/[Oo]bj/
-
-HiSql.PostGreSql/[Bb]in/
-HiSql.PostGreSql/[Oo]bj/
-HiSql.PostGreSqlUnitTest/[Bb]in/
-HiSql.PostGreSqlUnitTest/[Oo]bj/
-
-HiSql.SNRO/[Bb]in/
-HiSql.SNRO/[Oo]bj/
-HiSql.SqlServer/[Bb]in/
-HiSql.SqlServer/[Oo]bj/
-HiSql.SqlServerUnitTest/[Bb]in/
-HiSql.SqlServerUnitTest/[Oo]bj/
-
-HiSql.Test/[Bb]in/
-HiSql.Test/[Oo]bj/
-
-HiSql.Extension/HiSql.Excel/[Bb]in/
-HiSql.Extension/HiSql.Excel/[Oo]bj//
-HiSql.Extension/HiSql.Excel.Demo/[Bb]in/
-HiSql.Extension/HiSql.Excel.Demo/[Oo]bj/
+/.vs/*
+**/obj/**
+**/bin/**
 
 # Visual Studio 2015 cache/options directory
 .vs/
@@ -307,3 +264,5 @@ __pycache__/
 *.v1
 .vs
 /HiSql-dameng.zip
+/HiSql.SQLiteUnitTest
+/HiSql.SQLite

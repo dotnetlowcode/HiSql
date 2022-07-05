@@ -22,6 +22,10 @@
    6. HiSql.dameng.dll `新支持1.0.4及以上支持`
 
 
+### hisql官方群
+<img src="http://hisql.net/images/group/qq.png" alt="hisql官方QQ群" >
+
+为了更好的服务于真正使用hisql的用户，进群的伙伴必须是在github或gitee 上star了hisql项目或进行过捐的伙伴的方能进群
 
 
 ### 初始安装 

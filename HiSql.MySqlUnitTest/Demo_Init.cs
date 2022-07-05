@@ -19,7 +19,7 @@ namespace HiSql.MySqlUnitTest
                          ConnectionString = "data source=127.0.0.1,3306;database=hone;user id=root;password=Hone@123;pooling=false;charset=utf8;AllowLoadLocalInfile=true",//; MultipleActiveResultSets = true;
                          //ConnectionString = "data source=192.168.10.172;database=hone;user id=root;password=hone@123;charset=utf8",//; MultipleActiveResultSets = true;
                          // ConnectionString = "data source=192.168.10.172;Port=8029;database=hone;user id=root;password=hone@123;charset=utf8",//; MultipleActiveResultSets = true;
-                         // ConnectionString = "data source=192.168.10.172;Port=8000;database=hone;user id=root;password=hone@123;charset=utf8",
+                          //ConnectionString = "data source=192.168.10.172;Port=8000;database=hone;user id=root;password=hone@123;charset=utf8",
                          //ConnectionString = "data source=127.0.0.1;Port=5706;database=hone;user id=root;password=hone@123;charset=utf8",
 
                          Schema = "hone",
@@ -66,6 +66,7 @@ namespace HiSql.MySqlUnitTest
                      }
                      );
 
+            Console.WriteLine($" 版本号：{sqlclient.Context.DMTab.DBVersion().Version}  版本描述：{sqlclient.Context.DMTab.DBVersion().VersionDesc}");
             return sqlclient;
         }
     }

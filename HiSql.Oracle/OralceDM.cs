@@ -20,6 +20,25 @@ namespace HiSql
         }
 
         #region IDMInitalize接口实现
+        MCache mcache = new MCache(typeof(OracleDM).FullName);
+        public DBVersion DBVersion()
+        {
+
+            var version = mcache.GetOrCreate(typeof(OracleDM).FullName + "_DBVersion", () =>
+            {
+                var _version = new DBVersion() { Version = new Version() };
+
+                var tablerows = Context.DBO.GetDataTable(dbConfig.GetVersion).Select("product like '%Oracle%'");
+                if (tablerows.Length > 0)
+                {
+                    _version.VersionDesc = tablerows[0][0]?.ToString();
+                    
+                    _version.Version = new Version(String.Join(".", tablerows[0][1].ToString().Split('.').Take(3).ToArray()));
+                }
+                return _version;
+            });
+            return version;
+        }
         public TabInfo BuildTab(Type type)
         {
             TabInfo tabInfo = new TabInfo();
@@ -1089,7 +1108,7 @@ namespace HiSql
                 string _temp = sequence_temp;
                 _temp = _temp.Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema)
                     .Replace("[$TabName$]", tabname)
-                    .Replace("[$ConnectID$]",Context.CurrentConnectionConfig.ConfigId.Replace("-","").Substring(8))
+                    .Replace("[$ConnectID$]", GetKeyID())
                     .Replace("[$FieldName$]", hiColumn.FieldName);
                 sb.AppendLine(
                     _temp
@@ -1150,7 +1169,7 @@ namespace HiSql
                 if (!string.IsNullOrEmpty(keys))
                 {
                     keys = dbConfig.Table_Key.Replace("[$TabName$]", _create_tabname)
-                        .Replace("[$Keys$]", keys).Replace("[$ConnectID$]", this.Context.ConnectedId.Replace("-",""));
+                        .Replace("[$Keys$]", keys).Replace("[$ConnectID$]", GetKeyID());
 
                     keys = $"execute immediate '{keys.Replace("'","''")}';";
                 }
@@ -1535,23 +1554,23 @@ namespace HiSql
                     {
                         case OperType.EQ:
                             sb_where.Append(" = ");
-                            sb_where.Append(getSingleValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value));
+                            sb_where.Append(getSingleValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value, TableList, dictabinfo));
                             break;
                         case OperType.GT:
                             sb_where.Append(" > ");
-                            sb_where.Append(getSingleValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value));
+                            sb_where.Append(getSingleValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value, TableList, dictabinfo));
                             break;
                         case OperType.LT:
                             sb_where.Append(" < ");
-                            sb_where.Append(getSingleValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value));
+                            sb_where.Append(getSingleValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value, TableList, dictabinfo));
                             break;
                         case OperType.GE:
                             sb_where.Append(" >= ");
-                            sb_where.Append(getSingleValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value));
+                            sb_where.Append(getSingleValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value, TableList, dictabinfo));
                             break;
                         case OperType.LE:
                             sb_where.Append(" <= ");
-                            sb_where.Append(getSingleValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value));
+                            sb_where.Append(getSingleValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value, TableList, dictabinfo));
                             break;
                         case OperType.IN:
                             sb_where.Append(" in ");
@@ -1825,35 +1844,32 @@ namespace HiSql
 
                         if (field.IsFun)
                         {
-                            //表示函数
-                            switch (field.DbFun)
+                            if (Tool.IsDecimal(whereResult.Result["value"].ToString()))
                             {
-                                case DbFunction.AVG:
-                                    sb_sql.Append($"avg({dbConfig.Field_Pre}{field.FieldName}{dbConfig.Field_After}) {whereResult.Result["op"].ToString()} '{whereResult.Result["value"].ToString()}'");
-
-
-                                    break;
-                                case DbFunction.COUNT:
-                                    sb_sql.Append($"count(*) {whereResult.Result["op"].ToString()} '{whereResult.Result["value"].ToString()}'");
-
-                                    break;
-                                case DbFunction.MAX:
-                                    sb_sql.Append($"max({dbConfig.Field_Pre}{field.FieldName}{dbConfig.Field_After}) {whereResult.Result["op"].ToString()} '{whereResult.Result["value"].ToString()}'");
-
-
-
-                                    break;
-                                case DbFunction.MIN:
-                                    sb_sql.Append($"min({dbConfig.Field_Pre}{field.FieldName}{dbConfig.Field_After}) {whereResult.Result["op"].ToString()} '{whereResult.Result["value"].ToString()}'");
-
-                                    break;
-                                case DbFunction.SUM:
-                                    sb_sql.Append($"sum({dbConfig.Field_Pre}{field.FieldName}{dbConfig.Field_After}) {whereResult.Result["op"].ToString()} '{whereResult.Result["value"].ToString()}'");
-
-                                    break;
-                                default:
-                                    break;
+                                //表示函数
+                                switch (field.DbFun)
+                                {
+                                    case DbFunction.AVG:
+                                        sb_sql.Append($"avg({dbConfig.Field_Pre}{field.FieldName}{dbConfig.Field_After}) {whereResult.Result["op"].ToString()} {whereResult.Result["value"].ToString()}");
+                                        break;
+                                    case DbFunction.COUNT:
+                                        sb_sql.Append($"count(*) {whereResult.Result["op"].ToString()} {whereResult.Result["value"].ToString()}");
+                                        break;
+                                    case DbFunction.MAX:
+                                        sb_sql.Append($"max({dbConfig.Field_Pre}{field.FieldName}{dbConfig.Field_After}) {whereResult.Result["op"].ToString()} {whereResult.Result["value"].ToString()}");
+                                        break;
+                                    case DbFunction.MIN:
+                                        sb_sql.Append($"min({dbConfig.Field_Pre}{field.FieldName}{dbConfig.Field_After}) {whereResult.Result["op"].ToString()} {whereResult.Result["value"].ToString()}");
+                                        break;
+                                    case DbFunction.SUM:
+                                        sb_sql.Append($"sum({dbConfig.Field_Pre}{field.FieldName}{dbConfig.Field_After}) {whereResult.Result["op"].ToString()} {whereResult.Result["value"].ToString()}");
+                                        break;
+                                    default:
+                                        break;
+                                }
                             }
+                            else
+                                throw new Exception($"Having字段[{field.FieldName}] 值 [{whereResult.Result["value"].ToString()}] 非数字有注入风险");
                         }
                         else
                         {
@@ -2985,6 +3001,17 @@ namespace HiSql
             else
                 return new List<TabIndexDetail>();
         }
+        private string GetKeyID()
+        {
+            if (DBVersion().Version < new Version("19.0"))
+            {
+                return DateTime.Now.ToString("f");
+            }
+            else
+            {
+                return DateTime.Now.ToString("yyMMddHHmmssfff");
+            }
+        }
         /// <summary>
         /// 创建主键
         /// </summary>
@@ -3003,7 +3030,7 @@ namespace HiSql
             if (!string.IsNullOrEmpty(keys))
             {
                 keys = dbConfig.Table_Key.Replace("[$TabName$]", tabname)
-                    .Replace("[$Keys$]", keys).Replace("[$ConnectID$]", this.Context.ConnectedId.Replace("-", "_"));
+                    .Replace("[$Keys$]", keys).Replace("[$ConnectID$]", GetKeyID());
             }
             return "execute immediate  '" + keys + "';";
         }

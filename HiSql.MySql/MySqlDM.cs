@@ -18,7 +18,25 @@ namespace HiSql
         public MySqlDM()
         {
         }
+        MCache mcache = new MCache(typeof(MySqlDM).FullName);
+        public DBVersion DBVersion()
+        {
 
+            var version = mcache.GetOrCreate(typeof(MySqlDM).FullName + "_DBVersion", () =>
+            {
+                var _version = new DBVersion() { Version = new Version() };
+
+                var tablerows = Context.DBO.GetDataTable(dbConfig.GetVersion).Rows;
+                if (tablerows.Count > 0)
+                {
+                    _version.VersionDesc = tablerows[0][0]?.ToString();
+
+                    _version.Version = new Version(tablerows[0][0]?.ToString());
+                }
+                return _version;
+            });
+            return version;
+        }
         #region IDMInitalize接口实现
         public TabInfo BuildTab(Type type)
         {
@@ -1504,23 +1522,23 @@ namespace HiSql
                     {
                         case OperType.EQ:
                             sb_where.Append(" = ");
-                            sb_where.Append(getSingleValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value));
+                            sb_where.Append(getSingleValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value, TableList, dictabinfo));
                             break;
                         case OperType.GT:
                             sb_where.Append(" > ");
-                            sb_where.Append(getSingleValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value));
+                            sb_where.Append(getSingleValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value, TableList, dictabinfo));
                             break;
                         case OperType.LT:
                             sb_where.Append(" < ");
-                            sb_where.Append(getSingleValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value));
+                            sb_where.Append(getSingleValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value, TableList, dictabinfo));
                             break;
                         case OperType.GE:
                             sb_where.Append(" >= ");
-                            sb_where.Append(getSingleValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value));
+                            sb_where.Append(getSingleValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value, TableList, dictabinfo));
                             break;
                         case OperType.LE:
                             sb_where.Append(" <= ");
-                            sb_where.Append(getSingleValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value));
+                            sb_where.Append(getSingleValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value, TableList, dictabinfo));
                             break;
                         case OperType.IN:
                             sb_where.Append(" in ");
@@ -1797,35 +1815,32 @@ namespace HiSql
 
                         if (field.IsFun)
                         {
-                            //表示函数
-                            switch (field.DbFun)
+                            if (Tool.IsDecimal(whereResult.Result["value"].ToString()))
                             {
-                                case DbFunction.AVG:
-                                    sb_sql.Append($"avg({dbConfig.Field_Pre}{field.FieldName}{dbConfig.Field_After}) {whereResult.Result["op"].ToString()} '{whereResult.Result["value"].ToString()}'");
-
-
-                                    break;
-                                case DbFunction.COUNT:
-                                    sb_sql.Append($"count(*) {whereResult.Result["op"].ToString()} '{whereResult.Result["value"].ToString()}'");
-
-                                    break;
-                                case DbFunction.MAX:
-                                    sb_sql.Append($"max({dbConfig.Field_Pre}{field.FieldName}{dbConfig.Field_After}) {whereResult.Result["op"].ToString()} '{whereResult.Result["value"].ToString()}'");
-
-
-
-                                    break;
-                                case DbFunction.MIN:
-                                    sb_sql.Append($"min({dbConfig.Field_Pre}{field.FieldName}{dbConfig.Field_After}) {whereResult.Result["op"].ToString()} '{whereResult.Result["value"].ToString()}'");
-
-                                    break;
-                                case DbFunction.SUM:
-                                    sb_sql.Append($"sum({dbConfig.Field_Pre}{field.FieldName}{dbConfig.Field_After}) {whereResult.Result["op"].ToString()} '{whereResult.Result["value"].ToString()}'");
-
-                                    break;
-                                default:
-                                    break;
+                                //表示函数
+                                switch (field.DbFun)
+                                {
+                                    case DbFunction.AVG:
+                                        sb_sql.Append($"avg({dbConfig.Field_Pre}{field.FieldName}{dbConfig.Field_After}) {whereResult.Result["op"].ToString()} {whereResult.Result["value"].ToString()}");
+                                        break;
+                                    case DbFunction.COUNT:
+                                        sb_sql.Append($"count(*) {whereResult.Result["op"].ToString()} {whereResult.Result["value"].ToString()}");
+                                        break;
+                                    case DbFunction.MAX:
+                                        sb_sql.Append($"max({dbConfig.Field_Pre}{field.FieldName}{dbConfig.Field_After}) {whereResult.Result["op"].ToString()} {whereResult.Result["value"].ToString()}");
+                                        break;
+                                    case DbFunction.MIN:
+                                        sb_sql.Append($"min({dbConfig.Field_Pre}{field.FieldName}{dbConfig.Field_After}) {whereResult.Result["op"].ToString()} {whereResult.Result["value"].ToString()}");
+                                        break;
+                                    case DbFunction.SUM:
+                                        sb_sql.Append($"sum({dbConfig.Field_Pre}{field.FieldName}{dbConfig.Field_After}) {whereResult.Result["op"].ToString()} {whereResult.Result["value"].ToString()}");
+                                        break;
+                                    default:
+                                        break;
+                                }
                             }
+                            else
+                                throw new Exception($"Having字段[{field.FieldName}] 值 [{whereResult.Result["value"].ToString()}] 非数字有注入风险");
                         }
                         else
                         {
