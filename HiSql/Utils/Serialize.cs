@@ -20,23 +20,28 @@ namespace HiSql
         public static void ToFile(T t, string path)
         {
              
-            Stream stream = null; ;
+            Stream stream = null;
+            bool _error = false;
+            var _msg = string.Empty;
             try
             {
-                IFormatter formatter = new BinaryFormatter();
                 stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None);
-
-                formatter.Serialize(stream, t);
-                
+                var json=Newtonsoft.Json.JsonConvert.SerializeObject(t);
+                byte[] bs = Encoding.Unicode.GetBytes(json);
+                stream.Write(bs,0,bs.Length);
             }
             catch (Exception E)
             {
-                throw new Exception($"文件[{path}]保存失败,错误:{E.Message.ToString()}");
+                _error = true;
+                _msg = $"文件[{path}]保存失败,错误:{E.Message.ToString()}";
             }
             finally
             {
                 stream.Close();
+                stream.Dispose();
             }
+            if(_error)
+                throw new Exception(_msg);
             
         }
         /// <summary>
@@ -48,21 +53,28 @@ namespace HiSql
         {
             T myt=null;
             Stream stream = null;
+            bool _error = false;
+            var _msg = string.Empty;
             try
             {
-                IFormatter formatter = new BinaryFormatter();
                 stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
-                myt = (T)formatter.Deserialize(stream);
-                
+                byte[] bytes = new byte[stream.Length];
+                stream.Read(bytes, 0, bytes.Length);
+                string json = Encoding.Unicode.GetString(bytes);
+                myt=Newtonsoft.Json.JsonConvert.DeserializeObject<T>(json);
             }
             catch (Exception E)
             {
-                throw new Exception($"文件[{path}]读取失败,错误:{E.Message.ToString()}");
+                _error = true;
+                _msg = $"文件[{path}]读取失败,错误:{E.Message.ToString()}";
             }
             finally
             {
                 stream.Close();
+                stream.Dispose();
             }
+            if (_error)
+                throw new Exception(_msg);
             return myt;
         }
     }

@@ -1298,11 +1298,12 @@ namespace HiSql
         }
 
 
-        public int BuildTabCreate(TabInfo tabInfo)
+       public int BuildTabCreate(TabInfo tabInfo)
         {
             string _sql = BuildTabCreateSql(tabInfo.TabModel, tabInfo.GetColumns);
-            string v = this.Context.DBO.ExecScalar(_sql).ToString();
+            string v = this.Context.DBO.ExecCommand(_sql).ToString();
             int _effect = Convert.ToInt32(v);
+            _effect=_effect > 1 ? 1 : _effect;
             return _effect;
         }
 
