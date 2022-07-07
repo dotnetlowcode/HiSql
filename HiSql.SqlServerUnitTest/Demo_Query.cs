@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -46,11 +47,35 @@ namespace HiSql.UnitTest
             //Query_Demo17(sqlClient);
             //Query_Demo18(sqlClient);
             //Query_Demo19(sqlClient);
-            Query_Demo20(sqlClient);
+            //Query_Demo20(sqlClient);
+            Query_Demo21();
             var s = Console.ReadLine();
         }
 
 
+        static void Query_Demo21()
+        {
+            HiSqlClient sqlClient = Demo_Init.GetSql90Client();
+
+            sqlClient.Query("S4_REP_ZRMB52_2022_07_04").Field("*").Sort("_STID_ asc").Take(1).Skip(1).ToSql();
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            string json = sqlClient.Query("S4_REP_ZRMB52_2022_07_04").Field("*").Sort("_STID_ asc").Take(20).Skip(10).ToJson();
+            //DataTable dt= sqlClient.Query("S4_REP_ZRMB52_2022_07_04").Field("*").Sort("_STID_ asc").Take(20).Skip(10).ToTable();
+            sw.Stop();
+
+            int _total = 0;
+            for (int i = 10; i < 50; i++)
+            {
+                sw.Reset();
+                sw.Start();
+                string json2 = sqlClient.Query("S4_REP_ZRMB52_2022_07_04").Field("*").Sort("_STID_ asc").Take(100).Skip(i + 1).ToJson(ref _total);
+                //DataTable dt= sqlClient.Query("S4_REP_ZRMB52_2022_07_04").Field("*").Sort("_STID_ asc").Take(20).Skip(10).ToTable();
+                sw.Stop();
+                Console.WriteLine($"第{i + 1}查询 耗时：{sw.Elapsed}");
+            }
+
+        }
 
         static void Query_Demo20(HiSqlClient sqlClient)
         {

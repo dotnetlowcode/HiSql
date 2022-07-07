@@ -107,7 +107,7 @@ namespace HiSql
         /// <returns></returns>
         public static bool IsNumberField(this HiType thisValue)
         {
-            return thisValue.IsIn<HiType>(HiType.INT, HiType.DECIMAL);
+            return thisValue.IsIn<HiType>(HiType.INT, HiType.DECIMAL,HiType.BIGINT,HiType.SMALLINT);
         }
 
         public static bool IsDateField(this HiType thisValue)

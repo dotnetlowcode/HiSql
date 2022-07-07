@@ -600,7 +600,8 @@ namespace HiSql
             {
                 if (this.IsAutoClose())
                 {
-                    this.Close();
+                    //DataReader 不能关闭链接
+                    //this.Close();
                 }
                 //ChooseConnectionEnd(sql);
             }

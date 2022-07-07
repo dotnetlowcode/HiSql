@@ -98,8 +98,40 @@ namespace HiSql
             //Demo1_Insert9(sqlClient);
 
             //Demo1_Insert11(sqlClient);
-            Demo1_Insert12(sqlClient);
+            //Demo1_Insert12(sqlClient);
+            Demo1_Insert13(sqlClient);
         }
+
+
+        static void Demo1_Insert13(HiSqlClient sqlClient)
+        {
+
+            HiSql.Global.SnroOn = true;
+            HiSql.SnroNumber.SqlClient = sqlClient;
+
+            var json=sqlClient.HiSql("select * from H_Test4").Take(1).Skip(1).ToJson();
+            var json1 = sqlClient.HiSql("select * from H_Test5").Take(1).Skip(1).ToJson();
+
+            //sqlClient.Update("hi_fieldmodel", new { TabName= "H_Test4",FieldName= "sid", SNO = "SALENO", SNO_NUM = "1" }).Only("SNO", "SNO_NUM").ExecCommand();
+            //HiSqlCommProvider.RemoveTabInfoCache("H_Test4");
+            sqlClient.Update("hi_fieldmodel", new { TabName = "H_Test5", FieldName = "sid", SNO = "SALENO", SNO_NUM = "1" }).Only("SNO", "SNO_NUM").ExecCommand();
+            HiSqlCommProvider.RemoveTabInfoCache("H_Test5");
+
+            List<object> list = new List<object>();
+            for (int i = 0; i < 10000; i++)
+            {
+                list.Add(new { uname =$"uname{i}",age=20*i,descript=$"test{i}"});
+
+            }
+
+            sqlClient.Insert("H_Test5", list).ExecCommand();
+
+
+
+
+        }
+
+
 
 
         static void Demo1_Insert12(HiSqlClient sqlClient)
