@@ -71,9 +71,10 @@ sqlClient.Modi("Hi_Snro", list).ExecCommand();
 
 3. 创建表`h_test`
 
-<img src="http://hisql.net/images/demo/h_test5.png">
 
-4. 绑定配置
+![](http://hisql.net/images/demo/h_test5.png)
+
+1. 绑定配置
    
 
 
@@ -103,9 +104,9 @@ sqlClient.Insert("H_Test5", list).ExecCommand();
 ```
 
 6. 查看结果
-
-<img src="http://hisql.net/images/demo/h_test5_result.png">
-
+   
+   
+![](http://hisql.net/images/demo/h_test5_result.png)
 
 
 ### 2022.6.21 新增hisql参数化查询
