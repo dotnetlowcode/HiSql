@@ -18,8 +18,8 @@ namespace HiSql
             //Snro_Demo(sqlClient);
             //Snro_Demo2(sqlClient);
             //Snro_Demo3(sqlClient);
-            Snro_Demo4(sqlClient);
-
+            //Snro_Demo4(sqlClient);
+            Snro_Demo5(sqlClient);
             //HiSql.Snowflake.TickTick = (long)(new DateTime(2021, 1, 1, 0, 0, 0, DateTimeKind.Utc) - new DateTime(1970, 3, 2, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
 
             //HiSql.Snowflake.SnowType = SnowType.IdWorker;
@@ -31,6 +31,24 @@ namespace HiSql
             //}
 
             string s = Console.ReadLine();
+        }
+
+
+        static void Snro_Demo5(HiSqlClient sqlClient)
+        {
+            SnroNumber.ConnectionString = sqlClient.CurrentConnectionConfig.ConnectionString;
+            SnroNumber.Schema = sqlClient.CurrentConnectionConfig.Schema;
+            SnroNumber.User = sqlClient.CurrentConnectionConfig.User;
+            SnroNumber.DBType = sqlClient.CurrentConnectionConfig.DbType;
+
+
+            Global.SnroOn = true;
+            for (int i = 0; i < 100; i++)
+            {
+                string num = SnroNumber.NewNumber("SALENO", 1);
+
+                Console.WriteLine($"编号创建成功：{num}");
+            }
         }
 
         static void Snro_Demo4(HiSqlClient sqlClient)

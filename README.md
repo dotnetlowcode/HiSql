@@ -40,6 +40,74 @@
 传统ORM框架最大的弊端就是完全要依赖于实体用lambda表达式写查询语句，但最大的问题就是如果业务场景需要动态拼接条件时只能又切换到原生数据库的sql语句进行完成，如果自行拼接开发人员还要解决防注入的问题,hisql 刚才完美的解决这些问题,Hisql底层已经对sql注入进行了处理，开发人员只要关注于业务开发
 
 
+
+### 2022.7.7 新增自动产生SNRO编号
+
+操作步骤
+1. 启用Snro编号
+
+```c#
+HiSql.Global.SnroOn = true;
+
+//只要执行一次 启用Snro编号 将会安装创建Hi_Snro表
+sqlClient.CodeFirst.InstallHisql();
+
+
+HiSql.SnroNumber.SqlClient = sqlClient;
+
+```
+
+
+2. 配置编号
+   
+```c#
+List<object> list = new List<object>();
+///生成销售订单编码 每分钟从0开始编号 如20220602145800001-20220602145899999
+list.Add(new { SNRO = "SALENO", SNUM = 1, IsSnow = false, SnowTick = 0, StartNum = "10000", EndNum = "99999", Length = 5, CurrNum = "10000", CurrAllNum = "", PreChar = "", IsNumber = true, PreType = PreType.YMDHm, FixPreChar = "", IsHasPre = true, CacheSpace = 10, Descript = "销售订单号流水" });
+
+sqlClient.Modi("Hi_Snro", list).ExecCommand();
+
+```
+
+3. 创建表`h_test`
+
+<img src="http://hisql.net/images/demo/h_test5.png">
+
+4. 绑定配置
+   
+
+
+```c#
+
+//只要使用 H_Test5 表就会将该表配置写入到 hi_fieldmodel 中
+var json=sqlClient.HiSql("select * from H_Test5").Take(1).Skip(1).ToJson();
+
+
+//增另对sid字段的编号配置 绑定创建的编号规则
+sqlClient.Update("hi_fieldmodel", new { TabName = "H_Test5", FieldName = "sid", SNO = "SALENO", SNO_NUM = "1" }).Only("SNO", "SNO_NUM").ExecCommand();
+```
+
+5. 插入数据
+   
+```c# 
+List<object> list = new List<object>();
+for (int i = 0; i < 10000; i++)
+{
+
+    //不需要为sid赋值 hisql底层会自动根据snro配置进行编号
+    list.Add(new { uname =$"uname{i}",age=20*i,descript=$"test{i}"});
+
+}
+
+sqlClient.Insert("H_Test5", list).ExecCommand();
+```
+
+6. 查看结果
+
+<img src="http://hisql.net/images/demo/h_test5_result.png">
+
+
+
 ### 2022.6.21 新增hisql参数化查询
 
 
