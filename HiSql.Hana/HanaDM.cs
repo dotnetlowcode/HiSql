@@ -34,7 +34,10 @@ namespace HiSql
             });
             return version;
         }
-
+        public bool InstallHisql(HiSqlClient hiSqlClient)
+        {
+            throw new NotImplementedException();
+        }
         HanaConfig dbConfig = new HanaConfig(true);
         public HanaDM()
         {

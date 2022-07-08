@@ -142,9 +142,9 @@ namespace HiSql
                 {
                     return DBType.PostGreSql.ToString();
                 }
-                else if (_subclassName.IndexOf(DBType.SQLite.ToString()) == 0)
+                else if (_subclassName.IndexOf(DBType.Sqlite.ToString()) == 0)
                 {
-                    return DBType.SQLite.ToString();
+                    return DBType.Sqlite.ToString();
                 }
                 else if (_subclassName.IndexOf(DBType.DaMeng.ToString()) == 0)
                 {

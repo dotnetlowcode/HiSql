@@ -14,7 +14,7 @@ namespace HiSql
     {
         SqlServer=1,
         MySql=2,
-        SQLite=3,
+        Sqlite=3,
         Oracle=4,
         Hana=5,
         PostGreSql = 6,

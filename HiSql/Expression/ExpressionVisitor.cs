@@ -888,7 +888,7 @@ namespace HiSql
                 case DBType.MySql:
                 case DBType.Oracle:
                 case DBType.DaMeng:
-                case DBType.SQLite:
+                case DBType.Sqlite:
                     result = "||";
                     break;
             }

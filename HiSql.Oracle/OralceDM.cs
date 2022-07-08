@@ -39,6 +39,10 @@ namespace HiSql
             });
             return version;
         }
+        public bool InstallHisql(HiSqlClient hiSqlClient)
+        {
+            throw new NotImplementedException();
+        }
         public TabInfo BuildTab(Type type)
         {
             TabInfo tabInfo = new TabInfo();

@@ -14,8 +14,12 @@ namespace HiSql
     /// </summary>
     public interface IDMTab
     {
-       
-       
+        /// <summary>
+        /// 安装系统表
+        /// </summary>
+        /// <returns></returns>
+        bool InstallHisql(HiSqlClient hiSqlClient);
+
         HiSqlProvider Context { get; set; }
         /// <summary>
         /// 表创建
