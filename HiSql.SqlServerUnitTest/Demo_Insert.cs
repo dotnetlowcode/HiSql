@@ -118,13 +118,33 @@ namespace HiSql
             HiSqlCommProvider.RemoveTabInfoCache("H_Test5");
 
             List<object> list = new List<object>();
-            for (int i = 0; i < 10000; i++)
+
+            List<string> list2 = new List<string>();
+
+            list2.Add("20220708090210095");
+            list2.Add("20220708090210096");
+            list2.Add("20220708090210097");
+            list2.Add("20220708090210098");
+            list2.Add("20220708090210099");
+            list2.Add("20220708090210100");
+
+            for (int i = 0; i < 100; i++)
             {
-                list.Add(new { uname =$"uname{i}",age=20*i,descript=$"test{i}"});
+                if (list2.Count > 0)
+                {
+                    list.Add(new { sid= list2[0], uname = $"uname{i}", age = 20 * i, descript = $"test{i}" });
+                    list2.RemoveAt(0);
+                }
+                else
+                {
+                    list.Add(new { sid="", uname = $"uname{i}", age = 20 * i, descript = $"test{i}" });
+                }
 
             }
 
-            sqlClient.Insert("H_Test5", list).ExecCommand();
+            sqlClient.Modi("H_Test5", list).ExecCommand();
+
+            //sqlClient.Insert("H_Test5", list).ExecCommand();
 
 
 

@@ -749,9 +749,13 @@ namespace HiSql
                 {
                     //add by tgm date:2022.4.8 
                     if (dataColLst != null && dataColLst.Count > 0)
-                    { 
-                        if(dataColLst.Any(c=>c.ToLower().Equals(hiColumn.FieldName.ToLower())))
+                    {
+                        if (dataColLst.Any(c => c.ToLower().Equals(hiColumn.FieldName.ToLower())))
                             _lstupdate.Add($"a.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}=b.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}");
+                        else if (hiColumn.IsModiField())
+                        {
+                            _lstupdate.Add($"a.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}=b.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}");
+                        }
                     }
                     else
                         _lstupdate.Add($"a.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}=b.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}");
