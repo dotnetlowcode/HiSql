@@ -284,6 +284,10 @@ namespace HiSql
                     hiColumn.IsShow = column.IsShow;
                     hiColumn.IsSearch = column.IsSearch;
 
+
+                    hiColumn.SNO = column.SNO;
+                    hiColumn.SNO_NUM = column.SNO_NUM;
+
                     //如果有扩展信息需要在此处赋值
 
                 }

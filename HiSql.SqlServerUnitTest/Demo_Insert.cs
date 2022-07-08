@@ -98,8 +98,60 @@ namespace HiSql
             //Demo1_Insert9(sqlClient);
 
             //Demo1_Insert11(sqlClient);
-            Demo1_Insert12(sqlClient);
+            //Demo1_Insert12(sqlClient);
+            Demo1_Insert13(sqlClient);
         }
+
+
+        static void Demo1_Insert13(HiSqlClient sqlClient)
+        {
+
+            HiSql.Global.SnroOn = true;
+            HiSql.SnroNumber.SqlClient = sqlClient;
+
+            var json=sqlClient.HiSql("select * from H_Test4").Take(1).Skip(1).ToJson();
+            var json1 = sqlClient.HiSql("select * from H_Test5").Take(1).Skip(1).ToJson();
+
+            //sqlClient.Update("hi_fieldmodel", new { TabName= "H_Test4",FieldName= "sid", SNO = "SALENO", SNO_NUM = "1" }).Only("SNO", "SNO_NUM").ExecCommand();
+            //HiSqlCommProvider.RemoveTabInfoCache("H_Test4");
+            sqlClient.Update("hi_fieldmodel", new { TabName = "H_Test5", FieldName = "sid", SNO = "SALENO", SNO_NUM = "1" }).Only("SNO", "SNO_NUM").ExecCommand();
+            HiSqlCommProvider.RemoveTabInfoCache("H_Test5");
+
+            List<object> list = new List<object>();
+
+            List<string> list2 = new List<string>();
+
+            list2.Add("20220708090210095");
+            list2.Add("20220708090210096");
+            list2.Add("20220708090210097");
+            list2.Add("20220708090210098");
+            list2.Add("20220708090210099");
+            list2.Add("20220708090210100");
+
+            for (int i = 0; i < 100; i++)
+            {
+                if (list2.Count > 0)
+                {
+                    list.Add(new { sid= list2[0], uname = $"uname{i}", age = 20 * i, descript = $"test{i}" });
+                    list2.RemoveAt(0);
+                }
+                else
+                {
+                    list.Add(new { sid="", uname = $"uname{i}", age = 20 * i, descript = $"test{i}" });
+                }
+
+            }
+
+            sqlClient.Modi("H_Test5", list).ExecCommand();
+
+            //sqlClient.Insert("H_Test5", list).ExecCommand();
+
+
+
+
+        }
+
+
 
 
         static void Demo1_Insert12(HiSqlClient sqlClient)

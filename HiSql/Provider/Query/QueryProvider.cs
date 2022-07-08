@@ -1234,6 +1234,9 @@ namespace HiSql
                 IDataReader dr = this.Context.DBO.GetDataReader(_sql, null);
                 lstobj = DataConvert.ToEObject(dr);
                 dr.Close();
+                if(this.Context.CurrentConnectionConfig.IsAutoClose)
+                    this.Context.DBO.Close();
+
             }
             if (lstobj != null)
                 return JsonConvert.SerializeObject(lstobj);
@@ -1255,6 +1258,8 @@ namespace HiSql
                 }
                 IDataReader dr = this.Context.DBO.GetDataReader(_sql, null);
                 lstobj = DataConvert.ToEObject(dr);
+                dr.Close();
+
             }
             if (lstobj != null)
                 return JsonConvert.SerializeObject(lstobj);

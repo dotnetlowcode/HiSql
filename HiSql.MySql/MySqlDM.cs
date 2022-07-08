@@ -706,6 +706,8 @@ namespace HiSql
                     {
                         if (dataColLst.Any(c => c.ToLower().Equals(hiColumn.FieldName.ToLower())))
                             _lstupdate.Add($"{dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{targetinfo.TabModel.TabReName}{dbConfig.Table_After}.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}=values({dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After})");
+                        else if (hiColumn.IsModiField())
+                            _lstupdate.Add($"{dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{targetinfo.TabModel.TabReName}{dbConfig.Table_After}.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}=values({dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After})");
                     }
                     else
                         _lstupdate.Add($"{dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{targetinfo.TabModel.TabReName}{dbConfig.Table_After}.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}=values({dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After})");
@@ -1112,9 +1114,9 @@ namespace HiSql
         public int BuildTabCreate(TabInfo tabInfo)
         {
             string _sql = BuildTabCreateSql(tabInfo.TabModel, tabInfo.GetColumns);
-
-            string v = this.Context.DBO.ExecScalar(_sql).ToString();
+            string v = this.Context.DBO.ExecCommand(_sql).ToString();
             int _effect = Convert.ToInt32(v);
+            _effect=_effect > 1 ? 1 : _effect;
             return _effect;
         }
         /// <summary>

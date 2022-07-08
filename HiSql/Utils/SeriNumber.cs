@@ -8,15 +8,7 @@ namespace HiSql
 {
     public class SeriNumber : INumber
     {
-        /// <summary>
-        /// 根目录
-        /// </summary>
 
-        string snropath = $"{Environment.CurrentDirectory}\\Snro";
-        string _prestr = "SNRO";
-        /// <summary>
-        /// 
-        /// </summary>
         ICache cache = null;
         HiSqlClient SqlClient = null;
 

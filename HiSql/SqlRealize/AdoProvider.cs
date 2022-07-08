@@ -424,6 +424,7 @@ namespace HiSql
         private async Task<object> execScalar(string sql)
         {
             object _effect = null;
+            //int _effect = 0;
             bool hassError = false;
             Exception _e = null;
             try
@@ -452,8 +453,10 @@ namespace HiSql
                 }
                 #endregion
                 DbCommand sqlCommand = GetCommand(sql, null);
+
+                //_effect = await sqlCommand.ExecuteNonQueryAsync();
                 _effect = await sqlCommand.ExecuteScalarAsync();
-                if (_effect == null) _effect = 1;
+                if (_effect ==null) _effect = 1;
                 sqlCommand.Dispose();
 
                 #region 执行后操作
@@ -597,7 +600,8 @@ namespace HiSql
             {
                 if (this.IsAutoClose())
                 {
-                    this.Close();
+                    //DataReader 不能关闭链接
+                    //this.Close();
                 }
                 //ChooseConnectionEnd(sql);
             }

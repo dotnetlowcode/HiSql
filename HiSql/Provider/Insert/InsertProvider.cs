@@ -809,9 +809,17 @@ namespace HiSql
                 Dictionary<string, HashSet<string>> dic_hash_reg = new Dictionary<string, HashSet<string>>();
                 Dictionary<string, HashSet<string>> dic_hash_tab = new Dictionary<string, HashSet<string>>();
 
+                Dictionary<string, HiColumn> dic_snro = new Dictionary<string, HiColumn>(StringComparer.OrdinalIgnoreCase);
+                Dictionary<string, int> dic_snro_num = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+
+
 
                 var arrcol_reg = hiColumns.Where(h => !string.IsNullOrEmpty(h.Regex)).ToList();
                 var arrcol_tab = hiColumns.Where(h => h.IsRefTab).ToList();
+
+                var arrcol_snro=hiColumns.Where(h=>!string.IsNullOrEmpty(h.SNO)).ToList();
+
 
                 var arrcol = hiColumns.Where(h => !string.IsNullOrEmpty(h.Regex) || h.IsRefTab).ToList();
                 foreach (HiColumn hi in arrcol)
@@ -819,7 +827,17 @@ namespace HiSql
                     //if(!string.IsNullOrEmpty(hi.Regex))
                     dic_hash_reg.Add(hi.FieldName, new HashSet<string>());
                 }
+
+                foreach (HiColumn hi in arrcol_snro)
+                {
+                    dic_snro.Add(hi.FieldName, hi);
+                    dic_snro_num.Add(hi.FieldName, 0);
+                }
+
                 int _rowidx = 0;
+
+                //是否snro编号
+                bool _issnro = false;
                 if (_isdic)
                 {
                     //表示是字典 Dictionary<string, object>
@@ -830,15 +848,22 @@ namespace HiSql
                         foreach (Dictionary<string, object> _o in lstdata)
                         {
                             _rowidx++;
+                            _issnro = false;
                             //Dictionary<string, string> _dic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                             Dictionary<string, string> _rowdic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                             foreach (HiColumn hiColumn in hiColumns)
                             {
                                 _value = "";
+                                _issnro = false;
+                                if (!string.IsNullOrEmpty(hiColumn.SNO))
+                                    _issnro = true;
+
                                 #region  判断必填 及自增长
                                 if (hiColumn.IsRequire && !hiColumn.IsIdentity && !_o.ContainsKey(hiColumn.FieldName))
                                 {
-                                    throw new Exception($"行[{_rowidx}] 缺少字段[{hiColumn.FieldName}] 为必填字段");
+                                    //如果配置了SNRO编号 说明需要通过SNRO创建
+                                    if (!_issnro)
+                                        throw new Exception($"行[{_rowidx}] 缺少字段[{hiColumn.FieldName}] 为必填字段");
                                 }
                                 if (hiColumn.IsIdentity && _o.ContainsKey(hiColumn.FieldName))
                                 {
@@ -854,15 +879,20 @@ namespace HiSql
 
                                 if (_o.ContainsKey(hiColumn.FieldName))
                                 {
+                                    if (_issnro)
+                                    { 
+                                        if(string.IsNullOrEmpty(_o[hiColumn.FieldName].ToString()))
+                                            dic_snro_num[hiColumn.FieldName] = dic_snro_num[hiColumn.FieldName] + 1;
+                                    }
+
+
                                     #region 将值转成string 及特殊处理
                                     if (hiColumn.FieldType.IsIn<HiType>(HiType.DATE, HiType.DATETIME))
                                     {
                                         DateTime dtime = DateTime.MinValue;
                                         if (_o[hiColumn.FieldName] != null)
                                         {
-                                            
                                             dtime = Convert.ToDateTime(_o[hiColumn.FieldName]);
-
                                         }
                                         
                                         if (dtime != null && dtime != DateTime.MinValue)
@@ -911,9 +941,13 @@ namespace HiSql
                                 else
                                 {
                                     #region 未赋值数据处理
-                                    if (!hiColumn.IsNull && hiColumn.DBDefault == HiTypeDBDefault.NONE && !hiColumn.IsIdentity)
+                                    if (!hiColumn.IsNull && hiColumn.DBDefault == HiTypeDBDefault.NONE && !hiColumn.IsIdentity && !_issnro)
                                     {
                                         throw new Exception($"行[{_rowidx}] 字段[{hiColumn.FieldName}]不允许为空数据库中未设置默认值 且插入数据值中未指定值");
+                                    }
+                                    else if (_issnro)
+                                    {
+                                        dic_snro_num[hiColumn.FieldName] = dic_snro_num[hiColumn.FieldName] + 1;
                                     }
                                     else if (Constants.IsStandardField(hiColumn.FieldName))
                                     {
@@ -943,15 +977,20 @@ namespace HiSql
                         foreach (Dictionary<string, string> _o in lstdata)
                         {
                             _rowidx++;
-
+                            _issnro = false;
                             Dictionary<string, string> _rowdic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                             foreach (HiColumn hiColumn in hiColumns)
                             {
                                 _value = "";
+                                _issnro = false;
+                                if (!string.IsNullOrEmpty(hiColumn.SNO))
+                                    _issnro = true;
                                 #region  判断必填 及自增长
                                 if (hiColumn.IsRequire && !hiColumn.IsIdentity && !_o.ContainsKey(hiColumn.FieldName))
                                 {
-                                    throw new Exception($"行[{_rowidx}] 缺少字段[{hiColumn.FieldName}] 为必填字段");
+                                    //如果配置了SNRO编号 说明需要通过SNRO创建
+                                    if (!_issnro)
+                                        throw new Exception($"行[{_rowidx}] 缺少字段[{hiColumn.FieldName}] 为必填字段");
                                 }
                                 if (hiColumn.IsIdentity && _o.ContainsKey(hiColumn.FieldName))
                                 {
@@ -965,9 +1004,15 @@ namespace HiSql
                                     continue;
                                 #endregion
 
-                                    if (_o.ContainsKey(hiColumn.FieldName) || _o.ContainsKey(hiColumn.FieldName.ToLower()))
+                                if (_o.ContainsKey(hiColumn.FieldName) || _o.ContainsKey(hiColumn.FieldName.ToLower()))
                                 {
                                     _value = _o[hiColumn.FieldName].ToString();
+                                    if (_issnro)
+                                    {
+                                        if (string.IsNullOrEmpty(_value))
+                                            dic_snro_num[hiColumn.FieldName] = dic_snro_num[hiColumn.FieldName] + 1;
+                                    }
+
 
                                     #region 是否需要正则校验
                                     if (arrcol.Any(h => h.FieldName == hiColumn.FieldName))
@@ -988,9 +1033,13 @@ namespace HiSql
                                 else
                                 {
                                     #region 未赋值数据处理
-                                    if (!hiColumn.IsNull && hiColumn.DBDefault == HiTypeDBDefault.NONE && !hiColumn.IsIdentity)
+                                    if (!hiColumn.IsNull && hiColumn.DBDefault == HiTypeDBDefault.NONE && !hiColumn.IsIdentity && !_issnro)
                                     {
                                         throw new Exception($"行[{_rowidx}] 字段[{hiColumn.FieldName}]不允许为空数据库中未设置默认值 且插入数据值中未指定值");
+                                    }
+                                    else if (_issnro)
+                                    {
+                                        dic_snro_num[hiColumn.FieldName] = dic_snro_num[hiColumn.FieldName] + 1;
                                     }
                                     else if (Constants.IsStandardField(hiColumn.FieldName))
                                     {
@@ -1023,20 +1072,24 @@ namespace HiSql
                     foreach (object objdata in lstdata)
                     {
                         _rowidx++;
+                        _issnro = false;
                         Dictionary<string, string> _dic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                         Dictionary<string, string> _rowdic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                         foreach (HiColumn hiColumn in hiColumns)
                         {
                             _value = "";
 
-
+                            _issnro = false;
+                            if (!string.IsNullOrEmpty(hiColumn.SNO))
+                                _issnro = true;
                             PropertyInfo objprop = null;
                             if(dicprop.ContainsKey(hiColumn.FieldName))
                                 objprop=dicprop[hiColumn.FieldName];
                             #region  判断必填 及自增长
                             if (hiColumn.IsRequire && !hiColumn.IsIdentity && objprop == null)
                             {
-                                throw new Exception($"行[{_rowidx}] 缺少字段[{hiColumn.FieldName}] 为必填字段");
+                                if (!_issnro)
+                                    throw new Exception($"行[{_rowidx}] 缺少字段[{hiColumn.FieldName}] 为必填字段");
                             }
                             if (hiColumn.IsIdentity && _dic.ContainsKey(hiColumn.FieldName))
                             {
@@ -1057,6 +1110,12 @@ namespace HiSql
                                 object objvalue = objprop.GetValue(objdata);
                                 if (objvalue != null)
                                 {
+                                    if (_issnro)
+                                    {
+                                        if (string.IsNullOrEmpty(objvalue.ToString()))
+                                            dic_snro_num[hiColumn.FieldName] = dic_snro_num[hiColumn.FieldName] + 1;
+                                    }
+
                                     #region 将值转成string 及特殊处理
                                     if (hiColumn.FieldType.IsIn<HiType>(HiType.DATE, HiType.DATETIME))
                                     {
@@ -1113,6 +1172,10 @@ namespace HiSql
                                     {
                                         throw new Exception($"行[{_rowidx}] 字段[{hiColumn.FieldName}]不允许为空数据库中未设置默认值 且插入数据值中未指定值");
                                     }
+                                    else if (_issnro)
+                                    {
+                                        dic_snro_num[hiColumn.FieldName] = dic_snro_num[hiColumn.FieldName] + 1;
+                                    }
                                     else if (Constants.IsStandardField(hiColumn.FieldName))
                                     {
                                         var result = checkFieldValue(hiColumn, _rowidx, "");
@@ -1128,9 +1191,13 @@ namespace HiSql
                             else
                             {
                                 #region 未赋值数据处理
-                                if (!hiColumn.IsNull && hiColumn.DBDefault == HiTypeDBDefault.NONE && !hiColumn.IsIdentity)
+                                if (!hiColumn.IsNull && hiColumn.DBDefault == HiTypeDBDefault.NONE && !hiColumn.IsIdentity && !_issnro)
                                 {
                                     throw new Exception($"行[{_rowidx}] 字段[{hiColumn.FieldName}]不允许为空数据库中未设置默认值 且插入数据值中未指定值");
+                                }
+                                else if (_issnro)
+                                {
+                                    dic_snro_num[hiColumn.FieldName] = dic_snro_num[hiColumn.FieldName] + 1;
                                 }
                                 else if (Constants.IsStandardField(hiColumn.FieldName))
                                 {
@@ -1248,11 +1315,111 @@ namespace HiSql
                 #endregion
 
 
+
+                #region 编号填充
+                rtnlst=fillSnro(rtnlst,dic_snro,dic_snro_num);
+                #endregion
+
             }
             else
                 return rtnlst;
             return rtnlst;
         }
+
+
+        /// <summary>
+        /// 填充SNRO编号
+        /// </summary>
+        /// <param name="rtnlst"></param>
+        /// <param name="dic_snro"></param>
+        /// <param name="dic_snro_num"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+
+        List<Dictionary<string, string>> fillSnro(List<Dictionary<string, string>> rtnlst, Dictionary<string, HiColumn> dic_snro, Dictionary<string, int> dic_snro_num)
+        {
+            Dictionary<string, List<string>> dic_listnum = new Dictionary<string, List<string>>();
+            if (dic_snro_num.Any(p => p.Value > 0))
+            {
+                Dictionary<string, int> dicnum = new Dictionary<string, int>();
+                foreach (string key in dic_snro_num.Keys)
+                {
+                    if (dic_snro_num[key] > 0)
+                        dicnum.Add(key,dic_snro_num[key]);
+                }
+                foreach (string key in dicnum.Keys)
+                {
+                    HiColumn hiColumn = dic_snro[key];
+
+                    if (!hiColumn.FieldType.IsIn(HiType.NVARCHAR, HiType.NCHAR, HiType.VARCHAR, HiType.CHAR
+                        , HiType.INT, HiType.BIGINT, HiType.DECIMAL, HiType.SMALLINT)
+                        )
+                    {
+                        throw new Exception($"字段[{key}] 的字段类型为[{hiColumn.FieldType.ToString()}] 无法使用SNRO编号");
+                    }
+                    List<string> lstnum = SnroNumber.NewNumber(hiColumn.SNO.Trim(), int.Parse(hiColumn.SNO_NUM), dicnum[key]);
+                    dic_listnum.Add(key, lstnum);
+                }
+
+
+                foreach (Dictionary<string, string> dic in rtnlst)
+                {
+                    foreach (string key in dicnum.Keys)
+                    {
+                        if (dic.ContainsKey(key))
+                        {
+                            string v = dic[key];
+                            if (v.Equals("''"))
+                            {
+                                if (dic_listnum[key].Count > 0)
+                                {
+                                    if (dic_listnum[key][0].Length <= dic_snro[key].FieldLen)
+                                    {
+                                        dic[key] = $"'{dic_listnum[key][0]}'";
+                                        dic_listnum[key].RemoveAt(0);
+                                    }
+                                }
+                                else
+                                    throw new Exception($"字段[{key}]生成编号不足");
+                            }
+                            else if (v.Equals("0") && dic_snro[key].FieldType.IsNumberField())
+                            {
+                                if (dic_listnum[key].Count > 0)
+                                {
+                                    if (dic_listnum[key][0].Length <= dic_snro[key].FieldLen)
+                                    {
+                                        dic[key] = $"{dic_listnum[key][0]}";
+                                        dic_listnum[key].RemoveAt(0);
+                                    }
+                                }
+                                else
+                                    throw new Exception($"字段[{key}]生成编号不足");
+                            }
+                        }
+                        else
+                        {
+
+                            if (dic_listnum[key].Count > 0)
+                            {
+                                string v = $"{dic_listnum[key][0]}";
+                                dic_listnum[key].RemoveAt(0);
+                                if (dic_snro[key].FieldType.IsNumberField())
+                                {
+                                    dic.Add(key,v);
+                                }
+                                else
+                                {
+                                    dic.Add(key, $"'{v}'");
+                                }
+                            }else
+                                throw new Exception($"字段[{key}]生成编号不足");
+                        }
+                    }
+                }
+            }
+            return rtnlst;
+        }
+
 
         Tuple<bool, string> checkFieldValue(HiColumn hiColumn, int rowidx, string value)
         {
@@ -1294,7 +1461,7 @@ namespace HiSql
                     }
                     if (hiColumn.IsRequire)
                     {
-                        if (string.IsNullOrEmpty(_value.Trim()))
+                        if (string.IsNullOrEmpty(_value.Trim()) && string.IsNullOrEmpty(hiColumn.SNO))
                             throw new Exception($"字段[{hiColumn.FieldName}] 为必填 无法数据提交");
                     }
 
@@ -1313,7 +1480,7 @@ namespace HiSql
                     }
                     if (hiColumn.IsRequire)
                     {
-                        if (string.IsNullOrEmpty(_value.Trim()))
+                        if (string.IsNullOrEmpty(_value.Trim()) && string.IsNullOrEmpty(hiColumn.SNO))
                             throw new Exception($"字段[{hiColumn.FieldName}] 为必填 无法数据提交");
                     }
                     _value = $"'{_value.ToSqlInject()}'";
@@ -1323,7 +1490,10 @@ namespace HiSql
                 {
 
                     //_value = "1";
-                    rtn = new Tuple<bool, string>(true, $"{_value}");
+                    if(!string.IsNullOrEmpty(_value.Trim()))
+                        rtn = new Tuple<bool, string>(true, $"{_value}");
+                    else
+                        rtn = new Tuple<bool, string>(true, $"0");
                 }
                 else if (hiColumn.FieldType.IsIn<HiType>(HiType.BOOL))
                 {
