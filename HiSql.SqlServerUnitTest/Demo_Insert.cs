@@ -87,7 +87,7 @@ namespace HiSql
         {
             //Demo1_Insert(sqlClient);
             //Demo1_Insert2(sqlClient);
-            //Demo1_Insert3(sqlClient);
+            Demo1_Insert3(sqlClient);
             //Demo1_Insert4(sqlClient);
             //Demo1_Insert5(sqlClient);
             //Demo1_Insert6(sqlClient);
@@ -99,7 +99,7 @@ namespace HiSql
 
             //Demo1_Insert11(sqlClient);
             //Demo1_Insert12(sqlClient);
-            Demo1_Insert13(sqlClient);
+            //Demo1_Insert13(sqlClient);
         }
 
 
@@ -432,16 +432,16 @@ namespace HiSql
         {
             List<Dictionary<string, string>> list = new List<Dictionary<string, string>>();
 
-            Dictionary<string, string> _dic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "Hid", "2" }, { "UserName", "QXW" }, { "UserAge", "100" }, { "ReName", "xw" } };
+            Dictionary<string, string> _dic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "DID", "2" }, { "UserName", "QXW" }, { "UserAge", "100" }, { "ReName", "xw" } };
             list.Add(_dic);
 
-            Dictionary<string, string> _dic1 = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "Hid", "3" }, { "UserName", "QXW1" }, { "UserAge", "101" }, { "ReName", "xw1" } };
+            Dictionary<string, string> _dic1 = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "DID", "3" }, { "UserName", "QXW1" }, { "UserAge", "101" }, { "ReName", "xw1" } };
             list.Add(_dic1);
 
 
-            sqlClient.Update<Dictionary<string, string>>("H_Test", list).ExecCommand();
-            sqlClient.Modi<Dictionary<string, string>>("H_Test", list).ExecCommand();
-            sqlClient.Modi<Dictionary<string, string>>("H_Test", list).ExecCommand();
+            var SQL= sqlClient.Update<Dictionary<string, string>>("H_Test", list).ToSql();
+            //sqlClient.Modi<Dictionary<string, string>>("H_Test", list).ExecCommand();
+            //sqlClient.Modi<Dictionary<string, string>>("H_Test", list).ExecCommand();
         }
         static async void Demo1_Insert(HiSqlClient sqlClient)
         {

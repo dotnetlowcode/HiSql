@@ -1032,7 +1032,8 @@ namespace HiSql
                             _str_temp_field = _str_temp_field.Replace("[$FieldName$]", hiColumn.FieldName)
                                 .Replace("[$FieldLen$]", hiColumn.FieldLen.ToString())
                                 .Replace("[$IsNull$]", hiColumn.IsPrimary ? "NOT NULL" : hiColumn.IsNull == true ? "" : "NOT NULL")
-                                .Replace("[$Default$]", hiColumn.IsPrimary ? "" : GetDbDefault(hiColumn))
+                                //.Replace("[$Default$]", hiColumn.IsPrimary ? "" : GetDbDefault(hiColumn))
+                                .Replace("[$Default$]", hiColumn.IsPrimary ? GetDbDefault(hiColumn) : GetDbDefault(hiColumn))
                                 .Replace("[$EXTEND$]", hiTable.TableType == TableType.Var && hiColumn.IsPrimary ? "primary key" : "")
                                 ;
                             break;

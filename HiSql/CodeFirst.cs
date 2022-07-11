@@ -54,7 +54,7 @@ namespace HiSql
                 bool _has_tabfield = _sqlClient.DbFirst.CheckTabExists(Constants.HiSysTable["Hi_FieldModel"]); 
                 bool _has_domain = _sqlClient.DbFirst.CheckTabExists(Constants.HiSysTable["Hi_Domain"]);
                 bool _has_element = _sqlClient.DbFirst.CheckTabExists(Constants.HiSysTable["Hi_DataElement"]);
-                
+
                 //系统表只有要一个表不存在就需要初始化安装
                 if (!_has_tabmodel || !_has_tabfield || !_has_domain || !_has_element)
                 {
@@ -66,6 +66,23 @@ namespace HiSql
                     //返回受影响的行
                     int _effect = _sqlClient.Context.DBO.ExecCommand(_sql);
                 }
+                else
+                {
+                    //如果已经存在则判断是否要升级
+
+                    Version _lowver = new Version("1.0.4.6");
+
+
+                    Version _curver = Constants.HiSqlVersion;
+                    if (_lowver <= _curver)
+                    { 
+                        
+                    }
+
+
+
+                }
+
                 //如果启用了编号那么需要安装编号配置表
                 if (Global.SnroOn)
                 { 

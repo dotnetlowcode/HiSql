@@ -377,6 +377,10 @@ namespace HiSql
             var t = (T)Activator.CreateInstance(typeof(T));
             return deepCloneProperty(thisValue, t);
         }
+        public static T CloneCopy<T>(this T thisValue) where T : class { 
+            string json=Newtonsoft.Json.JsonConvert.SerializeObject(thisValue);
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(json);
+        }
     }
 
 

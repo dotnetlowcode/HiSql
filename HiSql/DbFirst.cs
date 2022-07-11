@@ -1503,6 +1503,15 @@ namespace HiSql
 
                             if (lstchg.Count > 0)
                             {
+                                if (_sqlClient.Context.CurrentConnectionConfig.DbType.IsIn(DBType.PostGreSql))
+                                {
+                                    _sqlClient.CommitTran();
+                                    _sqlClient.BeginTran();
+
+                                    tabinfo = tabInfo.CloneCopy();
+                                    tabinfo = idm.GetTabStruct(tabInfo.TabModel.TabName);
+                                    //HiSqlCommProvider.RemoveTabInfoCache(Constants.HiSysTable["Hi_FieldModel"].ToString());
+                                }
                                 modi_count = _sqlClient.Modi(Constants.HiSysTable["Hi_FieldModel"].ToString(), lstchg).ExecCommand();
                             }
                             _sqlClient.CommitTran();
