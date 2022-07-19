@@ -87,7 +87,7 @@ namespace HiSql
         {
             //Demo1_Insert(sqlClient);
             //Demo1_Insert2(sqlClient);
-            Demo1_Insert3(sqlClient);
+            //Demo1_Insert3(sqlClient);
             //Demo1_Insert4(sqlClient);
             //Demo1_Insert5(sqlClient);
             //Demo1_Insert6(sqlClient);
@@ -99,7 +99,7 @@ namespace HiSql
 
             //Demo1_Insert11(sqlClient);
             //Demo1_Insert12(sqlClient);
-            //Demo1_Insert13(sqlClient);
+            Demo1_Insert13(sqlClient);
         }
 
 
@@ -114,7 +114,7 @@ namespace HiSql
 
             //sqlClient.Update("hi_fieldmodel", new { TabName= "H_Test4",FieldName= "sid", SNO = "SALENO", SNO_NUM = "1" }).Only("SNO", "SNO_NUM").ExecCommand();
             //HiSqlCommProvider.RemoveTabInfoCache("H_Test4");
-            sqlClient.Update("hi_fieldmodel", new { TabName = "H_Test5", FieldName = "sid", SNO = "SALENO", SNO_NUM = "1" }).Only("SNO", "SNO_NUM").ExecCommand();
+            sqlClient.Update("hi_fieldmodel", new { DbName="", TabName = "H_Test5", FieldName = "sid", SNO = "SALENO", SNO_NUM = "1" }).Only("SNO", "SNO_NUM").ExecCommand();
             HiSqlCommProvider.RemoveTabInfoCache("H_Test5");
 
             List<object> list = new List<object>();
@@ -128,7 +128,7 @@ namespace HiSql
             list2.Add("20220708090210099");
             list2.Add("20220708090210100");
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 1000000; i++)
             {
                 if (list2.Count > 0)
                 {

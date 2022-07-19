@@ -1313,7 +1313,16 @@ namespace HiSql
             var reBuilderPrimaryKey = true;
             if (tab.PrimaryKey.Count == tabInfo.PrimaryKey.Count && tab.PrimaryKey.Select(t => t.FieldName).ToList().All(tabInfo.PrimaryKey.Select(t => t.FieldName).ToList().Contains))
             {
-                reBuilderPrimaryKey = false;
+                bool _haskey = false;
+                foreach (FieldChange fieldChange in fieldChanges)
+                {
+                    if (tabInfo.PrimaryKey.Any(p => p.FieldName.Equals(fieldChange.FieldName, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        _haskey = true;
+                    }
+                }
+
+                reBuilderPrimaryKey = _haskey;
             }
             List<HiColumn> lstchg = new List<HiColumn>();
             List<HiColumn> lstdel = new List<HiColumn>();
@@ -1503,16 +1512,25 @@ namespace HiSql
 
                             if (lstchg.Count > 0)
                             {
-                                if (_sqlClient.Context.CurrentConnectionConfig.DbType.IsIn(DBType.PostGreSql))
-                                {
-                                    _sqlClient.CommitTran();
-                                    _sqlClient.BeginTran();
+                                string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", tabInfo.TabModel.TabName.ToLower());
+                                //if (_sqlClient.Context.CurrentConnectionConfig.DbType.IsIn(DBType.PostGreSql,DBType.Oracle))
+                                //{
+                                    //_sqlClient.CommitTran();
+                                    //_sqlClient.BeginTran();
 
-                                    tabinfo = tabInfo.CloneCopy();
-                                    tabinfo = idm.GetTabStruct(tabInfo.TabModel.TabName);
-                                    //HiSqlCommProvider.RemoveTabInfoCache(Constants.HiSysTable["Hi_FieldModel"].ToString());
-                                }
+                                    HiSqlCommProvider.RemoveTabInfoCache(Constants.HiSysTable["Hi_FieldModel"].ToString());
+
+                                    _sqlClient.Context.MCache.RemoveCache(_keyname);
+                                    _sqlClient.Context.MCache.GetOrCreate<TabInfo>(_keyname, () =>
+                                    {
+                                        return tabInfo.CloneCopy();
+
+                                    });
+                                    TabInfo newtabinfo = _sqlClient.Context.MCache.GetCache<TabInfo>(_keyname);
+                                //}
                                 modi_count = _sqlClient.Modi(Constants.HiSysTable["Hi_FieldModel"].ToString(), lstchg).ExecCommand();
+                                _sqlClient.Context.MCache.RemoveCache(_keyname);
+
                             }
                             _sqlClient.CommitTran();
                             _isok = true;

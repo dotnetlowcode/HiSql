@@ -639,7 +639,7 @@ namespace HiSql
                 //2022.6.17 add by tgm 
                 .AppendLine("do $$")
                 .AppendLine("begin ")
-                .AppendLine("if not exists(select count(*) tabcount from ( ")
+                .AppendLine("if not exists(select * from ( ") // count(*) tabcount
                 .AppendLine("SELECT tablename as \"TabName\", 'Table' as \"TabType\",'' as \"CreateTime\" FROM pg_tables where schemaname='[$Schema$]'")
                 .AppendLine("union all")
                 .AppendLine("SELECT viewname as \"TabName\", 'View' as \"TabType\" ,'' as \"CreateTime\" FROM pg_views where schemaname='[$Schema$]'")

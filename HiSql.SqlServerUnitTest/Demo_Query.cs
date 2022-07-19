@@ -47,8 +47,8 @@ namespace HiSql.UnitTest
             //Query_Demo17(sqlClient);
             //Query_Demo18(sqlClient);
             //Query_Demo19(sqlClient);
-            //Query_Demo20(sqlClient);
-            Query_Demo21();
+            Query_Demo20(sqlClient);
+            //Query_Demo21();
             var s = Console.ReadLine();
         }
 

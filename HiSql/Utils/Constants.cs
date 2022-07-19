@@ -298,7 +298,8 @@ namespace HiSql
             { "Hi_TabModel","Hi_TabModel"},
             { "Hi_FieldModel","Hi_FieldModel"},
             
-            { "Hi_Snro","Hi_Snro"}//自定义编号
+            { "Hi_Snro","Hi_Snro"},//自定义编号
+            { "Hi_Version","Hi_Version"} //版本号信息
 
         };
 

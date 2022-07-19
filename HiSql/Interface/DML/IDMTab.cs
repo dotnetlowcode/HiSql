@@ -190,8 +190,10 @@ namespace HiSql
 
         string BuildKey(List<HiColumn> hiColumn);
 
-        string BuildFieldStatement(HiTable hiTable, HiColumn hiColumn);
+        string BuildFieldStatement(HiTable hiTable, HiColumn hiColumn, bool isalteraddkey=false);
 
+
+ 
         /// <summary>
         /// 
         /// </summary>

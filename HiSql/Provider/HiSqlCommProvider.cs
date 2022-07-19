@@ -40,7 +40,7 @@ namespace HiSql
         /// <returns></returns>
         public static TabInfo InitTabMaping(string tabname, Func<TabInfo> GetInfo)
         {
-            string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", tabname);
+            string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", tabname.ToLower());
             //TabInfo tableInfo = null; 
             //bool locked = false;
             //var lckinfo = new LckInfo() { UName = "hisql", EventName = "InitTabMaping" };
@@ -152,7 +152,7 @@ namespace HiSql
         /// <param name="tabname"></param>
         public static void RemoveTabInfoCache(string tabname)
         {
-            string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", tabname);
+            string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", tabname.ToLower());
             if (CacheContext.MCache.Exists(_keyname))
                 CacheContext.MCache.RemoveCache(_keyname);
 

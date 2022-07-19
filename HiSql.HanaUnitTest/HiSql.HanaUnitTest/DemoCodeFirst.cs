@@ -115,17 +115,17 @@ namespace HiSql.HanaUnitTest
             //IDM dMBuilder = Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
            
             
-            Tuple<HiTable, List<HiColumn>> tabomdel = sqlClient.Context.DMInitalize.BuildTabStru(typeof(Hi_TabModel));
-            Tuple<HiTable, List<HiColumn>> fieldomdel = sqlClient.Context.DMInitalize.BuildTabStru(typeof(Hi_FieldModel));
-            TabInfo tabinfo_tab = sqlClient.Context.DMInitalize.BuildTab(typeof(Hi_Domain));
-            TabInfo tabinfo_field = sqlClient.Context.DMInitalize.BuildTab(typeof(Hi_DataElement));
+            //Tuple<HiTable, List<HiColumn>> tabomdel = sqlClient.Context.DMInitalize.BuildTabStru(typeof(Hi_TabModel));
+            //Tuple<HiTable, List<HiColumn>> fieldomdel = sqlClient.Context.DMInitalize.BuildTabStru(typeof(Hi_FieldModel));
+            //TabInfo tabinfo_tab = sqlClient.Context.DMInitalize.BuildTab(typeof(Hi_Domain));
+            //TabInfo tabinfo_field = sqlClient.Context.DMInitalize.BuildTab(typeof(Hi_DataElement));
 
-            //tabinfo_tab.TabModel.TabName = "##"+tabinfo_tab.TabModel.TabName;
-            //tabinfo_tab.TabModel.TabReName = tabinfo_tab.TabModel.TabName.Substring(2)+"_"+System.Threading.Thread.CurrentThread.ManagedThreadId+"_"+ tabinfo_tab.TabModel.TabName.GetHashCode().ToString().Substring(1);
-            //BuildTabCreateSql
-            TabInfo tab_info_test=  sqlClient.Context.DMInitalize.GetTabStruct("H_TEST");
+            ////tabinfo_tab.TabModel.TabName = "##"+tabinfo_tab.TabModel.TabName;
+            ////tabinfo_tab.TabModel.TabReName = tabinfo_tab.TabModel.TabName.Substring(2)+"_"+System.Threading.Thread.CurrentThread.ManagedThreadId+"_"+ tabinfo_tab.TabModel.TabName.GetHashCode().ToString().Substring(1);
+            ////BuildTabCreateSql
+            //TabInfo tab_info_test=  sqlClient.Context.DMInitalize.GetTabStruct("H_TEST");
 
-            string _sql= sqlClient.Context.DMTab.BuildTabCreateSql(tabinfo_field.TabModel, tabinfo_field.GetColumns, true);
+            //string _sql= sqlClient.Context.DMTab.BuildTabCreateSql(tabinfo_field.TabModel, tabinfo_field.GetColumns, true);
 
 
 

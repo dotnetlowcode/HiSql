@@ -202,6 +202,9 @@ namespace HiSql
     [Serializable]
     public class HiColumn : Attribute
     {
+
+
+        string _dbname = "";
         private string _ColumnName= "";
         string _tabName = "";
         private string _fieldDesc = "";
@@ -246,6 +249,15 @@ namespace HiSql
         string _refieldname = "";
 
         
+        /// <summary>
+        /// 数据库名
+        /// </summary>
+        public string DbName
+        {
+            get { return _dbname; }
+            set { _dbname = value; }
+        }
+
         /// <summary>
         /// 表名
         /// </summary>

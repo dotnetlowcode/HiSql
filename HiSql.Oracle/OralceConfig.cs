@@ -485,25 +485,25 @@ namespace HiSql
 
             _fieldtempmapping = new Dictionary<string, string> {
                 //样例：[TabName] [varchar](50) NOT NULL,
-                { "nvarchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  nvarchar2 ([$FieldLen$]) [$IsNull$]  [$Default$] [$EXTEND$]"},
-                { "varchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  varchar2 ([$FieldLen$]) [$IsNull$] [$Default$]  [$EXTEND$] "},
-                { "nchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  nchar ([$FieldLen$]) [$IsNull$] [$Default$] [$EXTEND$] "},
-                { "char",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  char ([$FieldLen$]) [$IsNull$] [$Default$] [$EXTEND$] "},
+                { "nvarchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  nvarchar2 ([$FieldLen$])  [$Default$] [$IsNull$]  [$EXTEND$]"},
+                { "varchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  varchar2 ([$FieldLen$]) [$Default$]  [$IsNull$] [$EXTEND$] "},
+                { "nchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  nchar ([$FieldLen$])  [$Default$] [$IsNull$] [$EXTEND$] "},
+                { "char",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  char ([$FieldLen$])  [$Default$] [$IsNull$] [$EXTEND$] "},
                 //样例：[udescript] [text] NULL,
-                { "text",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  long  [$IsNull$] [$Default$] [$EXTEND$] "},
+                { "text",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  long   [$Default$] [$IsNull$] [$EXTEND$] "},
 
-                { "int",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  integer  [$IsIdentity$] [$IsNull$] [$Default$] [$EXTEND$] "},
-                { "bigint",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  number(18)  [$IsIdentity$] [$IsNull$] [$Default$] [$EXTEND$] " },
-                { "smallint",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  number(5)   [$IsNull$] [$Default$] [$EXTEND$] "},
-                { "decimal",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  decimal ([$FieldLen$],[$FieldDec$])  [$IsNull$] [$Default$] [$EXTEND$] "},
+                { "int",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  integer  [$IsIdentity$]  [$Default$] [$IsNull$] [$EXTEND$] "},
+                { "bigint",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  number(18)  [$IsIdentity$]  [$Default$] [$IsNull$] [$EXTEND$] " },
+                { "smallint",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  number(5)   [$Default$]  [$IsNull$] [$EXTEND$] "},
+                { "decimal",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  decimal ([$FieldLen$],[$FieldDec$])  [$Default$]  [$IsNull$] [$EXTEND$] "},
 
-                { "bit",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  number(1)    [$IsNull$] [$Default$] [$EXTEND$] "},
+                { "bit",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  number(1)    [$Default$] [$IsNull$] [$EXTEND$] "},
 
-                { "datetime",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  timestamp    [$IsNull$] [$Default$] [$EXTEND$] "},
-                { "date",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  date   [$IsNull$] [$Default$] [$EXTEND$] " },
+                { "datetime",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  timestamp    [$Default$] [$IsNull$] [$EXTEND$] "},
+                { "date",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  date   [$Default$]  [$IsNull$] [$EXTEND$] " },
 
                 { "image",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  BLOB    [$IsNull$] [$EXTEND$] "},
-                { "uniqueidentifier",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  varchar2(36)   [$IsNull$] [$Default$] [$EXTEND$] "},
+                { "uniqueidentifier",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  varchar2(36)  [$Default$]  [$IsNull$] [$EXTEND$] "},
             };
 
 

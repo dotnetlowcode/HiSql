@@ -37,12 +37,14 @@ namespace HiSql.PostGreSqlUnitTest
 
             //tabinfo_tab.TabModel.TabName = "##" + tabinfo_tab.TabModel.TabName;
             //tabinfo_tab.TabModel.TabReName = tabinfo_tab.TabModel.TabName.Substring(2) + "_" + System.Threading.Thread.CurrentThread.ManagedThreadId + "_" + tabinfo_tab.TabModel.TabName.GetHashCode().ToString().Substring(1);
-           // TabInfo tab_info_test = sqlClient.Context.DMInitalize.GetTabStruct("H_Test");
+            // TabInfo tab_info_test = sqlClient.Context.DMInitalize.GetTabStruct("H_Test");
 
             //string _sql = sqlClient.Context.DMTab.BuildTabCreateSql(tabomdel.Item1, tabomdel.Item2, true);
             //string _sql = sqlClient.Context.DMTab.BuildTabCreateSql(tabinfo_field.TabModel, tabinfo_field.GetColumns, true);
             //int _effect = (int)sqlClient.Context.DBO.ExecCommand(_sql);
             //int _effect = (int)sqlClient.Context.DBO.ExecScalar(_sql);
+
+            HiSql.Global.SnroOn = true;
             sqlClient.CodeFirst.InstallHisql();
 
         }
