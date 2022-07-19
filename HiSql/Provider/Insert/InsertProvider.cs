@@ -403,6 +403,12 @@ namespace HiSql
                 {
                     _Sql.Append(sql);
                 }
+                else
+                {
+                    if (_forcepage)
+                        _lstsql.Insert(0, _Sql.ToString());
+
+                }
 
                 ///如果强制分包 那么按批次执行
                 if (_forcepage)
