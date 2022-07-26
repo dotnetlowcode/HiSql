@@ -725,6 +725,10 @@ namespace HiSql
                     {
                         if (dataColLst.Any(c => c.ToLower().Equals(hiColumn.FieldName.ToLower())))
                             _lstupdate.Add($"{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}=excluded.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}");
+                        else if (hiColumn.IsModiField())
+                        {
+                            _lstupdate.Add($"{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}=excluded.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}");
+                        }
                     }
                     else
                         _lstupdate.Add($"{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}=excluded.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}");
@@ -779,6 +783,10 @@ namespace HiSql
                     {
                         if (dataColLst.Any(c => c.ToLower().Equals(hiColumn.FieldName.ToLower())))
                             _lstupdate.Add($"{dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{targetinfo.TabModel.TabReName}{dbConfig.Table_After}.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}=values({dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After})");
+                        else if (hiColumn.IsModiField())
+                        {
+                            _lstupdate.Add($"{dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{targetinfo.TabModel.TabReName}{dbConfig.Table_After}.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}=values({dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After})");
+                        }
                     }
                     else
                         _lstupdate.Add($"{dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{targetinfo.TabModel.TabReName}{dbConfig.Table_After}.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}=values({dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After})");
