@@ -46,7 +46,7 @@ namespace HiSql.AST
             /// <summary>
             /// 识别 inner join ,left inner join ,outer join ,join ==inner join ,left join == left inner join 
             /// </summary>
-            public static string REG_SELECT_JOIN = @"^\s*(?<join>\binner\s*join\b|\bleft\s*\binner\s*join|\bouter\s*\bjoin\b|\bjoin\b|\bleft\s*\bjoin\b)\s*(?<table>(?:[\s]*)(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w]+))\s*(?:\bas\b\s*(?<asname>[\w]+))?\s*(?:\bon\b)\s*";
+            public static string REG_SELECT_JOIN = @"^\s*(?<join>\binner\s*join\b|left\s*\bouter\s*\bjoin\b|\bright\s*\bouter\s*\bjoin\b|\bjoin\b|\bouter\s*\bjoin\b|\bjoin\b|\bleft\s*\bjoin\b|\bright\s*\bjoin\b)\s*(?<table>(?:[\s]*)(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w]+))\s*(?:\bas\b\s*(?<asname>[\w]+))?\s*(?:\bon\b)\s*";
 
 
             /// <summary>
@@ -57,12 +57,12 @@ namespace HiSql.AST
             /// <summary>
             /// 左连接
             /// </summary>
-            public static string REG_SELECT_LEFTJOIN = @"^\s*left\s*inner\s*join\s*$|^\s*left\s*join\s*$";
+            public static string REG_SELECT_LEFTJOIN = @"^\s*left\s*join\s*|^\s*left\s*\bouter\s*\bjoin\s*|^\s*outer\s*join\s*$";
 
             /// <summary>
             /// 右连接
             /// </summary>
-            public static string REG_SELECT_RIGHTJOIN = @"^\s*outer\s*join\s*$";
+            public static string REG_SELECT_RIGHTJOIN = @"^\s*right\s*join\s*|^\s*right\s*\bouter\s*\bjoin\s*$";
 
 
             public static string REG_SELECT_WHERE = @"^\s*\b(?<cmd>where)\b";
@@ -676,6 +676,7 @@ namespace HiSql.AST
                 //获取最外层的 关键词位置顺序 可能子语句中也可能包括关键字
                 List<int> lstnum = new List<int> { 
                     sql.IndexOf(" left ", StringComparison.OrdinalIgnoreCase),
+                    sql.IndexOf(" outer ", StringComparison.OrdinalIgnoreCase),
                     //sql.LastIndexOf($" left{System.Environment.NewLine}",StringComparison.OrdinalIgnoreCase),
                     sql.IndexOf(" inner ", StringComparison.OrdinalIgnoreCase), 
                     //sql.LastIndexOf($" inner{System.Environment.NewLine}",StringComparison.OrdinalIgnoreCase), 
