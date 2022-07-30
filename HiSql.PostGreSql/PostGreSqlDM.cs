@@ -1869,7 +1869,7 @@ namespace HiSql
                 else if (joinDefinition.JoinType == JoinType.Left)
                     sb_join.Append($" left  join");
                 else if (joinDefinition.JoinType == JoinType.Right)
-                    sb_join.Append($" outer join");
+                    sb_join.Append($" right join");
                 sb_join.Append($" {dbConfig.Table_Pre}{dictabinfo[joinDefinition.Right.TabName].TabModel.TabName}{dbConfig.Table_After} as {dbConfig.Table_Pre}{joinDefinition.Right.AsTabName.ToLower()}{dbConfig.Table_After}");
                 sb_join.Append(" on ");
 
