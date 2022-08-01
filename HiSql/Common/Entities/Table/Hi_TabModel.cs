@@ -32,7 +32,7 @@ namespace HiSql
         /// <summary>
         /// 表的别名
         /// </summary>
-        [HiColumn(FieldDesc= "表的别名",  FieldLen = 50, SortNum = 5, DBDefault = HiTypeDBDefault.EMPTY)]
+        [HiColumn(FieldDesc= "表的别名",  FieldLen = 50, SortNum = 5, DBDefault = HiTypeDBDefault.EMPTY )]
         public string TabReName { get; set; }
 
 
@@ -45,46 +45,46 @@ namespace HiSql
         /// <summary>
         /// 表的存储方式
         /// </summary>
-        [HiColumn(FieldDesc = "表存储方式",  SortNum = 10, DBDefault = HiTypeDBDefault.EMPTY)]
+        [HiColumn(FieldDesc = "表存储方式",  SortNum = 10, DBDefault = HiTypeDBDefault.EMPTY,FieldType = HiType.INT)]
         public int TabStoreType { get; set; }
 
         /// <summary>
         /// 表类型
         /// </summary>
-        [HiColumn(FieldDesc = "表类型", SortNum = 15,DBDefault =HiTypeDBDefault.EMPTY)]
+        [HiColumn(FieldDesc = "表类型", SortNum = 15,DBDefault =HiTypeDBDefault.EMPTY, FieldType = HiType.INT)]
         public int TabType { get; set; }
 
         /// <summary>
         /// 表的缓存类型
         /// </summary>
-        [HiColumn(FieldDesc = "表的缓存类型", SortNum = 20, DBDefault = HiTypeDBDefault.EMPTY)]
+        [HiColumn(FieldDesc = "表的缓存类型", SortNum = 20, DBDefault = HiTypeDBDefault.EMPTY, FieldType = HiType.INT)]
         public int TabCacheType { get; set; }
 
         /// <summary>
         /// 表状态
         /// </summary>
-        [HiColumn(FieldDesc = "表状态", SortNum = 25, DBDefault = HiTypeDBDefault.EMPTY)]
+        [HiColumn(FieldDesc = "表状态", SortNum = 25, DBDefault = HiTypeDBDefault.EMPTY, FieldType = HiType.INT)]
         public int TabStatus { get; set; }
 
 
         /// <summary>
         /// 是否系统内置表
         /// </summary>
-        [HiColumn(FieldDesc = "是否系统内置表", SortNum = 30, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY)]
+        [HiColumn(FieldDesc = "是否系统内置表", SortNum = 30, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY, FieldType = HiType.BOOL)]
         public bool IsSys { get; set; }
 
 
         /// <summary>
         /// 是否可编辑
         /// </summary>
-        [HiColumn(FieldDesc = "是否可编辑", SortNum = 35, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY)]
+        [HiColumn(FieldDesc = "是否可编辑", SortNum = 35, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY, FieldType = HiType.BOOL)]
         public bool IsEdit { get; set; }
 
 
         /// <summary>
         /// 是否开启表日志
         /// </summary>
-        [HiColumn(FieldDesc = "是否开启表日志", SortNum = 40, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY)]
+        [HiColumn(FieldDesc = "是否开启表日志", SortNum = 40, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY, FieldType = HiType.BOOL)]
         public bool IsLog { get; set; }
 
 
@@ -97,7 +97,7 @@ namespace HiSql
         /// <summary>
         /// 日志保留天数
         /// </summary>
-        [HiColumn(FieldDesc = "日志保留天数", SortNum = 50, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY)]
+        [HiColumn(FieldDesc = "日志保留天数", SortNum = 50, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY, FieldType = HiType.INT)]
         public int LogExprireDay { get; set; }
 
 

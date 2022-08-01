@@ -1,0 +1,66 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <TargetFrameworks>net461;net5.0;netcoreapp3.1;net6.0</TargetFrameworks>
+	  <!--<TargetFrameworks>netstandard2.0;net60;net50;net451;net461;net45;net40</TargetFrameworks>-->
+    <Authors>HiSql</Authors>
+    <Version>1.0.4.4</Version>
+    <Company>HiSql</Company>
+    <SignAssembly>false</SignAssembly>
+    <AssemblyOriginatorKeyFile>hisql.sqlserver.pfx</AssemblyOriginatorKeyFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>该包支持SQLite数据库 依赖于HiSql.dll包运行
+</Description>
+    <ApplicationIcon>hisql-sqlite-logo.ico</ApplicationIcon>
+    <PackageIconUrl />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="SqlServerInsert.txt" />
+    <Content Include="hisql-sqlite-logo.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="6.0.6" />
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlcipher" Version="2.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\HiSql\HiSql.csproj" />
+  </ItemGroup>
+
+
+	
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Data\hisql-sqlite-logo.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\hisql-sqlite-logo.jpg">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\HiSql.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="hisql-sqlite-logo.jpg">
+      <Pack>True</Pack>
+    </None>
+  </ItemGroup>
+
+</Project>

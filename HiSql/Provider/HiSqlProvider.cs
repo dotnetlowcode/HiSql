@@ -113,9 +113,8 @@ namespace HiSql
         public HiSqlClient Root;
         public HiSqlProvider(ConnectionConfig config)
         {
-
             _currentConnectionConfig = config;
-            _connectedid = Guid.NewGuid().ToString();
+            _connectedid = Guid.NewGuid().ToString("N").ToMd5();
 
         }
         public ICache MCache

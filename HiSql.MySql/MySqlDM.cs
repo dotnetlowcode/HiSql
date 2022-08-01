@@ -3061,5 +3061,9 @@ namespace HiSql
             int _effect = Convert.ToInt32(v);
             return _effect;
         }
+        public string BuildTabModiSql(TabInfo tabInfo)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

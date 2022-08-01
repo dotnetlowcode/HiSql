@@ -196,6 +196,14 @@ namespace HiSql
 
         string BuildFieldStatement(HiTable hiTable, HiColumn hiColumn);
 
+
+        /// <summary>
+        /// 根据表结构信息生成修改表的SQL语句
+        /// </summary>
+        /// <param name="tabInfo"></param>
+        /// <returns></returns>
+        string BuildTabModiSql(TabInfo tabInfo);
+
         /// <summary>
         /// 
         /// </summary>

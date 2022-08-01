@@ -3255,7 +3255,10 @@ namespace HiSql
             return _effect;
         }
 
-
+        public string BuildTabModiSql(TabInfo tabInfo)
+        {
+            throw new NotImplementedException();
+        }
         #endregion
     }
 }

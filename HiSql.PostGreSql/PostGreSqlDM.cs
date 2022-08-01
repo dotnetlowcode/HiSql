@@ -2472,7 +2472,10 @@ namespace HiSql
         }
         #endregion
 
-
+        public string BuildTabModiSql(TabInfo tabInfo)
+        {
+            throw new NotImplementedException();
+        }
 
         #region 私有方法集
         string buildCaseSql(Dictionary<string, TabInfo> dictabinfo, QueryProvider queryProvider, FieldDefinition fieldDefinition)

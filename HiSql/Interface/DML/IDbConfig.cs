@@ -31,9 +31,8 @@ namespace HiSql
         public int BulkUnitSize { get; set; }
 
 
-
-
-
+        public string GetLocalTempTablePre { get; }
+        public string GetGlobalTempTablePre { get; }
 
         /// <summary>
         /// 强制分包记录数大小 结合 强制分包列数量 一起触发

@@ -77,10 +77,10 @@ namespace HiSql
 
 
         //本地临时表前辍
-        string _temp_local_temp_pre = "#";
+        string _temp_local_table_pre = "#";
 
         //全局临时表前辍
-        string _temp_global_temp_pre = "##";
+        string _temp_global_table_pre = "##";
 
         //变量表前辍
         string _temp_var_temp_pre = "@";
@@ -244,7 +244,8 @@ namespace HiSql
         /// </summary>
         public int PackageCell { get => _packagecell; set => _packagecell = value; }
 
-
+        public string GetLocalTempTablePre { get => _temp_local_table_pre; }
+        public string GetGlobalTempTablePre { get => _temp_global_table_pre; }
         /// <summary>
         /// 按分包单元格数
         /// </summary>
