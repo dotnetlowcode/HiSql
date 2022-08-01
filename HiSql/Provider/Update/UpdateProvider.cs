@@ -518,6 +518,7 @@ namespace HiSql
                                     if (_o.ContainsKey(hiColumn.FieldName))
                                     {
                                         _value = _o[hiColumn.FieldName];
+
                                         #region 是否需要正则校验
                                         if (arrcol.Any(h => h.FieldName == hiColumn.FieldName))
                                         {
