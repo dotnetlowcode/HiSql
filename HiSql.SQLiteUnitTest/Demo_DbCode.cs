@@ -1,6 +1,7 @@
 ﻿using HiSql.UnitTest;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,11 +36,42 @@ namespace HiSql
             // Demo_IndexList(sqlClient);//OK
             // Demo_Index_Create(sqlClient);//OK
             // Demo_Primary_Create(sqlClient);//OK
-            //Demo_AllTablesPaging(sqlClient);//OK
+            // Demo_AllTablesPaging(sqlClient);//OK
             // Dome_GetTableStruct();//ok
+            //Dome_TestCone();
+
+        }
+        static void Dome_TestCone()
+        {
+            HiSqlClient sqlClient = Demo_Init.GetSqlClient();
+            var tabinfo = sqlClient.Context.DMInitalize.GetTabStruct("H_Test");
+
+            int cnt = 1000000;
+            TabInfo _tabcopy = ClassExtensions.DeepCopy<TabInfo>(tabinfo);
+
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
+            for (int i = 0; i < cnt; i++)
+            {
+                TabInfo tabcopy = ClassExtensions.DeepCopy<TabInfo>(tabinfo);
+            }
+
+
+            Console.WriteLine($"ClassExtensions.DeepCopy 执行{cnt}次耗时 {stopwatch.ElapsedMilliseconds}");
+
+             stopwatch = Stopwatch.StartNew();
+
+            for (int i = 0; i < cnt; i++)
+            {
+                TabInfo tabcopy = DataConvert.CloneTabInfo (tabinfo);
+            }
+
+
+            Console.WriteLine($"DataConvert.CloneTabInfo 执行{cnt}次耗时 {stopwatch.ElapsedMilliseconds}");
+
         }
 
-        static void Dome_GetTableStruct()
+            static void Dome_GetTableStruct()
         {
             //Global.RedisOn = true;
             //Global.RedisOptions = new RedisOptions() { Host = "192.168.10.130", Port = 8379, PassWord = "", Database = 1 }; //rCache = new RCache(new RedisOptions { Host = "192.168.10.130", Port=8379, PassWord = "" , Database = 1});
