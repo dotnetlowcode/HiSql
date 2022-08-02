@@ -394,6 +394,9 @@ namespace HiSql
                 }
                 snro.CurrNum = _o_curstr.Trim();
                 //snro.PreStr = snro.PreChar.Trim() + _prestr.Trim();
+                if (string.IsNullOrEmpty(snro.PreChar))
+                    snro.PreChar = string.Empty;
+
                 snro.CurrAllNum = string.IsNullOrEmpty(snro.FixPreChar)?  snro.PreChar.Trim() + _o_curstr.Trim(): snro.FixPreChar.Trim() + snro.PreChar.Trim() + _o_curstr.Trim();
 
 

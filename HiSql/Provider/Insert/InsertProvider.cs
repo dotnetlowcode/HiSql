@@ -146,7 +146,10 @@ namespace HiSql
             {
                 sqldm = Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{this.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
                 sqldm.Context = this.Context;
-                tabinfo = sqldm.GetTabStruct(this.Table.TabName);
+
+                string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", this.Table.TabName.ToLower());
+                tabinfo = this.Context.DMInitalize.GetTabStruct(this.Table.TabName);
+
                 _insertTabName = this.Table.TabName;
                 //由于DBType.PostGreSql mergeinto的方法实现逻辑与其它的数据库完全不一样只能特殊处理
                 if (_mergeinto && Context.CurrentConnectionConfig.DbType != DBType.PostGreSql && Context.CurrentConnectionConfig.DbType != DBType.Sqlite)
@@ -1478,7 +1481,7 @@ namespace HiSql
                     }
                     if (hiColumn.IsRequire)
                     {
-                        if (string.IsNullOrEmpty(_value.Trim()) && string.IsNullOrEmpty(hiColumn.SNO))
+                        if (string.IsNullOrEmpty(_value.Trim()) && string.IsNullOrEmpty(hiColumn.SNO) && hiColumn.DBDefault == HiTypeDBDefault.NONE)
                             throw new Exception($"字段[{hiColumn.FieldName}] 为必填 无法数据提交");
                     }
 
@@ -1497,10 +1500,13 @@ namespace HiSql
                     }
                     if (hiColumn.IsRequire)
                     {
-                        if (string.IsNullOrEmpty(_value.Trim()) && string.IsNullOrEmpty(hiColumn.SNO))
+                        if (string.IsNullOrEmpty(_value.Trim()) && string.IsNullOrEmpty(hiColumn.SNO) && hiColumn.DBDefault==HiTypeDBDefault.NONE)
                             throw new Exception($"字段[{hiColumn.FieldName}] 为必填 无法数据提交");
                     }
-                    _value = $"'{_value.ToSqlInject()}'";
+                    if (hiColumn.IsPrimary && string.IsNullOrEmpty(_value) && Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.Oracle))
+                        _value = $"' '";
+                    else
+                        _value = $"'{_value.ToSqlInject()}'";
                     rtn = new Tuple<bool, string>(true, _value);
                 }
                 else if (hiColumn.FieldType.IsIn<HiType>(HiType.INT, HiType.BIGINT, HiType.DECIMAL, HiType.SMALLINT))

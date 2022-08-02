@@ -54,27 +54,22 @@ namespace HiSql
                 bool _has_tabfield = _sqlClient.DbFirst.CheckTabExists(Constants.HiSysTable["Hi_FieldModel"]); 
                 bool _has_domain = _sqlClient.DbFirst.CheckTabExists(Constants.HiSysTable["Hi_Domain"]);
                 bool _has_element = _sqlClient.DbFirst.CheckTabExists(Constants.HiSysTable["Hi_DataElement"]);
-                
+
+                bool _isinstall = false;
+
                 //系统表只有要一个表不存在就需要初始化安装
                 if (!_has_tabmodel || !_has_tabfield || !_has_domain || !_has_element)
                 {
-                    if (_sqlClient.CurrentConnectionConfig.DbType == DBType.Sqlite)
-                    {
-                        IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
-                        idm.Context = this._sqlClient.Context;
-                        idm.InstallHisql(this._sqlClient);
-                    }
-                    else
-                    {
-                        IDbConfig dbConfig = Instance.CreateInstance<IDbConfig>($"{Constants.NameSpace}.{_sqlClient.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.Config.ToString()}");
-                        string _sql = dbConfig.InitSql;
-                        _sql = _sql.Replace("[$Schema$]", _sqlClient.CurrentConnectionConfig.Schema);
+                    IDbConfig dbConfig = Instance.CreateInstance<IDbConfig>($"{Constants.NameSpace}.{_sqlClient.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.Config.ToString()}");
 
-                        //返回受影响的行
-                        int _effect = _sqlClient.Context.DBO.ExecCommand(_sql);
-                    }
-                    
+                    string _sql = dbConfig.InitSql;
+                    _sql = _sql.Replace("[$Schema$]", _sqlClient.CurrentConnectionConfig.Schema);
+                    _isinstall = true;
+                    //返回受影响的行
+                    int _effect = _sqlClient.Context.DBO.ExecCommand(_sql);
                 }
+               
+
                 //如果启用了编号那么需要安装编号配置表
                 if (Global.SnroOn)
                 { 
@@ -88,11 +83,154 @@ namespace HiSql
                     }
                 }
 
+                Tuple<bool, List<Hi_Version>> verinfo = checkVersion();
+                upgradeVersions(_isinstall,verinfo.Item1, verinfo.Item2);
 
-                
+
             }
             else
                 throw new Exception($"请先指定数据库连接!");
+        }
+
+
+
+        /// <summary>
+        /// 升级版本
+        /// </summary>
+        /// <param name="hasversion"></param>
+        /// <param name="versions"></param>
+        private void upgradeVersions(bool isinstall,bool hasversion, List<Hi_Version> versions)
+        {
+            string jssonver=HiSql.Properties.Resources.UpgradeVersion.ToString();
+            List<Hi_UpgradeInfo> lstupgradeinfo = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Hi_UpgradeInfo>>(jssonver);
+            if (lstupgradeinfo.Count > 0)
+            {
+                //当前版本号
+                Version _curver = Constants.HiSqlVersion;
+                if (!hasversion  )
+                {
+                    if (!isinstall)
+                    {
+                        //需要一个版本一个版本的升级
+                        foreach (Hi_UpgradeInfo upgradeInfo in lstupgradeinfo)
+                        {
+                            upgradeVersion(_curver, upgradeInfo);
+                        }
+                    }
+                }
+                else
+                {
+                    List<Hi_UpgradeInfo> upgradeInfos = lstupgradeinfo.Where(u => u.MinVersion <= _curver && _curver < u.MaxVersion).ToList();
+                    if (upgradeInfos.Count>0)
+                    {
+                        foreach (Hi_UpgradeInfo upgradeInfo in upgradeInfos)
+                            upgradeVersion(_curver, upgradeInfo);
+
+                        saveCurrVersion();
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 升级到指定的版本
+        /// </summary>
+        /// <param name="curversion"></param>
+        /// <param name="upgradeInfo"></param>
+        private void upgradeVersion(Version curversion, Hi_UpgradeInfo upgradeInfo)
+        {
+            //逐个表更新
+            foreach (Hi_UpgradeTab upgradeTab in upgradeInfo.UpgradTabs)
+            {
+                if (_sqlClient.DbFirst.CheckTabExists(upgradeTab.TabName))
+                {
+                    TabInfo tabinfo = _sqlClient.Context.DMInitalize.GetTabStruct(upgradeTab.TabName);
+                    TabInfo tabinfo2 = tabinfo.CloneCopy();
+                    foreach (Hi_UpgradeCol upgradeCol in upgradeTab.Columns)
+                    {
+                        if (upgradeCol.TabFieldAction == TabFieldAction.ADD || upgradeCol.TabFieldAction == TabFieldAction.MODI)
+                        {
+                            if (!tabinfo2.Columns.Any(c => c.FieldName.Equals(upgradeCol.ColumnInfo.FieldName, StringComparison.OrdinalIgnoreCase)))
+                                tabinfo2.Columns.Add(upgradeCol.ColumnInfo);
+                            else
+                            {
+                                for (int i = 0; i < tabinfo2.Columns.Count; i++)
+                                {
+                                    if (tabinfo2.Columns[i].FieldName.Equals(upgradeCol.ColumnInfo.FieldName, StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        tabinfo2.Columns[i] = upgradeCol.ColumnInfo.CloneCopy();
+                                    }
+                                }
+                            }
+                        }
+                        else if (upgradeCol.TabFieldAction == TabFieldAction.DELETE)
+                        {
+                            int _idx = 0;
+                            bool _hascol = false;
+                            for (int i = 0; i < tabinfo2.Columns.Count; i++)
+                            {
+                                if (tabinfo2.Columns[i].FieldName.Equals(upgradeCol.ColumnInfo.FieldName, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    _idx = i;
+                                    _hascol = true;
+                                }
+                            }
+                            if (_hascol)
+                                tabinfo2.Columns.RemoveAt(_idx);
+                        }
+                    }
+                    var tuple = _sqlClient.DbFirst.ModiTable(tabinfo2, OpLevel.Execute);
+                    Console.WriteLine(tuple.Item2);
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// 版本检测
+        /// </summary>
+        /// <returns></returns>
+        private Tuple<bool, List<Hi_Version>> checkVersion()
+        {
+            bool _has_version = _sqlClient.DbFirst.CheckTabExists(Constants.HiSysTable["Hi_Version"]);
+            Tuple<bool, List<Hi_Version>> rtn = new Tuple<bool, List<Hi_Version>>(false,null);
+            List<Hi_Version> lstver = new List<Hi_Version>();
+            if (!_has_version)
+            {
+                TabInfo tabinfo_field = _sqlClient.Context.DMInitalize.BuildTab(typeof(Hi_Version));
+                _sqlClient.DbFirst.CreateTable(tabinfo_field);
+                lstver=saveCurrVersion();
+                rtn= new Tuple<bool, List<Hi_Version>>(false, lstver);
+            }
+            else
+            {
+                 lstver = _sqlClient.HiSql($"select * from {Constants.HiSysTable["Hi_Version"]} where HiPackName in (@HiPackName)",
+                    new { HiPackName = new List<string> { Constants.NameSpace, _sqlClient.CurrentConnectionConfig.DbType.ToString() } })
+                    .ToList<Hi_Version>();
+                rtn = new Tuple<bool, List<Hi_Version>>(true, lstver);
+            }
+            return rtn;
+        }
+
+        /// <summary>
+        /// 保存当前最新的版本号信息
+        /// </summary>
+        private List<Hi_Version> saveCurrVersion()
+        {
+            List<string> list = Constants.DbCurrentSupportList;
+            Version version = Constants.HiSqlVersion;
+            List<Hi_Version> lstver = new List<Hi_Version>();
+            lstver.Add(new Hi_Version { HiPackName = Constants.NameSpace, Version = version.ToString(), VerNum = Convert.ToInt32(version.ToString().Replace(".", "")) });
+            foreach (string n in list)
+            {
+                Version ver = Constants.GetDbTypeVersion(n);
+
+          
+                lstver.Add(new Hi_Version { HiPackName = n, Version = ver.ToString(),VerNum=Convert.ToInt32(ver.ToString().Replace(".", "")) });
+            }
+            if(lstver.Count > 0)
+                _sqlClient.Modi(Constants.HiSysTable["Hi_Version"], lstver).ExecCommand();
+            return lstver;
         }
 
         /// <summary>

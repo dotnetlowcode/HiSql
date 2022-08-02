@@ -29,7 +29,7 @@ namespace HiSql.UnitTest
             //Query_Demo(sqlClient);
             //QuerySlave(sqlClient);
             //Query_Demo3(sqlClient);
-            Query_Case(sqlClient);
+            //Query_Case(sqlClient);
             //Query_Demo2(sqlClient);
             //Query_Demo4(sqlClient);
             //Query_Demo5(sqlClient);
@@ -47,7 +47,7 @@ namespace HiSql.UnitTest
             //Query_Demo17(sqlClient);
             //Query_Demo18(sqlClient);
             //Query_Demo19(sqlClient);
-            //Query_Demo20(sqlClient);
+            Query_Demo20(sqlClient);
             //Query_Demo21();
             var s = Console.ReadLine();
         }

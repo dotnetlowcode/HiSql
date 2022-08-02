@@ -30,21 +30,21 @@ namespace HiSql.DaMengUnitTest
             //TabInfo tabinfo_tab = sqlClient.Context.DMInitalize.BuildTab(typeof(Hi_Domain));
 
 
-            TabInfo tabinfo_field = sqlClient.Context.DMInitalize.BuildTab(typeof(Table.HTest01));
+            //TabInfo tabinfo_field = sqlClient.Context.DMInitalize.BuildTab(typeof(Table.HTest01));
 
-            //tabinfo_tab.TabModel.TabName = "#" + tabinfo_tab.TabModel.TabName;
-            //tabinfo_tab.TabModel.TabReName = tabinfo_tab.TabModel.TabName.Substring(2) + "_" + System.Threading.Thread.CurrentThread.ManagedThreadId + "_" + tabinfo_tab.TabModel.TabName.GetHashCode().ToString().Substring(1);
+            ////tabinfo_tab.TabModel.TabName = "#" + tabinfo_tab.TabModel.TabName;
+            ////tabinfo_tab.TabModel.TabReName = tabinfo_tab.TabModel.TabName.Substring(2) + "_" + System.Threading.Thread.CurrentThread.ManagedThreadId + "_" + tabinfo_tab.TabModel.TabName.GetHashCode().ToString().Substring(1);
 
-            string _sql = sqlClient.Context.DMTab.BuildTabCreateSql(tabinfo_field.TabModel, tabinfo_field.GetColumns, true);
-            int _effect = (int)sqlClient.Context.DBO.ExecCommand(_sql);
+            //string _sql = sqlClient.Context.DMTab.BuildTabCreateSql(tabinfo_field.TabModel, tabinfo_field.GetColumns, true);
+            //int _effect = (int)sqlClient.Context.DBO.ExecCommand(_sql);
 
-             tabinfo_field = sqlClient.Context.DMInitalize.BuildTab(typeof(Table.HTest02));
-             _sql = sqlClient.Context.DMTab.BuildTabCreateSql(tabinfo_field.TabModel, tabinfo_field.GetColumns, true);
-             _effect = (int)sqlClient.Context.DBO.ExecCommand(_sql);
+            // tabinfo_field = sqlClient.Context.DMInitalize.BuildTab(typeof(Table.HTest02));
+            // _sql = sqlClient.Context.DMTab.BuildTabCreateSql(tabinfo_field.TabModel, tabinfo_field.GetColumns, true);
+            // _effect = (int)sqlClient.Context.DBO.ExecCommand(_sql);
 
-            tabinfo_field = sqlClient.Context.DMInitalize.BuildTab(typeof(Table.HTest03));
-            _sql = sqlClient.Context.DMTab.BuildTabCreateSql(tabinfo_field.TabModel, tabinfo_field.GetColumns, true);
-            _effect = (int)sqlClient.Context.DBO.ExecCommand(_sql);
+            //tabinfo_field = sqlClient.Context.DMInitalize.BuildTab(typeof(Table.HTest03));
+            //_sql = sqlClient.Context.DMTab.BuildTabCreateSql(tabinfo_field.TabModel, tabinfo_field.GetColumns, true);
+            //_effect = (int)sqlClient.Context.DBO.ExecCommand(_sql);
 
             //int _effect = (int)sqlClient.Context.DBO.ExecScalar(_sql);
 

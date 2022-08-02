@@ -194,9 +194,10 @@ namespace HiSql
 
         string BuildKey(List<HiColumn> hiColumn);
 
-        string BuildFieldStatement(HiTable hiTable, HiColumn hiColumn);
+        string BuildFieldStatement(HiTable hiTable, HiColumn hiColumn, bool isalteraddkey=false);
 
 
+ 
         /// <summary>
         /// 根据表结构信息生成修改表的SQL语句
         /// </summary>

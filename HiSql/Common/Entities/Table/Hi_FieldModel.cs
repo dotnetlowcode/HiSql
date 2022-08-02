@@ -16,9 +16,9 @@ namespace HiSql
     public partial class Hi_FieldModel: StandField
     {
 
-        /// <summary>
-        /// 自长ID
-        /// </summary>
+        [HiColumn(FieldDesc = "数据库名", FieldLen = 50, IsPrimary = true, IsBllKey = true, IsNull = false, DBDefault = HiTypeDBDefault.EMPTY, DefaultValue = "" , SortNum = 4, IsSys = true)]
+        public string DbName { get; set; }
+
         //[HiColumn(  FieldDesc = "字段编号" ,IsPrimary =true,IsIdentity =true,SortNum =1, IsSys = true)]
         //public int Fid { get; set; }
         /// <summary>
@@ -114,7 +114,7 @@ namespace HiSql
         /// <summary>
         /// 编号名称
         /// </summary>
-        [HiColumn(FieldDesc = "编号名称",FieldLen =10,FieldType =HiType.NCHAR, DBDefault = HiTypeDBDefault.EMPTY, IsSys = true, SortNum = 70)]
+        [HiColumn(FieldDesc = "编号名称",FieldLen =10,FieldType =HiType.VARCHAR, DBDefault = HiTypeDBDefault.EMPTY, IsSys = true, SortNum = 70)]
         public string SNO
         {
             get;set;
@@ -122,7 +122,7 @@ namespace HiSql
         /// <summary>
         /// 子编号
         /// </summary>
-        [HiColumn(FieldDesc = "子编号", FieldLen = 3, FieldType = HiType.NCHAR, DBDefault = HiTypeDBDefault.EMPTY, IsSys = true, SortNum = 75)]
+        [HiColumn(FieldDesc = "子编号", FieldLen = 3, FieldType = HiType.VARCHAR, DBDefault = HiTypeDBDefault.EMPTY, IsSys = true, SortNum = 75)]
         public string SNO_NUM
         {
             get;set;

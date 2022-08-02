@@ -47,11 +47,8 @@ namespace HiSql
             }
 
         }
-        [System.Serializable]
-        [HiTable(IsEdit = true, TabName = "H_Test")]
         class H_Test : StandField
         {
-            [HiColumn(FieldDesc = "编号", IsPrimary = true, IsBllKey = true, FieldType = HiType.INT, SortNum = 1, IsSys = false, DBDefault = HiTypeDBDefault.EMPTY)]
             public int Hid
             {
                 get; set;
@@ -68,20 +65,29 @@ namespace HiSql
             {
                 get; set;
             }
+            public DateTime CreateTime
+            {
+                get; set;
+            }
+            public string CreateName
+            {
+                get; set;
+            }
+            public DateTime ModiTime
+            {
+                get; set;
+            }
+            public string ModiName
+            {
+                get; set;
+            }
 
         }
         public static void Init(HiSqlClient sqlClient)
         {
-            if (!sqlClient.DbFirst.CheckTabExists(typeof(H_Test).Name))
-            {
-                sqlClient.DbFirst.CreateTable(typeof(H_Test));
-            }
-
-            var a = sqlClient.Context.DMInitalize.GetTabStruct("H_Test");
             //Demo1_Insert(sqlClient);
             //Demo1_Insert2(sqlClient);
-            
-            Demo1_Insert3(sqlClient);
+            //Demo1_Insert3(sqlClient);
             //Demo1_Insert4(sqlClient);
             //Demo1_Insert5(sqlClient);
             //Demo1_Insert6(sqlClient);
@@ -93,7 +99,7 @@ namespace HiSql
 
             //Demo1_Insert11(sqlClient);
             //Demo1_Insert12(sqlClient);
-           // Demo1_Insert13(sqlClient);
+            Demo1_Insert13(sqlClient);
         }
 
 
@@ -108,7 +114,7 @@ namespace HiSql
 
             //sqlClient.Update("hi_fieldmodel", new { TabName= "H_Test4",FieldName= "sid", SNO = "SALENO", SNO_NUM = "1" }).Only("SNO", "SNO_NUM").ExecCommand();
             //HiSqlCommProvider.RemoveTabInfoCache("H_Test4");
-            sqlClient.Update("hi_fieldmodel", new { TabName = "H_Test5", FieldName = "sid", SNO = "SALENO", SNO_NUM = "1" }).Only("SNO", "SNO_NUM").ExecCommand();
+            sqlClient.Update("hi_fieldmodel", new { DbName="", TabName = "H_Test5", FieldName = "sid", SNO = "SALENO", SNO_NUM = "1" }).Only("SNO", "SNO_NUM").ExecCommand();
             HiSqlCommProvider.RemoveTabInfoCache("H_Test5");
 
             List<object> list = new List<object>();
@@ -122,7 +128,7 @@ namespace HiSql
             list2.Add("20220708090210099");
             list2.Add("20220708090210100");
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 1000000; i++)
             {
                 if (list2.Count > 0)
                 {
@@ -426,16 +432,16 @@ namespace HiSql
         {
             List<Dictionary<string, string>> list = new List<Dictionary<string, string>>();
 
-            Dictionary<string, string> _dic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "Hid", "2" }, { "UserName", "QXW" }, { "UserAge", "100" }, { "ReName", "xw" } };
+            Dictionary<string, string> _dic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "DID", "2" }, { "UserName", "QXW" }, { "UserAge", "100" }, { "ReName", "xw" } };
             list.Add(_dic);
 
-            Dictionary<string, string> _dic1 = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "Hid", "3" }, { "UserName", "QXW1" }, { "UserAge", "101" }, { "ReName", "xw1" } };
+            Dictionary<string, string> _dic1 = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "DID", "3" }, { "UserName", "QXW1" }, { "UserAge", "101" }, { "ReName", "xw1" } };
             list.Add(_dic1);
 
 
-            var sql = sqlClient.Update<Dictionary<string, string>>("H_Test", list).ToSql();
-            sqlClient.Modi<Dictionary<string, string>>("H_Test", list).ExecCommand();
-            sqlClient.Modi<Dictionary<string, string>>("H_Test", list).ExecCommand();
+            var SQL= sqlClient.Update<Dictionary<string, string>>("H_Test", list).ToSql();
+            //sqlClient.Modi<Dictionary<string, string>>("H_Test", list).ExecCommand();
+            //sqlClient.Modi<Dictionary<string, string>>("H_Test", list).ExecCommand();
         }
         static async void Demo1_Insert(HiSqlClient sqlClient)
         {

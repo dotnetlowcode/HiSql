@@ -28,6 +28,7 @@ namespace HiSql
         public override object TypeId { get; }
 
 
+        string _dbName = "";
         string _tabName = "";
         string _tabReName = "";
         string _dbServer = "";
@@ -56,6 +57,15 @@ namespace HiSql
         public TableType TableType
         {
             get { return tableType; }
+        }
+
+        /// <summary>
+        /// 数据库名
+        /// </summary>
+        public string DbName
+        {
+            get { return _dbName; }
+            set { _dbName = value; }
         }
 
         /// <summary>
@@ -202,6 +212,9 @@ namespace HiSql
     [Serializable]
     public class HiColumn : Attribute
     {
+
+
+        string _dbname = "";
         private string _ColumnName= "";
         string _tabName = "";
         private string _fieldDesc = "";
@@ -246,6 +259,15 @@ namespace HiSql
         string _refieldname = "";
 
         
+        /// <summary>
+        /// 数据库名
+        /// </summary>
+        public string DbName
+        {
+            get { return _dbname; }
+            set { _dbname = value; }
+        }
+
         /// <summary>
         /// 表名
         /// </summary>
