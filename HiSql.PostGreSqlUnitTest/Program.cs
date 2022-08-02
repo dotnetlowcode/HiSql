@@ -13,11 +13,11 @@ namespace HiSql.PostGreSqlUnitTest
             //DemoCodeFirst.Init(sqlClient);
            
             //Demo_Query.Init(sqlClient);
-            Demo_Insert.Init(sqlClient);
+            //Demo_Insert.Init(sqlClient);
             //Demo_Update.Init(sqlClient);
             //Demo_Delete.Init(sqlClient);
 
-            //Demo_Upgrade.Init(sqlClient);
+            Demo_Upgrade.Init(sqlClient);
         }
     }
 }

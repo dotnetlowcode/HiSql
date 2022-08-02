@@ -28,6 +28,7 @@ namespace HiSql
         public override object TypeId { get; }
 
 
+        string _dbName = "";
         string _tabName = "";
         string _tabReName = "";
         string _dbServer = "";
@@ -56,6 +57,15 @@ namespace HiSql
         public TableType TableType
         {
             get { return tableType; }
+        }
+
+        /// <summary>
+        /// 数据库名
+        /// </summary>
+        public string DbName
+        {
+            get { return _dbName; }
+            set { _dbName = value; }
         }
 
         /// <summary>

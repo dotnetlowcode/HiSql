@@ -4,6 +4,54 @@
     "MaxVersion": "1.0.4.7",
     "UpgradTabs": [
       {
+        "TabName": "Hi_TabModel",
+        "Columns": [
+          {
+            "TabFieldAction": 2,
+            "ColumnInfo": {
+              "DbName": "",
+              "TabName": "Hi_TabModel",
+              "FieldName": "DbName",
+              "ReFieldName": "DbName",
+              "FieldType": 12,
+              "DBDefault": 11,
+              "SortNum": 4,
+              "FieldDesc": "数据库名",
+              "FieldLen": 50,
+              "FieldDec": 0,
+              "SNO": "",
+              "SNO_NUM": "",
+              "Regex": "",
+              "IsPrimary": true,
+              "IsIdentity": false,
+              "IsNull": true,
+              "IsBllKey": true,
+              "IsIgnore": false,
+              "IsRequire": true,
+              "IsObsolete": false,
+              "IsSys": false,
+              "DefaultValue": "",
+              "IsShow": true,
+              "IsSearch": true,
+              "SrchMode": 10,
+              "IsRefTab": false,
+              "RefTab": "",
+              "RefField": "",
+              "RefFields": "",
+              "RefFieldDesc": "",
+              "RefWhere": "",
+              "TypeId": "HiSql.HiColumn, HiSql, Version=1.0.4.6, Culture=neutral, PublicKeyToken=null"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "MinVersion": "1.0.0.1",
+    "MaxVersion": "1.0.4.7",
+    "UpgradTabs": [
+      {
         "TabName": "Hi_FieldModel",
         "Columns": [
           {

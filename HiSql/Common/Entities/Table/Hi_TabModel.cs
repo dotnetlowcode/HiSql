@@ -19,12 +19,15 @@ namespace HiSql
     public partial class Hi_TabModel:StandField
     {
 
-
-
+        /// <summary>
+        /// 数据库名
+        /// </summary>
+        [HiColumn(FieldDesc = "数据库名", FieldLen = 50, IsPrimary = true, IsBllKey = true, IsNull = false, DBDefault = HiTypeDBDefault.EMPTY, DefaultValue = "", SortNum = 4, IsSys = true)]
+        public string DbName { get; set; }
         /// <summary>
         /// 表名
         /// </summary>
-        [HiColumn(FieldDesc = "表名", IsPrimary = true, IsBllKey = true,IsNull =false, FieldLen = 50, SortNum = 1, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY)]
+        [HiColumn(FieldDesc = "表名", IsPrimary = true, IsBllKey = true,IsNull =false, FieldLen = 50, SortNum = 5, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY)]
         public string TabName { get; set; }
 
 
@@ -32,14 +35,14 @@ namespace HiSql
         /// <summary>
         /// 表的别名
         /// </summary>
-        [HiColumn(FieldDesc= "表的别名",  FieldLen = 50, SortNum = 5, DBDefault = HiTypeDBDefault.EMPTY)]
+        [HiColumn(FieldDesc= "表的别名",  FieldLen = 50, SortNum = 6, DBDefault = HiTypeDBDefault.EMPTY)]
         public string TabReName { get; set; }
 
 
         /// <summary>
         /// 表描述
         /// </summary>
-        [HiColumn(FieldDesc = "表描述", FieldLen = 100, SortNum = 5, DBDefault = HiTypeDBDefault.EMPTY)]
+        [HiColumn(FieldDesc = "表描述", FieldLen = 100, SortNum = 7, DBDefault = HiTypeDBDefault.EMPTY)]
         public string TabDescript { get; set; }
 
         /// <summary>

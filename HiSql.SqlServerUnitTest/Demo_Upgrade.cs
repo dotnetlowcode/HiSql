@@ -78,6 +78,28 @@ namespace HiSql.UnitTest
         {
 
             List<Hi_UpgradeInfo> lstupgradeinfo = new List<Hi_UpgradeInfo>();
+
+
+            lstupgradeinfo.Add(
+                new Hi_UpgradeInfo
+                {
+                    MinVersion = new Version("1.0.0.1"),
+                    MaxVersion = new Version("1.0.4.7"),
+                    UpgradTabs = new List<Hi_UpgradeTab>
+                    {
+                        new Hi_UpgradeTab{
+                            TabName="Hi_TabModel",
+                            Columns=new List<Hi_UpgradeCol>{
+                                new Hi_UpgradeCol {
+                                    TabFieldAction = TabFieldAction.MODI ,
+                                    ColumnInfo=new HiColumn { TabName= "Hi_TabModel",FieldName="DbName", SortNum=4, FieldLen=50,FieldType=HiType.VARCHAR,IsBllKey=true,IsPrimary=true,DBDefault=HiTypeDBDefault.VALUE,DefaultValue="",FieldDesc="数据库名"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
             lstupgradeinfo.Add(
                 new Hi_UpgradeInfo
                 {
