@@ -64,11 +64,13 @@ namespace HiSql
         string _temp_get_table_schema = "";
 
 
+
         //本地临时表前辍
-        string _temp_local_temp_pre = "#";
+        string _temp_local_table_pre = "TMP_";
 
         //全局临时表前辍
-        string _temp_global_temp_pre = "##";
+        string _temp_global_table_pre = "GTMP_";
+
 
         //变量表前辍
         string _temp_var_temp_pre = "@";
@@ -224,7 +226,8 @@ namespace HiSql
         }
         public int BlukSize { get => _bluksize; set => _bluksize = value; }
         public int BulkUnitSize { get => _bulkunitsize; set => _bulkunitsize = value; }
-
+        public string GetLocalTempTablePre { get => _temp_local_table_pre; }
+        public string GetGlobalTempTablePre { get => _temp_global_table_pre; }
 
         /// <summary>
         /// 强制分包记录数大小 结合 强制分包列数量 一起触发

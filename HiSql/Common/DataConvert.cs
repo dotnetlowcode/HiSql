@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Dynamic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -1400,6 +1401,109 @@ namespace HiSql
                 }
             }
             return hash;
+        }
+
+        public static List<Hi_FieldModel> CloneFieldModelList(List<Hi_FieldModel> hi_FieldModels)
+        {
+            List<Hi_FieldModel> l = new List<Hi_FieldModel>();
+            foreach (var item in hi_FieldModels)
+            {
+               l.Add(item.CloneFieldModel());
+            }
+            return l;
+        }
+        public static Hi_FieldModel CloneFieldModel(this Hi_FieldModel hi_FieldModel)
+        {
+            Hi_FieldModel l = new Hi_FieldModel() { 
+                CreateName = hi_FieldModel.CreateName,
+                CreateTime = hi_FieldModel.CreateTime,
+                DBDefault = hi_FieldModel.DBDefault,    
+                DefaultValue = hi_FieldModel.DefaultValue,  
+                FieldDec    = hi_FieldModel.FieldDec,
+                FieldDesc = hi_FieldModel.FieldDesc,
+                FieldType = hi_FieldModel.FieldType,    
+                FieldLen = hi_FieldModel.FieldLen,
+                FieldName = hi_FieldModel.FieldName,
+                IsBllKey = hi_FieldModel.IsBllKey,
+                IsIdentity = hi_FieldModel.IsIdentity,
+                IsIgnore = hi_FieldModel.IsIgnore,  
+                IsNull = hi_FieldModel.IsNull,
+                IsObsolete = hi_FieldModel.IsObsolete,  
+                IsPrimary = hi_FieldModel.IsPrimary,
+                IsRefTab = hi_FieldModel.IsRefTab,
+                IsRequire = hi_FieldModel.IsRequire,    
+                IsSearch = hi_FieldModel.IsSearch,  
+                IsShow = hi_FieldModel.IsShow,
+                IsSys = hi_FieldModel.IsSys,
+                ModiName = hi_FieldModel.ModiName,
+                ModiTime = hi_FieldModel.ModiTime,
+                RefField = hi_FieldModel.RefField,  
+                RefFieldDesc = hi_FieldModel.RefFieldDesc,  
+                RefFields = hi_FieldModel.RefFields,    
+                RefTab = hi_FieldModel.RefTab,  
+                RefWhere = hi_FieldModel.RefWhere,  
+                Regex = hi_FieldModel.Regex,    
+                SNO = hi_FieldModel.SNO,
+                SNO_NUM = hi_FieldModel.SNO_NUM,
+                SortNum = hi_FieldModel.SortNum,    
+                SrchMode = hi_FieldModel.SrchMode,
+                TabName = hi_FieldModel.TabName
+            };
+
+            return l;
+        }
+
+        public static TabInfo CloneTabInfo(TabInfo tabInfo)
+        {
+            TabInfo l = new TabInfo() { 
+               Columns = CloneHiColumnList(tabInfo.Columns),
+               DbTabName = tabInfo.DbTabName,
+               EntityName = tabInfo.EntityName
+               , TabModel = tabInfo.TabModel
+            };
+            
+            return l;
+        }
+        public static List<HiColumn> CloneHiColumnList(List<HiColumn> HiColumns)
+        {
+            List<HiColumn> l = new List<HiColumn>();
+            foreach (var item in HiColumns)
+            {
+                l.Add(CloneHiColumn(item));
+            }
+            return l;
+        }
+        public static HiColumn CloneHiColumn(HiColumn hiColumn)
+        {
+            HiColumn l = new HiColumn()
+            {
+                TabName = hiColumn.TabName,
+                DBDefault = hiColumn.DBDefault,
+                DefaultValue = hiColumn.DefaultValue,
+                FieldDec = hiColumn.FieldDec,
+                FieldDesc = hiColumn.FieldDesc,
+                FieldLen = hiColumn.FieldLen,
+                FieldName = hiColumn.FieldName,
+                FieldType = hiColumn.FieldType,
+                IsBllKey = hiColumn.IsBllKey,
+                IsIdentity = hiColumn.IsIdentity,
+                IsIgnore = hiColumn.IsIgnore,
+                IsNull = hiColumn.IsNull,
+                IsObsolete = hiColumn.IsObsolete,
+                IsPrimary = hiColumn.IsPrimary,
+                IsRefTab = hiColumn.IsRefTab,
+                IsRequire = hiColumn.IsRequire, 
+                IsSearch   = hiColumn.IsSearch, 
+                IsShow = hiColumn.IsShow,
+                IsSys = hiColumn.IsSys, 
+                RefField = hiColumn.RefField,
+                RefFieldDesc = hiColumn.RefFieldDesc,
+                RefFields = hiColumn.RefFields,
+                ReFieldName = hiColumn.ReFieldName,RefTab = hiColumn.RefTab,RefWhere = hiColumn.RefWhere,Regex = hiColumn.Regex,
+                SNO = hiColumn.SNO,SNO_NUM = hiColumn.SNO_NUM,SortNum = hiColumn.SortNum,SrchMode = hiColumn.SrchMode
+            };
+
+            return l;
         }
     }
 }

@@ -40,6 +40,10 @@ namespace HiSql
             });
             return version;
         }
+        public bool InstallHisql(HiSqlClient hiSqlClient)
+        {
+            throw new NotImplementedException();
+        }
         #region IDMInitalize接口实现
         public TabInfo BuildTab(Type type)
         {
@@ -2479,7 +2483,10 @@ namespace HiSql
         }
         #endregion
 
-
+        public string BuildTabModiSql(TabInfo tabInfo)
+        {
+            throw new NotImplementedException();
+        }
 
         #region 私有方法集
         string buildCaseSql(Dictionary<string, TabInfo> dictabinfo, QueryProvider queryProvider, FieldDefinition fieldDefinition)

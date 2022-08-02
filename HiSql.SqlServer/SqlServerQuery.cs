@@ -80,9 +80,14 @@ namespace HiSql
             StringBuilder sb = new StringBuilder();
 
             StringBuilder sb_total = new StringBuilder();
-            
 
-            if (!this.IsMultiSubQuery)
+            string insertintosql = string.Empty;
+            if (!string.IsNullOrEmpty(this.ITabName))
+            {
+                //sqlserver 支持自动创建临时表
+                insertintosql =  $"  into {this.ITabName} ";
+            }
+           if (!this.IsMultiSubQuery)
             {
                 if (this.IsPage)
                 {
@@ -120,10 +125,11 @@ namespace HiSql
                     sb_total.AppendLine($"select @_hisqltotal;");
                     this.PageTotalSql = sb_total.ToString();
 
+
                     if (this.CurrentPage == 1)
                     {
                         //表示第一页
-                        sb.AppendLine($"select  top {this.PageSize} {sb_field.ToString()} from {sb_table.ToString()}");
+                        sb.AppendLine($"select  top {this.PageSize} {sb_field.ToString()} {insertintosql} from {sb_table.ToString()}");
                         
                         if (!string.IsNullOrEmpty(sb_join.ToString()))
                             sb.AppendLine($" {sb_join.ToString()}");
@@ -149,7 +155,7 @@ namespace HiSql
                         
                         if (string.IsNullOrEmpty(sb_sort.ToString()))
                             throw new Exception($"有分页查询时必须指定排序条件");
-                        sb.AppendLine($"select  {sb_field_result.ToString()} from ( ");
+                        sb.AppendLine($"select  {sb_field_result.ToString()} {insertintosql} from ( ");
                         sb.AppendLine($"select ROW_NUMBER() OVER(Order by {sb_sort.ToString()}) AS _hi_rownum_, {sb_field.ToString()} from {sb_table.ToString()}");
                         if (!string.IsNullOrEmpty(sb_join.ToString()))
                             sb.AppendLine($" {sb_join.ToString()}");
@@ -172,7 +178,7 @@ namespace HiSql
                 }
                 else
                 {
-                    sb.AppendLine($"select {sb_distinct.ToString()} {sb_field.ToString()} from {sb_table.ToString()}");
+                    sb.AppendLine($"select {sb_distinct.ToString()} {sb_field.ToString()} {insertintosql} from {sb_table.ToString()}");
                     if (!string.IsNullOrEmpty(sb_join.ToString()))
                         sb.AppendLine($" {sb_join.ToString()}");
                     if (!string.IsNullOrEmpty(sb_where.ToString()))
@@ -209,14 +215,7 @@ namespace HiSql
 
             }
 
-            if (!string.IsNullOrEmpty(this.ITabName))
-            {
-                //sqlserver 支持自动创建临时表
-                return  $"insert into   {this.ITabName}   {sb.ToString()} ";
-
-            }
-            else
-                return sb.ToString();
+            return sb.ToString();
         }
 
 

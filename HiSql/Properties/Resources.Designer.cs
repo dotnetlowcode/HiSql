@@ -63,10 +63,10 @@ namespace HiSql.Properties {
         /// <summary>
         ///   查找 System.Byte[] 类型的本地化资源。
         /// </summary>
-        internal static string UpgradeVersion {
+        internal static byte[] UpgradeVersion {
             get {
-                byte[] bytes =(byte[]) ResourceManager.GetObject("UpgradeVersion", resourceCulture);
-                return System.Text.Encoding.UTF8.GetString(bytes,0, bytes.Length);
+                object obj = ResourceManager.GetObject("UpgradeVersion", resourceCulture);
+                return ((byte[])(obj));
             }
         }
     }

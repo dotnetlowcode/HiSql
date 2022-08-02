@@ -34,7 +34,10 @@ namespace HiSql
             });
             return version;
         }
-
+        public bool InstallHisql(HiSqlClient hiSqlClient)
+        {
+            throw new NotImplementedException();
+        }
         HanaConfig dbConfig = new HanaConfig(true);
         public HanaDM()
         {
@@ -3135,6 +3138,10 @@ namespace HiSql
             string v = this.Context.DBO.ExecScalar(_sql).ToString();
             int _effect = Convert.ToInt32(v);
             return _effect;
+        }
+        public string BuildTabModiSql(TabInfo tabInfo)
+        {
+            throw new NotImplementedException();
         }
     }
 }

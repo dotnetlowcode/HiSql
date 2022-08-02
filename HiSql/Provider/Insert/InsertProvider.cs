@@ -152,7 +152,7 @@ namespace HiSql
 
                 _insertTabName = this.Table.TabName;
                 //由于DBType.PostGreSql mergeinto的方法实现逻辑与其它的数据库完全不一样只能特殊处理
-                if (_mergeinto && Context.CurrentConnectionConfig.DbType != DBType.PostGreSql)
+                if (_mergeinto && Context.CurrentConnectionConfig.DbType != DBType.PostGreSql && Context.CurrentConnectionConfig.DbType != DBType.Sqlite)
                 {
                     string _json = JsonConvert.SerializeObject(tabinfo);
                     //TabInfo tabinfo2 =  JsonConvert.DeserializeObject<TabInfo>(_json);
@@ -322,7 +322,16 @@ namespace HiSql
                             Dictionary<string, string> _values = rtnlst[i];
                             if (_values.Count == 0)
                                 throw new Exception($"向表[{_insertTabName}]插入数据值中无任何配置的字段");
-                            string _sql = sqldm.BuildInsertSql(_values, i > p * DbConfig.BlukSize).Replace("[$TabName$]", _insertTabName);//i > p * _bluksize
+
+                            string _sql = String.Empty;
+                            if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.Sqlite) && _mergeinto) //由于DBType.Sqlite mergeinto的方法实现逻辑与其它的数据库完全不一样只能特殊处理
+                            {
+                                _sql = sqldm.BuildInsertSql(_values, i > p * DbConfig.BlukSize).Replace("[$TabName$]", _insertTabName).Replace("insert", "replace");//i > p * _bluksize
+                            }
+                            else
+                            {
+                                _sql = sqldm.BuildInsertSql(_values, i > p * DbConfig.BlukSize).Replace("[$TabName$]", _insertTabName);//i > p * _bluksize
+                            }
                             sb_sql.Append(_sql);
                             _times++;
                         }
@@ -419,7 +428,7 @@ namespace HiSql
 
                 sb_sql = new StringBuilder();
 
-                if (_mergeinto && Context.CurrentConnectionConfig.DbType != DBType.PostGreSql)
+                if (_mergeinto && Context.CurrentConnectionConfig.DbType != DBType.PostGreSql && Context.CurrentConnectionConfig.DbType != DBType.Sqlite)
                 {
                     TabInfo _tabtarget = sqldm.GetTabStruct(this.Table.TabName);
                     TabInfo _tabsource = sqldm.Context.MCache.GetCache<TabInfo>(_cacheinsertTabName);
@@ -1149,7 +1158,9 @@ namespace HiSql
                                     {
                                         if (hiColumn.FieldType.IsIn<HiType>(HiType.INT))
                                         {
-                                            _dic.Add(hiColumn.FieldName, ((int)objvalue).ToString());
+                                            int _intobjvalue = 0;
+                                            int.TryParse(objvalue.ToString(), out _intobjvalue);
+                                            _dic.Add(hiColumn.FieldName, (_intobjvalue).ToString()); //pengxy
                                         }
                                         else
                                             _dic.Add(hiColumn.FieldName, objvalue.ToString());

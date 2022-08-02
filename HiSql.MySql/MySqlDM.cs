@@ -37,6 +37,10 @@ namespace HiSql
             });
             return version;
         }
+        public bool InstallHisql(HiSqlClient hiSqlClient)
+        {
+            throw new NotImplementedException();
+        }
         #region IDMInitalize接口实现
         public TabInfo BuildTab(Type type)
         {
@@ -3063,6 +3067,10 @@ namespace HiSql
             string v = this.Context.DBO.ExecScalar(_sql).ToString();
             int _effect = Convert.ToInt32(v);
             return _effect;
+        }
+        public string BuildTabModiSql(TabInfo tabInfo)
+        {
+            throw new NotImplementedException();
         }
     }
 }

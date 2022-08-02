@@ -13,11 +13,11 @@ namespace HiSql
         {
 
             Console.WriteLine("表操作测试");
-            //Demo_AddColumn(sqlClient);
+           // Demo_AddColumn(sqlClient);
 
             //Demo_ModiColumn(sqlClient);
             //Demo_ReColumn(sqlClient);
-            //Demo_ModiTable(sqlClient);
+            Demo_ModiTable(sqlClient);
             //Demo_ReTable(sqlClient);
             //Demo_DelColumn(sqlClient);
             //Demo_Tables(sqlClient);
@@ -34,7 +34,7 @@ namespace HiSql
             //Demo_Index_Create(sqlClient);
             //Demo_Primary_Create(sqlClient);
             // Demo_AllTablesPaging(sqlClient);
-            Dome_GetTableStruct();
+            //Dome_GetTableStruct();
         }
 
         static void Dome_GetTableStruct()
@@ -289,11 +289,11 @@ namespace HiSql
             HiColumn column = new HiColumn()
             {
                 TabName = "Hi_Test",
-                FieldName = "TestAdd22",
+                FieldName = "TestAdd",
                 FieldType = HiType.VARCHAR,
                 FieldLen = 50,
                 DBDefault = HiTypeDBDefault.EMPTY,
-                DefaultValue = "",
+                DefaultValue = "asdfasdf",
                 FieldDesc = "测试字段添加"
 
             };
@@ -364,26 +364,27 @@ namespace HiSql
 
             TabInfo _tabcopy = ClassExtensions.DeepCopy<TabInfo>(tabinfo);
             //_tabcopy.Columns.RemoveAt(5);
+            
+            HiColumn newcol = _tabcopy.Columns.Where(t=>t.FieldName== "TestAdd").FirstOrDefault();
+            newcol.IsNull = false;
+            newcol.FieldType = HiType.NVARCHAR;
+            newcol.FieldDesc = Guid.NewGuid().ToString();
+            newcol.DefaultValue = Guid.NewGuid().ToString();
+            //_tabcopy.Columns.Add(newcol);
 
-            HiColumn newcol = ClassExtensions.DeepCopy<HiColumn>(_tabcopy.Columns[3]);
-            newcol.FieldName = "Testname231233";
-            newcol.ReFieldName = "Testname231233";
-            newcol.IsNull = true;
-            _tabcopy.Columns.Add(newcol);
+            //_tabcopy.Columns[4].ReFieldName = "Testname231233sdf";
+            //_tabcopy.Columns[4].IsRequire = true;
 
-            _tabcopy.Columns[4].ReFieldName = "Testname231233sdf";
-            _tabcopy.Columns[4].IsRequire = true;
-
-            _tabcopy.PrimaryKey.ForEach(x => {
-                x.IsPrimary = false;
-            });
+            //_tabcopy.PrimaryKey.ForEach(x => {
+            //    x.IsPrimary = false;
+            //});
            
-            _tabcopy.Columns.ForEach(t => {
-                if (t.FieldName == "SNRO" || t.FieldName == "SNUM")
-                {
-                    t.IsPrimary = true;
-                }
-            });
+            //_tabcopy.Columns.ForEach(t => {
+            //    if (t.FieldName == "SNRO" || t.FieldName == "SNUM")
+            //    {
+            //        t.IsPrimary = true;
+            //    }
+            //});
 
             var rtn = sqlClient.DbFirst.ModiTable(_tabcopy, OpLevel.Execute);
             if (rtn.Item1)
@@ -404,8 +405,8 @@ namespace HiSql
             {
                 TabName = "Hi_Test",
                 FieldName = "TestAdd",
-                FieldType = HiType.INT,
-                FieldLen = 51,
+                FieldType = HiType.VARCHAR,
+                FieldLen = 501,
                 DBDefault = HiTypeDBDefault.VALUE,
                 DefaultValue = "TGM",
                 FieldDesc = "测试字段变更"

@@ -14,8 +14,12 @@ namespace HiSql
     /// </summary>
     public interface IDMTab
     {
-       
-       
+        /// <summary>
+        /// 安装系统表
+        /// </summary>
+        /// <returns></returns>
+        bool InstallHisql(HiSqlClient hiSqlClient);
+
         HiSqlProvider Context { get; set; }
         /// <summary>
         /// 表创建
@@ -194,6 +198,13 @@ namespace HiSql
 
 
  
+        /// <summary>
+        /// 根据表结构信息生成修改表的SQL语句
+        /// </summary>
+        /// <param name="tabInfo"></param>
+        /// <returns></returns>
+        string BuildTabModiSql(TabInfo tabInfo);
+
         /// <summary>
         /// 
         /// </summary>
