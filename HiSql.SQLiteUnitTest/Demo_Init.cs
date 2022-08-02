@@ -16,7 +16,7 @@ namespace HiSql.UnitTest
             //Global.RedisOn = true;
             // Global.RedisOptions = new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "", CacheRegion = "", Database = 3, EnableMultiCache = false, KeyspaceNotificationsEnabled = false };
 
-            string dbName = Path.Combine(Environment.CurrentDirectory, "SampleDB2.db");
+            string dbName = Path.Combine(Environment.CurrentDirectory, "SampleDB3.db");
             string connStr = new SqliteConnectionStringBuilder()
             {
                 DataSource = dbName

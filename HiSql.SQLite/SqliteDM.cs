@@ -557,6 +557,7 @@ namespace HiSql
 
 
             sb.AppendLine($"insert into {dbConfig.Table_Pre}{Constants.HiSysTable["Hi_TabModel"]}{dbConfig.Table_After} (")
+                .Append($"{dbConfig.Field_Pre}DbName{dbConfig.Field_After}{dbConfig.Field_Split}")
                .Append($"{dbConfig.Field_Pre}TabName{dbConfig.Field_After}{dbConfig.Field_Split}")
                 .Append($"{dbConfig.Field_Pre}TabReName{dbConfig.Field_After}{dbConfig.Field_Split}")
                 .Append($"{dbConfig.Field_Pre}TabDescript{dbConfig.Field_After}{dbConfig.Field_Split}")
@@ -570,6 +571,7 @@ namespace HiSql
                 .Append($"{dbConfig.Field_Pre}LogTable{dbConfig.Field_After}{dbConfig.Field_Split}")
                 .Append($"{dbConfig.Field_Pre}LogExprireDay{dbConfig.Field_After}")
                 .Append(") values(")
+                 .Append($"'',")
                 .Append($"'{hiTable.TabName}',")
                 .Append($"'{hiTable.TabReName.ToSqlInject()}',")
                 .Append($"'{hiTable.TabDescript.ToSqlInject()}',")
@@ -591,6 +593,7 @@ namespace HiSql
             foreach (HiColumn hiColumn in lstHiTable)
             {
                 sb.AppendLine($"insert into {dbConfig.Table_Pre}{Constants.HiSysTable["Hi_FieldModel"]}{dbConfig.Table_After} (")
+                     .Append($"{dbConfig.Field_Pre}DbName{dbConfig.Field_After}{dbConfig.Field_Split}")
                     .Append($"{dbConfig.Field_Pre}TabName{dbConfig.Field_After}{dbConfig.Field_Split}")
                     .Append($"{dbConfig.Field_Pre}FieldName{dbConfig.Field_After}{dbConfig.Field_Split}")
                     .Append($"{dbConfig.Field_Pre}FieldDesc{dbConfig.Field_After}{dbConfig.Field_Split}")
@@ -620,7 +623,7 @@ namespace HiSql
                     .Append($"{dbConfig.Field_Pre}RefFields{dbConfig.Field_After}{dbConfig.Field_Split}")
                     .Append($"{dbConfig.Field_Pre}RefFieldDesc{dbConfig.Field_After}{dbConfig.Field_Split}")
                     .Append($"{dbConfig.Field_Pre}RefWhere{dbConfig.Field_After}")
-                    .Append(")values(")
+                    .Append(")values('',")
                     .Append($"'{hiTable.TabName}',")
                     .Append($"'{hiColumn.FieldName}',")
                     .Append($"'{hiColumn.FieldDesc.ToSqlInject()}',")
@@ -1133,7 +1136,7 @@ namespace HiSql
         /// </summary>
         /// <param name="hiColumn"></param>
         /// <returns></returns>
-        public string BuildFieldStatement(HiTable hiTable, HiColumn hiColumn)
+        public string BuildFieldStatement(HiTable hiTable, HiColumn hiColumn, bool isalteraddkey = false)
         {
             string _str_temp_field = "";
             if (dbConfig.DbMapping.ContainsKey(hiColumn.FieldType))
@@ -1141,7 +1144,7 @@ namespace HiSql
                 if (dbConfig.FieldTempMapping.ContainsKey(dbConfig.DbMapping[hiColumn.FieldType].ToString()))
                 {
                     _str_temp_field = dbConfig.FieldTempMapping[dbConfig.DbMapping[hiColumn.FieldType].ToString()].ToString();
-
+                    bool _isnull = isalteraddkey && hiColumn.IsPrimary;
                     switch (dbConfig.DbMapping[hiColumn.FieldType].ToString())
                     {
                         case "nvarchar":
@@ -1150,7 +1153,7 @@ namespace HiSql
                         case "char":
                             _str_temp_field = _str_temp_field.Replace("[$FieldName$]", hiColumn.FieldName)
                                 .Replace("[$FieldLen$]", hiColumn.FieldLen < 0 ? "max" : hiColumn.FieldLen.ToString())
-                                .Replace("[$IsNull$]", hiColumn.IsPrimary ? "NOT NULL" : hiColumn.IsNull == true ? "NULL" : "NOT NULL")
+                                .Replace("[$IsNull$]",  hiColumn.IsPrimary ? "NOT NULL" : hiColumn.IsNull == true ? "NULL" : "NOT NULL")
                                 .Replace("[$Default$]", hiColumn.IsPrimary ? "" : GetDbDefault(hiColumn))
                                 .Replace("[$EXTEND$]", hiTable.TableType == TableType.Var && hiColumn.IsPrimary ? "primary key" : "")
                                 ;
@@ -3908,6 +3911,7 @@ namespace HiSql
             hiSqlClient.Context.DMInitalize.GetTabStruct(typeof(Hi_DataElement).Name);
             return true;
         }
+
 
         #endregion
     }

@@ -60,13 +60,22 @@ namespace HiSql
                 //系统表只有要一个表不存在就需要初始化安装
                 if (!_has_tabmodel || !_has_tabfield || !_has_domain || !_has_element)
                 {
-                    IDbConfig dbConfig = Instance.CreateInstance<IDbConfig>($"{Constants.NameSpace}.{_sqlClient.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.Config.ToString()}");
+                    if (_sqlClient.CurrentConnectionConfig.DbType == DBType.Sqlite)
+                    {
+                        IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
+                        idm.Context = this._sqlClient.Context;
+                        idm.InstallHisql(this._sqlClient);
+                    }
+                    else
+                    {
+                        IDbConfig dbConfig = Instance.CreateInstance<IDbConfig>($"{Constants.NameSpace}.{_sqlClient.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.Config.ToString()}");
 
-                    string _sql = dbConfig.InitSql;
-                    _sql = _sql.Replace("[$Schema$]", _sqlClient.CurrentConnectionConfig.Schema);
-                    _isinstall = true;
-                    //返回受影响的行
-                    int _effect = _sqlClient.Context.DBO.ExecCommand(_sql);
+                        string _sql = dbConfig.InitSql;
+                        _sql = _sql.Replace("[$Schema$]", _sqlClient.CurrentConnectionConfig.Schema);
+                        _isinstall = true;
+                        //返回受影响的行
+                        int _effect = _sqlClient.Context.DBO.ExecCommand(_sql);
+                    }
                 }
                
 
