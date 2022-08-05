@@ -44,24 +44,27 @@ namespace HiSql
         /// <param name="obj1"></param>
         /// <param name="obj2"></param>
         /// <returns></returns>
-        public static Tuple<bool,bool> CompareTabProperties<T>(T obj1, T obj2)
+        public static Tuple<bool,bool, List<FieldChangeDetail>> CompareTabProperties<T>(T obj1, T obj2)
         {
+            List < FieldChangeDetail > fieldChanges = new List < FieldChangeDetail >();
             //为空判断
             if (obj1 == null && obj2 == null)
-                return  new Tuple<bool, bool>(true,false);
+                return  new Tuple<bool, bool, List<FieldChangeDetail>>(true,false, fieldChanges);
             else if (obj1 == null || obj2 == null)
-                return new Tuple<bool, bool>(false, false);
+                return new Tuple<bool, bool, List<FieldChangeDetail>>(false, false, fieldChanges);
 
             Type t1 = obj1.GetType();
             Type t2 = obj2.GetType();
-            if (t1 != t2) return new Tuple<bool, bool>(false, false);
+            if (t1 != t2) return new Tuple<bool, bool, List<FieldChangeDetail>>(false, false, fieldChanges);
 
             //比对是否是表结构有变更
+
+            bool _resultok = true;//两个结果是否相同
+            bool _isstructchg = false;//是否有结构变更
 
             PropertyInfo[] props = t1.GetProperties().Where(p => p.CanWrite == true && !Constants.IsStandardField(p.Name) &&
             //(p.Name.ToLower()!= "SortNum".ToLower() && p.Name.ToLower() != "IsSys".ToLower()) 
             (
-
                  p.Name.ToLower().IsIn("FieldDesc".ToLower(), "IsIdentity".ToLower(), "FieldName".ToLower(),
                 "FieldType".ToLower(), "DefaultValue".ToLower(), "FieldLen".ToLower(), "FieldDec".ToLower(), "IsNull".ToLower(), "ReFieldName".ToLower())
             ) // "IsPrimary".ToLower(),  是否主键额外处理  pengxy 
@@ -70,9 +73,20 @@ namespace HiSql
             {
                 if (IsCanCompare(po.PropertyType))
                 {
-                    if (!po.GetValue(obj1).Equals(po.GetValue(obj2)))
+                    string _a = po.GetValue(obj1).ToString();
+                    string _b = po.GetValue(obj2).ToString();
+                    if (!string.Equals(_a,_b,StringComparison.OrdinalIgnoreCase))
                     {
-                        return new Tuple<bool, bool>(false, true);
+                        if ((_a.Equals("''") || _a.Equals("' '")) && (_b.Equals("") || _b.Equals(" ")))
+                        {
+                            //忽略
+                        }
+                        else
+                        {
+                            _resultok= false;
+                            _isstructchg = true;//是否有结构变更
+                            fieldChanges.Add(new FieldChangeDetail { AttrName=po.Name,ValueA=_a,ValueB=_b });
+                        }
                     }
                 }
                 else
@@ -81,6 +95,9 @@ namespace HiSql
                     if (!b.Item1) return b;
                 }
             }
+
+            if(!_resultok)
+                return new Tuple<bool, bool, List<FieldChangeDetail>>(_resultok, _isstructchg, fieldChanges);
 
             //配置有变更
             props = t1.GetProperties().Where(p => p.CanWrite == true && !Constants.IsStandardField(p.Name)
@@ -99,7 +116,11 @@ namespace HiSql
                 {
                     if (!po.GetValue(obj1).Equals(po.GetValue(obj2)))
                     {
-                        return new Tuple<bool, bool>(false, false);
+                        string _a = po.GetValue(obj1).ToString();
+                        string _b = po.GetValue(obj2).ToString();
+                        _resultok = false;
+                        _isstructchg = false;//是否有结构变更
+                        fieldChanges.Add(new FieldChangeDetail { AttrName = po.Name, ValueA = _a, ValueB = _b });
                     }
                 }
                 else
@@ -108,9 +129,7 @@ namespace HiSql
                     if (!b.Item1) return b;
                 }
             }
-
-
-            return new Tuple<bool, bool>(true, false);
+            return new Tuple<bool, bool,List<FieldChangeDetail>>(_resultok, _isstructchg, fieldChanges);
         }
 
         public static bool CompareProperties<T>(T obj1, T obj2)

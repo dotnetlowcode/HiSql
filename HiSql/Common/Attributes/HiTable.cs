@@ -316,7 +316,13 @@ namespace HiSql
         {
 
             get { return _dbdefalut; }
-            set { _dbdefalut = value; }
+            set { _dbdefalut = value;
+                if (value == HiTypeDBDefault.FUNDATE)
+                    DefaultValue = Constants.FunDate;
+                else if (value == HiTypeDBDefault.FUNGUID)
+                    DefaultValue = Constants.FunGuid;
+            
+            }
         }
 
         /// <summary>

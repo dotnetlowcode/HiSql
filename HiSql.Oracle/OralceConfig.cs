@@ -84,6 +84,9 @@ namespace HiSql
         string _temp_delete = "";
         string _temp_delete_where = "";
 
+        string _temp_delete_tabstruct = "";
+        string _temp_delete_tabmodel = "";
+        string _temp_delete_fieldmodel = "";
 
         string _temp_truncate = "";
 
@@ -285,6 +288,13 @@ namespace HiSql
 
         public string Delete_Statement_Where { get => _temp_delete_where; }
 
+        /// <summary>
+        /// 删除指定表的表结构信息语句
+        /// </summary>
+        public string Delete_TabStruct { get => _temp_delete_tabstruct; }
+        public string Delete_TabModel { get => _temp_delete_tabmodel; }
+
+        public string Delete_FieldModel { get => _temp_delete_fieldmodel; }
         public string Delete_TrunCate { get => _temp_truncate; }
 
         public Dictionary<string, string> FieldTempMapping => _fieldtempmapping;
@@ -527,6 +537,14 @@ namespace HiSql
                 .ToString();
 
 
+            _temp_delete_tabmodel = $"   execute immediate 'delete from {Constants.HiSysTable["Hi_TabModel"].ToString()} where TabName=''[$TabName$]''';";
+            _temp_delete_fieldmodel = $"   execute immediate 'delete from {Constants.HiSysTable["Hi_FieldModel"].ToString()} where TabName=''[$TabName$]''';";
+
+
+            _temp_delete_tabstruct = new StringBuilder()
+               .AppendLine(_temp_delete_tabmodel)
+               .AppendLine(_temp_delete_fieldmodel).ToString();
+
             _temp_create_table = new StringBuilder()
                 .AppendLine("declare ")
                 .AppendLine($"  v_number integer;")
@@ -544,19 +562,19 @@ namespace HiSql
                 .AppendLine("    [$Primary$]")
                 .AppendLine($"   end if;")
                 //.AppendLine($"        execute immediate 'drop table [$TabName$] ';")
-                
+
                 //.AppendLine($"   select count(*) into v_secout from user_sequences where SEQUENCE_NAME = upper('[$TabName$]_SEQ');")
                 //.AppendLine($"   IF v_secout > 0 then")
                 //.AppendLine($"       execute immediate 'drop sequence [$TabName$]_SEQ';")
                 //.AppendLine($"   end if;")
                 //.AppendLine($"   execute immediate 'create sequence [$TabName$]_SEQ increment by 1 start with 1 minvalue 1 maxvalue 999999999999';")
 
-                
 
-                .AppendLine($"   execute immediate 'delete from {Constants.HiSysTable["Hi_TabModel"].ToString()} where TabName=''[$TabName$]''';")
-                .AppendLine($"   execute immediate 'delete from {Constants.HiSysTable["Hi_FieldModel"].ToString()} where TabName=''[$TabName$]''';")
+                .AppendLine($"[$DeleteTabStruct$]")
+                //.AppendLine($"   execute immediate 'delete from {Constants.HiSysTable["Hi_TabModel"].ToString()} where TabName=''[$TabName$]''';")
+                //.AppendLine($"   execute immediate 'delete from {Constants.HiSysTable["Hi_FieldModel"].ToString()} where TabName=''[$TabName$]''';")
 
-                
+
                 .AppendLine("    [$TabStruct$]")
                 .AppendLine("   [$Comment$]")
                 .AppendLine("end;")

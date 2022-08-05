@@ -9,7 +9,7 @@ namespace HiSql
     /// <summary>
     /// 指定了属性则以属性指定的为准
     /// </summary>
-    [HiTable(IsEdit =true,TabName = "Hi_FieldModel")]
+    [HiTable(IsEdit =false,TabName = "Hi_FieldModel", TabDescript = "表结构信息字段表",TabStatus =TabStatus.Use)]
     /// <summary>
     /// 字段信息
     /// </summary>

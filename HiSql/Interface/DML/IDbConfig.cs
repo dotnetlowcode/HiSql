@@ -150,6 +150,17 @@ namespace HiSql
 
         public string Delete_Statement_Where { get; }
 
+
+        /// <summary>
+        /// 删除指定表的表结构信息
+        /// </summary>
+        public string Delete_TabStruct { get; }
+
+
+        public string Delete_TabModel { get; }
+
+        public string Delete_FieldModel { get; }
+
         public string Delete_TrunCate { get; }
 
         public string Drop_Table { get; }

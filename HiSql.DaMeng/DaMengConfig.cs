@@ -82,7 +82,9 @@ namespace HiSql
 
         string _temp_delete = "";
         string _temp_delete_where = "";
-
+        string _temp_delete_tabstruct = "";
+        string _temp_delete_tabmodel = "";
+        string _temp_delete_fieldmodel = "";
 
         string _temp_truncate = "";
 
@@ -285,6 +287,13 @@ namespace HiSql
 
         public string Delete_Statement_Where { get => _temp_delete_where; }
 
+        /// <summary>
+        /// 删除指定表的表结构信息语句
+        /// </summary>
+        public string Delete_TabStruct { get => _temp_delete_tabstruct; }
+        public string Delete_TabModel { get => _temp_delete_tabmodel; }
+
+        public string Delete_FieldModel { get => _temp_delete_fieldmodel; }
         public string Delete_TrunCate { get => _temp_truncate; }
 
         public Dictionary<string, string> FieldTempMapping => _fieldtempmapping;
@@ -488,25 +497,25 @@ namespace HiSql
 
             _fieldtempmapping = new Dictionary<string, string> {
                 //样例：[TabName] [varchar](50) NOT NULL,
-                { "nvarchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  nvarchar2 ([$FieldLen$]) [$IsNull$]  [$Default$] [$EXTEND$]"},
-                { "varchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  varchar2 ([$FieldLen$]) [$IsNull$] [$Default$]  [$EXTEND$] "},
-                { "nchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  nchar ([$FieldLen$]) [$IsNull$] [$Default$] [$EXTEND$] "},
+                { "nvarchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  varchar2 ([$FieldLen$]) [$IsNull$]  [$Default$] [$EXTEND$]"},
+                { "varchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  varchar ([$FieldLen$]) [$IsNull$] [$Default$]  [$EXTEND$] "},
+                { "nchar",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  CHARACTER ([$FieldLen$]) [$IsNull$] [$Default$] [$EXTEND$] "},
                 { "char",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  char ([$FieldLen$]) [$IsNull$] [$Default$] [$EXTEND$] "},
                 //样例：[udescript] [text] NULL,
-                { "text",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  long  [$IsNull$] [$Default$] [$EXTEND$] "},
+                { "text",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  LONGVARCHAR  [$IsNull$] [$Default$] [$EXTEND$] "},
 
                 { "int",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  integer  [$IsIdentity$] [$IsNull$] [$Default$] [$EXTEND$] "},
-                { "bigint",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  number(18)  [$IsIdentity$] [$IsNull$] [$Default$] [$EXTEND$] " },
-                { "smallint",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  number(5)   [$IsNull$] [$Default$] [$EXTEND$] "},
+                { "bigint",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  bigint(18)  [$IsIdentity$] [$IsNull$] [$Default$] [$EXTEND$] " },
+                { "smallint",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  smallint   [$IsNull$] [$Default$] [$EXTEND$] "},
                 { "decimal",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  decimal ([$FieldLen$],[$FieldDec$])  [$IsNull$] [$Default$] [$EXTEND$] "},
 
-                { "bit",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  number(1)    [$IsNull$] [$Default$] [$EXTEND$] "},
+                { "bit",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  BIT    [$IsNull$] [$Default$] [$EXTEND$] "},
 
-                { "datetime",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  timestamp    [$IsNull$] [$Default$] [$EXTEND$] "},
-                { "date",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  date   [$IsNull$] [$Default$] [$EXTEND$] " },
+                { "datetime",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  TIMESTAMP    [$IsNull$] [$Default$] [$EXTEND$] "},
+                { "date",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  DATE   [$IsNull$] [$Default$] [$EXTEND$] " },
 
                 { "image",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  BLOB    [$IsNull$] [$EXTEND$] "},
-                { "uniqueidentifier",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  varchar2(36)   [$IsNull$] [$Default$] [$EXTEND$] "},
+                { "uniqueidentifier",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  varchar(36)   [$IsNull$] [$Default$] [$EXTEND$] "},
             };
 
 
@@ -527,6 +536,14 @@ namespace HiSql
                 .ToString();
 
 
+            _temp_delete_tabmodel = $"   execute immediate 'delete from {Constants.HiSysTable["Hi_TabModel"].ToString()} where TabName=''[$TabName$]''';";
+            _temp_delete_fieldmodel = $"   execute immediate 'delete from {Constants.HiSysTable["Hi_FieldModel"].ToString()} where TabName=''[$TabName$]''';";
+
+
+            _temp_delete_tabstruct = new StringBuilder()
+               .AppendLine(_temp_delete_tabmodel)
+               .AppendLine(_temp_delete_fieldmodel).ToString();
+
             _temp_create_table = new StringBuilder()
                 .AppendLine("declare ")
                 .AppendLine($"  v_number integer;")
@@ -543,20 +560,22 @@ namespace HiSql
 
                 .AppendLine("    [$Primary$]")
                 .AppendLine($"   end if;")
-                //.AppendLine($"        execute immediate 'drop table [$TabName$] ';")
-                
-                //.AppendLine($"   select count(*) into v_secout from user_sequences where SEQUENCE_NAME = upper('[$TabName$]_SEQ');")
-                //.AppendLine($"   IF v_secout > 0 then")
-                //.AppendLine($"       execute immediate 'drop sequence [$TabName$]_SEQ';")
-                //.AppendLine($"   end if;")
-                //.AppendLine($"   execute immediate 'create sequence [$TabName$]_SEQ increment by 1 start with 1 minvalue 1 maxvalue 999999999999';")
+                 //.AppendLine($"        execute immediate 'drop table [$TabName$] ';")
 
-                
+                 //.AppendLine($"   select count(*) into v_secout from user_sequences where SEQUENCE_NAME = upper('[$TabName$]_SEQ');")
+                 //.AppendLine($"   IF v_secout > 0 then")
+                 //.AppendLine($"       execute immediate 'drop sequence [$TabName$]_SEQ';")
+                 //.AppendLine($"   end if;")
+                 //.AppendLine($"   execute immediate 'create sequence [$TabName$]_SEQ increment by 1 start with 1 minvalue 1 maxvalue 999999999999';")
 
-                .AppendLine($"   execute immediate 'delete from {Constants.HiSysTable["Hi_TabModel"].ToString()} where TabName=''[$TabName$]''';")
-                .AppendLine($"   execute immediate 'delete from {Constants.HiSysTable["Hi_FieldModel"].ToString()} where TabName=''[$TabName$]''';")
 
-                
+                 .AppendLine("    [$DeleteTabStruct$]")
+
+
+                //.AppendLine($"   execute immediate 'delete from {Constants.HiSysTable["Hi_TabModel"].ToString()} where TabName=''[$TabName$]''';")
+                //.AppendLine($"   execute immediate 'delete from {Constants.HiSysTable["Hi_FieldModel"].ToString()} where TabName=''[$TabName$]''';")
+
+
                 .AppendLine("    [$TabStruct$]")
                 .AppendLine("   [$Comment$]")
                 .AppendLine("end;")
@@ -716,11 +735,12 @@ UNION ALL
                 .AppendLine("	T1.TABLE_NAME as \"TabName\",")
                 .AppendLine("	T1.COLUMN_ID AS \"FieldNo\", ")
                 .AppendLine("	T1.COLUMN_NAME AS \"FieldName\",")
+                .AppendLine("   case when T1.DATA_TYPE = 'TIMESTAMP' or T1.DATA_TYPE = 'DATETIME' or  T1.DATA_TYPE = 'DATE' or  T1.DATA_TYPE = 'BIGINT' or  T1.DATA_TYPE = 'INT'   or  T1.DATA_TYPE = 'SMALLINT' or  T1.DATA_TYPE = 'INTEGER'  then 0	else")
                 .AppendLine("	case ")
                 .AppendLine("	    when t1.Data_LENGTH > 0 then t1.Data_LENGTH")
                 .AppendLine("		when t1.data_precision > 0 then t1.data_precision")
                 .AppendLine("	    else 0")
-                .AppendLine("	end as \"Lens\",")
+                .AppendLine("	end end as \"Lens\",")
 
                 .AppendLine("	case ")
                 .AppendLine("	    when t1.Data_LENGTH > 0 then t1.Data_LENGTH")
@@ -738,27 +758,30 @@ UNION ALL
                 .AppendLine("	    else 0")
                 .AppendLine("	end as \"IsPrimary\",")
                 .AppendLine("	case ")
-                .AppendLine("	    when T1.DATA_TYPE = 'NUMBER' AND ( t1.data_scale=0 or t1.data_scale is null ) then 'int'")
-                .AppendLine("	    when T1.DATA_TYPE = 'NUMBER' AND t1.data_scale>0 then 'decimal'")
-                .AppendLine("	    when T1.DATA_TYPE = 'FLOAT' then 'decimal'")
+                .AppendLine("	    when T1.DATA_TYPE = 'BIGINT' then 'bigint'")
+                .AppendLine("	    when T1.DATA_TYPE = 'INT' OR T1.DATA_TYPE='INTEGER' then 'int'")
+                .AppendLine("	    when T1.DATA_TYPE = 'NUMBER' or T1.DATA_TYPE = 'DOUBLE'  or T1.DATA_TYPE = 'DECIMAL' or T1.DATA_TYPE = 'FLOAT' then 'decimal'")
+                .AppendLine("	    when T1.DATA_TYPE = 'SMALLINT' or T1.DATA_TYPE = 'TINYINT'  then 'smallint'")
                 .AppendLine("	    when T1.DATA_TYPE = 'VARCHAR2' then 'varchar'")
-                .AppendLine("	    when T1.DATA_TYPE = 'CHAR' then 'char'")
-                .AppendLine("	    when T1.DATA_TYPE = 'NCHAR' then 'nchar'")
-                .AppendLine("	    when T1.DATA_TYPE = 'NVARCHAR2' then 'nvarchar'")
-                .AppendLine("	    when T1.DATA_TYPE = 'DATE' then 'date'")
+                .AppendLine("	    when T1.DATA_TYPE = 'CHAR' or T1.DATA_TYPE ='CHARACTER' then 'char'")
+                .AppendLine("	    when T1.DATA_TYPE = 'VARCHAR2' or T1.DATA_TYPE='VARCHAR' then 'varchar'")
+                .AppendLine("	    when T1.DATA_TYPE = 'BIT'  then 'bit'")
                 .AppendLine("	    when T1.DATA_TYPE = 'TIMESTAMP' then 'datetime' ")
-                 .AppendLine("	    when T1.DATA_TYPE = 'TIMESTAMP(6)' then 'datetime' ")
+                 .AppendLine("	    when T1.DATA_TYPE = 'DATETIME' then 'datetime' ")
+                 .AppendLine("	    when T1.DATA_TYPE = 'DATE' then 'datetime' ")
                 .AppendLine("	    when T1.DATA_TYPE = 'LONG' then 'text' ")
                 .AppendLine("	    when T1.DATA_TYPE = 'NCLOB' then 'text'")
                 .AppendLine("	    when T1.DATA_TYPE = 'CLOB' then 'text' ")
+                .AppendLine("	    when T1.DATA_TYPE = 'LONGVARCHAR' then 'text' ")
                 .AppendLine("	    when T1.DATA_TYPE = 'BLOB' then 'image' ")
                 .AppendLine("	    when T1.DATA_TYPE = 'BFILE' then 'image' ")
                 .AppendLine("	else 'nvarchar'")
                 .AppendLine("	end   AS \"FieldType\",")
+                .AppendLine("   case when T1.DATA_TYPE = 'TIMESTAMP' or T1.DATA_TYPE = 'DATETIME' or  T1.DATA_TYPE = 'DATE' then 0	else")
                 .AppendLine("	case ")
                 .AppendLine("	    when t1.data_scale > 0 then  t1.data_scale")
                 .AppendLine("	    else 0")
-                .AppendLine("	end as \"PointDec\",")
+                .AppendLine("	end end as \"PointDec\",")
                 .AppendLine("	CASE ")
                 .AppendLine("	    WHEN T1.NULLABLE='Y' THEN 1")
                 .AppendLine("	    ELSE 0")

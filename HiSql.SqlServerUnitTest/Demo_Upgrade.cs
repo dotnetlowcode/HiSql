@@ -92,7 +92,7 @@ namespace HiSql.UnitTest
                             Columns=new List<Hi_UpgradeCol>{
                                 new Hi_UpgradeCol {
                                     TabFieldAction = TabFieldAction.MODI ,
-                                    ColumnInfo=new HiColumn { TabName= "Hi_TabModel",FieldName="DbName", SortNum=4, FieldLen=50,FieldType=HiType.VARCHAR,IsBllKey=true,IsPrimary=true,DBDefault=HiTypeDBDefault.VALUE,DefaultValue="",FieldDesc="数据库名"
+                                    ColumnInfo=new HiColumn { TabName= "Hi_TabModel",FieldName="DbName", SortNum=4, FieldLen=50,FieldType=HiType.NVARCHAR,IsBllKey=true,IsPrimary=true,DBDefault=HiTypeDBDefault.VALUE,DefaultValue="",FieldDesc="数据库名"
                                     }
                                 }
                             }
@@ -112,7 +112,7 @@ namespace HiSql.UnitTest
                             Columns=new List<Hi_UpgradeCol>{
                                 new Hi_UpgradeCol {
                                     TabFieldAction = TabFieldAction.MODI ,
-                                    ColumnInfo=new HiColumn { TabName= "Hi_FieldModel",FieldName="DbName", SortNum=4, FieldLen=50,FieldType=HiType.VARCHAR,IsBllKey=true,IsPrimary=true,DBDefault=HiTypeDBDefault.VALUE,DefaultValue="",FieldDesc="数据库名"
+                                    ColumnInfo=new HiColumn { TabName= "Hi_FieldModel",FieldName="DbName", SortNum=4, FieldLen=50,FieldType=HiType.NVARCHAR,IsBllKey=true,IsPrimary=true,DBDefault=HiTypeDBDefault.VALUE,DefaultValue="",FieldDesc="数据库名"
                                     }
                                 }
                             }

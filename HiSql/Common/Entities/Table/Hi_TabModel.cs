@@ -15,7 +15,7 @@ namespace HiSql
     /// 表信息
     /// 用于表数据信息
     /// </summary>
-    [HiTable(IsEdit = true, TabName = "Hi_TabModel")]
+    [HiTable(IsEdit = false, TabName = "Hi_TabModel",TabDescript = "表结构信息主表")]
     public partial class Hi_TabModel:StandField
     {
 

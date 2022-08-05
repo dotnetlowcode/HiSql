@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace HiSql
 {
     [System.Serializable]
-    [HiTable(IsEdit = true, TabName = "Hi_Snro")]
+    [HiTable(IsEdit = false, TabName = "Hi_Snro",TabDescript ="编号配置表", TabStatus = TabStatus.Use)]
     public class Hi_Snro:StandField
     {
         [HiColumn(FieldDesc = "SNRO主编号", IsPrimary = true, IsBllKey = true, IsNull = false, FieldLen = 10, SortNum = 1, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY)]

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HiSql 
 {
-    [HiTable(IsEdit = true, TabName = "Hi_Domain",TabDescript ="数据域主表")]
+    [HiTable(IsEdit = false, TabName = "Hi_Domain",TabDescript ="数据域主表", TabStatus = TabStatus.Use)]
     public class Hi_Domain : StandField
     {
         [HiColumn(FieldDesc = "数据域名", FieldLen = 10, IsPrimary = true, IsBllKey = true, IsNull = false, DBDefault = HiTypeDBDefault.EMPTY, SortNum = 5, IsSys = true)]

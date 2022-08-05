@@ -337,10 +337,8 @@ namespace HiSql
 
                     if (!rtntuple.Item1)
                     {
-                        fieldChanges.Add(new FieldChange { IsTabChange = rtntuple.Item2, OldColumn = _column, NewColumn = column, FieldName = column.FieldName, Action = TabFieldAction.MODI });
+                        fieldChanges.Add(new FieldChange { IsTabChange = rtntuple.Item2, OldColumn = _column, NewColumn = column, FieldName = column.FieldName, Action = TabFieldAction.MODI,ChangeDetail= rtntuple.Item3 });
                     }
-
-
                 }
                 else
                 {

@@ -20,21 +20,21 @@ namespace HiSql.OralceUnitTest
             sqlClient.CodeFirst.InstallHisql();
 
 
-            TabInfo tabInfo = sqlClient.Context.DMInitalize.GetTabStruct("Hi_FieldModel");
+            //TabInfo tabInfo = sqlClient.Context.DMInitalize.GetTabStruct("Hi_FieldModel");
 
-            TabInfo tabinfo2 = tabInfo.CloneCopy();
+            //TabInfo tabinfo2 = tabInfo.CloneCopy();
 
-            HiColumn dbnamecol = new HiColumn { TabName = "Hi_FieldModel", FieldName = "DbName", SortNum = 4, FieldLen = 50, FieldType = HiType.VARCHAR, IsBllKey = true, IsPrimary = true, DBDefault = HiTypeDBDefault.VALUE, DefaultValue = "", FieldDesc = "数据库名" };
-            tabinfo2.Columns.Add(dbnamecol);
+            //HiColumn dbnamecol = new HiColumn { TabName = "Hi_FieldModel", FieldName = "DbName", SortNum = 4, FieldLen = 50, FieldType = HiType.VARCHAR, IsBllKey = true, IsPrimary = true, DBDefault = HiTypeDBDefault.VALUE, DefaultValue = "", FieldDesc = "数据库名" };
+            //tabinfo2.Columns.Add(dbnamecol);
 
-            //tabinfo2.TabModel.TabName = "Hi_FieldModel1";
-            //foreach (var col in tabinfo2.Columns)
-            //{
-            //    col.TabName = tabinfo2.TabModel.TabName;
-            //}
+            ////tabinfo2.TabModel.TabName = "Hi_FieldModel1";
+            ////foreach (var col in tabinfo2.Columns)
+            ////{
+            ////    col.TabName = tabinfo2.TabModel.TabName;
+            ////}
 
 
-            var tuple = sqlClient.DbFirst.ModiTable(tabinfo2, OpLevel.Execute);
+            //var tuple = sqlClient.DbFirst.ModiTable(tabinfo2, OpLevel.Execute);
 
 
         }

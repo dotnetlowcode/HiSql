@@ -44,28 +44,62 @@ namespace HiSql
             Type type = typeof(T);
             List<string> fieldNameList = new List<string>();
             string _value = "";
+            Dictionary<string, string> dic_type = new Dictionary<string, string>();
+
+            Dictionary<string, PropertyInfo> dic_propinfo = new Dictionary<string, PropertyInfo>();
+
+            Dictionary<string,string> dic_fieldname=new Dictionary<string,string>();
+
             List<PropertyInfo> listInfo = type.GetProperties().Where(p => p.CanWrite && p.CanRead && p.MemberType == MemberTypes.Property).ToList();//
             for (int i = 0; i < dataReader.FieldCount; i++)
             {
-                fieldNameList.Add(dataReader.GetName(i));
+                string fieldname = dataReader.GetName(i);
+                fieldNameList.Add(fieldname);
+                if (!dic_fieldname.ContainsKey(fieldname.ToLower()))
+                    dic_fieldname.Add(fieldname.ToLower(), fieldname);
             }
+
+            foreach (PropertyInfo pinfo in listInfo)
+            {
+                if (!dic_propinfo.ContainsKey(pinfo.Name.ToLower()))
+                {
+                    dic_propinfo.Add(pinfo.Name.ToLower(),pinfo);
+                }
+            }
+            
+            DataTable dt_schema=dataReader.GetSchemaTable();
+
+            if (dt_schema.Rows.Count > 0)
+            {
+                foreach (DataRow drow in dt_schema.Rows)
+                {
+                    string colname = drow["ColumnName"].ToString().ToLower();
+                    if (!dic_type.ContainsKey(colname))
+                        dic_type.Add(colname, drow["DataType"].ToString());
+                }
+            }
+
+
             if (listInfo.Count > 0)
             {
                 while (dataReader.Read())
                 {
                     T t1 = (T)Activator.CreateInstance(type, true);
+                    string _fullname = "";
                     if (listInfo.Count > fieldNameList.Count)
                     {
+                       
                         foreach (string n in fieldNameList)
                         {
-                            PropertyInfo pinfo = listInfo.Where(p => p.Name.ToLower() == n.ToLower()).FirstOrDefault();
+                            PropertyInfo pinfo = dic_propinfo.ContainsKey(n.ToLower()) ? dic_propinfo[n.ToLower()] : null; // listInfo.Where(p => p.Name.ToLower() == n.ToLower()).FirstOrDefault();
                             if (pinfo != null)
                             {
 
 
                                 if (dataReader[n] is not DBNull)
                                 {
-                                    if (pinfo.PropertyType.FullName.IndexOf("bool") >= 0)
+                                    _fullname = pinfo.PropertyType.FullName;
+                                    if (_fullname.IndexOf("bool", StringComparison.OrdinalIgnoreCase) >= 0)
                                     {
                                         _value = dataReader[n].ToString().ToLower().Trim();
                                         if (_value == "1" || _value == "true")
@@ -74,7 +108,20 @@ namespace HiSql
                                             pinfo.SetValue(t1, false);
                                     }
                                     else
-                                        pinfo.SetValue(t1, dataReader[n]);
+                                    {
+                                        if (dic_type.ContainsKey(n.ToLower()))
+                                        {
+                                            if (string.Equals(_fullname, "System.Int32", StringComparison.OrdinalIgnoreCase) && dic_type[n.ToLower()].IndexOf("Decimal", StringComparison.OrdinalIgnoreCase) > 0)
+                                            {
+                                                pinfo.SetValue(t1, Convert.ToInt32( dataReader[n].ToString()));
+                                            }
+                                            else
+                                                pinfo.SetValue(t1, dataReader[n]);
+                                        }else
+                                            pinfo.SetValue(t1, dataReader[n]);
+
+
+                                    }
 
                                 }
                                 else
@@ -103,13 +150,14 @@ namespace HiSql
                     {
                         foreach (PropertyInfo pinfo in listInfo)
                         {
-                            string n = fieldNameList.Where(fn => fn.ToLower() == pinfo.Name.ToLower()).FirstOrDefault();
+                            string n = dic_fieldname.ContainsKey(pinfo.Name.ToLower())? dic_fieldname[pinfo.Name.ToLower()]:string.Empty;// fieldNameList.Where(fn => fn.ToLower() == pinfo.Name.ToLower()).FirstOrDefault();
                             if (!string.IsNullOrEmpty(n))
                             {
 
                                 //当不为Null值时才赋值
                                 if (dataReader[n] is not DBNull)
                                 {
+                                    _fullname = pinfo.PropertyType.FullName;
                                     if (pinfo.PropertyType.FullName.ToLower().IndexOf("bool") >= 0)
                                     {
                                         _value = dataReader[n].ToString().ToLower().Trim();
@@ -119,7 +167,19 @@ namespace HiSql
                                             pinfo.SetValue(t1, false);
                                     }
                                     else
-                                        pinfo.SetValue(t1, dataReader[n]);
+                                    {
+                                        if (dic_type.ContainsKey(n.ToLower()))
+                                        {
+                                            if (string.Equals(_fullname, "System.Int32", StringComparison.OrdinalIgnoreCase) && dic_type[n.ToLower()].IndexOf("Decimal", StringComparison.OrdinalIgnoreCase) > 0)
+                                            {
+                                                pinfo.SetValue(t1, Convert.ToInt32(dataReader[n].ToString()));
+                                            }
+                                            else
+                                                pinfo.SetValue(t1, dataReader[n]);
+                                        }
+                                        else
+                                            pinfo.SetValue(t1, dataReader[n]);
+                                    }
                                 }
                                 else
                                 {
@@ -1477,6 +1537,7 @@ namespace HiSql
         {
             HiColumn l = new HiColumn()
             {
+                DbName=hiColumn.DbName,
                 TabName = hiColumn.TabName,
                 DBDefault = hiColumn.DBDefault,
                 DefaultValue = hiColumn.DefaultValue,

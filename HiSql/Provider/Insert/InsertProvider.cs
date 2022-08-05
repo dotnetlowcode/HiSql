@@ -1484,8 +1484,10 @@ namespace HiSql
                         if (string.IsNullOrEmpty(_value.Trim()) && string.IsNullOrEmpty(hiColumn.SNO) && hiColumn.DBDefault == HiTypeDBDefault.NONE)
                             throw new Exception($"字段[{hiColumn.FieldName}] 为必填 无法数据提交");
                     }
-
-                    _value = $"'{_value.ToSqlInject()}'";
+                    if (hiColumn.IsPrimary && string.IsNullOrEmpty(_value) && Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.Oracle, DBType.DaMeng))
+                        _value = $"' '";
+                    else
+                        _value = $"'{_value.ToSqlInject()}'";
                     rtn = new Tuple<bool, string>(true, _value);
 
                 }
@@ -1503,7 +1505,7 @@ namespace HiSql
                         if (string.IsNullOrEmpty(_value.Trim()) && string.IsNullOrEmpty(hiColumn.SNO) && hiColumn.DBDefault==HiTypeDBDefault.NONE)
                             throw new Exception($"字段[{hiColumn.FieldName}] 为必填 无法数据提交");
                     }
-                    if (hiColumn.IsPrimary && string.IsNullOrEmpty(_value) && Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.Oracle))
+                    if (hiColumn.IsPrimary && string.IsNullOrEmpty(_value) && Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.Oracle,DBType.DaMeng))
                         _value = $"' '";
                     else
                         _value = $"'{_value.ToSqlInject()}'";

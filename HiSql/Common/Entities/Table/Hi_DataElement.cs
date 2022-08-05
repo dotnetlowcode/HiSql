@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HiSql
 {
-    [HiTable(IsEdit = true, TabName = "Hi_DataElement", TabDescript = "数据域明细表")]
+    [HiTable(IsEdit = false, TabName = "Hi_DataElement", TabDescript = "数据域明细表", TabStatus = TabStatus.Use)]
     public class Hi_DataElement : StandField
     {
         [HiColumn(FieldDesc = "数据域名", FieldLen = 10, IsPrimary = true, IsBllKey = true, IsNull = false, DBDefault = HiTypeDBDefault.EMPTY, SortNum = 5, IsSys = true)]
@@ -18,7 +18,7 @@ namespace HiSql
         [HiColumn(FieldDesc = "数据域值描述", FieldLen = 100,   DBDefault = HiTypeDBDefault.EMPTY, SortNum = 15, IsSys = true)]
         public string ElementDesc { get; set; }
 
-        [HiColumn(FieldDesc = "数据域排序号",   DBDefault = HiTypeDBDefault.EMPTY, SortNum = 20, IsSys = true)]
+        [HiColumn(FieldDesc = "数据域排序号",   DBDefault = HiTypeDBDefault.VALUE, DefaultValue ="0", SortNum = 20, IsSys = true)]
         public int SortNum { get; set; }
     }
 }
