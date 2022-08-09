@@ -92,8 +92,7 @@ namespace HiSql.UnitTest
                             Columns=new List<Hi_UpgradeCol>{
                                 new Hi_UpgradeCol {
                                     TabFieldAction = TabFieldAction.MODI ,
-                                    ColumnInfo=new HiColumn { TabName= "Hi_TabModel",FieldName="DbName", SortNum=4, FieldLen=50,FieldType=HiType.NVARCHAR,IsBllKey=true,IsPrimary=true,DBDefault=HiTypeDBDefault.VALUE,DefaultValue="",FieldDesc="数据库名"
-                                    }
+                                    ColumnInfo=new HiColumn {TabName="Hi_TabModel",FieldName="DbName", FieldDesc = "数据库名",FieldType=HiType.NVARCHAR, FieldLen = 50, IsPrimary = true, IsBllKey = true, IsNull = false, DBDefault = HiTypeDBDefault.EMPTY, DefaultValue = "", SortNum = 4, IsSys = true }
                                 }
                             }
                         }
@@ -112,8 +111,7 @@ namespace HiSql.UnitTest
                             Columns=new List<Hi_UpgradeCol>{
                                 new Hi_UpgradeCol {
                                     TabFieldAction = TabFieldAction.MODI ,
-                                    ColumnInfo=new HiColumn { TabName= "Hi_FieldModel",FieldName="DbName", SortNum=4, FieldLen=50,FieldType=HiType.NVARCHAR,IsBllKey=true,IsPrimary=true,DBDefault=HiTypeDBDefault.VALUE,DefaultValue="",FieldDesc="数据库名"
-                                    }
+                                    ColumnInfo=new HiColumn {TabName="Hi_FieldModel",FieldName="DbName", FieldDesc = "数据库名",FieldType=HiType.NVARCHAR, FieldLen = 50, IsPrimary = true, IsBllKey = true, IsNull = false, DBDefault = HiTypeDBDefault.EMPTY, DefaultValue = "" , SortNum = 4, IsSys = true }
                                 }
                             }
                         }
@@ -132,8 +130,7 @@ namespace HiSql.UnitTest
                             Columns=new List<Hi_UpgradeCol>{
                                 new Hi_UpgradeCol {
                                     TabFieldAction = TabFieldAction.MODI ,
-                                    ColumnInfo=new HiColumn { TabName= "Hi_Domain",FieldName="Domain", SortNum=5, FieldLen=20,FieldType=HiType.NVARCHAR,IsBllKey=true,IsPrimary=true,DBDefault=HiTypeDBDefault.VALUE,DefaultValue="",FieldDesc="数据域名"
-                                    }
+                                    ColumnInfo=new HiColumn {TabName="Hi_Domain", FieldName="Domain", FieldType=HiType.NVARCHAR, FieldDesc = "数据域名", FieldLen = 20, IsPrimary = true, IsBllKey = true, IsNull = false, DBDefault = HiTypeDBDefault.EMPTY, SortNum = 5, IsSys = true }
                                 }
                             }
                         }
@@ -151,8 +148,7 @@ namespace HiSql.UnitTest
                             Columns=new List<Hi_UpgradeCol>{
                                 new Hi_UpgradeCol {
                                     TabFieldAction = TabFieldAction.MODI ,
-                                    ColumnInfo=new HiColumn { TabName= "Hi_DataElement",FieldName="Domain", SortNum=5, FieldLen=20,FieldType=HiType.NVARCHAR,IsBllKey=true,IsPrimary=true,DBDefault=HiTypeDBDefault.VALUE,DefaultValue="",FieldDesc="数据域名"
-                                    }
+                                    ColumnInfo=new HiColumn { TabName="Hi_DataElement",FieldName="Domain", FieldDesc = "数据域名",FieldType=HiType.NVARCHAR, FieldLen = 20, IsPrimary = true, IsBllKey = true, IsNull = false, DBDefault = HiTypeDBDefault.EMPTY, SortNum = 5, IsSys = true }
                                 }
                             }
                         }
@@ -171,7 +167,7 @@ namespace HiSql.UnitTest
                             Columns=new List<Hi_UpgradeCol>{
                                 new Hi_UpgradeCol {
                                     TabFieldAction = TabFieldAction.MODI ,
-                                    ColumnInfo=new HiColumn { TabName= "Hi_Snro",FieldName="SNRO", SortNum=5, FieldLen=50,FieldType=HiType.VARCHAR,IsBllKey=true,IsPrimary=true,DBDefault=HiTypeDBDefault.VALUE,DefaultValue="",FieldDesc="SNRO主编号"
+                                    ColumnInfo=new HiColumn { TabName= "Hi_Snro",FieldName="SNRO", SortNum=5, FieldLen=50,FieldType=HiType.VARCHAR,IsBllKey=true,IsPrimary=true,DBDefault=HiTypeDBDefault.EMPTY,FieldDesc="SNRO主编号"
                                     }
                                 }
                             }
@@ -190,7 +186,7 @@ namespace HiSql.UnitTest
                             Columns=new List<Hi_UpgradeCol>{
                                 new Hi_UpgradeCol {
                                     TabFieldAction = TabFieldAction.MODI ,
-                                    ColumnInfo=new HiColumn { TabName= "Hi_FieldModel",FieldName="SNO", SortNum=70, FieldLen=50,FieldType=HiType.VARCHAR,DBDefault=HiTypeDBDefault.VALUE,DefaultValue="",FieldDesc="编号名称"
+                                    ColumnInfo=new HiColumn { TabName= "Hi_FieldModel",FieldName="SNO", SortNum=70,FieldLen=50,FieldType=HiType.VARCHAR,DBDefault=HiTypeDBDefault.VALUE,DefaultValue="",FieldDesc="编号名称"
                                     }
                                 },
                                 new Hi_UpgradeCol {

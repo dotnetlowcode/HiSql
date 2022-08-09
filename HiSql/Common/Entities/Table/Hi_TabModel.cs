@@ -94,7 +94,7 @@ namespace HiSql
         /// <summary>
         /// 日志记录表
         /// </summary>
-        [HiColumn(FieldDesc = "日志表名", IsNull = false, FieldLen = 50, SortNum = 45, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY)]
+        [HiColumn(FieldDesc = "日志表名", IsNull = true, FieldLen = 50, SortNum = 45, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY)]
         public string LogTable { get; set; }
 
         /// <summary>

@@ -9,7 +9,7 @@ namespace HiSql
     [HiTable(IsEdit = false, TabName = "Hi_DataElement", TabDescript = "数据域明细表", TabStatus = TabStatus.Use)]
     public class Hi_DataElement : StandField
     {
-        [HiColumn(FieldDesc = "数据域名", FieldLen = 10, IsPrimary = true, IsBllKey = true, IsNull = false, DBDefault = HiTypeDBDefault.EMPTY, SortNum = 5, IsSys = true)]
+        [HiColumn(FieldDesc = "数据域名", FieldLen = 20, IsPrimary = true, IsBllKey = true, IsNull = false, DBDefault = HiTypeDBDefault.EMPTY, SortNum = 5, IsSys = true)]
         public string Domain { get; set; }
 
         [HiColumn(FieldDesc = "数据域值", FieldLen = 50, IsPrimary = true, IsBllKey = true, IsNull = false, DBDefault = HiTypeDBDefault.EMPTY, SortNum = 10, IsSys = true)]

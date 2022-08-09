@@ -71,9 +71,9 @@ namespace HiSql.UnitTest
 
             //Demo_Delete.Init(sqlcient);//ok
             //
-            //DemoCodeFirst.Init(sqlcient);//ok
+            DemoCodeFirst.Init(sqlcient);//ok
             //Demo_Snro.Init(sqlcient);
-             Demo_DbCode.Init(sqlcient);
+             //Demo_DbCode.Init(sqlcient);
 
             //Demo_Cache.Init(sqlcient);
             //RedisTest();

@@ -159,6 +159,7 @@ namespace HiSql
                 {
                     HiColumn hiColumn = new HiColumn();
                     hiColumn.FieldName = drow["FieldName"].ToString().Trim();
+                    hiColumn.TabName = hiTable.TabName;
                     //hiColumn.FieldType
                     hiColumn.IsPrimary = drow["IsPrimary"].ToString().Trim().IsIn<string>("1", "True") ? true : false;
                     hiColumn.IsIdentity = drow["IsIdentity"].ToString().Trim().IsIn<string>("1", "True") ? true : false;
@@ -459,7 +460,7 @@ namespace HiSql
                             //如果不一样（则有变更物理表） 则以物理表的数据为准
 
                             var phytabInfo = TabDefinitionToEntity(dts, dbConfig.DbMapping);
-                            List<FieldChange> fieldChanges = HiSqlCommProvider.TabToCompare(phytabInfo, tabInfo);
+                            List<FieldChange> fieldChanges = HiSqlCommProvider.TabToCompare(phytabInfo, tabInfo,DBType.Sqlite);
                             List<HiColumn> lstcolumn = tabInfo.GetColumns;
 
                             phytabInfo = HiSqlCommProvider.TabMerge(phytabInfo, tabInfo);
@@ -1069,9 +1070,19 @@ namespace HiSql
             _sql.AppendLine($"insert into {dbConfig.Table_Pre}{tabInfo.TabModel.TabName}{dbConfig.Table_After}({fieldsStr}) select {fieldsStr} from {temp_table}  ;");
 
             _sql.AppendLine(dbConfig.Drop_Table.Replace("[$TabName$]", temp_table));
+
+            if (Constants.HiSysTable["Hi_TabModel"].Equals(tabInfo.TabModel.TabName, StringComparison.OrdinalIgnoreCase) || Constants.HiSysTable["Hi_FieldModel"].Equals(tabInfo.TabModel.TabName, StringComparison.OrdinalIgnoreCase))
+            {
+                _sql.AppendLine(DeleteTabStruct(tabInfo.TabModel));
+                _sql.AppendLine(inertTabStruct(tabInfo.TabModel, tabInfo.GetColumns));
+            }
+                        ;
             _sql.AppendLine(dbConfig.GetModiTableRELEASE);
 
             _sql = _sql.Replace("[$TabName$]", tabInfo.TabModel.TabName).Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema);
+
+
+
             return _sql.ToString();
 
         }

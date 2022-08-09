@@ -1158,9 +1158,18 @@ namespace HiSql
                                     {
                                         if (hiColumn.FieldType.IsIn<HiType>(HiType.INT))
                                         {
-                                            int _intobjvalue = 0;
-                                            int.TryParse(objvalue.ToString(), out _intobjvalue);
-                                            _dic.Add(hiColumn.FieldName, (_intobjvalue).ToString()); //pengxy
+                                            if (objvalue is bool)
+                                            {
+                                                bool _boolvalue = (bool)objvalue;
+
+                                                _dic.Add(hiColumn.FieldName, _boolvalue?"1":"0");
+                                            }
+                                            else
+                                            {
+                                                int _intobjvalue = (int)objvalue;
+                                                //int.TryParse(objvalue.ToString(), out _intobjvalue);
+                                                _dic.Add(hiColumn.FieldName, (_intobjvalue).ToString()); //pengxy
+                                            }
                                         }
                                         else
                                             _dic.Add(hiColumn.FieldName, objvalue.ToString());
@@ -1481,7 +1490,7 @@ namespace HiSql
                     }
                     if (hiColumn.IsRequire)
                     {
-                        if (string.IsNullOrEmpty(_value.Trim()) && string.IsNullOrEmpty(hiColumn.SNO) && hiColumn.DBDefault == HiTypeDBDefault.NONE)
+                        if (string.IsNullOrEmpty(_value.Trim()) && string.IsNullOrEmpty(hiColumn.SNO) && hiColumn.DBDefault == HiTypeDBDefault.NONE && !hiColumn.IsPrimary)
                             throw new Exception($"字段[{hiColumn.FieldName}] 为必填 无法数据提交");
                     }
                     if (hiColumn.IsPrimary && string.IsNullOrEmpty(_value) && Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.Oracle, DBType.DaMeng))

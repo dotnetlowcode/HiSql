@@ -203,6 +203,7 @@ namespace HiSql
                 {
                     HiColumn hiColumn = new HiColumn();
                     hiColumn.FieldName = drow["FieldName"].ToString().Trim();
+                    hiColumn.TabName = hiTable.TabName;
                     //hiColumn.FieldType
                     hiColumn.IsPrimary = drow["IsPrimary"].ToString().Trim().IsIn<string>("1", "True") ? true : false;
                     hiColumn.IsIdentity = drow["IsIdentity"].ToString().Trim().IsIn<string>("1", "True") ? true : false;
@@ -470,7 +471,7 @@ namespace HiSql
                             //如果不一样（则有变更物理表） 则以物理表的数据为准
 
                             var phytabInfo = TabDefinitionToEntity(dts, dbConfig.DbMapping);
-                            List<FieldChange> fieldChanges = HiSqlCommProvider.TabToCompare(phytabInfo, tabInfo);
+                            List<FieldChange> fieldChanges = HiSqlCommProvider.TabToCompare(phytabInfo, tabInfo,DBType.PostGreSql);
                             List<HiColumn> lstcolumn = tabInfo.GetColumns;
 
                             phytabInfo = HiSqlCommProvider.TabMerge(phytabInfo, tabInfo);

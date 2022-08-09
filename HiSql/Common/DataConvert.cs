@@ -38,7 +38,71 @@ namespace HiSql
         }
 
 
-        public static List<T> ToList<T>(IDataReader dataReader)
+        static T fillData<T>(T ef,string fname, Dictionary<string, string> dic_type , List<PropertyInfo> listInfo, PropertyInfo pinfo,object value, DBType dbtype)
+        {
+            string _fullname = pinfo.PropertyType.FullName;
+
+            if (pinfo.PropertyType.FullName.ToLower().IndexOf("bool") >= 0)
+            {
+                string _value = value.ToString().ToLower().Trim();
+                if (_value == "1" || _value == "true")
+                    pinfo.SetValue(ef, true);
+                else
+                    pinfo.SetValue(ef, false);
+            }
+            else
+            {
+                if (dic_type.ContainsKey(fname.ToLower()))
+                {
+                    if (dbtype != DBType.Sqlite)
+                    {
+                        if (string.Equals(_fullname, "System.Int32", StringComparison.OrdinalIgnoreCase) && dic_type[fname.ToLower()].IndexOf("Decimal", StringComparison.OrdinalIgnoreCase) > 0)
+                        {
+                            pinfo.SetValue(ef, Convert.ToInt32(value.ToString()));
+                        }
+                        else if (string.Equals(_fullname, "System.Int32") && dic_type[fname.ToLower()].Equals("System.Int64"))
+                        {
+                            pinfo.SetValue(ef, Convert.ToInt32(value.ToString()));
+                        }
+                        else
+                        {
+                            pinfo.SetValue(ef, value);
+                        }
+                    }
+                    else
+                    {
+                        string _value = value.ToString().ToLower().Trim();
+                        if (_fullname.IndexOf("string", StringComparison.OrdinalIgnoreCase) > 0)
+                        {
+                            pinfo.SetValue(ef, _value);
+                        }
+                        else if (_fullname.IndexOf("int64", StringComparison.OrdinalIgnoreCase) > 0)
+                        {
+                            pinfo.SetValue(ef, Convert.ToInt64( _value));
+                        }
+                        else if (_fullname.IndexOf("int32", StringComparison.OrdinalIgnoreCase) > 0)
+                        {
+                            pinfo.SetValue(ef, Convert.ToInt32(_value));
+                        }
+                        else if (_fullname.IndexOf("decimal", StringComparison.OrdinalIgnoreCase) > 0)
+                        {
+                            pinfo.SetValue(ef, Convert.ToDecimal(_value));
+                        }
+                        else if (_fullname.IndexOf("date", StringComparison.OrdinalIgnoreCase) > 0)
+                        {
+                            pinfo.SetValue(ef, string.IsNullOrEmpty(_value)?DateTime.MinValue: Convert.ToDateTime(_value));
+                        }
+                        else    
+                            pinfo.SetValue(ef, value);
+                    }
+                }
+                else
+                    pinfo.SetValue(ef, value);
+            }
+            return ef;
+        }
+
+        public static List<T> ToList<T>(IDataReader dataReader,DBType dbtype)
         {
             List<T> lst = new List<T>();
             Type type = typeof(T);
@@ -98,30 +162,32 @@ namespace HiSql
 
                                 if (dataReader[n] is not DBNull)
                                 {
-                                    _fullname = pinfo.PropertyType.FullName;
-                                    if (_fullname.IndexOf("bool", StringComparison.OrdinalIgnoreCase) >= 0)
-                                    {
-                                        _value = dataReader[n].ToString().ToLower().Trim();
-                                        if (_value == "1" || _value == "true")
-                                            pinfo.SetValue(t1, true);
-                                        else
-                                            pinfo.SetValue(t1, false);
-                                    }
-                                    else
-                                    {
-                                        if (dic_type.ContainsKey(n.ToLower()))
-                                        {
-                                            if (string.Equals(_fullname, "System.Int32", StringComparison.OrdinalIgnoreCase) && dic_type[n.ToLower()].IndexOf("Decimal", StringComparison.OrdinalIgnoreCase) > 0)
-                                            {
-                                                pinfo.SetValue(t1, Convert.ToInt32( dataReader[n].ToString()));
-                                            }
-                                            else
-                                                pinfo.SetValue(t1, dataReader[n]);
-                                        }else
-                                            pinfo.SetValue(t1, dataReader[n]);
+
+                                    t1 = fillData(t1,n, dic_type, listInfo, pinfo, dataReader[n], dbtype);
+                                    //_fullname = pinfo.PropertyType.FullName;
+                                    //if (_fullname.IndexOf("bool", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    //{
+                                    //    _value = dataReader[n].ToString().ToLower().Trim();
+                                    //    if (_value == "1" || _value == "true")
+                                    //        pinfo.SetValue(t1, true);
+                                    //    else
+                                    //        pinfo.SetValue(t1, false);
+                                    //}
+                                    //else
+                                    //{
+                                    //    if (dic_type.ContainsKey(n.ToLower()))
+                                    //    {
+                                    //        if (string.Equals(_fullname, "System.Int32", StringComparison.OrdinalIgnoreCase) && dic_type[n.ToLower()].IndexOf("Decimal", StringComparison.OrdinalIgnoreCase) > 0)
+                                    //        {
+                                    //            pinfo.SetValue(t1, Convert.ToInt32( dataReader[n].ToString()));
+                                    //        }
+                                    //        else
+                                    //            pinfo.SetValue(t1, dataReader[n]);
+                                    //    }else
+                                    //        pinfo.SetValue(t1, dataReader[n]);
 
 
-                                    }
+                                    //}
 
                                 }
                                 else
@@ -157,29 +223,34 @@ namespace HiSql
                                 //当不为Null值时才赋值
                                 if (dataReader[n] is not DBNull)
                                 {
-                                    _fullname = pinfo.PropertyType.FullName;
-                                    if (pinfo.PropertyType.FullName.ToLower().IndexOf("bool") >= 0)
-                                    {
-                                        _value = dataReader[n].ToString().ToLower().Trim();
-                                        if (_value == "1" || _value == "true")
-                                            pinfo.SetValue(t1, true);
-                                        else
-                                            pinfo.SetValue(t1, false);
-                                    }
-                                    else
-                                    {
-                                        if (dic_type.ContainsKey(n.ToLower()))
-                                        {
-                                            if (string.Equals(_fullname, "System.Int32", StringComparison.OrdinalIgnoreCase) && dic_type[n.ToLower()].IndexOf("Decimal", StringComparison.OrdinalIgnoreCase) > 0)
-                                            {
-                                                pinfo.SetValue(t1, Convert.ToInt32(dataReader[n].ToString()));
-                                            }
-                                            else
-                                                pinfo.SetValue(t1, dataReader[n]);
-                                        }
-                                        else
-                                            pinfo.SetValue(t1, dataReader[n]);
-                                    }
+                                    t1 = fillData(t1, n, dic_type, listInfo, pinfo, dataReader[n], dbtype);
+                                    //_fullname = pinfo.PropertyType.FullName;
+                                    //if (pinfo.PropertyType.FullName.ToLower().IndexOf("bool") >= 0)
+                                    //{
+                                    //    _value = dataReader[n].ToString().ToLower().Trim();
+                                    //    if (_value == "1" || _value == "true")
+                                    //        pinfo.SetValue(t1, true);
+                                    //    else
+                                    //        pinfo.SetValue(t1, false);
+                                    //}
+                                    //else
+                                    //{
+                                    //    if (dic_type.ContainsKey(n.ToLower()))
+                                    //    {
+                                    //        if (string.Equals(_fullname, "System.Int32", StringComparison.OrdinalIgnoreCase) && dic_type[n.ToLower()].IndexOf("Decimal", StringComparison.OrdinalIgnoreCase) > 0)
+                                    //        {
+                                    //            pinfo.SetValue(t1, Convert.ToInt32(dataReader[n].ToString()));
+                                    //        }
+                                    //        else if (string.Equals(_fullname, "System.Int32") && dic_type[n.ToLower()].Equals("System.Int64"))
+                                    //        {
+                                    //            pinfo.SetValue(t1, Convert.ToInt32(dataReader[n].ToString()));
+                                    //        }
+                                    //        else
+                                    //            pinfo.SetValue(t1, dataReader[n]);
+                                    //    }
+                                    //    else
+                                    //        pinfo.SetValue(t1, dataReader[n]);
+                                    //}
                                 }
                                 else
                                 {
@@ -1540,6 +1611,7 @@ namespace HiSql
                 DbName=hiColumn.DbName,
                 TabName = hiColumn.TabName,
                 DBDefault = hiColumn.DBDefault,
+                IsPrimary = hiColumn.IsPrimary,
                 DefaultValue = hiColumn.DefaultValue,
                 FieldDec = hiColumn.FieldDec,
                 FieldDesc = hiColumn.FieldDesc,
@@ -1551,7 +1623,7 @@ namespace HiSql
                 IsIgnore = hiColumn.IsIgnore,
                 IsNull = hiColumn.IsNull,
                 IsObsolete = hiColumn.IsObsolete,
-                IsPrimary = hiColumn.IsPrimary,
+                
                 IsRefTab = hiColumn.IsRefTab,
                 IsRequire = hiColumn.IsRequire, 
                 IsSearch   = hiColumn.IsSearch, 

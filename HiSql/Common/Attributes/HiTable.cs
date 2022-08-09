@@ -402,7 +402,7 @@ namespace HiSql
             get { return _isPrimary; }
 
             //如果没有指定Bllkey 那么是主键的情况下就默认为BLLkey 如果指定了就按指定的
-            set { _isPrimary = value; if (!_custombllkey && _isPrimary) { _isBllKey = _isPrimary; } }
+            set { _isPrimary = value; _isNull = false; if (!_custombllkey && _isPrimary) { _isBllKey = _isPrimary; } }
         }
         /// <summary>
         /// 是否自增长
