@@ -31,9 +31,8 @@ namespace HiSql
         public int BulkUnitSize { get; set; }
 
 
-
-
-
+        public string GetLocalTempTablePre { get; }
+        public string GetGlobalTempTablePre { get; }
 
         /// <summary>
         /// 强制分包记录数大小 结合 强制分包列数量 一起触发
@@ -151,6 +150,17 @@ namespace HiSql
 
         public string Delete_Statement_Where { get; }
 
+
+        /// <summary>
+        /// 删除指定表的表结构信息
+        /// </summary>
+        public string Delete_TabStruct { get; }
+
+
+        public string Delete_TabModel { get; }
+
+        public string Delete_FieldModel { get; }
+
         public string Delete_TrunCate { get; }
 
         public string Drop_Table { get; }
@@ -243,6 +253,19 @@ namespace HiSql
         /// </summary>
         public string Get_DropIndex { get; }
 
+
+
+        /// <summary>
+        /// 获取查询表结构主表信息结构
+        /// </summary>
+        public string Get_HiTabModel { get ; }
+
+       /// <summary>
+       /// 获取查询表结构信息结构
+       /// </summary>
+        public string Get_HiFieldModel { get ; }
+
+
         /// <summary>
         /// 表批量更新
         /// </summary>
@@ -251,6 +274,8 @@ namespace HiSql
         Dictionary<HiType,  string> DbMapping { get; }
 
 
+        //public string Table_PrimaryKeyCreate { get; }
+        //public string Table_PrimaryKeyDrop { get; }
         List<DefMapping> DbDefMapping { get; }
         void Init();
 

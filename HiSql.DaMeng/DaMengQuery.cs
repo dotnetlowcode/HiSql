@@ -219,11 +219,10 @@ namespace HiSql
                     tabInfo.Columns = this.ResultColumn;
 
                     if (hiTable.TableType == TableType.Global)
-                        hiTable.TabReName = hiTable.TabName.Substring(2) + "_" + System.Threading.Thread.CurrentThread.ManagedThreadId + "_" + hiTable.TabName.GetHashCode().ToString().Substring(1);
+                        hiTable.TabReName = DbConfig.GetGlobalTempTablePre + hiTable.TabName.Substring(2) + "_" + Context.ConnectedId;
                     else
-                        hiTable.TabReName = hiTable.TabName.Substring(2) + "_" + System.Threading.Thread.CurrentThread.ManagedThreadId + "_" + hiTable.TabName.GetHashCode().ToString().Substring(1);
+                        hiTable.TabReName = DbConfig.GetLocalTempTablePre + hiTable.TabName.Substring(1) + "_" + Context.ConnectedId;
 
-                    
                     string _sql = Context.DMTab.BuildTabCreateSql(tabInfo.TabModel, tabInfo.GetColumns);
                     int _effect = Context.DBO.ExecCommand(_sql);
                     this.ITabName = hiTable.TabReName;

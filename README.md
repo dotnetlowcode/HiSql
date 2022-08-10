@@ -25,7 +25,7 @@
 ### hisql官方群
 <img src="http://hisql.net/images/group/qq.png" alt="hisql官方QQ群" >
 
-为了更好的服务于真正使用hisql的用户，进群的伙伴必须是在github或gitee 上star了hisql项目或进行过捐的伙伴的方能进群
+为了更好的服务于真正使用hisql的用户， 进群的伙伴必须是在github或gitee 上star了hisql项目或进行过捐的伙伴的方能进群
 
 
 ### 初始安装 
@@ -40,6 +40,11 @@
 传统ORM框架最大的弊端就是完全要依赖于实体用lambda表达式写查询语句，但最大的问题就是如果业务场景需要动态拼接条件时只能又切换到原生数据库的sql语句进行完成，如果自行拼接开发人员还要解决防注入的问题,hisql 刚才完美的解决这些问题,Hisql底层已经对sql注入进行了处理，开发人员只要关注于业务开发
 
 
+
+
+### 2022.8.10 更新
+1. 新增支持sqlite 目前已经支持sqlserver,oracle,hana,,mysql,postgresql,达梦,sqlite
+2. 新增表结构升级功能（文档后续更新）
 
 ### 2022.7.7 新增自动产生SNRO编号
 

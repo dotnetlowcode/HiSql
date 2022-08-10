@@ -14,8 +14,7 @@ namespace HiSql
     /// </summary>
     public interface IDMTab
     {
-       
-       
+
         HiSqlProvider Context { get; set; }
         /// <summary>
         /// 表创建
@@ -48,6 +47,9 @@ namespace HiSql
         /// <param name="tabname"></param>
         /// <returns></returns>
         DataTable GetTableDefinition(string tabname);
+
+
+        DataSet GetTabModelInfo(string tabname);
 
         /// <summary>
         /// 获取当前库所有物理表清单
@@ -190,7 +192,16 @@ namespace HiSql
 
         string BuildKey(List<HiColumn> hiColumn);
 
-        string BuildFieldStatement(HiTable hiTable, HiColumn hiColumn);
+        string BuildFieldStatement(HiTable hiTable, HiColumn hiColumn, bool isalteraddkey=false);
+
+
+ 
+        /// <summary>
+        /// 根据表结构信息生成修改表的SQL语句
+        /// </summary>
+        /// <param name="tabInfo"></param>
+        /// <returns></returns>
+        string BuildTabModiSql(TabInfo tabInfo);
 
         /// <summary>
         /// 

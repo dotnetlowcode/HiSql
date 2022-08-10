@@ -40,7 +40,7 @@ namespace HiSql
         /// <returns></returns>
         public static TabInfo InitTabMaping(string tabname, Func<TabInfo> GetInfo)
         {
-            string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", tabname);
+            string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", tabname.ToLower());
             //TabInfo tableInfo = null; 
             //bool locked = false;
             //var lckinfo = new LckInfo() { UName = "hisql", EventName = "InitTabMaping" };
@@ -152,7 +152,7 @@ namespace HiSql
         /// <param name="tabname"></param>
         public static void RemoveTabInfoCache(string tabname)
         {
-            string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", tabname);
+            string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", tabname.ToLower());
             if (CacheContext.MCache.Exists(_keyname))
                 CacheContext.MCache.RemoveCache(_keyname);
 
@@ -304,7 +304,7 @@ namespace HiSql
         /// <param name="phytabInfo">物理表结构信息</param>
         /// <param name="tabInfo">表结构信息</param>
         /// <returns></returns>
-        public static List<FieldChange> TabToCompare(TabInfo phytabInfo, TabInfo tabInfo)
+        public static List<FieldChange> TabToCompare(TabInfo phytabInfo, TabInfo tabInfo, DBType dbtype)
         {
             List<FieldChange> fieldChanges = new List<FieldChange>();
             var phycolumns = phytabInfo.GetColumns;
@@ -322,7 +322,7 @@ namespace HiSql
                     if (string.IsNullOrEmpty(column.TabName))
                         column.TabName = _column.TabName;
 
-                    var rtntuple = ClassExtensions.CompareTabProperties(column, _column);
+                    var rtntuple = ClassExtensions.CompareTabProperties(column, _column, dbtype);
 
                     //if (!ClassExtensions.CompareProperties(column, _column))
                     //{
@@ -337,10 +337,40 @@ namespace HiSql
 
                     if (!rtntuple.Item1)
                     {
-                        fieldChanges.Add(new FieldChange { IsTabChange = rtntuple.Item2, OldColumn = _column, NewColumn = column, FieldName = column.FieldName, Action = TabFieldAction.MODI });
+                        if (dbtype != DBType.DaMeng)
+                        {
+                            fieldChanges.Add(new FieldChange { IsTabChange = rtntuple.Item2, OldColumn = _column, NewColumn = column, FieldName = column.FieldName, Action = TabFieldAction.MODI, ChangeDetail = rtntuple.Item3 });
+                        }
+                        else
+                        {
+                            //达梦数据没有nvarchar的概念
+                            FieldChangeDetail fieldlen = rtntuple.Item3.Where(fc => fc.AttrName.Equals("FieldLen", StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                            FieldChangeDetail fieldtype = rtntuple.Item3.Where(fc =>( fc.AttrName.Equals("FieldType", StringComparison.OrdinalIgnoreCase) 
+                            && fc.ValueA.Equals("varchar",StringComparison.OrdinalIgnoreCase)
+                            && fc.ValueB.Equals("nvarchar", StringComparison.OrdinalIgnoreCase)) || (fc.AttrName.Equals("FieldType", StringComparison.OrdinalIgnoreCase)
+                            && fc.ValueA.Equals("char", StringComparison.OrdinalIgnoreCase)
+                            && fc.ValueB.Equals("nchar", StringComparison.OrdinalIgnoreCase))
+                            ).FirstOrDefault();
+                            if (fieldtype!=null && fieldlen!=null)
+                            {
+                                int _va = int.Parse(fieldlen.ValueA);
+                                int _vb = int.Parse(fieldlen.ValueB);
+                                column.FieldType = _column.FieldType;
+                                if (_va / 2 == _vb && _va % 2 == 0)
+                                {
+                                    //表结构无变化 
+                                    column.FieldLen = _vb;
+                                }
+                                else
+                                {
+                                    column.FieldLen = _va / 2;
+                                    fieldChanges.Add(new FieldChange { IsTabChange = rtntuple.Item2, OldColumn = _column, NewColumn = column, FieldName = column.FieldName, Action = TabFieldAction.MODI, ChangeDetail = rtntuple.Item3 });
+
+                                }
+                            }else
+                                fieldChanges.Add(new FieldChange { IsTabChange = rtntuple.Item2, OldColumn = _column, NewColumn = column, FieldName = column.FieldName, Action = TabFieldAction.MODI, ChangeDetail = rtntuple.Item3 });
+                        }
                     }
-
-
                 }
                 else
                 {

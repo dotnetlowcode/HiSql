@@ -874,7 +874,7 @@ namespace HiSql
                     }
                     if (hiColumn.IsRequire)
                     {
-                        if (string.IsNullOrEmpty(_value.Trim()))
+                        if (string.IsNullOrEmpty(_value.Trim()) && !hiColumn.IsPrimary)
                             throw new Exception($"字段[{hiColumn.FieldName}] 为必填 无法数据提交");
                     }
 
@@ -893,7 +893,7 @@ namespace HiSql
                     }
                     if (hiColumn.IsRequire)
                     {
-                        if (string.IsNullOrEmpty(_value.Trim()))
+                        if (string.IsNullOrEmpty(_value.Trim()) && !hiColumn.IsPrimary)
                             throw new Exception($"字段[{hiColumn.FieldName}] 为必填 无法数据提交");
                     }
                     _value = $"'{_value.ToSqlInject()}'";

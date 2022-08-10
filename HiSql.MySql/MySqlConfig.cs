@@ -82,10 +82,10 @@ namespace HiSql
 
 
         //本地临时表前辍
-        string _temp_local_temp_pre = "#";
+        string _temp_local_table_pre = "#";
 
         //全局临时表前辍
-        string _temp_global_temp_pre = "##";
+        string _temp_global_table_pre = "##";
 
         //变量表前辍
         string _temp_var_temp_pre = "@";
@@ -98,7 +98,9 @@ namespace HiSql
 
         string _temp_delete = "";
         string _temp_delete_where = "";
-
+        string _temp_delete_tabstruct = "";
+        string _temp_delete_tabmodel = "";
+        string _temp_delete_fieldmodel = "";
 
         string _temp_truncate = "";
 
@@ -119,6 +121,8 @@ namespace HiSql
         string _temp_setdefalut = "";
 
         string _temp_deldefalut = "";
+        string _temp_hitabmodel = "";
+        string _temp_hifieldmodel = "";
 
         /// <summary>
         /// 所有物理实体表
@@ -228,7 +232,8 @@ namespace HiSql
         /// </summary>
         public int PackageCell { get => _packagecell; set => _packagecell = value; }
 
-
+        public string GetLocalTempTablePre { get => _temp_local_table_pre; }
+        public string GetGlobalTempTablePre { get => _temp_global_table_pre; }
         /// <summary>
         /// 按分包单元格数
         /// </summary>
@@ -272,6 +277,14 @@ namespace HiSql
 
         public string Delete_Statement_Where { get => _temp_delete_where; }
 
+        /// <summary>
+        /// 删除指定表的表结构信息语句
+        /// </summary>
+        public string Delete_TabStruct { get => _temp_delete_tabstruct; }
+        public string Delete_TabModel { get => _temp_delete_tabmodel; }
+
+        public string Delete_FieldModel { get => _temp_delete_fieldmodel; }
+
         public string Delete_TrunCate { get => _temp_truncate; }
 
         public Dictionary<string, string> FieldTempMapping => _fieldtempmapping;
@@ -282,7 +295,9 @@ namespace HiSql
 
 
 
+        public string Get_HiTabModel { get => _temp_hitabmodel; }
 
+        public string Get_HiFieldModel { get => _temp_hifieldmodel; }
 
         /// <summary>
         /// 新添加列的模板
@@ -500,6 +515,13 @@ namespace HiSql
                 { "uniqueidentifier",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} varchar(36) CHARACTER SET utf8 COLLATE utf8_general_ci   [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
             };
 
+            _temp_delete_tabmodel = $"delete from  {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{_temp_table_after} where TabName='[$TabName$]';";
+            _temp_delete_fieldmodel = $"delete from  {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{_temp_table_after} where TabName='[$TabName$]';";
+
+            _temp_delete_tabstruct = new StringBuilder()
+                .AppendLine(_temp_delete_tabmodel)
+                .AppendLine(_temp_delete_fieldmodel).ToString();
+
 
             _temp_create_table = new StringBuilder()
                 //样例：CREATE TABLE [dbo].[H_TEST_USER]
@@ -508,8 +530,10 @@ namespace HiSql
                 .AppendLine("[$Fields$]")
                 .AppendLine("[$Keys$]")//主键
                 .AppendLine(")[$Primary$]")
-                .AppendLine($"delete from  {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{_temp_table_after} where TabName='[$TabName$]';")
-                .AppendLine($"delete from  {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{_temp_table_after} where TabName='[$TabName$]';")
+
+                .AppendLine($"[$DeleteTabStruct$]")
+                //.AppendLine($"delete from  {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{_temp_table_after} where TabName='[$TabName$]';")
+                //.AppendLine($"delete from  {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{_temp_table_after} where TabName='[$TabName$]';")
 
                 .AppendLine("[$TabStruct$]")
 
@@ -674,7 +698,7 @@ UNION ALL
                 .AppendLine("   end  as `FieldType`, ")
 
                 .AppendLine("	CASE WHEN a.character_maximum_length IS NULL THEN 0 ELSE a.character_maximum_length*2 END as `UseBytes`,")
-                .AppendLine("	CASE WHEN a.character_maximum_length IS NULL THEN case when a.NUMERIC_PRECISION is null then 0 else a.NUMERIC_PRECISION end ELSE a.character_maximum_length END as `Lens`,")
+                .AppendLine("	case when a.data_type ='int' or  a.data_type ='bit' or   a.data_type ='integer' or  a.data_type ='bigint' or a.data_type ='smallint'  then 0   else CASE WHEN a.character_maximum_length IS NULL THEN  case when a.NUMERIC_PRECISION is null  then 0  	else a.NUMERIC_PRECISION  end  ELSE  a.character_maximum_length  END   end as `Lens`,")
                 .AppendLine("	CASE WHEN a.numeric_scale IS NULL THEN 0 ELSE a.numeric_scale END as `PointDec`,")
                 .AppendLine("	case a.is_nullable when 'YES' THEN true ELSE false END AS  `IsNull`,")
                 .AppendLine("	case when a.column_default  is null then '' else a.column_default  end as `DbDefault`,")
@@ -854,6 +878,10 @@ where    table_type in ('BASE TABLE','VIEW') and  table_schema = '[$Schema$]' [$
             _temp_truncate = $"TRUNCATE TABLE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after};";
 
             _temp_droptable = $"drop table {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after};";
+
+            _temp_hitabmodel = $"select * from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{_temp_table_after} where {_temp_field_pre}TabName{_temp_field_after}=@TabName";
+
+            _temp_hifieldmodel = $"select * from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{_temp_table_after} where {_temp_field_pre}TabName{_temp_field_after}=@TabName order by sortnum asc";
         }
     }
 }

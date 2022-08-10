@@ -99,7 +99,7 @@ namespace HiSql
             get {
 
                 //这两种库本身是区分大小写的 忽略大小写对转成大写
-                if (DbType.IsIn<DBType>(DBType.Hana, DBType.Oracle,DBType.SQLite,DBType.DaMeng) && _ignorecase && !_iscustomupper)
+                if (DbType.IsIn<DBType>(DBType.Hana, DBType.Oracle,DBType.DaMeng) && _ignorecase && !_iscustomupper)
                 {
                     _uppercase = true;
                 }
