@@ -45,6 +45,7 @@
 ### 2022.8.10 更新
 1. 新增支持sqlite 目前已经支持sqlserver,oracle,hana,,mysql,postgresql,达梦,sqlite
 2. 新增表结构升级功能（文档后续更新）
+3. 之前用过Hisql的项目更新了使用了新版本后需要重新执行一下  `sqlclient.CodeFirst.InstallHisql()`
 
 ### 2022.7.7 新增自动产生SNRO编号
 
