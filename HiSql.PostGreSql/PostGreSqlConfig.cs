@@ -67,7 +67,8 @@ namespace HiSql
         /// </summary>
         string _temp_get_table_schema = "";
 
-
+        string _temp_hitabmodel = "";
+        string _temp_hifieldmodel = "";
 
         //本地临时表前辍
         string _temp_local_table_pre = "TMP_";
@@ -284,7 +285,9 @@ namespace HiSql
         public string Field_Comment { get => _temp_field_comment; }
         public string Get_Table_Schema { get => _temp_get_table_schema; }
 
+        public string Get_HiTabModel { get => _temp_hitabmodel; }
 
+        public string Get_HiFieldModel { get => _temp_hifieldmodel; }
         public string GetVersion { get => "SELECT version();"; }
 
         public string Insert_StateMent { get => _temp_insert_statement; }
@@ -646,8 +649,8 @@ namespace HiSql
                 .ToString();
 
 
-            _temp_delete_tabmodel = $"delete from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{_temp_table_after} where {_temp_field_pre}TabName{_temp_field_after}='[$TabName$]';";
-            _temp_delete_fieldmodel = $"delete from  {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{_temp_table_after} where {_temp_field_pre}TabName{_temp_field_after}='[$TabName$]';";
+            _temp_delete_tabmodel = $"delete from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{_temp_table_after} where lower({_temp_field_pre}TabName{_temp_field_after})=lower('[$TabName$]');";
+            _temp_delete_fieldmodel = $"delete from  {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{_temp_table_after} where lower({_temp_field_pre}TabName{_temp_field_after})=lower('[$TabName$]');";
 
 
             _temp_delete_tabstruct = new StringBuilder()
@@ -1030,6 +1033,11 @@ CREATE INDEX {_temp_schema_pre}[$IndexName$]{_temp_schema_after}
 
             _temp_tabel_primarykey_create = $@"ALTER TABLE IF EXISTS {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} ADD PRIMARY KEY([$Keys$]) ;";
 
+
+
+            _temp_hitabmodel = $"select * from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{_temp_table_after} where  lower({_temp_field_pre}TabName{_temp_field_after})=lower(@TabName) ";
+
+            _temp_hifieldmodel = $"select * from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{_temp_table_after} where lower({_temp_field_pre}TabName{_temp_field_after})=lower(@TabName) order by {_temp_field_pre}SortNum{_temp_field_after} asc";
         }
     }
 }

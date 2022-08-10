@@ -1545,9 +1545,10 @@ namespace HiSql
         }
         public static Hi_FieldModel CloneFieldModel(this Hi_FieldModel hi_FieldModel)
         {
-            Hi_FieldModel l = new Hi_FieldModel() { 
-                CreateName = hi_FieldModel.CreateName,
-                CreateTime = hi_FieldModel.CreateTime,
+            Hi_FieldModel l = new Hi_FieldModel() {
+                DbServer=hi_FieldModel.DbServer,
+                DbName=hi_FieldModel.DbName,
+                TabName = hi_FieldModel.TabName,
                 DBDefault = hi_FieldModel.DBDefault,    
                 DefaultValue = hi_FieldModel.DefaultValue,  
                 FieldDec    = hi_FieldModel.FieldDec,
@@ -1566,8 +1567,6 @@ namespace HiSql
                 IsSearch = hi_FieldModel.IsSearch,  
                 IsShow = hi_FieldModel.IsShow,
                 IsSys = hi_FieldModel.IsSys,
-                ModiName = hi_FieldModel.ModiName,
-                ModiTime = hi_FieldModel.ModiTime,
                 RefField = hi_FieldModel.RefField,  
                 RefFieldDesc = hi_FieldModel.RefFieldDesc,  
                 RefFields = hi_FieldModel.RefFields,    
@@ -1578,7 +1577,11 @@ namespace HiSql
                 SNO_NUM = hi_FieldModel.SNO_NUM,
                 SortNum = hi_FieldModel.SortNum,    
                 SrchMode = hi_FieldModel.SrchMode,
-                TabName = hi_FieldModel.TabName
+                CreateName = hi_FieldModel.CreateName,
+                CreateTime = hi_FieldModel.CreateTime,
+                ModiName = hi_FieldModel.ModiName,
+                ModiTime = hi_FieldModel.ModiTime,
+
             };
 
             return l;

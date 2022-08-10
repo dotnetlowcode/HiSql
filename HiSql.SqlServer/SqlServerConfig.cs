@@ -115,6 +115,8 @@ namespace HiSql
         string _temp_retable = "EXECUTE sp_rename '[$TabName$]', '[$ReTabName$]'";
 
 
+        string _temp_hitabmodel = "";
+        string _temp_hifieldmodel = "";
    
 
         string _temp_setdefalut = "";
@@ -301,6 +303,10 @@ namespace HiSql
 
         public string Delete_Statement_Where { get => _temp_delete_where; }
 
+
+        public string Get_HiTabModel { get => _temp_hitabmodel; }
+
+        public string Get_HiFieldModel { get => _temp_hifieldmodel; }
 
         /// <summary>
         /// 删除指定表的表结构信息语句
@@ -985,6 +991,12 @@ UNION ALL
             _temp_truncate = $"TRUNCATE TABLE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after}";
 
             _temp_droptable = $"drop table {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after}";
+
+
+            _temp_hitabmodel = $"select * from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{_temp_table_after} where TabName=@TabName";
+
+            _temp_hifieldmodel = $"select * from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{_temp_table_after} where TabName=@TabName order by sortnum asc";
+
         }
     }
 }

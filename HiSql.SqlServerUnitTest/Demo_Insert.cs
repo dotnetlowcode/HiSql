@@ -97,8 +97,8 @@ namespace HiSql
             //Demo1_Insert8(sqlClient);
             //Demo1_Insert9(sqlClient);
 
-            //Demo1_Insert11(sqlClient);
-            Demo1_Insert12(sqlClient);
+            Demo1_Insert11(sqlClient);
+            //Demo1_Insert12(sqlClient);
             //Demo1_Insert13(sqlClient);
         }
 
@@ -175,6 +175,8 @@ namespace HiSql
                 new { UTYP = "U2", UTypeName = "中级用户" },
                 new { UTYP = "U3", UTypeName = "高级用户" }
             }).ExecCommand();
+
+            sqlClient.CommitTran();
 
         }
 

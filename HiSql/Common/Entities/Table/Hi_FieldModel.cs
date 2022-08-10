@@ -16,6 +16,12 @@ namespace HiSql
     public partial class Hi_FieldModel: StandField
     {
 
+        /// <summary>
+        /// 服务器名称
+        /// </summary>
+        [HiColumn(FieldDesc = "DB服务器", FieldLen = 50, IsPrimary = true, IsBllKey = true, IsNull = false, DBDefault = HiTypeDBDefault.EMPTY, DefaultValue = "", SortNum = 3, IsSys = true)]
+        public string DbServer { get; set; }
+
         [HiColumn(FieldDesc = "数据库名", FieldLen = 50, IsPrimary = true, IsBllKey = true, IsNull = false, DBDefault = HiTypeDBDefault.EMPTY, DefaultValue = "" , SortNum = 4, IsSys = true)]
         public string DbName { get; set; }
 

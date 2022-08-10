@@ -1285,7 +1285,7 @@ namespace HiSql
         /// <param name="tabInfo"></param>
         /// <param name="opLevel"></param>
         /// <returns></returns>
-        public Tuple<bool, string, string> ModiTable(TabInfo tabInfo, OpLevel opLevel)
+        public Tuple<bool, string, string> ModiTable(TabInfo tabInfo, OpLevel opLevel, bool onlychangetable = false)
         {
             TabInfo tab = _sqlClient.Context.DMInitalize.GetTabStruct(tabInfo.TabModel.TabName);
 
@@ -1326,6 +1326,13 @@ namespace HiSql
                 }
 
                 reBuilderPrimaryKey = _haskey;
+            }
+            else
+            {
+                if (fieldChanges.Any(f => f.NewColumn.IsPrimary))
+                {
+                    reBuilderPrimaryKey = true;
+                }
             }
             List<HiColumn> lstchg = new List<HiColumn>();
             List<HiColumn> lstdel = new List<HiColumn>();
@@ -1543,7 +1550,8 @@ namespace HiSql
                                     });
                                     TabInfo newtabinfo = _sqlClient.Context.MCache.GetCache<TabInfo>(_keyname);
                                 //}
-                                modi_count = _sqlClient.Modi(Constants.HiSysTable["Hi_FieldModel"].ToString(), lstchg).ExecCommand();
+                                if(!onlychangetable)
+                                    modi_count = _sqlClient.Modi(Constants.HiSysTable["Hi_FieldModel"].ToString(), lstchg).ExecCommand();
                                 _sqlClient.Context.MCache.RemoveCache(_keyname);
 
                             }

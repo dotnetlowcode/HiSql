@@ -80,43 +80,54 @@ namespace HiSql.UnitTest
             List<Hi_UpgradeInfo> lstupgradeinfo = new List<Hi_UpgradeInfo>();
 
 
-            lstupgradeinfo.Add(
-                new Hi_UpgradeInfo
-                {
-                    MinVersion = new Version("1.0.0.1"),
-                    MaxVersion = new Version("1.0.4.7"),
-                    UpgradTabs = new List<Hi_UpgradeTab>
-                    {
-                        new Hi_UpgradeTab{
-                            TabName="Hi_TabModel",
-                            Columns=new List<Hi_UpgradeCol>{
-                                new Hi_UpgradeCol {
-                                    TabFieldAction = TabFieldAction.MODI ,
-                                    ColumnInfo=new HiColumn {TabName="Hi_TabModel",FieldName="DbName", FieldDesc = "数据库名",FieldType=HiType.NVARCHAR, FieldLen = 50, IsPrimary = true, IsBllKey = true, IsNull = false, DBDefault = HiTypeDBDefault.EMPTY, DefaultValue = "", SortNum = 4, IsSys = true }
-                                }
-                            }
-                        }
-                    }
-                });
+            //lstupgradeinfo.Add(
+            //    new Hi_UpgradeInfo
+            //    {
+            //        MinVersion = new Version("1.0.0.1"),
+            //        MaxVersion = new Version("1.0.4.7"),
+            //        UpgradTabs = new List<Hi_UpgradeTab>
+            //        {
+            //            new Hi_UpgradeTab{
+            //                TabName="Hi_TabModel",
+            //                Columns=new List<Hi_UpgradeCol>{
+            //                    new Hi_UpgradeCol {
+            //                        TabFieldAction = TabFieldAction.MODI ,
+            //                        ColumnInfo=new HiColumn {TabName="Hi_TabModel",FieldName="DbName", FieldDesc = "数据库名",FieldType=HiType.NVARCHAR, FieldLen = 50, IsPrimary = true, IsBllKey = true, IsNull = false, DBDefault = HiTypeDBDefault.EMPTY, DefaultValue = "", SortNum = 4, IsSys = true }
+            //                    },
+            //                    new Hi_UpgradeCol {
+            //                        TabFieldAction = TabFieldAction.MODI ,
+            //                        ColumnInfo=new HiColumn {TabName="Hi_TabModel",FieldName="DbServer", FieldDesc = "DB服务器",FieldType=HiType.NVARCHAR, FieldLen = 50, IsPrimary = true, IsBllKey = true, IsNull = false, DBDefault = HiTypeDBDefault.EMPTY, DefaultValue = "", SortNum = 3, IsSys = true }
+            //                    }
+            //                }
+            //            }
+            //        }
+            //    });
 
-            lstupgradeinfo.Add(
-                new Hi_UpgradeInfo
-                {
-                    MinVersion = new Version("1.0.0.1"),
-                    MaxVersion = new Version("1.0.4.7"),
-                    UpgradTabs = new List<Hi_UpgradeTab>
-                    {
-                        new Hi_UpgradeTab{
-                            TabName="Hi_FieldModel",
-                            Columns=new List<Hi_UpgradeCol>{
-                                new Hi_UpgradeCol {
-                                    TabFieldAction = TabFieldAction.MODI ,
-                                    ColumnInfo=new HiColumn {TabName="Hi_FieldModel",FieldName="DbName", FieldDesc = "数据库名",FieldType=HiType.NVARCHAR, FieldLen = 50, IsPrimary = true, IsBllKey = true, IsNull = false, DBDefault = HiTypeDBDefault.EMPTY, DefaultValue = "" , SortNum = 4, IsSys = true }
-                                }
-                            }
-                        }
-                    }
-                });
+
+
+            //lstupgradeinfo.Add(
+            //    new Hi_UpgradeInfo
+            //    {
+            //        MinVersion = new Version("1.0.0.1"),
+            //        MaxVersion = new Version("1.0.4.7"),
+            //        UpgradTabs = new List<Hi_UpgradeTab>
+            //        {
+            //            new Hi_UpgradeTab{
+            //                TabName="Hi_FieldModel",
+            //                Columns=new List<Hi_UpgradeCol>{
+            //                    new Hi_UpgradeCol {
+            //                        TabFieldAction = TabFieldAction.MODI ,
+            //                        ColumnInfo=new HiColumn {TabName="Hi_FieldModel",FieldName="DbName", FieldDesc = "数据库名",FieldType=HiType.NVARCHAR, FieldLen = 50, IsPrimary = true, IsBllKey = true, IsNull = false, DBDefault = HiTypeDBDefault.EMPTY, DefaultValue = "" , SortNum = 4, IsSys = true }
+            //                    },
+            //                    new Hi_UpgradeCol {
+            //                        TabFieldAction = TabFieldAction.MODI ,
+            //                        ColumnInfo=new HiColumn {TabName="Hi_FieldModel",FieldName="DbServer", FieldDesc = "DB服务器",FieldType=HiType.NVARCHAR, FieldLen = 50, IsPrimary = true, IsBllKey = true, IsNull = false, DBDefault = HiTypeDBDefault.EMPTY, DefaultValue = "", SortNum = 3, IsSys = true }
+            //                    }
+            //                }
+            //            }
+            //        }
+            //    });
+
 
             lstupgradeinfo.Add(
                 new Hi_UpgradeInfo

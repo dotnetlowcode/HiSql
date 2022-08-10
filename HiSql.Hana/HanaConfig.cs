@@ -57,7 +57,8 @@ namespace HiSql
         string _temp_insert_statement = "";
         string _temp_insert_statementv2 = "";
 
-
+        string _temp_hitabmodel = "";
+        string _temp_hifieldmodel = "";
         /// <summary>
         /// 获取表结构信息模版
         /// </summary>
@@ -274,7 +275,9 @@ namespace HiSql
 
         public string Insert_StateMentv2 { get => _temp_insert_statementv2; }
 
+        public string Get_HiTabModel { get => _temp_hitabmodel; }
 
+        public string Get_HiFieldModel { get => _temp_hifieldmodel; }
 
         /// <summary>
         /// 表更新模板
@@ -482,8 +485,8 @@ namespace HiSql
                 { "uniqueidentifier",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  varchar(36)   [$IsNull$] [$Default$] [$COMMENT$] [$EXTEND$]{_temp_field_split}"},
             };
 
-            _temp_delete_tabmodel = $"      delete FROM  {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{_temp_table_after} where {_temp_field_pre}TabName{_temp_field_after}='[$TabName$]';";
-            _temp_delete_fieldmodel = $"      delete FROM  {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{_temp_table_after} where {_temp_field_pre}TabName{_temp_field_after}='[$TabName$]';";
+            _temp_delete_tabmodel = $"      delete FROM  {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{_temp_table_after} where lower({_temp_field_pre}TabName{_temp_field_after})=lower('[$TabName$]');";
+            _temp_delete_fieldmodel = $"      delete FROM  {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{_temp_table_after} where lower({_temp_field_pre}TabName{_temp_field_after})=lower('[$TabName$]');";
 
             _temp_delete_tabstruct = new StringBuilder()
                 .AppendLine(_temp_delete_tabmodel)
@@ -841,10 +844,15 @@ UNION ALL
                 .AppendLine($@"DROP INDEX  {_temp_schema_pre}[$IndexName$]{_temp_schema_after}")
                 .ToString();
 
-            _temp_tabel_primarykey_drop = $"ALTER TABLE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} DROP CONSTRAINT {_temp_table_pre}[$IndexName$]{_temp_table_after}";
+            //删除表中的所有主键
+            _temp_tabel_primarykey_drop = $"ALTER TABLE  {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{ _temp_table_after} DROP PRIMARY KEY";
 
-            _temp_tabel_primarykey_create = $@"ALTER TABLE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} add constraint {_temp_table_pre}PK_[$TabName$]_[$ConnectID$]{_temp_table_after} [$Primary$] ";
-            
+            _temp_tabel_primarykey_create = $@"ALTER TABLE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{ _temp_table_after} ADD  [$Primary$]";
+
+
+            _temp_hitabmodel = $"select * from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{_temp_table_after} where  lower({_temp_field_pre}TabName{_temp_field_after})=lower(@TabName) ";
+
+            _temp_hifieldmodel = $"select * from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{_temp_table_after} where lower({_temp_field_pre}TabName{_temp_field_after})=lower(@TabName) order by {_temp_field_pre}SortNum{_temp_field_after} asc";
 
         }
     }

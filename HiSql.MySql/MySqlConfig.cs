@@ -121,6 +121,8 @@ namespace HiSql
         string _temp_setdefalut = "";
 
         string _temp_deldefalut = "";
+        string _temp_hitabmodel = "";
+        string _temp_hifieldmodel = "";
 
         /// <summary>
         /// 所有物理实体表
@@ -293,7 +295,9 @@ namespace HiSql
 
 
 
+        public string Get_HiTabModel { get => _temp_hitabmodel; }
 
+        public string Get_HiFieldModel { get => _temp_hifieldmodel; }
 
         /// <summary>
         /// 新添加列的模板
@@ -874,6 +878,10 @@ where    table_type in ('BASE TABLE','VIEW') and  table_schema = '[$Schema$]' [$
             _temp_truncate = $"TRUNCATE TABLE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after};";
 
             _temp_droptable = $"drop table {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after};";
+
+            _temp_hitabmodel = $"select * from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{_temp_table_after} where {_temp_field_pre}TabName{_temp_field_after}=@TabName";
+
+            _temp_hifieldmodel = $"select * from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{_temp_table_after} where {_temp_field_pre}TabName{_temp_field_after}=@TabName order by sortnum asc";
         }
     }
 }

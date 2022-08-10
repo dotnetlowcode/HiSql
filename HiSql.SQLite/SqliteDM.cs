@@ -329,6 +329,25 @@ namespace HiSql
             }
             return _default;
         }
+
+        /// <summary>
+        /// 获取Hi_TabModel 和Hi_FieldModel 中指定表的结构信息
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <returns></returns>
+        public DataSet GetTabModelInfo(string tabname)
+        {
+            DataSet ds = new DataSet();
+            DataTable dt_tab = this.Context.DBO.GetDataTable(dbConfig.Get_HiTabModel.Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema), new HiParameter("@TabName", tabname));
+            dt_tab.TableName = Constants.HiSysTable["Hi_TabModel"];
+
+            DataTable dt_field = this.Context.DBO.GetDataTable(dbConfig.Get_HiFieldModel.Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema), new HiParameter("@TabName", tabname));
+            dt_field.TableName = Constants.HiSysTable["Hi_FieldModel"];
+            ds.Tables.Add(dt_tab);
+            ds.Tables.Add(dt_field);
+            return ds;
+        }
+
         /// <summary>
         /// 获取表结构信息并缓存
         /// </summary>
@@ -349,14 +368,7 @@ namespace HiSql
                 newtabinfo = HiSqlCommProvider.InitTabMaping(tabname, () =>
                 {
                     tabname = tabname.ToSqlInject();
-                    DataSet ds = new DataSet();
-                    DataTable dt_model = this.Context.DBO.GetDataTable($"select * from {dbConfig.Table_Pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{dbConfig.Table_After} where TabName=@TabName", new HiParameter("@TabName", tabname));
-                    dt_model.TableName = Constants.HiSysTable["Hi_TabModel"].ToString();
-                    ds.Tables.Add(dt_model);
-
-                    DataTable dt_struct = Context.DBO.GetDataTable($"select * from {dbConfig.Table_Pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{dbConfig.Table_After} where TabName=@TabName order by sortnum asc", new HiParameter("@TabName", tabname));
-                    dt_struct.TableName = Constants.HiSysTable["Hi_FieldModel"].ToString();
-                    ds.Tables.Add(dt_struct);
+                    DataSet ds = GetTabModelInfo(tabname);
 
                     TabInfo tabInfo = HiSqlCommProvider.TabToEntity(ds);
                     tabname = tabInfo != null ? tabInfo.TabModel.TabName : tabname;
@@ -581,6 +593,7 @@ namespace HiSql
 
 
             sb.AppendLine($"insert into {dbConfig.Table_Pre}{Constants.HiSysTable["Hi_TabModel"]}{dbConfig.Table_After} (")
+                .Append($"{dbConfig.Field_Pre}DbServer{dbConfig.Field_After}{dbConfig.Field_Split}")
                 .Append($"{dbConfig.Field_Pre}DbName{dbConfig.Field_After}{dbConfig.Field_Split}")
                .Append($"{dbConfig.Field_Pre}TabName{dbConfig.Field_After}{dbConfig.Field_Split}")
                 .Append($"{dbConfig.Field_Pre}TabReName{dbConfig.Field_After}{dbConfig.Field_Split}")
@@ -595,6 +608,7 @@ namespace HiSql
                 .Append($"{dbConfig.Field_Pre}LogTable{dbConfig.Field_After}{dbConfig.Field_Split}")
                 .Append($"{dbConfig.Field_Pre}LogExprireDay{dbConfig.Field_After}")
                 .Append(") values(")
+                .Append($"'{hiTable.DbServer.ToSqlInject()}',")
                  .Append($"'{hiTable.DbName.ToSqlInject()}',")
                 .Append($"'{hiTable.TabName}',")
                 .Append($"'{hiTable.TabReName.ToSqlInject()}',")
@@ -617,6 +631,7 @@ namespace HiSql
             foreach (HiColumn hiColumn in lstHiTable)
             {
                 sb.AppendLine($"insert into {dbConfig.Table_Pre}{Constants.HiSysTable["Hi_FieldModel"]}{dbConfig.Table_After} (")
+                     .Append($"{dbConfig.Field_Pre}DbServer{dbConfig.Field_After}{dbConfig.Field_Split}")
                      .Append($"{dbConfig.Field_Pre}DbName{dbConfig.Field_After}{dbConfig.Field_Split}")
                     .Append($"{dbConfig.Field_Pre}TabName{dbConfig.Field_After}{dbConfig.Field_Split}")
                     .Append($"{dbConfig.Field_Pre}FieldName{dbConfig.Field_After}{dbConfig.Field_Split}")
@@ -647,7 +662,9 @@ namespace HiSql
                     .Append($"{dbConfig.Field_Pre}RefFields{dbConfig.Field_After}{dbConfig.Field_Split}")
                     .Append($"{dbConfig.Field_Pre}RefFieldDesc{dbConfig.Field_After}{dbConfig.Field_Split}")
                     .Append($"{dbConfig.Field_Pre}RefWhere{dbConfig.Field_After}")
-                    .Append($")values('{hiColumn.DbName.ToSqlInject()}',")
+                    .Append($")values(")
+                    .Append($"'{hiTable.DbServer.ToSqlInject()}',")
+                    .Append($"'{hiTable.DbName.ToSqlInject()}',")
                     .Append($"'{hiTable.TabName}',")
                     .Append($"'{hiColumn.FieldName}',")
                     .Append($"'{hiColumn.FieldDesc.ToSqlInject()}',")
@@ -3498,54 +3515,6 @@ namespace HiSql
             return _effect;
         }
 
-
-        /// <summary>
-        /// 初始化安装HiSql
-        /// </summary>
-        /// <param name="hiSqlClient"></param>
-        /// <returns></returns>
-        public bool InstallHisql(HiSqlClient hiSqlClient)
-        {
-            hiSqlClient.CommitTran();//提交之前的事务
-            using (var hisqlClient = hiSqlClient.CreateUnitOfWork())
-            {
-                try
-                {
-                    if (!CheckTabExists(typeof(Hi_TabModel).Name))
-                    {
-                        hisqlClient.DbFirst.CreateTable(typeof(Hi_TabModel));
-                    }
-                    if (!CheckTabExists(typeof(Hi_FieldModel).Name))
-                    {
-                        hisqlClient.DbFirst.CreateTable(typeof(Hi_FieldModel));
-                    }
-
-                    hisqlClient.Context.DMInitalize.GetTabStruct(typeof(Hi_TabModel).Name);
-                    hisqlClient.Context.DMInitalize.GetTabStruct(typeof(Hi_FieldModel).Name);
-
-                    if (!CheckTabExists(typeof(Hi_Domain).Name))
-                    {
-                        hisqlClient.DbFirst.CreateTable(typeof(Hi_Domain));
-                    }
-                    if (!CheckTabExists(typeof(Hi_DataElement).Name))
-                    {
-                        hisqlClient.DbFirst.CreateTable(typeof(Hi_DataElement));
-                    }
-                    hisqlClient.Context.DMInitalize.GetTabStruct(typeof(Hi_Domain).Name);
-                    hisqlClient.Context.DMInitalize.GetTabStruct(typeof(Hi_DataElement).Name);
-                    hisqlClient.CommitTran();
-                }
-                catch (Exception ex)
-                {
-                    hisqlClient.RollBackTran();
-                    throw ex;
-                }
-
-            }
-
-
-            return true;
-        }
 
 
         #endregion

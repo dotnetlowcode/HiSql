@@ -150,6 +150,21 @@ namespace HiSql
                 string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", this.Table.TabName.ToLower());
                 tabinfo = this.Context.DMInitalize.GetTabStruct(this.Table.TabName);
 
+                //if (Constants.HiSysTable["Hi_FieldModel"].Equals(this.Table.TabName, StringComparison.OrdinalIgnoreCase))
+                //{
+                //    if (this.Data.Count > 0 && this.Data[0] is HiColumn)
+                //    {
+                //        foreach (HiColumn _col in this.Data)
+                //        {
+                //            if (!tabinfo.Columns.Any(c => c.FieldName.Equals(_col.FieldName, StringComparison.OrdinalIgnoreCase)))
+                //            {
+                //                tabinfo.Columns.Add(_col);
+                //            }
+                //        }
+                //    }
+                //}
+
+
                 _insertTabName = this.Table.TabName;
                 //由于DBType.PostGreSql mergeinto的方法实现逻辑与其它的数据库完全不一样只能特殊处理
                 if (_mergeinto && Context.CurrentConnectionConfig.DbType != DBType.PostGreSql && Context.CurrentConnectionConfig.DbType != DBType.Sqlite)
@@ -265,6 +280,7 @@ namespace HiSql
                 //sw.Start();
 
                 List<Dictionary<string, string>> rtnlst = CheckAllData(tabinfo.GetColumns, this.Data);
+                //List<Dictionary<string, string>> rtnlst = CheckAllData(tabinfo.GetColumns, this.Data);
                 //sw.Stop();
                 //Console.WriteLine($"检测{this.Data.Count} 条数据耗时{sw.Elapsed}");
                 //foreach (var obj in this.Data)

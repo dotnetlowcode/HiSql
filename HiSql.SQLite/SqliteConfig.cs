@@ -115,7 +115,8 @@ namespace HiSql
         string _temp_retable = "ALTER TABLE [$TabName$] RENAME TO [$ReTabName$]; ";
 
 
-   
+        string _temp_hitabmodel = "";
+        string _temp_hifieldmodel = "";
 
         string _temp_setdefalut = "";
         string _temp_setdefalut1 = "";
@@ -279,7 +280,9 @@ namespace HiSql
         public  string Field_Comment { get => _temp_field_comment; }
         public  string Get_Table_Schema { get => _temp_get_table_schema;   }
 
-        
+        public string Get_HiTabModel { get => _temp_hitabmodel; }
+
+        public string Get_HiFieldModel { get => _temp_hifieldmodel; }
         public  string Insert_StateMent { get => _temp_insert_statement;   }
 
         public  string Insert_StateMentv2 { get => _temp_insert_statementv2;   }
@@ -851,6 +854,10 @@ where type  in('table') [$Where$] COLLATE NOCASE  order by type ASC, [name] ASC
             _temp_truncate = $"DELETE FROM  {_temp_table_pre}[$TabName$]{_temp_table_after};";
 
             _temp_droptable = $"drop table IF EXISTS  {_temp_table_pre}[$TabName$]{_temp_table_after} ;";
+
+            _temp_hitabmodel = $"select * from {_temp_table_pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{_temp_table_after} where TabName=@TabName";
+
+            _temp_hifieldmodel = $"select * from {_temp_table_pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{_temp_table_after} where TabName=@TabName order by sortnum asc";
         }
     }
 }

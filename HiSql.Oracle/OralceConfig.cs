@@ -127,7 +127,8 @@ namespace HiSql
         /// </summary>
         string _temp_gettables_paging = "";
         string _temp_gettables_pagingcount = "";
-
+        string _temp_hitabmodel = "";
+        string _temp_hifieldmodel = "";
 
         string _temp_getTableDataCount = "select count(*) from [$TabName$] ";
         /// <summary>
@@ -271,7 +272,9 @@ namespace HiSql
         public string Field_Comment { get => _temp_field_comment; }
         public string Get_Table_Schema { get => _temp_get_table_schema; }
 
+        public string Get_HiTabModel { get => _temp_hitabmodel; }
 
+        public string Get_HiFieldModel { get => _temp_hifieldmodel; }
         public string Insert_StateMent { get => _temp_insert_statement; }
 
         public string Insert_StateMentv2 { get => _temp_insert_statementv2; }
@@ -537,8 +540,8 @@ namespace HiSql
                 .ToString();
 
 
-            _temp_delete_tabmodel = $"   execute immediate 'delete from {Constants.HiSysTable["Hi_TabModel"].ToString()} where TabName=''[$TabName$]''';";
-            _temp_delete_fieldmodel = $"   execute immediate 'delete from {Constants.HiSysTable["Hi_FieldModel"].ToString()} where TabName=''[$TabName$]''';";
+            _temp_delete_tabmodel = $"   execute immediate 'delete from {Constants.HiSysTable["Hi_TabModel"].ToString()} where lower(TabName)=lower(''[$TabName$]'')';";
+            _temp_delete_fieldmodel = $"   execute immediate 'delete from {Constants.HiSysTable["Hi_FieldModel"].ToString()} where lower(TabName)=lower(''[$TabName$]'')';";
 
 
             _temp_delete_tabstruct = new StringBuilder()
@@ -939,6 +942,10 @@ where idx.TABLE_NAME = '[$TabName$]' and idxc.INDEX_NAME = '[$IndexName$]' ";
 
             _temp_tabel_primarykey_create = $@"ALTER TABLE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} add constraint {_temp_table_pre}PK_[$TabName$][$ConnectID$]{_temp_table_after} primary key ([$Keys$]) ";
 
+
+            _temp_hitabmodel = $"select * from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{_temp_table_after} where  lower({_temp_field_pre}TabName{_temp_field_after})=lower(@TabName) ";
+
+            _temp_hifieldmodel = $"select * from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{_temp_table_after} where lower({_temp_field_pre}TabName{_temp_field_after})=lower(@TabName) order by {_temp_field_pre}SortNum{_temp_field_after} asc";
         }
     }
 }

@@ -20,6 +20,12 @@ namespace HiSql
     {
 
         /// <summary>
+        /// 服务器名称
+        /// </summary>
+        [HiColumn(FieldDesc = "DB服务器", FieldLen = 50, IsPrimary = true, IsBllKey = true, IsNull = false, DBDefault = HiTypeDBDefault.EMPTY, DefaultValue = "", SortNum = 3, IsSys = true)]
+        public string DbServer { get; set; }
+
+        /// <summary>
         /// 数据库名
         /// </summary>
         [HiColumn(FieldDesc = "数据库名", FieldLen = 50, IsPrimary = true, IsBllKey = true, IsNull = false, DBDefault = HiTypeDBDefault.EMPTY, DefaultValue = "", SortNum = 4, IsSys = true)]

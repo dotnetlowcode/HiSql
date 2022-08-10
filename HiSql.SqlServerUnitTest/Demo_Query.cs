@@ -53,29 +53,7 @@ namespace HiSql.UnitTest
         }
 
 
-        static void Query_Demo21()
-        {
-            HiSqlClient sqlClient = Demo_Init.GetSql90Client();
-
-            sqlClient.Query("S4_REP_ZRMB52_2022_07_04").Field("*").Sort("_STID_ asc").Take(1).Skip(1).ToSql();
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-            string json = sqlClient.Query("S4_REP_ZRMB52_2022_07_04").Field("*").Sort("_STID_ asc").Take(20).Skip(10).ToJson();
-            //DataTable dt= sqlClient.Query("S4_REP_ZRMB52_2022_07_04").Field("*").Sort("_STID_ asc").Take(20).Skip(10).ToTable();
-            sw.Stop();
-
-            int _total = 0;
-            for (int i = 10; i < 50; i++)
-            {
-                sw.Reset();
-                sw.Start();
-                string json2 = sqlClient.Query("S4_REP_ZRMB52_2022_07_04").Field("*").Sort("_STID_ asc").Take(100).Skip(i + 1).ToJson(ref _total);
-                //DataTable dt= sqlClient.Query("S4_REP_ZRMB52_2022_07_04").Field("*").Sort("_STID_ asc").Take(20).Skip(10).ToTable();
-                sw.Stop();
-                Console.WriteLine($"第{i + 1}查询 耗时：{sw.Elapsed}");
-            }
-
-        }
+        
 
         static void Query_Demo20(HiSqlClient sqlClient)
         {
