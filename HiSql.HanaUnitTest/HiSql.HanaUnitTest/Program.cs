@@ -12,7 +12,9 @@ namespace HiSql.HanaUnitTest
             Console.WriteLine($"数据库连接id" + sqlClient.Context.ConnectedId);
             //Demo_Insert.Init(sqlClient);
             //DemoCodeFirst.Init(sqlClient);
-            Demo_Query.Init(sqlClient);
+            //Demo_Query.Init(sqlClient);
+
+            Demo_Upgrade.Init(sqlClient);
 
             //Demo_Update.Init(sqlClient);
             //Demo_Delete.Init(sqlClient);

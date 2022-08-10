@@ -27,7 +27,7 @@ namespace HiSql
         }
 
 
-        #region 私有方法
+        #region 私有方法   aa
 
         void checkData()
         {

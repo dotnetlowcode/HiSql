@@ -77,10 +77,10 @@ namespace HiSql
 
 
         //本地临时表前辍
-        string _temp_local_temp_pre = "#";
+        string _temp_local_table_pre = "#";
 
         //全局临时表前辍
-        string _temp_global_temp_pre = "##";
+        string _temp_global_table_pre = "##";
 
         //变量表前辍
         string _temp_var_temp_pre = "@";
@@ -94,6 +94,9 @@ namespace HiSql
         string _temp_delete = "";
         string _temp_delete_where = "";
 
+        string _temp_delete_tabstruct = "";
+        string _temp_delete_tabmodel = "";
+        string _temp_delete_fieldmodel = "";
 
         string _temp_truncate = "";
 
@@ -112,6 +115,8 @@ namespace HiSql
         string _temp_retable = "EXECUTE sp_rename '[$TabName$]', '[$ReTabName$]'";
 
 
+        string _temp_hitabmodel = "";
+        string _temp_hifieldmodel = "";
    
 
         string _temp_setdefalut = "";
@@ -244,7 +249,8 @@ namespace HiSql
         /// </summary>
         public int PackageCell { get => _packagecell; set => _packagecell = value; }
 
-
+        public string GetLocalTempTablePre { get => _temp_local_table_pre; }
+        public string GetGlobalTempTablePre { get => _temp_global_table_pre; }
         /// <summary>
         /// 按分包单元格数
         /// </summary>
@@ -296,6 +302,21 @@ namespace HiSql
         public string Delete_Statement { get => _temp_delete; }
 
         public string Delete_Statement_Where { get => _temp_delete_where; }
+
+
+        public string Get_HiTabModel { get => _temp_hitabmodel; }
+
+        public string Get_HiFieldModel { get => _temp_hifieldmodel; }
+
+        /// <summary>
+        /// 删除指定表的表结构信息语句
+        /// </summary>
+        public string Delete_TabStruct { get => _temp_delete_tabstruct; }
+
+
+        public string Delete_TabModel { get => _temp_delete_tabmodel; }
+
+        public string Delete_FieldModel { get => _temp_delete_fieldmodel; }
 
         public string Delete_TrunCate { get => _temp_truncate; }
 
@@ -522,6 +543,13 @@ namespace HiSql
             };
 
 
+            _temp_delete_tabmodel = $"delete [$Schema$].{_temp_table_pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{_temp_table_after} where TabName='[$TabName$]'";
+            _temp_delete_fieldmodel = $"delete [$Schema$].{_temp_table_pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{_temp_table_after} where TabName='[$TabName$]'";
+
+            _temp_delete_tabstruct = new StringBuilder()
+                .AppendLine(_temp_delete_tabmodel)
+                .AppendLine(_temp_delete_fieldmodel).ToString();
+
             _temp_create_table = new StringBuilder()
                 //样例：CREATE TABLE [dbo].[H_TEST_USER]
                 .AppendLine("declare @_effect int")
@@ -536,8 +564,10 @@ namespace HiSql
 
                 .AppendLine("set @_effect=1 ")
                 .AppendLine("end")
-                .AppendLine($"delete dbo.{_temp_table_pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{_temp_table_after} where TabName='[$TabName$]'")
-                .AppendLine($"delete dbo.{_temp_table_pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{_temp_table_after} where TabName='[$TabName$]'")
+
+                 .AppendLine($"[$DeleteTabStruct$]")
+                //.AppendLine($"delete [$Schema$].{_temp_table_pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{_temp_table_after} where TabName='[$TabName$]'")
+                //.AppendLine($"delete [$Schema$].{_temp_table_pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{_temp_table_after} where TabName='[$TabName$]'")
 
                 .AppendLine("[$TabStruct$]")
                 //.AppendLine("else")
@@ -715,8 +745,8 @@ UNION ALL
                 .AppendLine("	) as IsPrimary,")
                 .AppendLine("	b.name FieldType,")
                 .AppendLine("	a.length UseBytes,")
-                .AppendLine("	COLUMNPROPERTY(a.id,a.name,'PRECISION') as Lens,")
-                .AppendLine("	isnull(COLUMNPROPERTY(a.id,a.name,'Scale'),0) as PointDec,")
+                .AppendLine("	(case when b.name = 'datetime' or b.name='int' or  b.name = 'bigint' or b.name='tinyint' or b.name='smallint' then 0 else COLUMNPROPERTY(a.id,a.name,'PRECISION') end) as Lens,")
+                .AppendLine("	(case when b.name =  'datetime' then 0 else isnull(COLUMNPROPERTY(a.id,a.name,'Scale'),0) end) as PointDec,")
                 .AppendLine("	(case when a.isnullable=1 then '1'else '0' end) [IsNull], ")
                 .AppendLine("	isnull(e.text,'') DbDefault,")
                 .AppendLine("	isnull(g.[value],'') AS FieldDesc   ")
@@ -740,12 +770,14 @@ UNION ALL
                 .AppendLine("       inner join sysobjects as b on a.cdefault=b.id")
                 .AppendLine("       where a.id=object_id('[$TabName$]') and a.name='[$FieldName$]'")
                 .AppendLine("       exec('ALTER TABLE [$Schema$].[$TabName$] DROP CONSTRAINT '+@_constname_[$FieldName$])")
+                .AppendLine("       [$AlterColumn$]")
                 .AppendLine("       [$AddDefault$]")
                 //.AppendLine("       exec('ALTER TABLE [$Schema$].[$TabName$] ADD CONSTRAINT '+@_constname_[$FieldName$]+ ' [$DefValue$] ' + ' FOR [$FieldName$]' )")
                 .AppendLine("   end")
                 .AppendLine("else")
                 .AppendLine("   begin")
                 .AppendLine("       set @_constname_[$FieldName$] ='DF_H_[$TabName$]_[$FieldName$]_[$KEY$]'")
+                .AppendLine("       [$AlterColumn$]")
                 .AppendLine("       [$AddDefault$]")
                 .AppendLine("   end")
                 .ToString();
@@ -959,6 +991,12 @@ UNION ALL
             _temp_truncate = $"TRUNCATE TABLE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after}";
 
             _temp_droptable = $"drop table {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after}";
+
+
+            _temp_hitabmodel = $"select * from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{_temp_table_after} where TabName=@TabName";
+
+            _temp_hifieldmodel = $"select * from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{_temp_table_after} where TabName=@TabName order by sortnum asc";
+
         }
     }
 }

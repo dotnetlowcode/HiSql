@@ -16,6 +16,41 @@ namespace HiSql
         
         static Dictionary<string, Assembly> DbAssembly = new Dictionary<string, Assembly>();
 
+
+
+        public static Assembly GetHiql()
+        {
+            if (DbAssembly.ContainsKey(Constants.NameSpace))
+            {
+                return DbAssembly[Constants.NameSpace];
+            }
+            else
+            {
+                lock (DbAssembly)
+                {
+                    if (DbAssembly.ContainsKey(Constants.NameSpace))
+                    {
+                        return DbAssembly[Constants.NameSpace];
+                    }
+                    else
+                    {
+                        Assembly _assembly = null;
+                        try
+                        {
+                            _assembly = Assembly.Load($"{Constants.NameSpace}");
+                            //_assembly = Assembly.Load($"{Constants.NameSpace}");
+                            DbAssembly.Add(Constants.NameSpace, _assembly);
+                            return _assembly;
+                        }
+                        catch (Exception E)
+                        {
+                            return null;
+
+                        }
+                    }
+                }
+            }
+        }
         public static Assembly GetAssembly(string dbtype)
         {
             if (DbAssembly.ContainsKey(dbtype.ToString()))
@@ -142,9 +177,9 @@ namespace HiSql
                 {
                     return DBType.PostGreSql.ToString();
                 }
-                else if (_subclassName.IndexOf(DBType.SQLite.ToString()) == 0)
+                else if (_subclassName.IndexOf(DBType.Sqlite.ToString()) == 0)
                 {
-                    return DBType.SQLite.ToString();
+                    return DBType.Sqlite.ToString();
                 }
                 else if (_subclassName.IndexOf(DBType.DaMeng.ToString()) == 0)
                 {

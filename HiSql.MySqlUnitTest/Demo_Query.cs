@@ -277,7 +277,7 @@ namespace HiSql.MySqlUnitTest
         {
             //DataTable dt3 = sqlClient.Query("Hi_TabModel").Field("*").ToTable();
             //DataTable DT_RESULT1 = sqlClient.Query("Hi_Domain").Field("Domain").Sort(new SortBy { { "createtime" } }).ToTable();
-            sqlClient.Query("Hi_Domain").Field("*").Sort("CreateTime asc", "ModiTime").Skip(1).Take(1000).Insert("#Hi_Domain");
+           var ar = sqlClient.Query("Hi_Domain").Field("*").Sort("CreateTime asc", "ModiTime").Skip(1).Take(1000).Insert("#Hi_Domain");
 
         }
         static void Query_Demo3(HiSqlClient sqlClient)

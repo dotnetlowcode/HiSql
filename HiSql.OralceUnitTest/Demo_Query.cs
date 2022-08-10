@@ -13,7 +13,7 @@ namespace HiSql.OralceUnitTest
         {
             //Query_Demo(sqlClient);
             //Query_Demo1(sqlClient);
-            // Query_Demo2(sqlClient);
+             Query_Demo2(sqlClient);
             //Query_Demo3(sqlClient);
             //Query_Demo4(sqlClient);
             //Query_Demo8(sqlClient);
@@ -22,7 +22,7 @@ namespace HiSql.OralceUnitTest
             //Query_Demo9(sqlClient);
             // Query_Demo13(sqlClient);
             //Query_Demo14(sqlClient);
-            Query_Demo15(sqlClient);
+           // Query_Demo15(sqlClient);
             //Query_Demo16(sqlClient);
             var s = Console.ReadLine();
         }
@@ -227,10 +227,11 @@ namespace HiSql.OralceUnitTest
 
         static void Query_Demo2(HiSqlClient sqlClient)
         {
-            DataTable dt = sqlClient.Context.DBO.GetDataTable("select * from system.Hi_TabModel where TabName='Hi_TabModel'");
-            DataTable dt3 = sqlClient.Query("Hi_TabModel").Field("*").ToTable();
-            DataTable DT_RESULT1 = sqlClient.Query("Hi_Domain").Field("Domain").Sort(new SortBy { { "createtime" } }).ToTable();
-            sqlClient.Query("Hi_Domain").Field("*").Sort("CreateTime asc", "ModiTime").Skip(1).Take(1000).Insert("#Hi_Domain");
+            //DataTable dt = sqlClient.Context.DBO.GetDataTable("select * from system.Hi_TabModel where TabName='Hi_TabModel'");
+            //DataTable dt3 = sqlClient.Query("Hi_TabModel").Field("*").ToTable();
+            //DataTable DT_RESULT1 = sqlClient.Query("Hi_Domain").Field("Domain").Sort(new SortBy { { "createtime" } }).ToTable();
+           var aa=  sqlClient.Query("Hi_Domain").Field("*").Sort("CreateTime asc", "ModiTime").Skip(1).Take(1000).Insert("#Hi_Domain"); 
+            var aa33 = sqlClient.Query("Hi_Domain").Field("*").Sort("CreateTime asc", "ModiTime").Skip(1).Take(1000).Insert("#Hi_Domain");
 
         }
 

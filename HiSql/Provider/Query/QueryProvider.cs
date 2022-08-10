@@ -1133,8 +1133,20 @@ namespace HiSql
             lock (this.Context)
             {
                 IDataReader dr = this.Context.DBO.GetDataReader(_sql, null);
-                _result = DataConvert.ToList<T>(dr);
-                dr.Close();
+                try
+                {
+                    _result = DataConvert.ToList<T>(dr,this.Context.CurrentConnectionConfig.DbType);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    throw ex;
+                }
+                finally
+                { 
+                    dr.Close();
+                }
+                
             }
             return _result;
         }
@@ -1159,7 +1171,7 @@ namespace HiSql
             }
             
                 IDataReader dr = this.Context.DBO.GetDataReader(_sql, null);
-                _result = DataConvert.ToList<T>(dr);
+                _result = DataConvert.ToList<T>(dr, this.Context.CurrentConnectionConfig.DbType);
                 dr.Close();
             }
             

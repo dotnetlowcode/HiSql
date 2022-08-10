@@ -146,10 +146,28 @@ namespace HiSql
             {
                 sqldm = Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{this.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
                 sqldm.Context = this.Context;
-                tabinfo = sqldm.GetTabStruct(this.Table.TabName);
+
+                string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", this.Table.TabName.ToLower());
+                tabinfo = this.Context.DMInitalize.GetTabStruct(this.Table.TabName);
+
+                //if (Constants.HiSysTable["Hi_FieldModel"].Equals(this.Table.TabName, StringComparison.OrdinalIgnoreCase))
+                //{
+                //    if (this.Data.Count > 0 && this.Data[0] is HiColumn)
+                //    {
+                //        foreach (HiColumn _col in this.Data)
+                //        {
+                //            if (!tabinfo.Columns.Any(c => c.FieldName.Equals(_col.FieldName, StringComparison.OrdinalIgnoreCase)))
+                //            {
+                //                tabinfo.Columns.Add(_col);
+                //            }
+                //        }
+                //    }
+                //}
+
+
                 _insertTabName = this.Table.TabName;
                 //由于DBType.PostGreSql mergeinto的方法实现逻辑与其它的数据库完全不一样只能特殊处理
-                if (_mergeinto && Context.CurrentConnectionConfig.DbType != DBType.PostGreSql)
+                if (_mergeinto && Context.CurrentConnectionConfig.DbType != DBType.PostGreSql && Context.CurrentConnectionConfig.DbType != DBType.Sqlite)
                 {
                     string _json = JsonConvert.SerializeObject(tabinfo);
                     //TabInfo tabinfo2 =  JsonConvert.DeserializeObject<TabInfo>(_json);
@@ -262,6 +280,7 @@ namespace HiSql
                 //sw.Start();
 
                 List<Dictionary<string, string>> rtnlst = CheckAllData(tabinfo.GetColumns, this.Data);
+                //List<Dictionary<string, string>> rtnlst = CheckAllData(tabinfo.GetColumns, this.Data);
                 //sw.Stop();
                 //Console.WriteLine($"检测{this.Data.Count} 条数据耗时{sw.Elapsed}");
                 //foreach (var obj in this.Data)
@@ -319,7 +338,16 @@ namespace HiSql
                             Dictionary<string, string> _values = rtnlst[i];
                             if (_values.Count == 0)
                                 throw new Exception($"向表[{_insertTabName}]插入数据值中无任何配置的字段");
-                            string _sql = sqldm.BuildInsertSql(_values, i > p * DbConfig.BlukSize).Replace("[$TabName$]", _insertTabName);//i > p * _bluksize
+
+                            string _sql = String.Empty;
+                            if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.Sqlite) && _mergeinto) //由于DBType.Sqlite mergeinto的方法实现逻辑与其它的数据库完全不一样只能特殊处理
+                            {
+                                _sql = sqldm.BuildInsertSql(_values, i > p * DbConfig.BlukSize).Replace("[$TabName$]", _insertTabName).Replace("insert", "replace");//i > p * _bluksize
+                            }
+                            else
+                            {
+                                _sql = sqldm.BuildInsertSql(_values, i > p * DbConfig.BlukSize).Replace("[$TabName$]", _insertTabName);//i > p * _bluksize
+                            }
                             sb_sql.Append(_sql);
                             _times++;
                         }
@@ -416,7 +444,7 @@ namespace HiSql
 
                 sb_sql = new StringBuilder();
 
-                if (_mergeinto && Context.CurrentConnectionConfig.DbType != DBType.PostGreSql)
+                if (_mergeinto && Context.CurrentConnectionConfig.DbType != DBType.PostGreSql && Context.CurrentConnectionConfig.DbType != DBType.Sqlite)
                 {
                     TabInfo _tabtarget = sqldm.GetTabStruct(this.Table.TabName);
                     TabInfo _tabsource = sqldm.Context.MCache.GetCache<TabInfo>(_cacheinsertTabName);
@@ -1146,7 +1174,18 @@ namespace HiSql
                                     {
                                         if (hiColumn.FieldType.IsIn<HiType>(HiType.INT))
                                         {
-                                            _dic.Add(hiColumn.FieldName, ((int)objvalue).ToString());
+                                            if (objvalue is bool)
+                                            {
+                                                bool _boolvalue = (bool)objvalue;
+
+                                                _dic.Add(hiColumn.FieldName, _boolvalue?"1":"0");
+                                            }
+                                            else
+                                            {
+                                                int _intobjvalue = (int)objvalue;
+                                                //int.TryParse(objvalue.ToString(), out _intobjvalue);
+                                                _dic.Add(hiColumn.FieldName, (_intobjvalue).ToString()); //pengxy
+                                            }
                                         }
                                         else
                                             _dic.Add(hiColumn.FieldName, objvalue.ToString());
@@ -1467,11 +1506,13 @@ namespace HiSql
                     }
                     if (hiColumn.IsRequire)
                     {
-                        if (string.IsNullOrEmpty(_value.Trim()) && string.IsNullOrEmpty(hiColumn.SNO))
+                        if (string.IsNullOrEmpty(_value.Trim()) && string.IsNullOrEmpty(hiColumn.SNO) && hiColumn.DBDefault == HiTypeDBDefault.NONE && !hiColumn.IsPrimary)
                             throw new Exception($"字段[{hiColumn.FieldName}] 为必填 无法数据提交");
                     }
-
-                    _value = $"'{_value.ToSqlInject()}'";
+                    if (hiColumn.IsPrimary && string.IsNullOrEmpty(_value) && Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.Oracle, DBType.DaMeng))
+                        _value = $"' '";
+                    else
+                        _value = $"'{_value.ToSqlInject()}'";
                     rtn = new Tuple<bool, string>(true, _value);
 
                 }
@@ -1486,10 +1527,13 @@ namespace HiSql
                     }
                     if (hiColumn.IsRequire)
                     {
-                        if (string.IsNullOrEmpty(_value.Trim()) && string.IsNullOrEmpty(hiColumn.SNO))
+                        if (string.IsNullOrEmpty(_value.Trim()) && string.IsNullOrEmpty(hiColumn.SNO) && hiColumn.DBDefault==HiTypeDBDefault.NONE)
                             throw new Exception($"字段[{hiColumn.FieldName}] 为必填 无法数据提交");
                     }
-                    _value = $"'{_value.ToSqlInject()}'";
+                    if (hiColumn.IsPrimary && string.IsNullOrEmpty(_value) && Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.Oracle,DBType.DaMeng))
+                        _value = $"' '";
+                    else
+                        _value = $"'{_value.ToSqlInject()}'";
                     rtn = new Tuple<bool, string>(true, _value);
                 }
                 else if (hiColumn.FieldType.IsIn<HiType>(HiType.INT, HiType.BIGINT, HiType.DECIMAL, HiType.SMALLINT))

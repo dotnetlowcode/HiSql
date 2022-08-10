@@ -66,8 +66,9 @@ namespace HiSql
         /// </summary>
         /// <param name="tabInfo"></param>
         /// <param name="opLevel"></param>
+        /// <param name="onlychangetable">是否仅修改物理表结构</param>
         /// <returns></returns>
-        Tuple<bool, string,string> ModiTable(TabInfo tabInfo, OpLevel opLevel);
+        Tuple<bool, string, string> ModiTable(TabInfo tabInfo, OpLevel opLevel, bool onlychangetable = false);
 
 
         /// <summary>

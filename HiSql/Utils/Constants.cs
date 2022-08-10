@@ -190,6 +190,36 @@ namespace HiSql
 
 
         /// <summary>
+        /// 获取当前hisql 的版本信息
+        /// </summary>
+        public static Version HiSqlVersion
+        {
+            get {
+                Assembly assembly = Instance.GetHiql();
+                if (assembly != null)
+                    return assembly.GetName().Version;
+                else
+                    return null;
+            }
+        }
+
+
+        /// <summary>
+        /// 获取数据库类型扩展表的版本信息
+        /// </summary>
+        /// <param name="dbname"></param>
+        /// <returns></returns>
+        public static Version GetDbTypeVersion(string dbname)
+        {
+           
+            Assembly assembly = Instance.GetAssembly(Constants.NameSpace);
+            if (assembly != null)
+                return assembly.GetName().Version;
+            else
+                return null;
+            
+        }
+        /// <summary>
         /// 获取当前支持的数据库
         /// </summary>
         public static List<string> DbCurrentSupportList
@@ -268,7 +298,8 @@ namespace HiSql
             { "Hi_TabModel","Hi_TabModel"},
             { "Hi_FieldModel","Hi_FieldModel"},
             
-            { "Hi_Snro","Hi_Snro"}//自定义编号
+            { "Hi_Snro","Hi_Snro"},//自定义编号
+            { "Hi_Version","Hi_Version"} //版本号信息
 
         };
 
@@ -339,8 +370,10 @@ namespace HiSql
 
         /// <summary>
         /// 解析表的名称
+        /// 2022 .7.11 升级支持同服务器跨库识别
+        /// 
         /// </summary>
-        public readonly static string REG_TABNAME = @"^(?:[\s]*)(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w-_]+)\s*$";
+        public readonly static string REG_TABNAME = @"^(?:[\s]*)(?:(?<dbname>[\w-_]+)[\s]*[\.]{1}[\s]*(?<schema>[\w-_]+)[\s]*[\.]{1}[\s]*|(?<schema>[\w-_]+)[\s]*[\.]{1}[\s]*)?(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w-_]+)\s*$"; //@"^(?:[\s]*)(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w-_]+)\s*$";
 
         /// <summary>
         /// 解析字段名称

@@ -810,6 +810,7 @@ namespace HiSql
             //支持返回多个结果集
             if (this.Context.CurrentConnectionConfig.DbType == DBType.SqlServer 
                 || this.Context.CurrentConnectionConfig.DbType == DBType.MySql
+                || this.Context.CurrentConnectionConfig.DbType == DBType.Sqlite
                || this.Context.CurrentConnectionConfig.DbType == DBType.PostGreSql
 
                 )
