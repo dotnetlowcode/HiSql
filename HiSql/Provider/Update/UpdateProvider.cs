@@ -413,7 +413,7 @@ namespace HiSql
                                             
                                             if (_o[hiColumn.FieldName] !=null)
                                             {
-                                                DateTime dtime = (DateTime)_o[hiColumn.FieldName];
+                                                DateTime dtime = string.IsNullOrEmpty( _o[hiColumn.FieldName].ToString())?DateTime.MinValue:Convert.ToDateTime(_o[hiColumn.FieldName].ToString());
                                                 _value = dtime.ToString("yyyy-MM-dd HH:mm:ss.fff");
                                             }
                                             else
