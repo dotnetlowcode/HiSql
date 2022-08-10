@@ -20,6 +20,7 @@
    4. HiSql.oracle.dll
    5. HiSql.postgresql.dll
    6. HiSql.dameng.dll `新支持1.0.4及以上支持`
+   7. HiSql.Sqlite.dll `新支持1.0.4.7以上支持`
 
 
 ### hisql官方群
