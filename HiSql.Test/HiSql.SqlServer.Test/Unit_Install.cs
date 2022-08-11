@@ -5,14 +5,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
+
 namespace HiSql.Unit.Test
 {
     public class Unit_Install
     {
-        [Fact]
-        [Trait("install", "SqlServer初始化")]
+        private readonly ITestOutputHelper _outputHelper;
+        public Unit_Install(ITestOutputHelper testOutputHelper)
+        {
+            _outputHelper = testOutputHelper;
+        }
+        [Fact(DisplayName = "SqlServer初始化")]
+        [Trait("install", "init")]
         public void InstallSqlServer()
         {
+            
             HiSqlClient sqlClient = TestClientInit.GetSqlServerClient();
 
             try
@@ -23,6 +31,9 @@ namespace HiSql.Unit.Test
                 bool _has_domain=sqlClient.DbFirst.CheckTabExists(Constants.HiSysTable["Hi_Domain"]);
                 bool _has_element= sqlClient.DbFirst.CheckTabExists(Constants.HiSysTable["Hi_DataElement"]);
 
+
+                _outputHelper.WriteLine("初始化SqlServer");
+
                 Assert.True(_has_tab&& _has_field&& _has_domain&& _has_element);
             }
             catch (Exception ex)
@@ -32,8 +43,8 @@ namespace HiSql.Unit.Test
         }
 
 
-        [Fact]
-        [Trait("install", "MySql初始化")]
+        [Fact(DisplayName = "MySql初始化")]
+        [Trait("install", "init")]
         public void InstallMySqlServer()
         {
             HiSqlClient sqlClient = TestClientInit.GetMySqlClient();
@@ -54,8 +65,8 @@ namespace HiSql.Unit.Test
             }
         }
 
-        [Fact]
-        [Trait("install", "Oracle初始化")]
+        [Fact(DisplayName = "Oracle初始化")]
+        [Trait("install", "init")]
         public void InstallOracleServer()
         {
             HiSqlClient sqlClient = TestClientInit.GetOracleClient();
@@ -76,8 +87,8 @@ namespace HiSql.Unit.Test
             }
         }
 
-        [Fact]
-        [Trait("install", "PostGreSql初始化")]
+        [Fact(DisplayName = "PostGreSql初始化")]
+        [Trait("install", "init")]
         public void InstallPostgreServer()
         {
             HiSqlClient sqlClient = TestClientInit.GetPostgreSqlClient();
@@ -98,8 +109,8 @@ namespace HiSql.Unit.Test
             }
         }
 
-        [Fact]
-        [Trait("install", "Hana初始化")]
+        [Fact(DisplayName = "Hana初始化")]
+        [Trait("install", "init")]
         public void InstallHanaServer()
         {
             HiSqlClient sqlClient = TestClientInit.GetHanaClient();
@@ -121,8 +132,8 @@ namespace HiSql.Unit.Test
         }
 
 
-        [Fact]
-        [Trait("install", "Sqlite初始化")]
+        [Fact(DisplayName = "Sqlite初始化")]
+        [Trait("install", "init")]
         public void InstallSqliteServer()
         {
             HiSqlClient sqlClient = TestClientInit.GetSqliteClient();
@@ -143,8 +154,8 @@ namespace HiSql.Unit.Test
             }
         }
 
-        [Fact]
-        [Trait("install", "达梦初始化")]
+        [Fact(DisplayName = "达梦初始化")]
+        [Trait("install", "init")]
         public void InstallDaMengServer()
         {
             HiSqlClient sqlClient = TestClientInit.GetDaMengClient();
