@@ -22,7 +22,7 @@ namespace HiSql
         public DBVersion DBVersion()
         {
 
-            var version = mcache.GetOrCreate(typeof(PostGreSqlDM).FullName + "_DBVersion", () =>
+            var version = CacheContext.LocalMCahe.GetOrCreate(typeof(PostGreSqlDM).FullName + "_DBVersion", () =>
             {
                 var _version = new DBVersion() { Version = new Version() };
 
@@ -40,10 +40,7 @@ namespace HiSql
             });
             return version;
         }
-        public bool InstallHisql(HiSqlClient hiSqlClient)
-        {
-            throw new NotImplementedException();
-        }
+        
         #region IDMInitalize接口实现
         public TabInfo BuildTab(Type type)
         {
@@ -160,6 +157,7 @@ namespace HiSql
                 {
                     HiColumn hiColumn = new HiColumn();
                     hiColumn.FieldName = drow["FieldName"].ToString().Trim();
+                    hiColumn.TabName = hiTable.TabName;
                     //hiColumn.FieldType
                     hiColumn.IsPrimary = drow["IsPrimary"].ToString().Trim().IsIn<string>("1", "True") ? true : false;
                     hiColumn.IsIdentity = drow["IsIdentity"].ToString().Trim().IsIn<string>("1", "True") ? true : false;
@@ -242,26 +240,26 @@ namespace HiSql
                         }
                     }
 
-                    //if (_dbdefault == "''" || _dbdefault == "" || _dbdefault == "0")
-                    //{
-                    //    hiColumn.DBDefault = HiTypeDBDefault.EMPTY;
-                    //    hiColumn.DefaultValue = _dbdefault;
-                    //}
-                    //else if (_dbdefault.ToLower() == "current_timestamp".ToLower())
-                    //{
-                    //    hiColumn.DBDefault = HiTypeDBDefault.FUNDATE;
-                    //}
-                    //else if (Tool.IsDecimal(_dbdefault))
-                    //{
-                    //    //指定非空的默认值
-                    //    hiColumn.DBDefault = HiTypeDBDefault.VALUE;
-                    //    hiColumn.DefaultValue = _dbdefault;
-                    //}
-                    //else if (string.IsNullOrEmpty(_dbdefault))
-                    //{
-                    //    hiColumn.DBDefault = HiTypeDBDefault.VALUE;
-                    //    hiColumn.DefaultValue = _dbdefault;
-                    //}
+                    if (_dbdefault == "''" || _dbdefault == "" )
+                    {
+                        hiColumn.DBDefault = HiTypeDBDefault.EMPTY;
+                        hiColumn.DefaultValue = _dbdefault;
+                    }
+                    else if (_dbdefault.ToLower() == "current_timestamp".ToLower())
+                    {
+                        hiColumn.DBDefault = HiTypeDBDefault.FUNDATE;
+                    }
+                    else if (Tool.IsDecimal(_dbdefault))
+                    {
+                        //指定非空的默认值
+                        hiColumn.DBDefault = HiTypeDBDefault.VALUE;
+                        hiColumn.DefaultValue = _dbdefault;
+                    }
+                    else if (string.IsNullOrEmpty(_dbdefault))
+                    {
+                        hiColumn.DBDefault = HiTypeDBDefault.VALUE;
+                        hiColumn.DefaultValue = _dbdefault;
+                    }
 
                     tabInfo.Columns.Add(hiColumn);
 
@@ -326,6 +324,25 @@ namespace HiSql
                 return $"DEFAULT nextval('\"{tabname}_{hiColumn.FieldName}_seq\"'::regclass)";
             return _default;
         }
+
+        /// <summary>
+        /// 获取Hi_TabModel 和Hi_FieldModel 中指定表的结构信息
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <returns></returns>
+        public DataSet GetTabModelInfo(string tabname)
+        {
+            DataSet ds = new DataSet();
+            DataTable dt_tab = this.Context.DBO.GetDataTable(dbConfig.Get_HiTabModel.Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema), new HiParameter("@TabName", tabname));
+            dt_tab.TableName = Constants.HiSysTable["Hi_TabModel"];
+
+            DataTable dt_field = this.Context.DBO.GetDataTable(dbConfig.Get_HiFieldModel.Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema), new HiParameter("@TabName", tabname));
+            dt_field.TableName = Constants.HiSysTable["Hi_FieldModel"];
+            ds.Tables.Add(dt_tab);
+            ds.Tables.Add(dt_field);
+            return ds;
+        }
+
         /// <summary>
         /// 获取表结构信息并缓存
         /// </summary>
@@ -345,21 +362,14 @@ namespace HiSql
                 newtabinfo = HiSqlCommProvider.InitTabMaping(tabname.ToLower(), () =>
                 {
                     tabname = tabname.ToSqlInject();
-                    DataSet ds = new DataSet();
-                    DataTable dt_model = this.Context.DBO.GetDataTable($"select * from {dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{dbConfig.Table_After} where lower({dbConfig.Table_Pre}TabName{dbConfig.Table_After})=lower(@TabName) ", new HiParameter("@TabName", tabname));
-                    dt_model.TableName = Constants.HiSysTable["Hi_TabModel"].ToString();
-                    ds.Tables.Add(dt_model);
-
-                    DataTable dt_struct = Context.DBO.GetDataTable($"select * from {dbConfig.Schema_Pre}{Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{dbConfig.Table_After} where lower({dbConfig.Table_Pre}TabName{dbConfig.Table_After})=lower(@TabName) order by {dbConfig.Field_Pre}SortNum{dbConfig.Field_After} asc", new HiParameter("@TabName", tabname));
-                    dt_struct.TableName = Constants.HiSysTable["Hi_FieldModel"].ToString();
-                    ds.Tables.Add(dt_struct);
+                    DataSet ds = GetTabModelInfo(tabname);
 
                     TabInfo tabInfo = HiSqlCommProvider.TabToEntity(ds);
 
-                //获取表结构信息因为可能数据库中的物理表结构可能会有变更,需要与缓存表中的数据进行比对
+                    //获取表结构信息因为可能数据库中的物理表结构可能会有变更,需要与缓存表中的数据进行比对
 
-                //以数据库中的表名称 为准add by tgm date:2022.6.13
-                tabname = tabInfo != null ? tabInfo.TabModel.TabName : tabname;
+                    //以数据库中的表名称 为准add by tgm date:2022.6.13
+                    tabname = tabInfo != null ? tabInfo.TabModel.TabName : tabname;
                     DataTable dts = GetTableDefinition(tabname);
                     if (dts == null || dts.Rows.Count == 0)
                         throw new Exception($"表[{tabname}]不存在");
@@ -372,30 +382,62 @@ namespace HiSql
 
                     if (tabInfo == null)
                     {
-                    //说明该表不是通过工具创建的,他的表结构信息不存在于Hi_TabModel和Hi_FieldModel中
-                    //那么需要通过底层SQL代码获取表结构信息 然后再添加到Hi_TabModel和Hi_FieldModel中 再进行缓存处理
-                    tabInfo = TabDefinitionToEntity(dts, dbConfig.DbMapping);
-                        HiSqlCommProvider.LockTableExecAction(tabname, () => { this.BuildTabCreate(tabInfo); });
+                        //说明该表不是通过工具创建的,他的表结构信息不存在于Hi_TabModel和Hi_FieldModel中
+                        //那么需要通过底层SQL代码获取表结构信息 然后再添加到Hi_TabModel和Hi_FieldModel中 再进行缓存处理
+                        tabInfo = TabDefinitionToEntity(dts, dbConfig.DbMapping);
+                        if (!CheckTabExists(tabname))
+                        {
+                            HiSqlCommProvider.LockTableExecAction(tabname, () => { this.BuildTabCreate(tabInfo); });
+                        }
+                        else
+                        {
 
-                    //string _sql = this.BuildTabStructSql(tabInfo.TabModel, tabInfo.Columns).ToString();
-                    //this.Context.DBO.ExecCommand(_sql);
-                    //GetTabStruct(tabname);
-                }
+                            var phytabInfo = TabDefinitionToEntity(dts, dbConfig.DbMapping);
+                            List<HiColumn> phyclumn = phytabInfo.GetColumns;
+
+                            tabInfo.TabModel.TabName = tabInfo.TabModel.TabReName = GetAllTables(tabname).Rows[0][0].ToString();
+                            if (Constants.HiSysTable["Hi_TabModel"].Equals(tabInfo.TabModel.TabName, StringComparison.OrdinalIgnoreCase))
+                            {
+                                TabInfo _tabinfo = BuildTab(typeof(Hi_TabModel));
+                                tabInfo.TabModel.TabDescript = _tabinfo.TabModel.TabDescript;
+                                tabInfo.TabModel.IsEdit = false;
+                            }
+                            else if (Constants.HiSysTable["Hi_FieldModel"].Equals(tabInfo.TabModel.TabName, StringComparison.OrdinalIgnoreCase))
+                            {
+                                TabInfo _tabinfo = BuildTab(typeof(Hi_FieldModel));
+                                tabInfo.TabModel.TabDescript = _tabinfo.TabModel.TabDescript;
+                                tabInfo.TabModel.IsEdit = false;
+                            }
+                            string _sql = this.BuildTabStructSql(tabInfo.TabModel, tabInfo.Columns).ToString();
+                            //HiSqlClient _cloneClient = this.Context.CloneClient();
+                            int cnt = this.Context.DBO.ExecCommand(_sql);
+                            if (cnt <= 0)
+                            {
+                                throw new HiSqlException($"初始化[{tabInfo.TabModel}]数据到基础表发生异常。");
+                            }
+                            //this.Context.CloneClient().Modi(Constants.HiSysTable["Hi_FieldModel"].ToString(), phyclumn).ExecCommand();
+                        }
+
+
+                        //string _sql = this.BuildTabStructSql(tabInfo.TabModel, tabInfo.Columns).ToString();
+                        //this.Context.DBO.ExecCommand(_sql);
+                        //GetTabStruct(tabname);
+                    }
                     else
                     {
-                    //物理表结构已经存在于Hi_TabModel和Hi_FieldModel中
-                    //需要进行比对变更以物理表为准，原有表的扩展配置以Hi_FieldModel为准
-                    //避免出现检测死循环 Hi_FieldModel,Hi_TabModel 变更需要通过升级工具升级
-                    if (tabname.ToLower() != Constants.HiSysTable["Hi_FieldModel"].ToString().ToLower()
-                            &&
-                            tabname.ToLower() != Constants.HiSysTable["Hi_TabModel"].ToString().ToLower()
-                        )
+                        //物理表结构已经存在于Hi_TabModel和Hi_FieldModel中
+                        //需要进行比对变更以物理表为准，原有表的扩展配置以Hi_FieldModel为准
+                        //避免出现检测死循环 Hi_FieldModel,Hi_TabModel 变更需要通过升级工具升级
+                        if (tabname.ToLower() != Constants.HiSysTable["Hi_FieldModel"].ToString().ToLower()
+                                &&
+                                tabname.ToLower() != Constants.HiSysTable["Hi_TabModel"].ToString().ToLower()
+                            )
                         {
-                        #region 与物理表进行比对
-                        //如果不一样（则有变更物理表） 则以物理表的数据为准
+                            #region 与物理表进行比对
+                            //如果不一样（则有变更物理表） 则以物理表的数据为准
 
-                        var phytabInfo = TabDefinitionToEntity(dts, dbConfig.DbMapping);
-                            List<FieldChange> fieldChanges = HiSqlCommProvider.TabToCompare(phytabInfo, tabInfo);
+                            var phytabInfo = TabDefinitionToEntity(dts, dbConfig.DbMapping);
+                            List<FieldChange> fieldChanges = HiSqlCommProvider.TabToCompare(phytabInfo, tabInfo,DBType.PostGreSql);
                             List<HiColumn> lstcolumn = tabInfo.GetColumns;
 
                             phytabInfo = HiSqlCommProvider.TabMerge(phytabInfo, tabInfo);
@@ -410,14 +452,14 @@ namespace HiSql
                                     HiColumn column = lstcolumn.Where(h => h.FieldName.ToLower() == fieldChange.FieldName.ToLower()).FirstOrDefault();
                                     if (column != null)
                                     {
-                                    //lstobj.Add(new { TabName = column.TabName, FieldName = column.FieldName });
-                                    _lstdel.Add(new { TabName = column.TabName, FieldName = column.FieldName });
+                                        //lstobj.Add(new { TabName = column.TabName, FieldName = column.FieldName });
+                                        _lstdel.Add(new { TabName = column.TabName, FieldName = column.FieldName });
                                     }
                                 }
                                 if (lstobj.Count > 0)
                                 {
-                                //_client.Delete(Constants.HiSysTable["Hi_FieldModel"].ToString(), lstobj).ExecCommand();
-                            }
+                                    //_client.Delete(Constants.HiSysTable["Hi_FieldModel"].ToString(), lstobj).ExecCommand();
+                                }
                             }
                             if (modifield != null && modifield.Count > 0)
                             {
@@ -428,19 +470,19 @@ namespace HiSql
                                     if (_column != null)
                                     {
                                         _column.TabName = phytabInfo.TabModel.TabName;
-                                    //lstobj.Add(_column);
-                                    _lstmodi.Add(_column);
+                                        //lstobj.Add(_column);
+                                        _lstmodi.Add(_column);
                                     }
                                 }
                                 if (lstobj.Count > 0)
                                 {
-                                //_client.Modi(Constants.HiSysTable["Hi_FieldModel"].ToString(), lstobj).ExecCommand();
-                            }
+                                    //_client.Modi(Constants.HiSysTable["Hi_FieldModel"].ToString(), lstobj).ExecCommand();
+                                }
                             }
                             tabInfo = phytabInfo;
 
-                        #endregion
-                    }
+                            #endregion
+                        }
                     }
                     return tabInfo;
                 });
@@ -449,13 +491,13 @@ namespace HiSql
                 {
                     HiSqlCommProvider.LockTableExecAction(tabname, () =>
                     {
-                        _client = this.Context.CloneClient();
+                        //_client = this.Context.CloneClient();
 
                         if (_lstdel.Count > 0)
                         {
                             try
                             {
-                                _client.Delete(Constants.HiSysTable["Hi_FieldModel"].ToString(), _lstdel).ExecCommand();
+                                this.Context.Delete(Constants.HiSysTable["Hi_FieldModel"].ToString(), _lstdel).ExecCommand();
                             }
                             catch (Exception e)
                             {
@@ -463,8 +505,8 @@ namespace HiSql
                             }
                             finally
                             {
-                                _client.Context.DBO.Close();
-                                _client.Context.DBO.Dispose();
+                                //_client.Context.DBO.Close();
+                                //_client.Context.DBO.Dispose();
                             }
 
 
@@ -473,7 +515,7 @@ namespace HiSql
                         {
                             try
                             {
-                                _client.Modi(Constants.HiSysTable["Hi_FieldModel"].ToString(), _lstmodi).ExecCommand();
+                                this.Context.Modi(Constants.HiSysTable["Hi_FieldModel"].ToString(), _lstmodi).ExecCommand();
                             }
                             catch (Exception e)
                             {
@@ -481,8 +523,8 @@ namespace HiSql
                             }
                             finally
                             {
-                                _client.Context.DBO.Close();
-                                _client.Context.DBO.Dispose();
+                                //_client.Context.DBO.Close();
+                                //_client.Context.DBO.Dispose();
                             }
                         }
 
@@ -496,6 +538,16 @@ namespace HiSql
 
 
         #region 私有方法
+
+        string DeleteTabStruct(HiTable hiTable)
+        {
+            if (Constants.HiSysTable["Hi_TabModel"].Equals(hiTable.TabName, StringComparison.OrdinalIgnoreCase))
+                return dbConfig.Delete_TabModel.Replace("[$TabName$]", hiTable.TabName).Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema);
+            else if (Constants.HiSysTable["Hi_FieldModel"].Equals(hiTable.TabName, StringComparison.OrdinalIgnoreCase))
+                return dbConfig.Delete_TabModel.Replace("[$TabName$]", hiTable.TabName).Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema);
+            else
+                return dbConfig.Delete_TabStruct.Replace("[$TabName$]", hiTable.TabName).Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema);
+        }
         /// <summary>
         /// 生成插入表结构表的语句
         /// </summary>
@@ -516,8 +568,13 @@ namespace HiSql
             //    .Replace("[$TabName$]", Constants.HiSysTable["Hi_FieldModel"])
             //    .Replace("[$Where$]", $"{dbConfig.Field_Pre}TabName{dbConfig.Field_After}='{hiTable.TabName}'")
             //    );
+
+            string _dbname = string.IsNullOrEmpty(hiTable.DbName) ? "" : hiTable.DbName.ToSqlInject();
+            string _dbserver = string.IsNullOrEmpty(hiTable.DbServer) ? "" : hiTable.DbServer.ToSqlInject();
             sb.AppendLine($"insert into  {dbConfig.Schema_Pre}{_schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{Constants.HiSysTable["Hi_TabModel"]}{dbConfig.Table_After} (")
-               .Append($"{dbConfig.Field_Pre}TabName{dbConfig.Field_After}{dbConfig.Field_Split}")
+               .Append($"{dbConfig.Field_Pre}DbServer{dbConfig.Field_After}{dbConfig.Field_Split}")
+               .Append($"{dbConfig.Field_Pre}DbName{dbConfig.Field_After}{dbConfig.Field_Split}")
+                .Append($"{dbConfig.Field_Pre}TabName{dbConfig.Field_After}{dbConfig.Field_Split}")
                 .Append($"{dbConfig.Field_Pre}TabReName{dbConfig.Field_After}{dbConfig.Field_Split}")
                 .Append($"{dbConfig.Field_Pre}TabDescript{dbConfig.Field_After}{dbConfig.Field_Split}")
                 .Append($"{dbConfig.Field_Pre}TabStoreType{dbConfig.Field_After}{dbConfig.Field_Split}")
@@ -530,6 +587,8 @@ namespace HiSql
                 .Append($"{dbConfig.Field_Pre}LogTable{dbConfig.Field_After}{dbConfig.Field_Split}")
                 .Append($"{dbConfig.Field_Pre}LogExprireDay{dbConfig.Field_After}")
                 .Append(") values(")
+                .Append($"'{_dbserver}',")
+                .Append($"'{_dbname}',")
                 .Append($"'{hiTable.TabName}',")
                 .Append($"'{hiTable.TabReName.ToSqlInject()}',")
                 .Append($"'{hiTable.TabDescript.ToSqlInject()}',")
@@ -550,9 +609,10 @@ namespace HiSql
             sb.AppendLine("");
             foreach (HiColumn hiColumn in lstHiTable)
             {
-                string _dbname = string.IsNullOrEmpty(hiColumn.DbName) ? "" : hiColumn.DbName;
+                _dbname = string.IsNullOrEmpty(hiColumn.DbName) ? "" : hiColumn.DbName;
 
                 sb.AppendLine($"insert into  {dbConfig.Schema_Pre}{_schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{Constants.HiSysTable["Hi_FieldModel"]}{dbConfig.Table_After} (")
+                    .Append($"{dbConfig.Field_Pre}DbServer{dbConfig.Field_After}{dbConfig.Field_Split}")
                     .Append($"{dbConfig.Field_Pre}DbName{dbConfig.Field_After}{dbConfig.Field_Split}")
                     .Append($"{dbConfig.Field_Pre}TabName{dbConfig.Field_After}{dbConfig.Field_Split}")
                     .Append($"{dbConfig.Field_Pre}FieldName{dbConfig.Field_After}{dbConfig.Field_Split}")
@@ -584,6 +644,7 @@ namespace HiSql
                     .Append($"{dbConfig.Field_Pre}RefFieldDesc{dbConfig.Field_After}{dbConfig.Field_Split}")
                     .Append($"{dbConfig.Field_Pre}RefWhere{dbConfig.Field_After}")
                     .Append(")values(")
+                    .Append($"'{_dbserver}',")
                     .Append($"'{_dbname}',")
                     .Append($"'{hiTable.TabName}',")
                     .Append($"'{hiColumn.FieldName}',")
@@ -987,7 +1048,7 @@ namespace HiSql
                     {
                         //说明是基于
                         Regex regex = new Regex(Constants.REG_TEMPLATE_FIELDS);
-                        
+
                         foreach (Dictionary<string, string> dic in _lstdic)
                         {
                             _str = regex.Replace(_str, $"{dbConfig.Field_Pre}{dic["field"].ToString()}{dbConfig.Field_After}", 1);
@@ -1321,12 +1382,12 @@ namespace HiSql
         }
 
 
-       public int BuildTabCreate(TabInfo tabInfo)
+        public int BuildTabCreate(TabInfo tabInfo)
         {
             string _sql = BuildTabCreateSql(tabInfo.TabModel, tabInfo.GetColumns);
             string v = this.Context.DBO.ExecCommand(_sql).ToString();
             int _effect = Convert.ToInt32(v);
-            _effect=_effect > 1 ? 1 : _effect;
+            _effect = _effect > 1 ? 1 : _effect;
             return _effect;
         }
 
@@ -1430,7 +1491,9 @@ namespace HiSql
                     .Replace("[$Fields$]", _fields_str)
                     .Replace("[$Keys$]", hiTable.TableType == TableType.Var ? "" : "")
                     .Replace("[$Primary$]", hiTable.TableType == TableType.Var ? "" : _table_keys);
-                if (hiTable.TabName.Substring(0, 1) != "#" && (hiTable.TabName.Substring(0, 1) != "@"))
+                if (hiTable.TabName.Substring(0, 1) != "#" && (hiTable.TabName.Substring(0, 1) != "@")
+                    && (!Constants.HiSysTable["Hi_TabModel"].Equals(hiTable.TabName, StringComparison.OrdinalIgnoreCase) && !Constants.HiSysTable["Hi_FieldModel"].Equals(hiTable.TabName, StringComparison.OrdinalIgnoreCase))
+                    )
                 {
                     //带描述的创建创建
                     StringBuilder sb_sqlcomment = new StringBuilder();
@@ -1446,11 +1509,33 @@ namespace HiSql
                     }
 
                     _temp_create = _temp_create.Replace("[$Comment$]", sb_sqlcomment.ToString())
-                        .Replace("[$TabStruct$]", inertTabStruct(hiTable, lstHiTable))
+                        .Replace("[$DeleteTabStruct$]", DeleteTabStruct(hiTable))
+                       .Replace("[$TabStruct$]", inertTabStruct(hiTable, lstHiTable))
+                       ;
+              
+                }
+                else
+                {
+                    //带描述的创建创建
+                    StringBuilder sb_sqlcomment = new StringBuilder();
+                    foreach (HiColumn hiColumn in lstHiTable)
+                    {
+                        sb_sqlcomment.AppendLine(
+                            dbConfig.Field_Comment
+                                .Replace("[$FieldDesc$]", hiColumn.FieldDesc)
+                                .Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema)
+                                .Replace("[$TabName$]", hiTable.TabName)
+                                .Replace("[$FieldName$]", hiColumn.FieldName)
+                            );
+                    }
+
+                    _temp_create = _temp_create
+                        .Replace("[$DeleteTabStruct$]", "")
+                        .Replace("[$TabStruct$]", "")
                         ;
-                    //_temp_create = new StringBuilder().AppendLine(_temp_create).AppendLine(sb_sqlcomment.ToString())
-                    //    .AppendLine(inertTabStruct(hiTable, lstHiTable))
-                    //    .ToString();
+                    _temp_create = _temp_create.Replace("[$Comment$]", sb_sqlcomment.ToString())
+                        .Replace("[$TabStruct$]", "")
+                        ;
                 }
                 return _temp_create;
             }
@@ -1521,7 +1606,7 @@ namespace HiSql
 
                             FieldDefinition field = new FieldDefinition(whereResult.Result["fields"].ToString());
                             HiColumn hiColumn = CheckField(TableList, dictabinfo, Fields, field);
-                            
+
                             if (hiColumn != null)
                             {
                                 sb_sql.Append($"{dbConfig.Table_Pre}{ Tool.GetDbTabName(hiColumn, field)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{ Tool.GetDbFieldName(hiColumn, field)}{dbConfig.Field_After}");
@@ -1789,6 +1874,10 @@ namespace HiSql
                     {
                         case OperType.EQ:
                             sb_where.Append(" = ");
+                            sb_where.Append(getSingleValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value, TableList, dictabinfo));
+                            break;
+                        case OperType.NE:
+                            sb_where.Append(" <> ");
                             sb_where.Append(getSingleValue(issubquery, hiColumn, filterDefinition, filterDefinition.Value, TableList, dictabinfo));
                             break;
                         case OperType.GT:
@@ -2896,7 +2985,8 @@ namespace HiSql
                         else
                             throw new Exception($"过滤条件字段[{filterDefinition.Field.AsFieldName}]指定的值超过了限定长度[{hiColumn.FieldLen}]");
                     }
-                    else {
+                    else
+                    {
                         _value = checkTempValue(_lstdic, hiColumn, filterDefinition, _value, true, TableList, dictabinfo);
                     }
                 }

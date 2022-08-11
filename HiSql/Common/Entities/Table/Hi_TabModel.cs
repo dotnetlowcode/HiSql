@@ -15,9 +15,15 @@ namespace HiSql
     /// 表信息
     /// 用于表数据信息
     /// </summary>
-    [HiTable(IsEdit = true, TabName = "Hi_TabModel")]
+    [HiTable(IsEdit = false, TabName = "Hi_TabModel",TabDescript = "表结构信息主表")]
     public partial class Hi_TabModel:StandField
     {
+
+        /// <summary>
+        /// 服务器名称
+        /// </summary>
+        [HiColumn(FieldDesc = "DB服务器", FieldLen = 50, IsPrimary = true, IsBllKey = true, IsNull = false, DBDefault = HiTypeDBDefault.EMPTY, DefaultValue = "", SortNum = 3, IsSys = true)]
+        public string DbServer { get; set; }
 
         /// <summary>
         /// 数据库名
@@ -94,7 +100,7 @@ namespace HiSql
         /// <summary>
         /// 日志记录表
         /// </summary>
-        [HiColumn(FieldDesc = "日志表名", IsNull = false, FieldLen = 50, SortNum = 45, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY)]
+        [HiColumn(FieldDesc = "日志表名", IsNull = true, FieldLen = 50, SortNum = 45, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY)]
         public string LogTable { get; set; }
 
         /// <summary>

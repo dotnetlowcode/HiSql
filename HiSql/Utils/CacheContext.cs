@@ -6,21 +6,23 @@ using System.Threading.Tasks;
 using System.Threading;
 namespace HiSql
 {
-    internal static class CacheContext
+    public static class CacheContext
     {
-        public static ThreadLocal<List<HiSqlProvider>> ContextList = new ThreadLocal<List<HiSqlProvider>>();
+        internal static ThreadLocal<List<HiSqlProvider>> ContextList = new ThreadLocal<List<HiSqlProvider>>();
 
 
         static ICache _cache = null;
 
+        static ICache _localcache = null;
+
         /// <summary>
         /// 提供外部访问缓存
         /// </summary>
-        public static ICache Cache
+        internal static ICache Cache
         {
             get => MCache;
         }
-        public static void Reset()
+        internal static void Reset()
         {
             if (_cache != null)
             {
@@ -28,9 +30,24 @@ namespace HiSql
                 _cache = null;
             }
         }
+        /// <summary>
+        /// 本地全局基于内存缓存
+        /// </summary>
+        public static ICache LocalMCahe
+        {
+            get {
+                if (_localcache == null)
+                {
+                    lock (ContextList)
+                    {
+                        _localcache= new MCache(HiSql.Constants.NameSpace);
+                    }
+                }
+                return _localcache;
+            }
+        }
 
-
-        public static ICache MCache
+        internal static ICache MCache
         {
             get
             {

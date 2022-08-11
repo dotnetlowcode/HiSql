@@ -14,6 +14,7 @@
 /.vs/*
 **/obj/**
 **/bin/**
+Test/*
 
 # Visual Studio 2015 cache/options directory
 .vs/

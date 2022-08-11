@@ -226,7 +226,7 @@ namespace HiSql.Extension
                                      case CellType.Numeric:
                                          short format = cell.CellStyle.DataFormat;
                                          //对时间格式（2015.12.5、2015/12/5、2015-12-5等）的处理  
-                                         if (format == 14 || format == 31 || format == 57 || format == 58)
+                                         if (format == 14 || format == 31 || format == 57 || format == 58 || format == 22 || format == 178)
                                              dataRow[j] = cell.DateCellValue;
                                          else
                                              dataRow[j] = cell.NumericCellValue;

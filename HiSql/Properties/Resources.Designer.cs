@@ -61,12 +61,11 @@ namespace HiSql.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Byte[] 类型的本地化资源。
+        ///   查找类似 [{&quot;MinVersion&quot;:&quot;1.0.0.1&quot;,&quot;MaxVersion&quot;:&quot;1.0.4.7&quot;,&quot;UpgradTabs&quot;:[{&quot;TabName&quot;:&quot;Hi_TabModel&quot;,&quot;Columns&quot;:[{&quot;TabFieldAction&quot;:2,&quot;ColumnInfo&quot;:{&quot;DbName&quot;:&quot;&quot;,&quot;TabName&quot;:&quot;Hi_TabModel&quot;,&quot;FieldName&quot;:&quot;DbName&quot;,&quot;ReFieldName&quot;:&quot;DbName&quot;,&quot;FieldType&quot;:11,&quot;DBDefault&quot;:10,&quot;SortNum&quot;:4,&quot;FieldDesc&quot;:&quot;数据库名&quot;,&quot;FieldLen&quot;:50,&quot;FieldDec&quot;:0,&quot;SNO&quot;:&quot;&quot;,&quot;SNO_NUM&quot;:&quot;&quot;,&quot;Regex&quot;:&quot;&quot;,&quot;IsPrimary&quot;:true,&quot;IsIdentity&quot;:false,&quot;IsNull&quot;:false,&quot;IsBllKey&quot;:true,&quot;IsIgnore&quot;:false,&quot;IsRequire&quot;:true,&quot;IsObsolete&quot;:false,&quot;IsSys&quot;:true,&quot;DefaultValue&quot;:&quot;&quot;,&quot;IsShow&quot;:true,&quot;IsSearch&quot;:tru [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
-        internal static byte[] UpgradeVersion {
+        internal static string UpgradeVersion {
             get {
-                object obj = ResourceManager.GetObject("UpgradeVersion", resourceCulture);
-                return ((byte[])(obj));
+                return ResourceManager.GetString("UpgradeVersion", resourceCulture);
             }
         }
     }

@@ -93,7 +93,10 @@ namespace HiSql
 
         string _temp_delete = "";
         string _temp_delete_where = "";
+        string _temp_delete_tabstruct = "";
 
+        string _temp_delete_tabmodel = "";
+        string _temp_delete_fieldmodel = "";
 
         string _temp_truncate = "";
 
@@ -112,7 +115,8 @@ namespace HiSql
         string _temp_retable = "ALTER TABLE [$TabName$] RENAME TO [$ReTabName$]; ";
 
 
-   
+        string _temp_hitabmodel = "";
+        string _temp_hifieldmodel = "";
 
         string _temp_setdefalut = "";
         string _temp_setdefalut1 = "";
@@ -276,7 +280,9 @@ namespace HiSql
         public  string Field_Comment { get => _temp_field_comment; }
         public  string Get_Table_Schema { get => _temp_get_table_schema;   }
 
-        
+        public string Get_HiTabModel { get => _temp_hitabmodel; }
+
+        public string Get_HiFieldModel { get => _temp_hifieldmodel; }
         public  string Insert_StateMent { get => _temp_insert_statement;   }
 
         public  string Insert_StateMentv2 { get => _temp_insert_statementv2;   }
@@ -292,6 +298,15 @@ namespace HiSql
         public string Delete_Statement { get => _temp_delete; }
 
         public string Delete_Statement_Where { get => _temp_delete_where; }
+
+        /// <summary>
+        /// 删除指定表的表结构信息语句
+        /// </summary>
+        public string Delete_TabStruct { get => _temp_delete_tabstruct; }
+
+        public string Delete_TabModel { get => _temp_delete_tabmodel; }
+
+        public string Delete_FieldModel { get => _temp_delete_fieldmodel; }
 
         public string Delete_TrunCate { get => _temp_truncate; }
 
@@ -524,6 +539,13 @@ PRAGMA [main].legacy_alter_table = 'off';"; }
                 //{ "uniqueidentifier",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} {_temp_field_pre}uniqueidentifier{_temp_field_after}   [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}"},
             };
 
+
+            _temp_delete_tabmodel = $"delete from {_temp_table_pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{_temp_table_after} where TabName='[$TabName$]';";
+            _temp_delete_fieldmodel = $"delete from {_temp_table_pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{_temp_table_after} where TabName='[$TabName$]';";
+
+            _temp_delete_tabstruct = new StringBuilder()
+                 .AppendLine(_temp_delete_tabmodel)
+                 .AppendLine(_temp_delete_fieldmodel).ToString();
 
             _temp_create_table = new StringBuilder()
                 //样例：CREATE TABLE [dbo].[H_TEST_USER]
@@ -832,6 +854,10 @@ where type  in('table') [$Where$] COLLATE NOCASE  order by type ASC, [name] ASC
             _temp_truncate = $"DELETE FROM  {_temp_table_pre}[$TabName$]{_temp_table_after};";
 
             _temp_droptable = $"drop table IF EXISTS  {_temp_table_pre}[$TabName$]{_temp_table_after} ;";
+
+            _temp_hitabmodel = $"select * from {_temp_table_pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{_temp_table_after} where TabName=@TabName";
+
+            _temp_hifieldmodel = $"select * from {_temp_table_pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{_temp_table_after} where TabName=@TabName order by sortnum asc";
         }
     }
 }

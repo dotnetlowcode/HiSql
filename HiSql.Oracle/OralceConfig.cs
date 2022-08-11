@@ -84,6 +84,9 @@ namespace HiSql
         string _temp_delete = "";
         string _temp_delete_where = "";
 
+        string _temp_delete_tabstruct = "";
+        string _temp_delete_tabmodel = "";
+        string _temp_delete_fieldmodel = "";
 
         string _temp_truncate = "";
 
@@ -124,7 +127,8 @@ namespace HiSql
         /// </summary>
         string _temp_gettables_paging = "";
         string _temp_gettables_pagingcount = "";
-
+        string _temp_hitabmodel = "";
+        string _temp_hifieldmodel = "";
 
         string _temp_getTableDataCount = "select count(*) from [$TabName$] ";
         /// <summary>
@@ -268,7 +272,9 @@ namespace HiSql
         public string Field_Comment { get => _temp_field_comment; }
         public string Get_Table_Schema { get => _temp_get_table_schema; }
 
+        public string Get_HiTabModel { get => _temp_hitabmodel; }
 
+        public string Get_HiFieldModel { get => _temp_hifieldmodel; }
         public string Insert_StateMent { get => _temp_insert_statement; }
 
         public string Insert_StateMentv2 { get => _temp_insert_statementv2; }
@@ -285,6 +291,13 @@ namespace HiSql
 
         public string Delete_Statement_Where { get => _temp_delete_where; }
 
+        /// <summary>
+        /// 删除指定表的表结构信息语句
+        /// </summary>
+        public string Delete_TabStruct { get => _temp_delete_tabstruct; }
+        public string Delete_TabModel { get => _temp_delete_tabmodel; }
+
+        public string Delete_FieldModel { get => _temp_delete_fieldmodel; }
         public string Delete_TrunCate { get => _temp_truncate; }
 
         public Dictionary<string, string> FieldTempMapping => _fieldtempmapping;
@@ -527,6 +540,14 @@ namespace HiSql
                 .ToString();
 
 
+            _temp_delete_tabmodel = $"   execute immediate 'delete from {Constants.HiSysTable["Hi_TabModel"].ToString()} where lower(TabName)=lower(''[$TabName$]'')';";
+            _temp_delete_fieldmodel = $"   execute immediate 'delete from {Constants.HiSysTable["Hi_FieldModel"].ToString()} where lower(TabName)=lower(''[$TabName$]'')';";
+
+
+            _temp_delete_tabstruct = new StringBuilder()
+               .AppendLine(_temp_delete_tabmodel)
+               .AppendLine(_temp_delete_fieldmodel).ToString();
+
             _temp_create_table = new StringBuilder()
                 .AppendLine("declare ")
                 .AppendLine($"  v_number integer;")
@@ -544,19 +565,19 @@ namespace HiSql
                 .AppendLine("    [$Primary$]")
                 .AppendLine($"   end if;")
                 //.AppendLine($"        execute immediate 'drop table [$TabName$] ';")
-                
+
                 //.AppendLine($"   select count(*) into v_secout from user_sequences where SEQUENCE_NAME = upper('[$TabName$]_SEQ');")
                 //.AppendLine($"   IF v_secout > 0 then")
                 //.AppendLine($"       execute immediate 'drop sequence [$TabName$]_SEQ';")
                 //.AppendLine($"   end if;")
                 //.AppendLine($"   execute immediate 'create sequence [$TabName$]_SEQ increment by 1 start with 1 minvalue 1 maxvalue 999999999999';")
 
-                
 
-                .AppendLine($"   execute immediate 'delete from {Constants.HiSysTable["Hi_TabModel"].ToString()} where TabName=''[$TabName$]''';")
-                .AppendLine($"   execute immediate 'delete from {Constants.HiSysTable["Hi_FieldModel"].ToString()} where TabName=''[$TabName$]''';")
+                .AppendLine($"[$DeleteTabStruct$]")
+                //.AppendLine($"   execute immediate 'delete from {Constants.HiSysTable["Hi_TabModel"].ToString()} where TabName=''[$TabName$]''';")
+                //.AppendLine($"   execute immediate 'delete from {Constants.HiSysTable["Hi_FieldModel"].ToString()} where TabName=''[$TabName$]''';")
 
-                
+
                 .AppendLine("    [$TabStruct$]")
                 .AppendLine("   [$Comment$]")
                 .AppendLine("end;")
@@ -921,6 +942,10 @@ where idx.TABLE_NAME = '[$TabName$]' and idxc.INDEX_NAME = '[$IndexName$]' ";
 
             _temp_tabel_primarykey_create = $@"ALTER TABLE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} add constraint {_temp_table_pre}PK_[$TabName$][$ConnectID$]{_temp_table_after} primary key ([$Keys$]) ";
 
+
+            _temp_hitabmodel = $"select * from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{_temp_table_after} where  lower({_temp_field_pre}TabName{_temp_field_after})=lower(@TabName) ";
+
+            _temp_hifieldmodel = $"select * from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{_temp_table_after} where lower({_temp_field_pre}TabName{_temp_field_after})=lower(@TabName) order by {_temp_field_pre}SortNum{_temp_field_after} asc";
         }
     }
 }

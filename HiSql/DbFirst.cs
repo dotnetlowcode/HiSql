@@ -1285,19 +1285,22 @@ namespace HiSql
         /// <param name="tabInfo"></param>
         /// <param name="opLevel"></param>
         /// <returns></returns>
-        public Tuple<bool, string, string> ModiTable(TabInfo tabInfo, OpLevel opLevel)
+        public Tuple<bool, string, string> ModiTable(TabInfo tabInfo, OpLevel opLevel, bool onlychangetable = false)
         {
             TabInfo tab = _sqlClient.Context.DMInitalize.GetTabStruct(tabInfo.TabModel.TabName);
 
 
             IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
 
+
             idm.Context = SqlClient.Context;
             //获取当前最新物理表结构信息
             HiSqlCommProvider.RemoveTabInfoCache(tabInfo.TabModel.TabName);
             //获取最新
             TabInfo tabinfo = idm.GetTabStruct(tabInfo.TabModel.TabName);
-            List<FieldChange> fieldChanges = HiSqlCommProvider.TabToCompare(tabInfo, tab);
+            List<FieldChange> fieldChanges = HiSqlCommProvider.TabToCompare(tabInfo, tab, _sqlClient.Context.CurrentConnectionConfig.DbType);
+
+            fieldChanges = fieldChanges.Where(f => f.ChangeDetail.Where(c => c.AttrName.Equals("DBDefault", StringComparison.OrdinalIgnoreCase) && c.ValueA.Equals("EMPTY", StringComparison.OrdinalIgnoreCase) && c.ValueB.Equals("NONE", StringComparison.OrdinalIgnoreCase)).ToList().Count == 0).ToList();
 
             bool _isok = true;
             string _msg = "";
@@ -1306,11 +1309,11 @@ namespace HiSql
             StringBuilder sb_sql = new StringBuilder();
 
             bool _tabchange = false;
-            var changes = fieldChanges.Where(f => f.Action != TabFieldAction.NONE);
+            var changes = fieldChanges.Where(f => f.Action != TabFieldAction.NONE).ToList();
 
 
             //检查是否要删除主键并创建主键
-            var reBuilderPrimaryKey = true;
+            var reBuilderPrimaryKey = false;
             if (tab.PrimaryKey.Count == tabInfo.PrimaryKey.Count && tab.PrimaryKey.Select(t => t.FieldName).ToList().All(tabInfo.PrimaryKey.Select(t => t.FieldName).ToList().Contains))
             {
                 bool _haskey = false;
@@ -1323,6 +1326,13 @@ namespace HiSql
                 }
 
                 reBuilderPrimaryKey = _haskey;
+            }
+            else
+            {
+                if (fieldChanges.Any(f => f.NewColumn.IsPrimary))
+                {
+                    reBuilderPrimaryKey = true;
+                }
             }
             List<HiColumn> lstchg = new List<HiColumn>();
             List<HiColumn> lstdel = new List<HiColumn>();
@@ -1540,7 +1550,8 @@ namespace HiSql
                                     });
                                     TabInfo newtabinfo = _sqlClient.Context.MCache.GetCache<TabInfo>(_keyname);
                                 //}
-                                modi_count = _sqlClient.Modi(Constants.HiSysTable["Hi_FieldModel"].ToString(), lstchg).ExecCommand();
+                                if(!onlychangetable)
+                                    modi_count = _sqlClient.Modi(Constants.HiSysTable["Hi_FieldModel"].ToString(), lstchg).ExecCommand();
                                 _sqlClient.Context.MCache.RemoveCache(_keyname);
 
                             }

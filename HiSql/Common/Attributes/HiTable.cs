@@ -213,7 +213,7 @@ namespace HiSql
     public class HiColumn : Attribute
     {
 
-
+        string _dbserver = "";
         string _dbname = "";
         private string _ColumnName= "";
         string _tabName = "";
@@ -259,6 +259,15 @@ namespace HiSql
         string _refieldname = "";
 
         
+        /// <summary>
+        /// DB服务器
+        /// </summary>
+        public string DbServer
+        {
+            get { return _dbserver; }
+            set { _dbserver = value; }
+        }
+
         /// <summary>
         /// 数据库名
         /// </summary>
@@ -316,7 +325,13 @@ namespace HiSql
         {
 
             get { return _dbdefalut; }
-            set { _dbdefalut = value; }
+            set { _dbdefalut = value;
+                if (value == HiTypeDBDefault.FUNDATE)
+                    DefaultValue = Constants.FunDate;
+                else if (value == HiTypeDBDefault.FUNGUID)
+                    DefaultValue = Constants.FunGuid;
+            
+            }
         }
 
         /// <summary>
@@ -396,7 +411,7 @@ namespace HiSql
             get { return _isPrimary; }
 
             //如果没有指定Bllkey 那么是主键的情况下就默认为BLLkey 如果指定了就按指定的
-            set { _isPrimary = value; if (!_custombllkey && _isPrimary) { _isBllKey = _isPrimary; } }
+            set { _isPrimary = value; _isNull = false; if (!_custombllkey && _isPrimary) { _isBllKey = _isPrimary; } }
         }
         /// <summary>
         /// 是否自增长

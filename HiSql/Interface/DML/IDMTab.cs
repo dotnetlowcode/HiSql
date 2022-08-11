@@ -14,11 +14,6 @@ namespace HiSql
     /// </summary>
     public interface IDMTab
     {
-        /// <summary>
-        /// 安装系统表
-        /// </summary>
-        /// <returns></returns>
-        bool InstallHisql(HiSqlClient hiSqlClient);
 
         HiSqlProvider Context { get; set; }
         /// <summary>
@@ -52,6 +47,9 @@ namespace HiSql
         /// <param name="tabname"></param>
         /// <returns></returns>
         DataTable GetTableDefinition(string tabname);
+
+
+        DataSet GetTabModelInfo(string tabname);
 
         /// <summary>
         /// 获取当前库所有物理表清单

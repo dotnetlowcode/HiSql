@@ -9,12 +9,18 @@ namespace HiSql
     /// <summary>
     /// 指定了属性则以属性指定的为准
     /// </summary>
-    [HiTable(IsEdit =true,TabName = "Hi_FieldModel")]
+    [HiTable(IsEdit =false,TabName = "Hi_FieldModel", TabDescript = "表结构信息字段表",TabStatus =TabStatus.Use)]
     /// <summary>
     /// 字段信息
     /// </summary>
     public partial class Hi_FieldModel: StandField
     {
+
+        /// <summary>
+        /// 服务器名称
+        /// </summary>
+        [HiColumn(FieldDesc = "DB服务器", FieldLen = 50, IsPrimary = true, IsBllKey = true, IsNull = false, DBDefault = HiTypeDBDefault.EMPTY, DefaultValue = "", SortNum = 3, IsSys = true)]
+        public string DbServer { get; set; }
 
         [HiColumn(FieldDesc = "数据库名", FieldLen = 50, IsPrimary = true, IsBllKey = true, IsNull = false, DBDefault = HiTypeDBDefault.EMPTY, DefaultValue = "" , SortNum = 4, IsSys = true)]
         public string DbName { get; set; }

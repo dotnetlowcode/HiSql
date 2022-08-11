@@ -18,7 +18,8 @@ namespace HiSql
         //将当前类的属性赋给另外一个类
 
 
-        public static T deepCloneProperty<T>(T thisValue, T t) where T :class {
+        public static T deepCloneProperty<T>(T thisValue, T t) where T : class
+        {
             if (thisValue == null) return t;
             var aType = thisValue.GetType();
             var bType = t.GetType();
@@ -44,49 +45,85 @@ namespace HiSql
         /// <param name="obj1"></param>
         /// <param name="obj2"></param>
         /// <returns></returns>
-        public static Tuple<bool,bool> CompareTabProperties<T>(T obj1, T obj2)
+        public static Tuple<bool, bool, List<FieldChangeDetail>> CompareTabProperties<T>(T obj1, T obj2, DBType dbtype)
         {
+            List<FieldChangeDetail> fieldChanges = new List<FieldChangeDetail>();
             //为空判断
             if (obj1 == null && obj2 == null)
-                return  new Tuple<bool, bool>(true,false);
+                return new Tuple<bool, bool, List<FieldChangeDetail>>(true, false, fieldChanges);
             else if (obj1 == null || obj2 == null)
-                return new Tuple<bool, bool>(false, false);
+                return new Tuple<bool, bool, List<FieldChangeDetail>>(false, false, fieldChanges);
 
             Type t1 = obj1.GetType();
             Type t2 = obj2.GetType();
-            if (t1 != t2) return new Tuple<bool, bool>(false, false);
+            if (t1 != t2) return new Tuple<bool, bool, List<FieldChangeDetail>>(false, false, fieldChanges);
 
             //比对是否是表结构有变更
 
-            PropertyInfo[] props = t1.GetProperties().Where(p => p.CanWrite == true && !Constants.IsStandardField(p.Name) &&
-            //(p.Name.ToLower()!= "SortNum".ToLower() && p.Name.ToLower() != "IsSys".ToLower()) 
-            (
+            bool _resultok = true;//两个结果是否相同
+            bool _isstructchg = false;//是否有结构变更
+            PropertyInfo[] props = new PropertyInfo[] { };
+            if (dbtype != DBType.Sqlite)
+            {
+                props = t1.GetProperties().Where(p => p.CanWrite == true && !Constants.IsStandardField(p.Name) &&
+                //(p.Name.ToLower()!= "SortNum".ToLower() && p.Name.ToLower() != "IsSys".ToLower()) 
+                (
+                     p.Name.ToLower().IsIn("FieldDesc".ToLower(), "IsIdentity".ToLower(), "FieldName".ToLower(),
+                    "FieldType".ToLower(), "DefaultValue".ToLower(), "FieldLen".ToLower(), "FieldDec".ToLower(), "IsNull".ToLower(), "ReFieldName".ToLower())
+                ) // "IsPrimary".ToLower(),  是否主键额外处理  pengxy 
 
-                 p.Name.ToLower().IsIn("FieldDesc".ToLower(), "IsIdentity".ToLower(), "FieldName".ToLower(),
-                "FieldType".ToLower(), "DefaultValue".ToLower(), "FieldLen".ToLower(), "FieldDec".ToLower(), "IsNull".ToLower(), "ReFieldName".ToLower())
-            ) // "IsPrimary".ToLower(),  是否主键额外处理  pengxy 
-            && p.MemberType == MemberTypes.Property).ToArray();
+                && p.MemberType == MemberTypes.Property).ToArray();
+            }
+            else
+            {
+                props = t1.GetProperties().Where(p => p.CanWrite == true && !Constants.IsStandardField(p.Name) &&
+                //(p.Name.ToLower()!= "SortNum".ToLower() && p.Name.ToLower() != "IsSys".ToLower()) 
+                (
+                     p.Name.ToLower().IsIn("IsIdentity".ToLower(), "FieldName".ToLower(),
+                    "FieldType".ToLower(), "DefaultValue".ToLower(), "FieldLen".ToLower(), "FieldDec".ToLower(), "IsNull".ToLower(), "ReFieldName".ToLower())
+                ) // "IsPrimary".ToLower(),  是否主键额外处理  pengxy 
+
+                && p.MemberType == MemberTypes.Property).ToArray();
+            }
             foreach (var po in props)
             {
                 if (IsCanCompare(po.PropertyType))
                 {
-                    if (!po.GetValue(obj1).Equals(po.GetValue(obj2)))
+                    string _a = po.GetValue(obj1).ToString();
+                    string _b = po.GetValue(obj2).ToString();
+                    if (!string.Equals(_a, _b, StringComparison.OrdinalIgnoreCase))
                     {
-                        return new Tuple<bool, bool>(false, true);
+                        if ((_a.Equals("''") || _a.Equals("' '") || _a.Equals("")) && (_b.Equals("") || _b.Equals(" ") || _b.Equals("''")))
+                        {
+                            //忽略
+                        }
+                        else
+                        {
+                            if (dbtype == DBType.DaMeng)
+                            { 
+                                
+                            }
+                            _resultok = false;
+                            _isstructchg = true;//是否有结构变更
+                            fieldChanges.Add(new FieldChangeDetail { AttrName = po.Name, ValueA = _a, ValueB = _b });
+                        }
                     }
                 }
                 else
                 {
-                    var b = CompareTabProperties(po.GetValue(obj1), po.GetValue(obj2));
+                    var b = CompareTabProperties(po.GetValue(obj1), po.GetValue(obj2), dbtype);
                     if (!b.Item1) return b;
                 }
             }
+
+            if (!_resultok)
+                return new Tuple<bool, bool, List<FieldChangeDetail>>(_resultok, _isstructchg, fieldChanges);
 
             //配置有变更
             props = t1.GetProperties().Where(p => p.CanWrite == true && !Constants.IsStandardField(p.Name)
             &&
             (
-                 p.Name.ToLower().NotIn("FieldDesc".ToLower(), "IsIdentity".ToLower(),  "FieldName".ToLower(),
+                 p.Name.ToLower().NotIn("FieldDesc".ToLower(), "IsIdentity".ToLower(), "FieldName".ToLower(),
                 "FieldType".ToLower(), "DefaultValue".ToLower(), "FieldLen".ToLower(), "FieldDec".ToLower(), "IsNull".ToLower(),
                 "SortNum".ToLower(), "IsSys".ToLower())
                 )   // "IsPrimary".ToLower(),  是否主键额外处理  pengxy 
@@ -97,20 +134,23 @@ namespace HiSql
             {
                 if (IsCanCompare(po.PropertyType))
                 {
-                    if (!po.GetValue(obj1).Equals(po.GetValue(obj2)))
+                    string _a = po.GetValue(obj1).ToString();
+                    string _b = po.GetValue(obj2).ToString();
+                    if (!string.Equals(_a, _b, StringComparison.OrdinalIgnoreCase))
                     {
-                        return new Tuple<bool, bool>(false, false);
+
+                        _resultok = false;
+                        _isstructchg = false;//是否有结构变更
+                        fieldChanges.Add(new FieldChangeDetail { AttrName = po.Name, ValueA = _a, ValueB = _b });
                     }
                 }
                 else
                 {
-                    var b = CompareTabProperties(po.GetValue(obj1), po.GetValue(obj2));
+                    var b = CompareTabProperties(po.GetValue(obj1), po.GetValue(obj2), dbtype);
                     if (!b.Item1) return b;
                 }
             }
-
-
-            return new Tuple<bool, bool>(true, false);
+            return new Tuple<bool, bool, List<FieldChangeDetail>>(_resultok, _isstructchg, fieldChanges);
         }
 
         public static bool CompareProperties<T>(T obj1, T obj2)
@@ -124,14 +164,14 @@ namespace HiSql
             Type t1 = obj1.GetType();
             Type t2 = obj2.GetType();
             if (t1 != t2) return false;
-            PropertyInfo[] props = t1.GetProperties().Where(p=>p.CanWrite==true && !Constants.IsStandardField(p.Name) &&
+            PropertyInfo[] props = t1.GetProperties().Where(p => p.CanWrite == true && !Constants.IsStandardField(p.Name) &&
             //(p.Name.ToLower()!= "SortNum".ToLower() && p.Name.ToLower() != "IsSys".ToLower()) 
             (
-                
+
                  p.Name.ToLower().IsIn("FieldDesc".ToLower(), "IsIdentity".ToLower(), "IsPrimary".ToLower(), "FieldName".ToLower(),
                 "FieldType".ToLower(), "DefaultValue".ToLower(), "FieldLen".ToLower(), "FieldDec".ToLower(), "IsNull".ToLower())
-            ) 
-            && p.MemberType==MemberTypes.Property ).ToArray();
+            )
+            && p.MemberType == MemberTypes.Property).ToArray();
             foreach (var po in props)
             {
                 if (IsCanCompare(po.PropertyType))
@@ -193,11 +233,11 @@ namespace HiSql
 
                 //string json = System.Text.Json.JsonSerializer.Serialize(RealObject);
                 string json = JsonConvert.SerializeObject(RealObject);
-                return JsonConvert.DeserializeObject<T>(json); 
+                return JsonConvert.DeserializeObject<T>(json);
             }
-        }   
+        }
 
-        public static T  MoveCross<T>(this T thisValue ,T t) where T : class
+        public static T MoveCross<T>(this T thisValue, T t) where T : class
         {
             return deepCloneProperty(thisValue, t);
         }
@@ -210,11 +250,11 @@ namespace HiSql
             var canList = aList.Where(it => it.CanRead).ToList();
             foreach (var prop in canList)
             {
-                
+
                 var bProp = bType.GetProperty(prop.Name);
                 if (bProp == null) continue;
                 //必须两个属性的相同
-                if (bProp!=null &&  prop.PropertyType == bProp.PropertyType && bProp.CanWrite==true)
+                if (bProp != null && prop.PropertyType == bProp.PropertyType && bProp.CanWrite == true)
                 {
                     bProp.SetValue(t, prop.GetValue(thisValue, null), null);
                 }
@@ -231,10 +271,11 @@ namespace HiSql
         /// <param name="thisValue"></param>
         /// <param name="t"></param>
         /// <returns></returns>
-        public static List<T1> Collect<T, T1>(this List<T> thisValue, T1 t) where T : class where T1 : class,new() {
+        public static List<T1> Collect<T, T1>(this List<T> thisValue, T1 t) where T : class where T1 : class, new()
+        {
 
             var aType = typeof(T);
-            var bType =typeof(T1);
+            var bType = typeof(T1);
             //Stopwatch sw = new Stopwatch();
             //sw.Start();
             List<PropertyInfo> aList = aType.GetProperties().ToList<PropertyInfo>();
@@ -262,14 +303,14 @@ namespace HiSql
             foreach (var aTemp in thisValue)
             {
                 _keyvalue = string.Empty;
-                
+
                 foreach (var bProp in bStrLst)
                 {
                     aProp = aType.GetProperty(bProp.Name);
                     _keyvalue += aProp.GetValue(aTemp, null).ToString();
                 }
                 //_keyvalue = _keyvalue.ToMd5();
-                T1 item ;
+                T1 item;
                 if (!indexDic.ContainsKey(_keyvalue))
                 {
                     //item = (T1)Activator.CreateInstance(bType);
@@ -377,8 +418,9 @@ namespace HiSql
             var t = (T)Activator.CreateInstance(typeof(T));
             return deepCloneProperty(thisValue, t);
         }
-        public static T CloneCopy<T>(this T thisValue) where T : class { 
-            string json=Newtonsoft.Json.JsonConvert.SerializeObject(thisValue);
+        public static T CloneCopy<T>(this T thisValue) where T : class
+        {
+            string json = Newtonsoft.Json.JsonConvert.SerializeObject(thisValue);
             return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(json);
         }
     }

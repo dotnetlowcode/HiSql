@@ -67,6 +67,8 @@ namespace HiSql
         /// </summary>
         string _temp_get_table_schema = "";
 
+        string _temp_hitabmodel = "";
+        string _temp_hifieldmodel = "";
 
 
         //本地临时表前辍
@@ -86,6 +88,9 @@ namespace HiSql
 
         string _temp_delete = "";
         string _temp_delete_where = "";
+        string _temp_delete_tabstruct = "";
+        string _temp_delete_tabmodel = "";
+        string _temp_delete_fieldmodel = "";
 
 
         string _temp_truncate = "";
@@ -281,7 +286,9 @@ namespace HiSql
         public string Field_Comment { get => _temp_field_comment; }
         public string Get_Table_Schema { get => _temp_get_table_schema; }
 
+        public string Get_HiTabModel { get => _temp_hitabmodel; }
 
+        public string Get_HiFieldModel { get => _temp_hifieldmodel; }
         public string GetVersion { get => "SELECT version();"; }
 
         public string Insert_StateMent { get => _temp_insert_statement; }
@@ -300,6 +307,13 @@ namespace HiSql
 
         public string Delete_Statement_Where { get => _temp_delete_where; }
 
+        /// <summary>
+        /// 删除指定表的表结构信息语句
+        /// </summary>
+        public string Delete_TabStruct { get => _temp_delete_tabstruct; }
+        public string Delete_TabModel { get => _temp_delete_tabmodel; }
+
+        public string Delete_FieldModel { get => _temp_delete_fieldmodel; }
         public string Delete_TrunCate { get => _temp_truncate; }
 
         public Dictionary<string, string> FieldTempMapping => _fieldtempmapping;
@@ -496,6 +510,8 @@ namespace HiSql
             //指定字符默认值 如('hisql') 或('')
             _lstdefmapping.Add(new DefMapping { IsRegex = true, DbValue = @"^\(\'(?<value>[\w\s*\S*\W*]*)\'\)$", DbType = HiTypeGroup.Char, DBDefault = HiTypeDBDefault.VALUE });
 
+            _lstdefmapping.Add(new DefMapping { IsRegex = true, DbValue = @"^\'(?<value>[\w\s*\S*\W*]*)\'[:]{2}", DbType = HiTypeGroup.Char, DBDefault = HiTypeDBDefault.VALUE });
+
             //日期
             _lstdefmapping.Add(new DefMapping { IsRegex = true, DbValue = @"^(?<value>CURRENT_TIMESTAMP)$", DbType = HiTypeGroup.Date, DBDefault = HiTypeDBDefault.FUNDATE });
 
@@ -634,6 +650,15 @@ namespace HiSql
                 .ToString();
 
 
+            _temp_delete_tabmodel = $"delete from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{_temp_table_after} where lower({_temp_field_pre}TabName{_temp_field_after})=lower('[$TabName$]');";
+            _temp_delete_fieldmodel = $"delete from  {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{_temp_table_after} where lower({_temp_field_pre}TabName{_temp_field_after})=lower('[$TabName$]');";
+
+
+            _temp_delete_tabstruct = new StringBuilder()
+                .AppendLine(_temp_delete_tabmodel)
+                .AppendLine(_temp_delete_fieldmodel).ToString();
+
+
             _temp_create_table = new StringBuilder()
                 //样例：CREATE TABLE [dbo].[H_TEST_USER]
 
@@ -661,8 +686,9 @@ namespace HiSql
 
                 .AppendLine("end if;")//2022.6.17增加
 
-                .AppendLine($"delete from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{_temp_table_after} where {_temp_field_pre}TabName{_temp_field_after}='[$TabName$]';")
-                .AppendLine($"delete from  {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{_temp_table_after} where {_temp_field_pre}TabName{_temp_field_after}='[$TabName$]';")
+                .AppendLine($"[$DeleteTabStruct$]")
+                //.AppendLine($"delete from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{_temp_table_after} where {_temp_field_pre}TabName{_temp_field_after}='[$TabName$]';")
+                //.AppendLine($"delete from  {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{_temp_table_after} where {_temp_field_pre}TabName{_temp_field_after}='[$TabName$]';")
 
                 .AppendLine("[$TabStruct$]")
                 
@@ -1008,6 +1034,11 @@ CREATE INDEX {_temp_schema_pre}[$IndexName$]{_temp_schema_after}
 
             _temp_tabel_primarykey_create = $@"ALTER TABLE IF EXISTS {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} ADD PRIMARY KEY([$Keys$]) ;";
 
+
+
+            _temp_hitabmodel = $"select * from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{_temp_table_after} where  lower({_temp_field_pre}TabName{_temp_field_after})=lower(@TabName) ";
+
+            _temp_hifieldmodel = $"select * from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{_temp_table_after} where lower({_temp_field_pre}TabName{_temp_field_after})=lower(@TabName) order by {_temp_field_pre}SortNum{_temp_field_after} asc";
         }
     }
 }
