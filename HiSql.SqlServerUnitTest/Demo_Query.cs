@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,8 +12,15 @@ namespace HiSql.UnitTest
 {
     public class Demo_Query
     {
+        public partial class Hi_TabNameCount
+        {
+            public string TabName { get; set; }
+            //public string FieldName { get; set; }
 
-        public class H_Test2
+            public int FieldLen { get; set; }
+
+        }
+            public class H_Test2
         {
             public int Uid { get; set; }
             public string UserName { get; set; }
@@ -47,8 +56,9 @@ namespace HiSql.UnitTest
             //Query_Demo17(sqlClient);
             //Query_Demo18(sqlClient);
             //Query_Demo19(sqlClient);
-            Query_Demo20(sqlClient);
+            // Query_Demo20(sqlClient);
             //Query_Demo21();
+            Query_DemoEmit(sqlClient);
             var s = Console.ReadLine();
         }
 
@@ -93,9 +103,9 @@ namespace HiSql.UnitTest
             //    ").Where(filters).ToSql();
 
 
-            var  sql=sqlClient.Query("sys_menu", "a").Field("a.*").Join("sys_role_menu", JoinType.Left).As("b").On(new Filter { { "a.menuId", OperType.EQ, "`b.menu_id`" } })
+            var sql = sqlClient.Query("sys_menu", "a").Field("a.*").Join("sys_role_menu", JoinType.Left).As("b").On(new Filter { { "a.menuId", OperType.EQ, "`b.menu_id`" } })
                 .Sort("a.menuId").ToSql();
-                ;
+            ;
 
 
         }
@@ -508,8 +518,451 @@ Order By a.fieldNamE
             DataTable dt3 = sqlClient.Query("Hi_TabModel").Field("*").ToTable();
         }
 
+        static void Query_DemoEmit(HiSqlClient sqlClient)
+        {
+            HiParameter Parm = new HiParameter("@TabName", "Hi_TabModel");
+
+            //DataTable dt= sqlClient.Context.DBO.GetDataTable("select * from dbo.Hi_FieldModel where TabName in (@TabName)", new HiParameter("@TabName",new List<string> { "Hi_TabModel' or 1=1", "Hi_FieldModel" }));
+            //DataTable dt2 = sqlClient.Context.DBO.GetDataTable("select * from dbo.Hi_FieldModel where TabName = @TabName and FieldName=@TabName and FieldType=@FieldType", new HiParameter("@TabName", "Hi_TabModel"), new HiParameter("@FieldType", 11));
+
+            DataTable dt3 = sqlClient.Query("Hi_FieldModel").Field("*").ToTable();
+            var modelList = DataConverter.ToList<Hi_FieldModel>(dt3);
+
+
+           
+
+
+            {
+                // DataTable dt3 = sqlClient.Query("Hi_FieldModel").Field("*").ToTable();
+                // var _result = DataConverter.ToList<Hi_FieldModel>(dt3);
+
+                // var column = _result[0];
+                // var _column = _result[1];
+                //_column.DbName = "";
+                // int cnt = 100000;
+
+                // var result = false;
+                // var m1 = new Hi_FieldModelTest()
+                // {
+                //     FieldName = "Hi_FieldModel_m1"
+                //     ,
+                //     DataType = DateTime.Now
+                // };
+                // var m2 = new Hi_FieldModelTest()
+                // {
+                //     FieldName = "Hi_FieldModel_m1"
+                //    ,
+                //     DataType = DateTime.Now // DateTime.Now  m1.DataType
+                // };
+
+
+                // m1.PropertyInfo = new Hi_FieldModel()
+                // {
+                //     FieldName = "Hi_FieldModel_m22"
+                //     ,
+                //     CreateName = "Hi_FieldModel_m22"
+                // };
+
+
+                // m2.PropertyInfo = new Hi_FieldModel()
+                // {
+                //     FieldName = "Hi_FieldModel_m22"
+                //     ,
+                //     CreateName = "Hi_FieldModel_m22"
+                // };
+
+
+                // Stopwatch stopwatch = Stopwatch.StartNew();
+
+
+                // for (int i = 0; i < cnt; i++)
+                // {
+                //     var aa = ClassExtensions.CompareTabProperties(column, _column);
+                //     result = aa.Item1;
+                // }
+                // Console.WriteLine($" ClassExtensions.CompareTabProperties 结果 {result} {cnt}次 耗时{stopwatch.ElapsedMilliseconds}");
+                // stopwatch = Stopwatch.StartNew();
 
 
 
+                // for (int i = 0; i < cnt; i++)
+                // {
+                //     result = DataConverter.ObjCompareProperties(column, _column);
+                // }
+                // Console.WriteLine($" ClassExtensions.CompareTabProperties  结果 {result}  {cnt} 次 耗时{stopwatch.ElapsedMilliseconds}");
+
+            }
+
+            { 
+                //sqlClient.Update("hi_fieldmodel", new { DbName = "", TabName = "H_Test5", FieldName = "sid", SNO = "SALENO", SNO_NUM = "1" }).Only("SNO", "SNO_NUM").ExecCommand();
+            }
+
+            //{
+            //    var listS = new List<Hi_FieldModel>();
+            //    listS.Add(new Hi_FieldModel());
+            //    Console.WriteLine(JsonConverter.ToJson(listS));
+
+            //    DataTable dt3 = sqlClient.Query("Hi_FieldModel").Field("*").ToTable();
+            //    var _resu3lt2 = DataConvert.ToEntityList<Hi_FieldModel>(dt3);
+
+            //    using (IDataReader dr = sqlClient.Context.DBO.GetDataReader("select * from Hi_FieldModel ", null))
+            //    {
+            //        var _result2 = DataConvert.ToList<Hi_FieldModel>(dr);
+            //        Console.WriteLine(JsonConvert.SerializeObject(_result2));
+            //    }
+
+            //}
+
+            //#region 测试 IDataReader 转 List<T>  和  DataTable 转 List<T> 
+            //{
+            //    Stopwatch stopwatch = Stopwatch.StartNew();
+            //    int cnt = 20;
+            //    for (int i = 0; i < cnt; i++)
+            //    {
+            //        DataTable dt3 = sqlClient.Query("Hi_FieldModel").Field("*").ToTable();
+            //        var _result = DataConverter.ToList<Hi_FieldModel>(dt3);
+            //        // var _result = DataConvert.ToEntityList<Hi_FieldModel>(dt3);
+            //    }
+            //    Console.WriteLine($"测试 DataTable 转 List<T> DataConverter {cnt}次 耗时{stopwatch.ElapsedMilliseconds}");
+            //    stopwatch = Stopwatch.StartNew();
+            //    for (int i = 0; i < cnt; i++)
+            //    {
+            //        using (IDataReader dr = sqlClient.Context.DBO.GetDataReader("select * from Hi_FieldModel", null))
+            //        {
+            //            var _result = DataConverter.ToList<Hi_FieldModel>(dr);
+            //            dr.Close();
+            //            dr.Dispose();
+            //        }
+            //    }
+            //    Console.WriteLine($"测试 IDataReader 转 List<T> DataConverter {cnt}次 耗时{stopwatch.ElapsedMilliseconds}");
+            //    /*
+            //        结论： 采用反射： 查询后 通过 DataTable  返回数据后转List比 IDataReader 再转List快；采用 emit结果相反
+            //     */
+            //}
+            //#endregion
+
+            #region 测试 DataTable 转 List<T>
+            {
+                //DataTable dt3s = sqlClient.Query("Hi_FieldModel").Field("*").ToTable();
+
+                //Stopwatch stopwatch = Stopwatch.StartNew();
+                //int cnt = 20000;
+                //for (int i = 0; i < cnt; i++)
+                //{
+                //    var _result = DataConvert.ToEntityList<Hi_FieldModel>(dt3s);
+                  
+                //}
+
+                //Console.WriteLine($"测试 DataTable 转 List<T> DataConvert {cnt}次 耗时{stopwatch.ElapsedMilliseconds}");
+                //stopwatch = Stopwatch.StartNew();
+                //for (int i = 0; i < cnt; i++)
+                //{
+                //    var _result = DataConverter.ToList<Hi_FieldModel>(dt3s);
+                //}
+                //Console.WriteLine($"测试 DataTable 转 List<T> DataConverter {cnt}次 耗时{stopwatch.ElapsedMilliseconds}");
+
+                /*
+                    结论： 通过 property.SetValue 和 emit 设置属性的值 时间差不多
+                 */
+            }
+            #endregion
+
+            #region 测试 IDataReader 转 List<T>
+            {
+                DataTable dt3s = sqlClient.Query("Hi_FieldModel").Field("*").ToTable();
+
+                Stopwatch stopwatch = Stopwatch.StartNew();
+
+                int cnt = 100;
+                for (int i = 0; i < cnt; i++)
+                {
+                    using (IDataReader dr = sqlClient.Context.DBO.GetDataReader("select * from Hi_FieldModel", null))
+                    {
+                        var _result = DataConvert.ToList<Hi_FieldModel>(dr);
+                    }
+                }
+                Console.WriteLine($"测试 IDataReader 转 List<T> DataConvert {cnt}次 耗时{stopwatch.ElapsedMilliseconds}");
+                stopwatch = Stopwatch.StartNew();
+                for (int i = 0; i < cnt; i++)
+                {
+                    using (IDataReader dr = sqlClient.Context.DBO.GetDataReader("select * from Hi_FieldModel", null))
+                    {
+                        var _result = DataConverter.ToList<Hi_FieldModel>(dr);
+                    }
+
+                }
+                Console.WriteLine($"测试 IDataReader 转 List<T> DataConverter {cnt}次 耗时{stopwatch.ElapsedMilliseconds}");
+            }
+            #endregion
+
+            #region 测试 对象克隆
+            {
+                //var m1 = new Hi_FieldModelTest()
+                //{
+                //    FieldName = "Hi_FieldModel_m1"
+                //    ,
+                //    DataType = DateTime.Now
+                //};
+                //var m2 = new Hi_FieldModelTest()
+                //{
+                //    FieldName = "Hi_FieldModel_m1"
+                //   ,
+                //    DataType = DateTime.Now // DateTime.Now  m1.DataType
+                //};
+
+
+                //m1.PropertyInfo = new Hi_FieldModel()
+                //{
+                //    FieldName = "Hi_FieldModel_m22"
+                //    ,
+                //    CreateName = "Hi_FieldModel_m22"
+                //};
+                //m1.PropertyInfo = t[0];
+
+                //m2.PropertyInfo = new Hi_FieldModel()
+                //{
+                //    FieldName = "Hi_FieldModel_m226"
+                //    ,
+                //    CreateName = "Hi_FieldModel_m22"
+                //};
+                //m2.PropertyInfo = t[0];
+               
+
+                //Stopwatch stopwatch = Stopwatch.StartNew();
+                //List<Hi_FieldModelTest> listA = new List<Hi_FieldModelTest>();
+                //int cnt = 100000;
+                //for (int i = 0; i < cnt; i++)
+                //{
+                //    var a = ClassExtensions.CloneCopy(m1);
+                //    listA.Add(a);
+                //}
+                //Console.WriteLine($"测试 Newtonsoft.Json.JsonConvert.SerializeObject {cnt}次 耗时{stopwatch.ElapsedMilliseconds} ");  //{JsonConverter.ToJson(listA)}
+
+                //List<Hi_FieldModelTest> listB = new List<Hi_FieldModelTest>();
+
+                //stopwatch = Stopwatch.StartNew();
+                //for (int i = 0; i < cnt; i++)
+                //{
+                //    var a = DataConverter.CloneObjectWithIL(m1);
+                //    listB.Add(a);
+                //}
+
+
+                //Console.WriteLine($"测试  emit {cnt}次 耗时{stopwatch.ElapsedMilliseconds}  "); //{JsonConverter.ToJson(listB)}
+
+                //stopwatch = Stopwatch.StartNew();
+                //for (int i = 0; i < cnt; i++)
+                //{
+                //    Hi_FieldModelTest a2 = new Hi_FieldModelTest();
+                //    FastCopy<Hi_FieldModelTest, Hi_FieldModelTest>.Copy(m2, a2);
+                //}
+                //Console.WriteLine($"测试 表达式树，不支持引用类型属性  FastCopy {cnt}次 耗时{stopwatch.ElapsedMilliseconds} "); //{JsonConverter.ToJson(listB)}
+
+            }
+            #endregion
+            var m1 = new Hi_FieldModelTest()
+            {
+                FieldName = "Hi_FieldModel_m1"
+                ,
+                DataType = DateTime.Now
+            };
+            var m2 = new Hi_FieldModelTest()
+            {
+                FieldName = "Hi_FieldModel_m1"
+               ,
+                DataType = DateTime.Now // DateTime.Now  m1.DataType
+            };
+
+
+            m1.PropertyInfo = new Hi_FieldModel()
+            {
+                FieldName = "Hi_FieldModel_m22"
+                ,
+                CreateName = "Hi_FieldModel_m22"
+            };
+            m1.PropertyInfo = modelList[0];
+
+            m2.PropertyInfo = new Hi_FieldModel()
+            {
+                FieldName = "Hi_FieldModel_m226"
+                ,
+                CreateName = "Hi_FieldModel_m22"
+            };
+            m2.PropertyInfo = modelList[0];
+
+            #region 测试   Collect
+            {
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                var collectModel = new Hi_TabNameCount();
+                int cnt = 1000;
+                for (int i = 0; i < cnt; i++)
+                {
+                     List<Hi_TabNameCount> lstcount = ClassExtensions.Collect(modelList.Where(t=>t.FieldLen < 1000).ToList(), collectModel);
+                }
+                Console.WriteLine($"测试  ClassExtensions.Collect 反射 {cnt}次 耗时{stopwatch.ElapsedMilliseconds} ");
+
+                // DataConverter.Collect(modelList.Where(t => t.FieldLen < 1000).ToList(), collectModel);
+                //stopwatch = Stopwatch.StartNew();
+                //for (int i = 0; i < cnt; i++)
+                //{
+                //    List<Hi_TabNameCount> lstcount = DataConverter.Collect(modelList.Where(t => t.FieldLen < 1000).ToList(), collectModel);
+                //}
+                //Console.WriteLine($"测试  DataConverter.Collect 反射 {cnt}次 耗时{stopwatch.ElapsedMilliseconds} ");
+
+                stopwatch = Stopwatch.StartNew();
+                //for (int i = 0; i < cnt; i++)
+                //{
+                //    Hi_FieldModel a2 = new Hi_FieldModel();
+                //    var a = DataConverter.MoveCrossWithIL(m1.PropertyInfo, a2);
+
+                //}
+
+                //stopwatch = Stopwatch.StartNew();
+                //for (int i = 0; i < cnt; i++)
+                //{
+                //    List<Hi_TabNameCount> lstcount = (from a in modelList where a.FieldLen < 1000 group a by new { a.TabName }
+                //                                      into g 
+                //                                      select new Hi_TabNameCount { TabName = g.Key.TabName,  FieldLen = g.Sum(t=>t.FieldLen) }).ToList();//  ClassExtensions.Collect(modelList, collectModel);
+                //}
+                //Console.WriteLine($"测试 Linq 反射 {cnt}次 耗时{stopwatch.ElapsedMilliseconds} ");  //{JsonConverter.ToJson(listA)}
+
+            }
+
+            #endregion
+
+            #region 测试 MoveCross
+            {
+                //var m1 = new Hi_FieldModelTest()
+                //{
+                //    FieldName = "Hi_FieldModel_m1"
+                //    ,
+                //    DataType = DateTime.Now
+                //};
+                //var m2 = new Hi_FieldModelTest()
+                //{
+                //    FieldName = "Hi_FieldModel_m1"
+                //   ,
+                //    DataType = DateTime.Now // DateTime.Now  m1.DataType
+                //};
+
+
+                //m1.PropertyInfo = new Hi_FieldModel()
+                //{
+                //    FieldName = "Hi_FieldModel_m22"
+                //    ,
+                //    CreateName = "Hi_FieldModel_m22"
+                //};
+                //m1.PropertyInfo = modelList[0];
+
+                //m2.PropertyInfo = new Hi_FieldModel()
+                //{
+                //    FieldName = "Hi_FieldModel_m226"
+                //    ,
+                //    CreateName = "Hi_FieldModel_m22"
+                //};
+                //m2.PropertyInfo = modelList[0];
+
+
+                //Stopwatch stopwatch = Stopwatch.StartNew();
+                //List<Hi_FieldModel> listA = new List<Hi_FieldModel>();
+                //int cnt = 200000;
+                //for (int i = 0; i < cnt; i++)
+                //{
+                //    Hi_FieldModel a2 = new Hi_FieldModel();
+                //    ClassExtensions.MoveCross<Hi_FieldModel>(m1.PropertyInfo, a2);
+                //    //listA.Add(a2);
+                //}
+                //Console.WriteLine($"测试 MoveCross 反射 {cnt}次 耗时{stopwatch.ElapsedMilliseconds} ");  //{JsonConverter.ToJson(listA)}
+
+                //List<Hi_FieldModel> listB = new List<Hi_FieldModel>();
+
+                //stopwatch = Stopwatch.StartNew();
+                //for (int i = 0; i < cnt; i++)
+                //{
+                //    Hi_FieldModel a2 = new Hi_FieldModel();
+                //    var a = DataConverter.MoveCrossWithIL(m1.PropertyInfo, a2);
+
+                //    listB.Add(a2);
+                //}
+
+
+                //Console.WriteLine($"测试 MoveCross  emit {cnt}次 耗时{stopwatch.ElapsedMilliseconds}  "); //{JsonConverter.ToJson(listB)}
+
+                //stopwatch = Stopwatch.StartNew();
+                //for (int i = 0; i < cnt; i++)
+                //{
+                //    Hi_FieldModel a2 = new Hi_FieldModel();
+                //    var a = CreateBuilderOfMoveCrossWithILHi_FieldModel(m1.PropertyInfo, a2);
+                //}
+
+
+                //Console.WriteLine($"测试 MoveCross  原生 {cnt}次 耗时{stopwatch.ElapsedMilliseconds}  "); //{JsonConverter.ToJson(listB)}
+
+
+            }
+            #endregion
+
+        }
+        public static bool CreateBuilderOfMoveCrossWithIL(object P_0, object P_1)
+        {
+            //Error decoding local variables: Signature type sequence must have at least one element.
+            ((Hi_FieldModelTest)P_0).FieldName = ((Hi_FieldModelTest)P_1).FieldName;
+            ((Hi_FieldModelTest)P_0).DataType = ((Hi_FieldModelTest)P_1).DataType;
+            CreateBuilderOfMoveCrossWithILHi_FieldModel((object)((Hi_FieldModelTest)P_0).PropertyInfo, (object)((Hi_FieldModelTest)P_1).PropertyInfo);
+            ((Hi_FieldModelTest)P_0).FieldName2 = ((Hi_FieldModelTest)P_1).FieldName2;
+            ((Hi_FieldModelTest)P_0).FieldName3 = ((Hi_FieldModelTest)P_1).FieldName3;
+            return true;
+        }
+        public static bool CreateBuilderOfMoveCrossWithILHi_FieldModel(object P_0, object P_1)
+        {
+            ((Hi_FieldModel)P_0).DbName = ((Hi_FieldModel)P_1).DbName;
+            ((Hi_FieldModel)P_0).TabName = ((Hi_FieldModel)P_1).TabName;
+            ((Hi_FieldModel)P_0).FieldName = ((Hi_FieldModel)P_1).FieldName;
+            ((Hi_FieldModel)P_0).FieldDesc = ((Hi_FieldModel)P_1).FieldDesc;
+            ((Hi_FieldModel)P_0).IsIdentity = ((Hi_FieldModel)P_1).IsIdentity;
+            ((Hi_FieldModel)P_0).IsPrimary = ((Hi_FieldModel)P_1).IsPrimary;
+            ((Hi_FieldModel)P_0).IsBllKey = ((Hi_FieldModel)P_1).IsBllKey;
+            ((Hi_FieldModel)P_0).FieldType = ((Hi_FieldModel)P_1).FieldType;
+            ((Hi_FieldModel)P_0).SortNum = ((Hi_FieldModel)P_1).SortNum;
+            ((Hi_FieldModel)P_0).Regex = ((Hi_FieldModel)P_1).Regex;
+            ((Hi_FieldModel)P_0).DBDefault = ((Hi_FieldModel)P_1).DBDefault;
+            ((Hi_FieldModel)P_0).DefaultValue = ((Hi_FieldModel)P_1).DefaultValue;
+            ((Hi_FieldModel)P_0).FieldLen = ((Hi_FieldModel)P_1).FieldLen;
+            ((Hi_FieldModel)P_0).FieldDec = ((Hi_FieldModel)P_1).FieldDec;
+            ((Hi_FieldModel)P_0).SNO = ((Hi_FieldModel)P_1).SNO;
+            ((Hi_FieldModel)P_0).SNO_NUM = ((Hi_FieldModel)P_1).SNO_NUM;
+            ((Hi_FieldModel)P_0).IsSys = ((Hi_FieldModel)P_1).IsSys;
+            ((Hi_FieldModel)P_0).IsNull = ((Hi_FieldModel)P_1).IsNull;
+            ((Hi_FieldModel)P_0).IsRequire = ((Hi_FieldModel)P_1).IsRequire;
+            ((Hi_FieldModel)P_0).IsIgnore = ((Hi_FieldModel)P_1).IsIgnore;
+            ((Hi_FieldModel)P_0).IsObsolete = ((Hi_FieldModel)P_1).IsObsolete;
+            ((Hi_FieldModel)P_0).IsShow = ((Hi_FieldModel)P_1).IsShow;
+            ((Hi_FieldModel)P_0).IsSearch = ((Hi_FieldModel)P_1).IsSearch;
+            ((Hi_FieldModel)P_0).SrchMode = ((Hi_FieldModel)P_1).SrchMode;
+            ((Hi_FieldModel)P_0).IsRefTab = ((Hi_FieldModel)P_1).IsRefTab;
+            ((Hi_FieldModel)P_0).RefTab = ((Hi_FieldModel)P_1).RefTab;
+            ((Hi_FieldModel)P_0).RefField = ((Hi_FieldModel)P_1).RefField;
+            ((Hi_FieldModel)P_0).RefFields = ((Hi_FieldModel)P_1).RefFields;
+            ((Hi_FieldModel)P_0).RefFieldDesc = ((Hi_FieldModel)P_1).RefFieldDesc;
+            ((Hi_FieldModel)P_0).RefWhere = ((Hi_FieldModel)P_1).RefWhere;
+            ((StandField)P_0).CreateTime = ((StandField)P_1).CreateTime;
+            ((StandField)P_0).CreateName = ((StandField)P_1).CreateName;
+            ((StandField)P_0).ModiTime = ((StandField)P_1).ModiTime;
+            ((StandField)P_0).ModiName = ((StandField)P_1).ModiName;
+            return true;
+        }
+    }
+
+
+    public class Hi_FieldModelTest
+    {
+        private const string privatevalueconst = "privatevalue";
+        private static string privatevaluestatic = "privatevaluestatic";
+        private string privatevalue = "privatevalue";
+        public string FieldName { get; set; }
+        public DateTime DataType { get; set; }
+        public Hi_FieldModel PropertyInfo { get; set; }
+        public string FieldName2 { get; set; }
+        public string FieldName3 { get; set; }
     }
 }
