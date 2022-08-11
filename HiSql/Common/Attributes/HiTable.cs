@@ -24,8 +24,8 @@ namespace HiSql
     [Serializable]
     public class HiTable : Attribute
     {
-        [JsonIgnore]
-        public override object TypeId { get; }
+        //[JsonIgnore]
+        //public override object TypeId { get; }
 
 
         string _dbName = "";

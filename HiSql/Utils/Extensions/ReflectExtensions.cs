@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Security.Cryptography;
@@ -8,6 +9,47 @@ using System.Threading.Tasks;
 
 namespace HiSql
 {
+
+    public static class DataRecordReflectExtensions
+    {
+        public static object GetValue(this IDataRecord dr, int i, HiModelFeildsInfo hiModel)
+        {
+            bool allowNull = false;
+
+            if (hiModel.PropertyInfo != null && Nullable.GetUnderlyingType(hiModel.PropertyInfo.PropertyType) != null)
+            {
+                allowNull = true;
+            }
+            if (dr.IsDBNull(i) && allowNull)
+            {
+                return null;
+            }
+            var type = dr.GetFieldType(i);
+            switch (type.Name)
+            {
+                case "Byte":
+                    return dr.GetByte(i);
+                case "DateTime":
+                    return dr.GetDateTime(i);
+                case "Double":
+                    return dr.GetDouble(i);
+                case "Float":
+                    return dr.GetFloat(i);
+                case "Guid":
+                    return dr.GetGuid(i);
+                case "Int16":
+                    return dr.GetInt16(i);
+                case "Int32":
+                    return dr.GetInt32(i);
+                case "Int64":
+                    return dr.GetInt64(i);
+                case "String":
+                    return dr.GetString(i);
+            }
+            return null;
+        }
+    }
+
     /// <summary>
     /// 反射类的扩展
     /// </summary>

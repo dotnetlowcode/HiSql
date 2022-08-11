@@ -66,6 +66,7 @@ namespace HiSql
         string _temp_hifieldmodel = "";
 
 
+
         //本地临时表前辍
         string _temp_local_table_pre = "TMP_";
 
