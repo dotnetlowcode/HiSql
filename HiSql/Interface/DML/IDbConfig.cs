@@ -270,6 +270,11 @@ namespace HiSql
         /// 表批量更新
         /// </summary>
         public string Table_MergeInto { get; }
+
+        /// <summary>
+        /// 字符串主键为空时的认值
+        /// </summary>
+        public string Key_Char_Default { get; }
         Dictionary< string,  string> FieldTempMapping { get; }
         Dictionary<HiType,  string> DbMapping { get; }
 

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace HiSql.SqlServer.Properties {
+namespace HiSql.Unit.Properties {
     using System;
     
     

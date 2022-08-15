@@ -198,7 +198,19 @@ namespace HiSql
         /// </summary>
         string _temp_drop_index = "";
 
-       
+        /// <summary>
+        /// 主键字符串默认值 
+        /// </summary>
+        string _temp_key_char_defalut = "";
+
+        /// <summary>
+        /// 字符串主键为空时的认值
+        /// </summary>
+        public string Key_Char_Default
+        {
+            get => _temp_key_char_defalut;
+        }
+
 
         /// <summary>
         /// 字段创建时的模板[$FieldName$]  这是一个可替换的字符串ColumnName是在HiColumn中的属性名
@@ -218,7 +230,7 @@ namespace HiSql
         {
             get { //return _temp_install;
 
-                return HiSql.SqlServer.Properties.Resources.HiSql.ToString();
+                return HiSql.Unit.Properties.Resources.HiSql.ToString();
             }
         }
 

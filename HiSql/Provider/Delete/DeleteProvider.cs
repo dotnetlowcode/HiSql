@@ -21,7 +21,18 @@ namespace HiSql
         bool _isdrop = false;
 
         Filter _where;
-        public HiSqlProvider Context { get; set; }
+
+        IDbConfig dbconfig = null;
+        HiSqlProvider _context = null;
+        public HiSqlProvider Context { get=>_context; 
+            set { _context = value;
+                if (dbconfig == null)
+                {
+                    dbconfig = (IDbConfig)Instance.CreateInstance<IDbConfig>($"{Constants.NameSpace}.{_context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.Config.ToString()}");
+                    dbconfig.Init();
+                }
+            } 
+        }
         public TableDefinition Table
         {
             get { return _table; }
@@ -59,9 +70,11 @@ namespace HiSql
         /// 是否完全没有数据库日志的删除
         /// </summary>
         public bool IsNoDbLog { get => _isnodblog; }
+
+        
         public DeleteProvider()
         {
-
+            
         }
 
         public virtual string ToSql()
@@ -342,7 +355,10 @@ namespace HiSql
                             {
                                 throw new Exception($"字段[{objprop.Name}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
                             }
-                            _values.Add(hiColumn.FieldName, $"'{_value.ToSqlInject()}'");
+                            if(hiColumn.IsPrimary && string.IsNullOrEmpty(_value))
+                                _values.Add(hiColumn.FieldName, $"'{dbconfig.Key_Char_Default}'");
+                            else
+                                _values.Add(hiColumn.FieldName, $"'{_value.ToSqlInject()}'");
                         }
                         else if (hiColumn.FieldType.IsIn<HiType>(HiType.VARCHAR, HiType.CHAR, HiType.TEXT))
                         {
@@ -350,7 +366,10 @@ namespace HiSql
                             {
                                 throw new Exception($"字段[{objprop.Name}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
                             }
-                            _values.Add(hiColumn.FieldName, $"'{_value.ToSqlInject()}'");
+                            if (hiColumn.IsPrimary && string.IsNullOrEmpty(_value))
+                                _values.Add(hiColumn.FieldName, $"'{dbconfig.Key_Char_Default}'");
+                            else
+                                _values.Add(hiColumn.FieldName, $"'{_value.ToSqlInject()}'");
 
                         }
                         else if (hiColumn.FieldType.IsIn<HiType>(HiType.INT, HiType.BIGINT, HiType.DECIMAL, HiType.SMALLINT))
@@ -443,12 +462,18 @@ namespace HiSql
                                 {
                                     throw new Exception($"字段[{hiColumn.FieldName}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
                                 }
-                                _values.Add(hiColumn.FieldName, $"'{_value.ToSqlInject()}'");
+                                if (hiColumn.IsPrimary && string.IsNullOrEmpty(_value))
+                                    _values.Add(hiColumn.FieldName, $"'{dbconfig.Key_Char_Default}'");
+                                else
+                                    _values.Add(hiColumn.FieldName, $"'{_value.ToSqlInject()}'");
                             }
                             else if (hiColumn.FieldType.IsIn<HiType>(HiType.VARCHAR, HiType.CHAR, HiType.TEXT))
                             {
 
-                                _values.Add(hiColumn.FieldName, $"'{_value.ToSqlInject()}'");
+                                if (hiColumn.IsPrimary && string.IsNullOrEmpty(_value))
+                                    _values.Add(hiColumn.FieldName, $"'{dbconfig.Key_Char_Default}'");
+                                else
+                                    _values.Add(hiColumn.FieldName, $"'{_value.ToSqlInject()}'");
                             }
                             else if (hiColumn.FieldType.IsIn<HiType>(HiType.INT, HiType.BIGINT, HiType.DECIMAL, HiType.SMALLINT))
                             {

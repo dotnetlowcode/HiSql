@@ -122,8 +122,8 @@ namespace HiSql
                             var tabresult = _sqlClient.DbFirst.ModiTable(tabInfo, OpLevel.Execute,true);
                             var fieldresult = _sqlClient.DbFirst.ModiTable(tabInfo2, OpLevel.Execute,true);
 
-                            HiSqlCommProvider.RemoveTabInfoCache(tabInfo.TabModel.TabName);
-                            HiSqlCommProvider.RemoveTabInfoCache(tabInfo2.TabModel.TabName);
+                            HiSqlCommProvider.RemoveTabInfoCache(tabInfo.TabModel.TabName,_sqlClient.Context.CurrentConnectionConfig.DbType);
+                            HiSqlCommProvider.RemoveTabInfoCache(tabInfo2.TabModel.TabName, _sqlClient.Context.CurrentConnectionConfig.DbType);
 
                             _sqlClient.Context.DBO.ExecCommand(idm.BuildSqlCodeBlock( dbConfig.Delete_TabStruct.Replace("[$Schema$]", _sqlClient.CurrentConnectionConfig.Schema).Replace("[$TabName$]", Constants.HiSysTable["Hi_TabModel"])));
                             _sqlClient.Context.DBO.ExecCommand(idm.BuildSqlCodeBlock(dbConfig.Delete_TabStruct.Replace("[$Schema$]", _sqlClient.CurrentConnectionConfig.Schema).Replace("[$TabName$]", Constants.HiSysTable["Hi_FieldModel"])));

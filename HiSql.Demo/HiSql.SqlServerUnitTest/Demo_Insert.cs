@@ -115,7 +115,7 @@ namespace HiSql
             //sqlClient.Update("hi_fieldmodel", new { TabName= "H_Test4",FieldName= "sid", SNO = "SALENO", SNO_NUM = "1" }).Only("SNO", "SNO_NUM").ExecCommand();
             //HiSqlCommProvider.RemoveTabInfoCache("H_Test4");
             sqlClient.Update("hi_fieldmodel", new { DbName="", TabName = "H_Test5", FieldName = "sid", SNO = "SALENO", SNO_NUM = "1" }).Only("SNO", "SNO_NUM").ExecCommand();
-            HiSqlCommProvider.RemoveTabInfoCache("H_Test5");
+            HiSqlCommProvider.RemoveTabInfoCache("H_Test5", sqlClient.Context.CurrentConnectionConfig.DbType);
 
             List<object> list = new List<object>();
 

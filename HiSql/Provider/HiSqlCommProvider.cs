@@ -35,12 +35,13 @@ namespace HiSql
         /// <summary>
         /// 初始化表结构缓存
         /// </summary>
-        /// <param name="tabname"></param>
+        /// <param name="keyname"></param>
         /// <param name="GetInfo"></param>
         /// <returns></returns>
-        public static TabInfo InitTabMaping(string tabname, Func<TabInfo> GetInfo)
+        public static TabInfo InitTabMaping(string keyname, Func<TabInfo> GetInfo)
         {
-            string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", tabname.ToLower());
+            string _keyname = keyname;
+            //string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", keyname.ToLower());
             //TabInfo tableInfo = null; 
             //bool locked = false;
             //var lckinfo = new LckInfo() { UName = "hisql", EventName = "InitTabMaping" };
@@ -150,9 +151,9 @@ namespace HiSql
         /// 移除表结构缓存信息
         /// </summary>
         /// <param name="tabname"></param>
-        public static void RemoveTabInfoCache(string tabname)
+        public static void RemoveTabInfoCache(string tabname,DBType dBType)
         {
-            string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", tabname.ToLower());
+            string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", tabname.ToLower()).Replace("[$DbType$]", dBType.ToString());
             if (CacheContext.MCache.Exists(_keyname))
                 CacheContext.MCache.RemoveCache(_keyname);
 
@@ -339,7 +340,17 @@ namespace HiSql
                     {
                         if (dbtype != DBType.DaMeng)
                         {
-                            fieldChanges.Add(new FieldChange { IsTabChange = rtntuple.Item2, OldColumn = _column, NewColumn = column, FieldName = column.FieldName, Action = TabFieldAction.MODI, ChangeDetail = rtntuple.Item3 });
+                            if (rtntuple.Item3.Count == 1 && rtntuple.Item3.Where(fc => fc.AttrName.Equals("DBDefault", StringComparison.OrdinalIgnoreCase)
+                                && (
+                                    fc.ValueA.Equals("EMPTY", StringComparison.OrdinalIgnoreCase) || fc.ValueA.Equals("VALUE", StringComparison.OrdinalIgnoreCase)
+                                    ||
+                                    fc.ValueB.Equals("EMPTY", StringComparison.OrdinalIgnoreCase) || fc.ValueB.Equals("VALUE", StringComparison.OrdinalIgnoreCase)
+                                    )
+                                ).Count() > 0)
+                            { 
+                                
+                            }else
+                                fieldChanges.Add(new FieldChange { IsTabChange = rtntuple.Item2, OldColumn = _column, NewColumn = column, FieldName = column.FieldName, Action = TabFieldAction.MODI, ChangeDetail = rtntuple.Item3 });
                         }
                         else
                         {
@@ -351,7 +362,7 @@ namespace HiSql
                             && fc.ValueA.Equals("char", StringComparison.OrdinalIgnoreCase)
                             && fc.ValueB.Equals("nchar", StringComparison.OrdinalIgnoreCase))
                             ).FirstOrDefault();
-                            if (fieldtype!=null && fieldlen!=null)
+                            if (fieldtype != null && fieldlen != null)
                             {
                                 int _va = int.Parse(fieldlen.ValueA);
                                 int _vb = int.Parse(fieldlen.ValueB);
@@ -367,8 +378,21 @@ namespace HiSql
                                     fieldChanges.Add(new FieldChange { IsTabChange = rtntuple.Item2, OldColumn = _column, NewColumn = column, FieldName = column.FieldName, Action = TabFieldAction.MODI, ChangeDetail = rtntuple.Item3 });
 
                                 }
-                            }else
-                                fieldChanges.Add(new FieldChange { IsTabChange = rtntuple.Item2, OldColumn = _column, NewColumn = column, FieldName = column.FieldName, Action = TabFieldAction.MODI, ChangeDetail = rtntuple.Item3 });
+                            }
+                            else
+                            {
+                                if (rtntuple.Item3.Count == 1 && rtntuple.Item3.Where(fc=>fc.AttrName.Equals("DBDefault", StringComparison.OrdinalIgnoreCase)
+                                && (
+                                    fc.ValueA.Equals("EMPTY", StringComparison.OrdinalIgnoreCase) || fc.ValueA.Equals("VALUE", StringComparison.OrdinalIgnoreCase)
+                                    ||
+                                    fc.ValueB.Equals("EMPTY", StringComparison.OrdinalIgnoreCase) || fc.ValueB.Equals("VALUE", StringComparison.OrdinalIgnoreCase)
+                                    )
+                                ).Count()>0)
+                                { 
+                                    //达梦数据库忽略此种差异
+                                }else
+                                    fieldChanges.Add(new FieldChange { IsTabChange = rtntuple.Item2, OldColumn = _column, NewColumn = column, FieldName = column.FieldName, Action = TabFieldAction.MODI, ChangeDetail = rtntuple.Item3 });
+                            }
                         }
                     }
                 }
