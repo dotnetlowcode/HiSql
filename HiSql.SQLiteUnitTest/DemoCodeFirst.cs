@@ -12,7 +12,7 @@ namespace HiSql
         public static void Init(HiSqlClient sqlClient)
         {
             //CodeFirst_Demo(sqlClient);
-            //CodeFirst_Table(sqlClient);
+            CodeFirst_Table(sqlClient);
             //Snro_Demo(sqlClient);
             //CodeFirst_Install(sqlClient);
             string s = Console.ReadLine();

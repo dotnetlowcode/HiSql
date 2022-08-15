@@ -410,9 +410,10 @@ namespace HiSql
                                         #region 将值转成string 及特殊处理
                                         if (hiColumn.FieldType.IsIn<HiType>(HiType.DATE, HiType.DATETIME))
                                         {
-                                            DateTime dtime = (DateTime)_o[hiColumn.FieldName];
-                                            if (dtime != null && dtime != DateTime.MinValue)
+                                            
+                                            if (_o[hiColumn.FieldName] !=null)
                                             {
+                                                DateTime dtime = string.IsNullOrEmpty( _o[hiColumn.FieldName].ToString())?DateTime.MinValue:Convert.ToDateTime(_o[hiColumn.FieldName].ToString());
                                                 _value = dtime.ToString("yyyy-MM-dd HH:mm:ss.fff");
                                             }
                                             else
@@ -429,10 +430,11 @@ namespace HiSql
                                             else
                                                 _value = "0";
                                         }
-                                        else
+                                        else if(hiColumn.FieldType.IsNumberField())
                                         {
-                                            _value = _o[hiColumn.FieldName].ToString();
-                                        }
+                                            _value = _o[hiColumn.FieldName]==null?"0":_o[hiColumn.FieldName].ToString();
+                                        }else
+                                            _value = _o[hiColumn.FieldName] == null ? "" : _o[hiColumn.FieldName].ToString();
                                         #endregion
 
                                         #region 是否需要正则校验

@@ -197,6 +197,19 @@ namespace HiSql
         string _temp_tabel_primarykey_drop = "";
 
         /// <summary>
+        /// 主键字符串默认值 
+        /// </summary>
+        string _temp_key_char_defalut = " ";
+
+        /// <summary>
+        /// 字符串主键为空时的认值
+        /// </summary>
+        public string Key_Char_Default
+        {
+            get => _temp_key_char_defalut;
+        }
+
+        /// <summary>
         /// 字段创建时的模板[$FieldName$]  这是一个可替换的字符串ColumnName是在HiColumn中的属性名
         /// </summary>
         Dictionary<string, string> _fieldtempmapping = new Dictionary<string, string> { };
@@ -702,7 +715,39 @@ UNION ALL
                 .AppendLine("a.\"DEFAULT_VALUE\" as \"DbDefault\",a.\"COMMENTS\" as \"FieldDesc\"")
                 .AppendLine(" FROM SYS.TABLE_COLUMNS as a")
                 .AppendLine("  INNER JOIN \"SYS\".\"OBJECTS\" AS b on a.\"TABLE_NAME\" = b.\"OBJECT_NAME\" AND b.\"OBJECT_TYPE\" in ('VIEW','TABLE')")
-                .AppendLine("  WHERE TABLE_NAME = '[$TabName$]' ORDER BY POSITION;")
+                .AppendLine("  WHERE TABLE_NAME = '[$TabName$]'")
+
+                .AppendLine(" union all")
+
+                .AppendLine("SELECT b.\"OBJECT_TYPE\" AS \"TabType\", a.\"VIEW_NAME\" AS \"TabName\" ,a.\"POSITION\" as \"FieldNo\",A.\"COLUMN_NAME\" AS \"FieldName\",FALSE AS  \"IsIdentity\",FALSE AS \"IsPrimary\",")
+                .AppendLine("   case ")
+                .AppendLine("       when a.\"DATA_TYPE_NAME\" = 'NVARCHAR' then 'nvarchar'")
+                .AppendLine("       when a.\"DATA_TYPE_NAME\" = 'VARCHAR' then 'varchar'")
+                .AppendLine("       when a.\"DATA_TYPE_NAME\" = 'NCHAR' then 'nchar'")
+                .AppendLine("       when a.\"DATA_TYPE_NAME\" = 'CHAR' then 'char'")
+                .AppendLine("       when a.\"DATA_TYPE_NAME\" = 'TEXT' then 'text'")
+                .AppendLine("       when a.\"DATA_TYPE_NAME\" = 'INTEGER' then 'integer'")
+                .AppendLine("       when a.\"DATA_TYPE_NAME\" = 'BIGINT' then 'bigint'")
+                .AppendLine("       when a.\"DATA_TYPE_NAME\" = 'SMALLINT' then 'smallint'")
+                .AppendLine("       when a.\"DATA_TYPE_NAME\" = 'TINYINT' then 'integer'")
+                .AppendLine("       when a.\"DATA_TYPE_NAME\" = 'DECIMAL' then 'decimal'")
+                .AppendLine("       when a.\"DATA_TYPE_NAME\" = 'FLOAT' then 'decimal'")
+                .AppendLine("       when a.\"DATA_TYPE_NAME\" = 'SMALLDECIMAL' then 'decimal'")
+                .AppendLine("       when a.\"DATA_TYPE_NAME\" = 'BOOLEAN' then 'boolean'")
+                .AppendLine("       when a.\"DATA_TYPE_NAME\" = 'DATE' then 'date'  ")
+                .AppendLine("       when a.\"DATA_TYPE_NAME\" = 'SECONDDATE' then 'timestamp'")
+                .AppendLine("       when a.\"DATA_TYPE_NAME\" = 'TIMESTAMP' then 'timestamp'")
+                .AppendLine("       when a.\"DATA_TYPE_NAME\" = 'BINARY' then 'binary'")
+                .AppendLine("       when a.\"DATA_TYPE_NAME\" = 'VARBINARY' then 'binary'")
+                .AppendLine("       ELSE 'nvarchar'")
+                .AppendLine("   end   AS \"FieldType\",")
+                .AppendLine("a.\"LENGTH\" * 2 AS \"UseBytes\",")
+                .AppendLine(" case when a.\"DATA_TYPE_NAME\" = 'INTEGER' or a.\"DATA_TYPE_NAME\" = 'BIGINT' or a.\"DATA_TYPE_NAME\" = 'SMALLINT' or a.\"DATA_TYPE_NAME\" = 'TINYINT' or a.\"DATA_TYPE_NAME\" = 'BOOLEAN'  or a.\"DATA_TYPE_NAME\" = 'SECONDDATE'  or a.\"DATA_TYPE_NAME\" = 'TIMESTAMP'   then 0   else    a.\"LENGTH\"    end   AS \"Lens\",")
+                .AppendLine("a.\"SCALE\" AS \"PointDec\",a.\"IS_NULLABLE\"  as \"IsNull\",")
+                .AppendLine("a.\"DEFAULT_VALUE\" as \"DbDefault\",a.\"COMMENTS\" as \"FieldDesc\"")
+                .AppendLine(" FROM SYS.VIEW_COLUMNS as a")
+                .AppendLine("  INNER JOIN \"SYS\".\"OBJECTS\" AS b on a.\"VIEW_NAME\" = b.\"OBJECT_NAME\" AND b.\"OBJECT_TYPE\" in ('VIEW','TABLE')")
+                .AppendLine("  WHERE VIEW_NAME = '[$TabName$]' order by \"FIELDNO\" asc;")
                 .ToString();
 
 

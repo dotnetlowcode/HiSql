@@ -328,7 +328,20 @@ namespace HiSql
             ds.Tables.Add(dt_field);
             return ds;
         }
-
+        /// <summary>
+        /// 获取物理表结构信息
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public TabInfo GetPhyTabStruct(string tabname)
+        {
+            DataTable dts = GetTableDefinition(tabname);
+            if (dts == null || dts.Rows.Count == 0)
+                throw new Exception($"表[{tabname}]不存在");
+            else
+                return TabDefinitionToEntity(dts, dbConfig.DbMapping);
+        }
         /// <summary>
         /// 获取表结构信息并缓存
         /// </summary>
@@ -341,13 +354,13 @@ namespace HiSql
             List<HiColumn> _lstmodi = new List<HiColumn>();
             List<object> _lstdel = new List<object>();
             HiSqlClient _client = null;
-            string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", tabname.ToLower());
+            string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", tabname.ToLower()).Replace("[$DbType$]", Context.CurrentConnectionConfig.DbType.ToString());
             TabInfo newtabinfo = this.Context.MCache.GetCache<TabInfo>(_keyname);
             if (newtabinfo == null)
             {
 
 
-                newtabinfo = HiSqlCommProvider.InitTabMaping(tabname, () =>
+                newtabinfo = HiSqlCommProvider.InitTabMaping(_keyname, () =>
                 {
                     tabname = tabname.ToSqlInject();
                     DataSet ds = GetTabModelInfo(tabname);
@@ -538,6 +551,8 @@ namespace HiSql
         {
             StringBuilder sb = new StringBuilder();
 
+            string _dbname = string.IsNullOrEmpty(hiTable.DbName) ? dbConfig.Key_Char_Default : hiTable.DbName.ToSqlInject();
+            string _dbserver = string.IsNullOrEmpty(hiTable.DbServer) ? dbConfig.Key_Char_Default : hiTable.DbServer.ToSqlInject();
             string _schema = this.Context.CurrentConnectionConfig.Schema;
             sb.AppendLine($"insert into {dbConfig.Schema_Pre}{_schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{Constants.HiSysTable["Hi_TabModel"]}{dbConfig.Table_After} (")
                 .Append($"{dbConfig.Field_Pre}DbServer{dbConfig.Field_After}{dbConfig.Field_Split}")
@@ -555,8 +570,8 @@ namespace HiSql
                 .Append($"{dbConfig.Field_Pre}LogTable{dbConfig.Field_After}{dbConfig.Field_Split}")
                 .Append($"{dbConfig.Field_Pre}LogExprireDay{dbConfig.Field_After}")
                 .Append(") values(")
-                .Append($"'{hiTable.DbServer.ToSqlInject()}',")
-                .Append($"'{hiTable.DbName.ToSqlInject()}',")
+                .Append($"'{_dbserver}',")
+                .Append($"'{_dbname}',")
                 .Append($"'{hiTable.TabName}',")
                 .Append($"'{hiTable.TabReName.ToSqlInject()}',")
                 .Append($"'{hiTable.TabDescript.ToSqlInject()}',")
@@ -610,8 +625,8 @@ namespace HiSql
                     .Append($"{dbConfig.Field_Pre}RefFieldDesc{dbConfig.Field_After}{dbConfig.Field_Split}")
                     .Append($"{dbConfig.Field_Pre}RefWhere{dbConfig.Field_After}")
                     .Append(")values(")
-                    .Append($"'{hiTable.DbServer.ToSqlInject()}',")
-                    .Append($"'{hiTable.DbName.ToSqlInject()}',")
+                    .Append($"'{_dbserver}',")
+                    .Append($"'{_dbname}',")
                     .Append($"'{hiTable.TabName}',")
                     .Append($"'{hiColumn.FieldName}',")
                     .Append($"'{hiColumn.FieldDesc.ToSqlInject()}',")
@@ -2553,7 +2568,14 @@ namespace HiSql
                 {
                     _value = value.ToString();
                     if (_value.Length <= hiColumn.FieldLen || hiColumn.FieldLen < 0)
-                        _value = $"'{_value.ToSqlInject()}'";
+                    {
+                        if (hiColumn.IsPrimary && string.IsNullOrEmpty(_value))
+                        {
+                            _value = $"'{dbConfig.Key_Char_Default}'";
+                        }
+                        else
+                            _value = $"'{_value.ToSqlInject()}'";
+                    }
                     else
                         throw new Exception($"过滤条件字段[{hiColumn.FieldName}]指定的值超过了限定长度[{hiColumn.FieldLen}]");
                 }
@@ -2561,7 +2583,14 @@ namespace HiSql
                 {
                     _value = value.ToString();
                     if (_value.LengthZH() <= hiColumn.FieldLen || hiColumn.FieldLen < 0)
-                        _value = $"'{_value.ToSqlInject()}'";
+                    {
+                        if (hiColumn.IsPrimary && string.IsNullOrEmpty(_value))
+                        {
+                            _value = $"'{dbConfig.Key_Char_Default}'";
+                        }
+                        else
+                            _value = $"'{_value.ToSqlInject()}'";
+                    }
                     else
                         throw new Exception($"过滤条件字段[{hiColumn.FieldName}]指定的值超过了限定长度[{hiColumn.FieldLen}]");
                 }
@@ -2679,7 +2708,14 @@ namespace HiSql
                     if (!_istempfield)
                     {
                         if (_value.Length <= hiColumn.FieldLen || hiColumn.FieldLen < 0)
-                            _value = $"'{_value.ToSqlInject()}'";
+                        {
+                            if (hiColumn.IsPrimary && string.IsNullOrEmpty(_value))
+                            {
+                                _value = $"'{dbConfig.Key_Char_Default}'";
+                            }
+                            else
+                                _value = $"'{_value.ToSqlInject()}'";
+                        }
                         else
                             throw new Exception($"过滤条件字段[{filterDefinition.Field.AsFieldName}]指定的值超过了限定长度[{hiColumn.FieldLen}]");
                     }
@@ -2694,7 +2730,14 @@ namespace HiSql
                     if (!_istempfield)
                     {
                         if (_value.LengthZH() <= hiColumn.FieldLen || hiColumn.FieldLen < 0)
-                            _value = $"'{_value.ToSqlInject()}'";
+                        {
+                            if (hiColumn.IsPrimary && string.IsNullOrEmpty(_value))
+                            {
+                                _value = $"'{dbConfig.Key_Char_Default}'";
+                            }
+                            else
+                                _value = $"'{_value.ToSqlInject()}'";
+                        }
                         else
                             throw new Exception($"过滤条件字段[{filterDefinition.Field.AsFieldName}]指定的值超过了限定长度[{hiColumn.FieldLen}]");
                     }

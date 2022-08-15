@@ -39,6 +39,14 @@ namespace HiSql
         /// <returns></returns>
         TabInfo GetTabStruct(string tabname);
 
+
+        /// <summary>
+        /// 获取物理表结构信息
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <returns></returns>
+        TabInfo GetPhyTabStruct(string tabname);
+
         /// <summary>
         /// 根据结构信息创建表
         /// </summary>

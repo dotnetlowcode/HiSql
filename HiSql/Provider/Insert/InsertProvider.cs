@@ -112,9 +112,18 @@ namespace HiSql
                         {
                             _sb_n.AppendLine("do begin");
                         }
+                        if (this.Context.CurrentConnectionConfig.DbType == DBType.Oracle)
+                        {
+                            _sb_n.AppendLine("begin");
+                        }
+
                         _sb_n.AppendLine(n);
                         
                         if (this.Context.CurrentConnectionConfig.DbType == DBType.Hana)
+                        {
+                            _sb_n.AppendLine("end;");
+                        }
+                        if (this.Context.CurrentConnectionConfig.DbType == DBType.Oracle)
                         {
                             _sb_n.AppendLine("end;");
                         }
