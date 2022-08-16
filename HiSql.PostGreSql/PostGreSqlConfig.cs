@@ -207,6 +207,20 @@ namespace HiSql
         string _temp_tabel_primarykey_create = "";
 
         string _temp_tabel_primarykey_drop = "";
+
+        /// <summary>
+        /// 主键字符串默认值 
+        /// </summary>
+        string _temp_key_char_defalut = "";
+
+        /// <summary>
+        /// 字符串主键为空时的认值
+        /// </summary>
+        public string Key_Char_Default
+        {
+            get => _temp_key_char_defalut;
+        }
+
         /// <summary>
         /// 字段创建时的模板[$FieldName$]  这是一个可替换的字符串ColumnName是在HiColumn中的属性名
         /// </summary>
@@ -877,7 +891,7 @@ SET "DomainDesc" = excluded."DomainDesc";
 
             _temp_delete = $"delete from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after};";
 
-            _temp_delete_where = $"delete from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} where [$Where$];";
+            _temp_delete_where = $"delete from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} [$AsTabName$] where [$Where$];";
 
             //删除不会留下任何痕迹
             _temp_truncate = $"TRUNCATE TABLE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after};";

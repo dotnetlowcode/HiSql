@@ -27,6 +27,8 @@ namespace HiSql
         string _temp_field_after = "\"";
 
 
+        
+
 
         string _temp_field_split = ",";
 
@@ -198,6 +200,18 @@ namespace HiSql
         /// </summary>
         string _temp_drop_index = "";
 
+        /// <summary>
+        /// 主键字符串默认值 
+        /// </summary>
+        string _temp_key_char_defalut = " ";
+
+        /// <summary>
+        /// 字符串主键为空时的认值
+        /// </summary>
+        public string Key_Char_Default
+        {
+            get => _temp_key_char_defalut;
+        }
 
         string _temp_tabel_primarykey_create = "";
 

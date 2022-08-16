@@ -197,7 +197,18 @@ namespace HiSql
         /// </summary>
         string _temp_drop_index = "";
 
-       
+        /// <summary>
+        /// 主键字符串默认值 
+        /// </summary>
+        string _temp_key_char_defalut = "";
+
+        /// <summary>
+        /// 字符串主键为空时的认值
+        /// </summary>
+        public string Key_Char_Default
+        {
+            get => _temp_key_char_defalut;
+        }
 
         /// <summary>
         /// 字段创建时的模板[$FieldName$]  这是一个可替换的字符串ColumnName是在HiColumn中的属性名
@@ -733,7 +744,7 @@ UNION ALL
             //获取表
             _temp_getalltables = new StringBuilder()
                 .AppendLine(@"select name as TabName, (case when type='table' then 'Table' else 'View' end ) as TabType, null as CreateTime from sqlite_master 
-where type  in('table') [$Where$] COLLATE NOCASE  order by type ASC, [name] ASC 
+where type  in('table','view') [$Where$] COLLATE NOCASE  order by type ASC, [name] ASC 
                        ").ToString();
 
             _temp_getalltables_paging = new StringBuilder()
