@@ -65,9 +65,9 @@ namespace HiSql.UnitTest
             HiSqlClient sqlcient = Demo_Init.GetSqlClient();
 
             // Console.WriteLine($"数据库连接id"+sqlcient.Context.ConnectedId);
-             Demo_Insert.Init(sqlcient);//ok
+             //Demo_Insert.Init(sqlcient);//ok
             //Demo_Update.Init(sqlcient);//ok
-            //Demo_Query.Init(sqlcient);//ok
+            Demo_Query.Init(sqlcient);//ok
 
             //Demo_Delete.Init(sqlcient);//ok
             //
