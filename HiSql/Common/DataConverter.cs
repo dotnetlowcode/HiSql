@@ -376,7 +376,7 @@ namespace HiSql
             .GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
                   .Where(p => p.GetSetMethod(true) != null)
                   .ToList();
-                DataTableEntityBuilder<T> eblist = DataTableEntityBuilder<T>.CreateBuilderOfDataRow(cacheHandlerInfo);
+                DataTableEntityBuilder<T> eblist = DataTableEntityBuilder<T>.CreateBuilderOfDataRow(cacheHandlerInfo, dbtype);
                 cacheHandlerInfo.Fun = eblist.DataRowHandler;
                 DataRowToEntityHandler.TryAdd(cacheKey, cacheHandlerInfo);
             }
@@ -419,7 +419,7 @@ namespace HiSql
                   .Where(p => p.GetSetMethod(true) != null)
                   .ToList();
 
-                DataTableEntityBuilder<T> eblist = DataTableEntityBuilder<T>.CreateBuilderOfDataRecord(cacheHandlerInfo, dataReader);
+                DataTableEntityBuilder<T> eblist = DataTableEntityBuilder<T>.CreateBuilderOfDataRecord(cacheHandlerInfo, dataReader, dbType);
                 cacheHandlerInfo.Fun = eblist.DataRecordHandler;
                 DataConverterCache<object>.DataReaderToEntityHandler.TryAdd(cacheKey, cacheHandlerInfo);
             }
@@ -660,6 +660,17 @@ namespace HiSql
 
         private static readonly MethodInfo getDateTimeEqualsMethod = typeof(System.DateTime).GetMethod("Equals", new Type[] { typeof(DateTime), typeof(DateTime) });
 
+        private static Dictionary<Type, MethodInfo> ConvertMethods = new Dictionary<Type, MethodInfo>()
+           {
+               {typeof(int),typeof(Convert).GetMethod("ToInt32",new Type[]{typeof(object)})},
+               {typeof(Int16),typeof(Convert).GetMethod("ToInt16",new Type[]{typeof(object)})},
+               {typeof(Int64),typeof(Convert).GetMethod("ToInt64",new Type[]{typeof(object)})},
+               {typeof(DateTime),typeof(Convert).GetMethod("ToDateTime",new Type[]{typeof(object)})},
+               {typeof(decimal),typeof(Convert).GetMethod("ToDecimal",new Type[]{typeof(object)})},
+               {typeof(Double),typeof(Convert).GetMethod("ToDouble",new Type[]{typeof(object)})},
+               {typeof(Boolean),typeof(Convert).GetMethod("ToBoolean",new Type[]{typeof(object)})},
+               {typeof(string),typeof(Convert).GetMethod("ToString",new Type[]{typeof(object)})}
+		   };
 
         public Func<IDataRecord, object> DataRecordHandler { get; set; }
         public Func<object, object, bool> CompareEntityHandler { get; set; }
@@ -709,7 +720,7 @@ namespace HiSql
         /// DataRow转Entity
         /// </summary>
         /// <returns></returns>
-        public static DataTableEntityBuilder<Entity> CreateBuilderOfDataRow(DataTableToEntityHandlerInfo handlerInfo)
+        public static DataTableEntityBuilder<Entity> CreateBuilderOfDataRow(DataTableToEntityHandlerInfo handlerInfo, DBType dbtype)
         {
             DataTableEntityBuilder<Entity> dynamicBuilder = new DataTableEntityBuilder<Entity>();
             DynamicMethod method = new DynamicMethod("CreateBuilderOfDataRow", typeof(Entity), new Type[] { typeof(DataRow) }, typeof(Entity), true);
@@ -745,8 +756,28 @@ namespace HiSql
 
                 var nullUnderlyingType = Nullable.GetUnderlyingType(property.PropertyType);
                 var unboxType = nullUnderlyingType?.IsEnum == true ? nullUnderlyingType : property.PropertyType;
-                generator.Emit(OpCodes.Unbox_Any, unboxType);
+
+                if (property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+                {
+                    unboxType = property.PropertyType.GetGenericArguments()[0];
+                }
+
+
+                if (dbtype == DBType.Sqlite || dbtype == DBType.Oracle || dbtype == DBType.MySql)
+                {
+                   
+                    if (unboxType.IsValueType)
+                    {
+                        var castMethod = typeof(Convert).GetMethod("To" + unboxType.Name, new Type[] { typeof(object) });
+                        generator.Emit(OpCodes.Call, castMethod); //类型转换
+                    }
+                }
                
+                else
+                {
+                    generator.Emit(OpCodes.Unbox_Any, unboxType); //拆箱
+                }
+
                 generator.Emit(OpCodes.Callvirt, property.GetSetMethod());
                 generator.MarkLabel(endIfDBNull);
                 colIndex++;
@@ -1228,7 +1259,7 @@ namespace HiSql
         /// DataReader转Entity
         /// </summary>
         /// <returns></returns>
-        public static DataTableEntityBuilder<Entity> CreateBuilderOfDataRecord(DataReaderToEntityHandlerInfo handlerInfo,IDataReader reader)
+        public static DataTableEntityBuilder<Entity> CreateBuilderOfDataRecord(DataReaderToEntityHandlerInfo handlerInfo,IDataReader reader, DBType dbtype)
         {
             DataTableEntityBuilder<Entity> dynamicBuilder = new DataTableEntityBuilder<Entity>();
             DynamicMethod method = new DynamicMethod("CreateBuilderOfDataRecord", typeof(Entity), new Type[] { typeof(IDataRecord)}, typeof(Entity), true);
@@ -1280,7 +1311,23 @@ namespace HiSql
 
                 var nullUnderlyingType = Nullable.GetUnderlyingType(property.PropertyType);
                 var unboxType = nullUnderlyingType?.IsEnum == true ? nullUnderlyingType : property.PropertyType;
-                //if (property.PropertyType.IsValueType)
+
+                if (property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+                {
+                    unboxType = property.PropertyType.GetGenericArguments()[0];
+                }
+
+
+                if (dbtype == DBType.Sqlite || dbtype == DBType.Oracle || dbtype == DBType.MySql)
+                {
+
+                    if (unboxType.IsValueType)
+                    {
+                        var castMethod = typeof(Convert).GetMethod("To" + unboxType.Name, new Type[] { typeof(object) });
+                        generator.Emit(OpCodes.Call, castMethod); //类型转换
+                    }
+                }
+                else
                 {
                     generator.Emit(OpCodes.Unbox_Any, unboxType);
                 }

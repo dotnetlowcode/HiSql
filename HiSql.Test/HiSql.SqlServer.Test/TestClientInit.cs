@@ -24,7 +24,7 @@ namespace HiSql.Unit.Test
                  {
                      DbType = DBType.SqlServer,
                      DbServer = "local-HiSql",
-                     ConnectionString = @"server=(local);uid=sa;pwd=Hone@123;database=Hone;Encrypt=True; TrustServerCertificate=True;",//; MultipleActiveResultSets = true;
+                     ConnectionString = @"server=(local);uid=sa;pwd=Hone@123;database=HiSql;Encrypt=True; TrustServerCertificate=True;",//; MultipleActiveResultSets = true;
                                                                                                                                        //User="tansar",//可以指定登陆用户的帐号
 
                      SlaveConnectionConfigs = new List<SlaveConnectionConfig> {
@@ -136,6 +136,9 @@ namespace HiSql.Unit.Test
                          }
                      }
                      );
+
+
+            sqlclient.CodeFirst.InstallHisql();
             return sqlclient;
         }
 
@@ -277,7 +280,7 @@ namespace HiSql.Unit.Test
                          DbType = DBType.MySql,
                          DbServer = "local-HoneBI",
                          //ConnectionString = "server=192.168.1.90,8433;uid=sa;pwd=Hone@123;database=HoneBI",
-                         ConnectionString = "data source=127.0.0.1,3306;database=hone;user id=root;password=Hone@123;pooling=false;charset=utf8;AllowLoadLocalInfile=true",//; MultipleActiveResultSets = true;
+                         ConnectionString = "data source=192.168.10.172;Port=8029;database=hone;user id=root;password=hone@123;charset=utf8",//; MultipleActiveResultSets = true;
                                                                                                                                                                            //ConnectionString = "data source=192.168.10.172;database=hone;user id=root;password=hone@123;charset=utf8",//; MultipleActiveResultSets = true;
                                                                                                                                                                            // ConnectionString = "data source=192.168.10.172;Port=8029;database=hone;user id=root;password=hone@123;charset=utf8",//; MultipleActiveResultSets = true;
                                                                                                                                                                            //ConnectionString = "data source=192.168.10.172;Port=8000;database=hone;user id=root;password=hone@123;charset=utf8",
