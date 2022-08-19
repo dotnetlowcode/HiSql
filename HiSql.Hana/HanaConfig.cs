@@ -471,7 +471,7 @@ namespace HiSql
                 { HiType.DATE,"date" },
 
                 { HiType.BINARY,"binary" },
-                { HiType.GUID,"varchar" },
+                { HiType.GUID,"uniqueidentifier" },
             };
 
             _fieldtempmapping = new Dictionary<string, string> {
@@ -709,7 +709,10 @@ UNION ALL
                 .AppendLine("       when a.\"DATA_TYPE_NAME\" = 'VARBINARY' then 'binary'")
                 .AppendLine("       ELSE 'nvarchar'")
                 .AppendLine("   end   AS \"FieldType\",")
-                .AppendLine("a.\"LENGTH\" * 2 AS \"UseBytes\",")
+                .AppendLine("case   WHEN A.\"DATA_TYPE_NAME\" = 'TEXT' then 0 else A.\"LENGTH\" * 2  end AS \"USEBYTES\",")
+
+
+
                 .AppendLine(" case when a.\"DATA_TYPE_NAME\" = 'INTEGER' or a.\"DATA_TYPE_NAME\" = 'BIGINT' or a.\"DATA_TYPE_NAME\" = 'SMALLINT' or a.\"DATA_TYPE_NAME\" = 'TINYINT' or a.\"DATA_TYPE_NAME\" = 'BOOLEAN'  or a.\"DATA_TYPE_NAME\" = 'SECONDDATE'  or a.\"DATA_TYPE_NAME\" = 'TIMESTAMP'   then 0   else    a.\"LENGTH\"    end   AS \"Lens\",")
                 .AppendLine("a.\"SCALE\" AS \"PointDec\",a.\"IS_NULLABLE\"  as \"IsNull\",")
                 .AppendLine("a.\"DEFAULT_VALUE\" as \"DbDefault\",a.\"COMMENTS\" as \"FieldDesc\"")
@@ -741,7 +744,7 @@ UNION ALL
                 .AppendLine("       when a.\"DATA_TYPE_NAME\" = 'VARBINARY' then 'binary'")
                 .AppendLine("       ELSE 'nvarchar'")
                 .AppendLine("   end   AS \"FieldType\",")
-                .AppendLine("a.\"LENGTH\" * 2 AS \"UseBytes\",")
+                .AppendLine("case   WHEN A.\"DATA_TYPE_NAME\" = 'TEXT' then 0 else A.\"LENGTH\" * 2  end AS \"USEBYTES\",")
                 .AppendLine(" case when a.\"DATA_TYPE_NAME\" = 'INTEGER' or a.\"DATA_TYPE_NAME\" = 'BIGINT' or a.\"DATA_TYPE_NAME\" = 'SMALLINT' or a.\"DATA_TYPE_NAME\" = 'TINYINT' or a.\"DATA_TYPE_NAME\" = 'BOOLEAN'  or a.\"DATA_TYPE_NAME\" = 'SECONDDATE'  or a.\"DATA_TYPE_NAME\" = 'TIMESTAMP'   then 0   else    a.\"LENGTH\"    end   AS \"Lens\",")
                 .AppendLine("a.\"SCALE\" AS \"PointDec\",a.\"IS_NULLABLE\"  as \"IsNull\",")
                 .AppendLine("a.\"DEFAULT_VALUE\" as \"DbDefault\",a.\"COMMENTS\" as \"FieldDesc\"")

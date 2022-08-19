@@ -80,6 +80,8 @@ namespace HiSql.Unit.Test
             reTabName(sqlClient);
 
             indexDemo(sqlClient);
+
+            createDemoDynTable(sqlClient);
         }
 
 
@@ -189,7 +191,73 @@ namespace HiSql.Unit.Test
 
             Assert.True(_isok);
         }
+        AopEvent GetAopEvent()
+        {
+            return new AopEvent()
+            {
+                OnDbDecryptEvent = (connstr) =>
+                {
+                    //解密连接字段
+                    //Console.WriteLine($"数据库连接:{connstr}");
 
+                    return connstr;
+                },
+                OnLogSqlExecuting = (sql, param) =>
+                {
+                    //sql执行前 日志记录 (异步)
+                    _outputHelper.WriteLine($"OnLogSqlExecuting:{System.Environment.NewLine}{sql}");
+                    //Console.WriteLine($"sql执行前记录{sql} time:{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss ffff")}");
+                },
+                OnLogSqlExecuted = (sql, param) =>
+                {
+                    //sql执行后 日志记录 (异步)
+                    //Console.WriteLine($"sql执行后记录{sql} time:{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss ffff")}");
+                },
+                OnSqlError = (sqlEx) =>
+                {
+                    //sql执行错误后 日志记录 (异步)
+                    _outputHelper.WriteLine($"OnSqlError:{System.Environment.NewLine}{sqlEx.Message.ToString()}");
+                },
+                OnTimeOut = (int timer) =>
+                {
+                    //Console.WriteLine($"执行SQL语句超过[{timer.ToString()}]毫秒...");
+                }
+            };
+
+        }
+
+        void createDemoDynTable(HiSqlClient sqlClient)
+        {
+            sqlClient.CurrentConnectionConfig.AppEvents = GetAopEvent();
+
+            string tabname1 = "H_dyntab1";
+
+            
+
+            _outputHelper.WriteLine($"检测表[{tabname1}] 是否在当前库中存在");
+            if (sqlClient.DbFirst.CheckTabExists(tabname1))
+            {
+                _outputHelper.WriteLine($"表[{tabname1}] 存在正在执行删除并清除表结构信息");
+                sqlClient.DbFirst.DropTable(tabname1);
+                _outputHelper.WriteLine($"表[{tabname1}] 已经删除");
+            }
+            bool iscreate = sqlClient.DbFirst.CreateTable(Test.TestTable.DynTable.BuildTabInfo(tabname1, true));
+            if (iscreate)
+                _outputHelper.WriteLine($"表[{tabname1}] 已经成功创建");
+            else
+                _outputHelper.WriteLine($"表[{tabname1}] 创建失败");
+
+
+            Assert.True(iscreate);
+
+
+            List<object> lstdata = TestTable.DynTable.BuildTabDataList(tabname1, 100);
+
+
+            int v=sqlClient.Insert(tabname1,lstdata).ExecCommand();
+
+
+        }
         #endregion
     }
 }

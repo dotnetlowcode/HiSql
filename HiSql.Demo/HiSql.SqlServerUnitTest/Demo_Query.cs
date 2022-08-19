@@ -504,7 +504,7 @@ Order By a.fieldNamE
             //DataTable dt2 = sqlClient.Context.DBO.GetDataTable("select * from dbo.Hi_FieldModel where TabName = @TabName and FieldName=@TabName and FieldType=@FieldType", new HiParameter("@TabName", "Hi_TabModel"), new HiParameter("@FieldType", 11));
 
             DataTable dt3 = sqlClient.Query("Hi_FieldModel").Field("*").ToTable();
-            var modelList = DataConverter.ToList<Hi_FieldModel>(dt3);
+            var modelList = DataConverter.ToList<Hi_FieldModel>(dt3,sqlClient.CurrentConnectionConfig.DbType);
 
 
            
@@ -666,7 +666,7 @@ Order By a.fieldNamE
                 {
                     using (IDataReader dr = sqlClient.Context.DBO.GetDataReader("select * from Hi_FieldModel", null))
                     {
-                        var _result = DataConverter.ToList<Hi_FieldModel>(dr);
+                        var _result = DataConverter.ToList<Hi_FieldModel>(dr, sqlClient.CurrentConnectionConfig.DbType);
                     }
 
                 }

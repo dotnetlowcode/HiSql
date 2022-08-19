@@ -71,7 +71,7 @@ namespace HiSql
                     }
                     else
                     {
-                        string _value = value.ToString().ToLower().Trim();
+                        string _value = value.ToString().Trim(); //ToLower().
                         if (_fullname.IndexOf("string", StringComparison.OrdinalIgnoreCase) > 0)
                         {
                             pinfo.SetValue(ef, _value);
@@ -373,13 +373,13 @@ namespace HiSql
 
 
 
-        static public T ToEntity<T>(DataRow dr) where T : new()
+        static public T ToEntity<T>(DataRow dr, PropertyInfo[] propertys) where T : new()
         {
             if (dr == null)
                 return default(T);
             //T t = Activator.CreateInstance<T>();
             T t = new T();
-            PropertyInfo[] propertys = t.GetType().GetProperties();
+           
             DataColumnCollection Columns = dr.Table.Columns;
             foreach (PropertyInfo property in propertys)
             {
@@ -398,7 +398,7 @@ namespace HiSql
                     }
                     catch
                     {
-                        continue;
+                        property.SetValue(t, Convert.ChangeType(value, property.PropertyType), null);
                     }
                 }
             }
@@ -1447,9 +1447,10 @@ namespace HiSql
             List<T> list = new List<T>();
             if (dt != null && dt.Rows.Count > 0)
             {
+                PropertyInfo[] propertys = typeof(T).GetProperties();
                 foreach (DataRow dr in dt.Rows)
                 {
-                    list.Add(ToEntity<T>(dr));
+                    list.Add(ToEntity<T>(dr, propertys));
                 }
             }
             return list;
