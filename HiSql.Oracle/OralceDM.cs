@@ -1120,6 +1120,7 @@ namespace HiSql
                             _str_temp_field = _str_temp_field.Replace("[$FieldName$]", hiColumn.FieldName)
                                 .Replace("[$IsNull$]", hiColumn.IsPrimary ? "" : hiColumn.IsNull == true ? hiColumn.DBDefault != HiTypeDBDefault.NONE ? "" : "NULL" : "NOT NULL")
                                 .Replace("[$EXTEND$]", hiTable.TableType == TableType.Var && hiColumn.IsPrimary ? "primary key" : "")
+                                .Replace("[$Default$]", hiColumn.IsPrimary ? "" : GetDbDefault(hiColumn))
                                 ;
                             break;
                         case "decimal":
@@ -1138,6 +1139,13 @@ namespace HiSql
                                 .Replace("[$Default$]", hiColumn.IsPrimary ? "" : GetDbDefault(hiColumn, hiTable.TabName))
                                 .Replace("[$EXTEND$]", hiTable.TableType == TableType.Var && hiColumn.IsPrimary ? "primary key" : "")
                                 ;
+                            break;
+                        case "text":
+                            _str_temp_field = _str_temp_field.Replace("[$FieldName$]", hiColumn.FieldName)
+                               .Replace("[$IsNull$]", hiColumn.IsIdentity ? "NOT NULL" : hiColumn.IsNull == true ? "NULL" : "NOT NULL")
+                               .Replace("[$Default$]", hiColumn.IsPrimary ? "" : GetDbDefault(hiColumn))
+                               .Replace("[$EXTEND$]", hiTable.TableType == TableType.Var && hiColumn.IsPrimary ? "primary key" : "")
+                               ;
                             break;
                         case "image":
                             _str_temp_field = _str_temp_field.Replace("[$FieldName$]", hiColumn.FieldName)

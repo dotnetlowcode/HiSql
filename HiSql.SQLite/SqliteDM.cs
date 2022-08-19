@@ -312,7 +312,7 @@ namespace HiSql
                 }
                 else if (hiColumn.FieldType.IsIn<HiType>(HiType.GUID))
                 {
-                    _default = "newid()";
+                    _default = "''";
                 }
                 else if (hiColumn.FieldType.IsIn<HiType>(HiType.DATE, HiType.DATETIME))
                 {

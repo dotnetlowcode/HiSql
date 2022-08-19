@@ -107,6 +107,7 @@ namespace HiSql
         string _temp_droptable = "";
 
         string _temp_fun_date = "";
+        string _temp_fun_date2 = "";
 
 
         string _temp_addcolumn = "alter table [$TabName$] add [$TempColumn$] ;";
@@ -469,6 +470,7 @@ namespace HiSql
         {
 
             _temp_fun_date = "CURRENT_TIMESTAMP";
+            _temp_fun_date2 = @"^(?<value>date_format\(now\(\).*)$";
             _lstdefmapping.Add(new DefMapping { IsRegex = false, DbValue = @"", DBDefault = HiTypeDBDefault.NONE });
             //数字默认
             _lstdefmapping.Add(new DefMapping { IsRegex = true, DbValue = @"^(?<value>[-]?\d+(?:[\.]?)[\d]*)$", DbType = HiTypeGroup.Number, DBDefault = HiTypeDBDefault.VALUE });
@@ -481,6 +483,8 @@ namespace HiSql
 
             //日期
             _lstdefmapping.Add(new DefMapping { IsRegex = true, DbValue = $@"^(?<value>{_temp_fun_date})\s*$", DbType = HiTypeGroup.Date, DBDefault = HiTypeDBDefault.FUNDATE });
+
+            _lstdefmapping.Add(new DefMapping { IsRegex = true, DbValue = $@"^(?<value>{_temp_fun_date2})\s*$", DbType = HiTypeGroup.Date, DBDefault = HiTypeDBDefault.FUNDATE });
 
             //md5值
             //_lstdefmapping.Add(new DefMapping { IsRegex = true, DbValue = @"^\((?<value>newid\(\))\)$", DBDefault = HiTypeDBDefault.FUNGUID });
