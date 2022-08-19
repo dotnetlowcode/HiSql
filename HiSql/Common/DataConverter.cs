@@ -1,128 +1,169 @@
-﻿using System;
+﻿using Dapper;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
+
+
+#if NET5_0_OR_GREATER
+using System.Reflection.Metadata;
+using System.Reflection.Metadata.Ecma335;
+
+using System.Reflection.PortableExecutable;
+#endif
 using System.Text;
 using System.Threading.Tasks;
 
 namespace HiSql
 {
-    public static class DataConverter<T>
-    {
-        public static ConcurrentDictionary<string, Func<T, string>> CollectGetValueKeyHandler =
-         new ConcurrentDictionary<string, Func<T, string>>();
+    public class DataReaderToEntityHandlerInfo
+    {       
+        public Func<IDataRecord, object> Fun { set; get; }
+
+        public Type EntityType { set; get; }
+
+        public List<PropertyInfo>  PropertyInfo { set; get; }
+
     }
-        public static class DataConverter
+    public class DataTableToEntityHandlerInfo
     {
+        public DataColumnCollection Columns { set; get; }
+        public Func<DataRow, object> Fun { set; get; }
+
+        public Type EntityType { set; get; }
+
+        public List<PropertyInfo> PropertyInfo { set; get; }
+
+    }
+
+    public static class DataConverterCache<T>
+    {
+        public static ConcurrentDictionary<string, Func<DataRow, T, bool >> ToDataTableHandler =
+         new ConcurrentDictionary<string, Func<DataRow, T,bool>>();
+
+        public static ConcurrentDictionary<string, DataTable> ToDataTableDefaultSchema =
+        new ConcurrentDictionary<string, DataTable>();
+
+        public static ConcurrentDictionary<string, Func<T, string>> CollectGetValueKeyHandler =
+       new ConcurrentDictionary<string, Func<T, string>>();
+
+        public static ConcurrentDictionary<string, DataReaderToEntityHandlerInfo> DataReaderToEntityHandler =
+          new ConcurrentDictionary<string, DataReaderToEntityHandlerInfo>();
+    }
+
+
+    public static class DataConverter
+    {
+
+        static ConcurrentDictionary<string, DataTableToEntityHandlerInfo> DataRowToEntityHandler =
+           new ConcurrentDictionary<string, DataTableToEntityHandlerInfo>();
+
+
+        private static string GetDataReaderCacheInfo(IDataReader reader, Type entityType)
+        {
+            unchecked
+            {
+                int max = reader.FieldCount;
+                int hash = max;
+                for (int i = 0; i < max; i++)
+                {
+                    string tmp = reader.GetName(i);
+                    hash = (-79 * ((hash * 31) + (tmp?.GetHashCode() ?? 0))) + (reader.GetFieldType(i)?.GetHashCode() ?? 0);
+                }
+                return hash.ToString() + entityType?.FullName;
+            }
+        }
+        private static string GetDataTableCacheInfo(DataTable table, Type entityType, DBType dbtype)
+        {
+            unchecked
+            {
+                int max = table.Columns.Count;
+                int hash = max;
+                for (int i = 0; i < max; i++)
+                {
+                    string tmp = table.Columns[i].ColumnName;
+                    hash = (-79 * ((hash * 31) + (tmp?.GetHashCode() ?? 0))) + (table.Columns[i].DataType?.GetHashCode() ?? 0);
+                }
+                return hash.ToString() + entityType?.FullName + (dbtype != null ? dbtype.ToString() : "");
+            }
+        }
         static ConcurrentDictionary<string, List<PropertyInfo>> typePropertyForCollect = new ConcurrentDictionary<string, List<PropertyInfo>>();
-
-        static ConcurrentDictionary<string, object> copiers = new ConcurrentDictionary<string, object>();
-
-        static Object lockHandleDict = new Object();
-        static Object lockDataRecordHandler = new Object();
-
-        static Dictionary<string, Func<DataRow, object>> handleDict =
-           new Dictionary<string, Func<DataRow, object>>();
-
-        static Dictionary<string, Func<IDataRecord, List<string>, object>> DataRecordHandler =
-           new Dictionary<string, Func<IDataRecord, List<string>, object>>();
-
 
         static Object lockCloneEntityHandler = new Object();
         private static ConcurrentDictionary<string, Func<object, object>> CloneEntityHandler { set; get; } = new ConcurrentDictionary<string, Func<object, object>>();
-        
+
         static Object lockCompareEntityHandler = new Object();
 
         static Dictionary<string, Func<object, object, bool>> CompareEntityHandler =
           new Dictionary<string, Func<object, object, bool>>();
 
 
-        public static List<T> ToList<T>(DataTable table) where T : class, new()
+        /// <summary>
+        /// 实体集合 转DataTable
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public static DataTable ListToDataTable<T>(IList<T> list)
         {
-            List<T> list = new List<T>();
-            if (table == null || table.Rows.Count == 0)
-                return list;
+            Type elementType = typeof(T);
+            string key = "ListToDataTableWithIL" + elementType.FullName;
 
-            Func<DataRow, object> handler = null;
-            string key = string.IsNullOrEmpty(table.TableName) ? "DataTable" : table.TableName + "_" + typeof(T).Name;
-            if (handleDict.ContainsKey(key))
+            DataTable table = null;
+
+            if (DataConverterCache<T>.ToDataTableDefaultSchema.ContainsKey(key))
             {
-                handler = (Func<DataRow, object>)handleDict[key];
+                table = DataConverterCache<T>.ToDataTableDefaultSchema[key];
             }
             else
             {
-                lock (lockHandleDict)
-                {
-                    if (handleDict.ContainsKey(key))
-                    {
-                        handler = (Func<DataRow, object>)handleDict[key];
-                    }
-                    else
-                    {
-                        DataTableEntityBuilder<T> eblist = DataTableEntityBuilder<T>.CreateBuilderOfDataRow();
-                        handler = eblist.DataRowHandler;
-                        handleDict.Add(key, handler);
-                    }
-                }
+                table = new DataTable();
+                elementType.GetProperties().Where(t=>t.CanRead && t.GetGetMethod() !=null).ToList().ForEach(propInfo => table.Columns.Add(propInfo.Name, Nullable.GetUnderlyingType(propInfo.PropertyType) ?? propInfo.PropertyType));
+
+                DataConverterCache<T>.ToDataTableDefaultSchema.TryAdd(key, table);
             }
+            
 
+            if (list == null || list.Count() == 0) return table;
 
-            foreach (DataRow info in table.Rows)
+           
+            Func<DataRow,T,bool> handler = null;
+            if (DataConverterCache<T>.ToDataTableHandler.ContainsKey(key))
             {
-                list.Add((T)handler(info));
-            }
-
-
-            return list;
-        }
-
-        public static T DataReaderToEntity<T>(IDataReader dataReader, List<string> fieldNameList) where T : class, new()
-        {
-            T t = new T();
-            if (dataReader == null)
-                return t;
-            Func<IDataRecord, List<string>, object> handler = null;
-            string key = "DataReader_" + typeof(T).Name;
-
-            if (DataRecordHandler.ContainsKey(key))
-            {
-                handler = (Func<IDataRecord, List<string>, object>)DataRecordHandler[key];
+                handler = DataConverterCache<T>.ToDataTableHandler[key];
             }
             else
             {
-                lock (lockDataRecordHandler)
-                {
-                    if (DataRecordHandler.ContainsKey(key))
-                    {
-                        handler = (Func<IDataRecord, List<string>, object>)DataRecordHandler[key];
-                    }
-                    else
-                    {
-                        DataTableEntityBuilder<T> eblist = DataTableEntityBuilder<T>.CreateBuilderOfDataRecord();
-                        handler = eblist.DataRecordHandler;
-                        DataRecordHandler.Add(key, handler);
-                    }
-                }
+                handler = DataTableEntityBuilder<T>.CreateBuilderOfEntity2Row(elementType);
+                DataConverterCache<T>.ToDataTableHandler.TryAdd(key, handler);
             }
-            List<string> cols = new List<string>();
-            for (int i = 0; i < dataReader.FieldCount; i++)
+            foreach (var item in list)
             {
-                cols.Add(dataReader.GetName(i).ToLower());
+                var row = table.NewRow();
+                handler(row, item);
+                table.Rows.Add(row);
             }
-            t = ((T)handler(dataReader, cols));
-            return t;
+            return table;
         }
-
 
         public static object CloneObjectWithILExt(object obj1)
         {
             var s = CloneObjectWithIL(obj1);
             return s;
         }
+        /// <summary>
+        /// 克隆对象
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="myObject"></param>
+        /// <returns></returns>
         public static T CloneObjectWithIL<T>(T myObject)
         {
             Type t1 = myObject.GetType();
@@ -160,6 +201,16 @@ namespace HiSql
             return targetObj;
         }
 
+        /// <summary>
+        /// 复制指定字段的值到另外一个对象
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T1"></typeparam>
+        /// <param name="sourceObj"></param>
+        /// <param name="targetObj"></param>
+        /// <param name="onlyProperty"></param>
+        /// <param name="isSum"></param>
+        /// <returns></returns>
         public static bool MoveCrossWithIL<T,T1>(T sourceObj, T1 targetObj, List<PropertyInfo> onlyProperty = null, bool isSum = false)
         {
             if (sourceObj == null) return false;
@@ -194,7 +245,7 @@ namespace HiSql
             return (bool)handler(sourceObj, targetObj);
         }
 
-        private static string CollectGetValueKeyWithIL<T>(T sourceObj, Type typeSource, List<PropertyInfo> onlyProperty = null)
+        public static string CollectGetValueKeyWithIL<T>(T sourceObj, Type typeSource, List<PropertyInfo> onlyProperty = null)
         {
             if (sourceObj == null) return "";
             string key = "CollectGetValueKeyWithIL" +  typeSource.Name;
@@ -204,23 +255,38 @@ namespace HiSql
                 key = "CollectGetValueKeyWithIL" + typeSource.Name + "_" + string.Join("_", onlyProperty.Select(t => t.Name));
             }
             Func<T, string> handler = null;
-            if (DataConverter<T>.CollectGetValueKeyHandler.ContainsKey(key))
+            if (DataConverterCache<T>.CollectGetValueKeyHandler.ContainsKey(key))
             {
-                handler = DataConverter < T > .CollectGetValueKeyHandler[key];
+                handler = DataConverterCache< T > .CollectGetValueKeyHandler[key];
             }
             else
             {
                 handler = DataTableEntityBuilder<T>.CreateBuilderOfCollectGetValueKey(onlyProperty);
-                DataConverter<T> .CollectGetValueKeyHandler.TryAdd(key, handler);
+                DataConverterCache<T> .CollectGetValueKeyHandler.TryAdd(key, handler);
             }            
             return handler(sourceObj);
         }
 
+
+
+        /// <summary>
+        /// 对比对象的所有属性
+        /// </summary>
+        /// <param name="obj1"></param>
+        /// <param name="obj2"></param>
+        /// <returns></returns>
         public static bool ObjComparePropertiesExt(object obj1, object obj2)
         {
             bool s = ObjCompareProperties(obj1, obj2);
             return s;
         }
+        /// <summary>
+        /// 对比对象的所有属性
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj1"></param>
+        /// <param name="obj2"></param>
+        /// <returns></returns>
         public static bool ObjCompareProperties<T>(T obj1, T obj2)
         {
             //为空判断
@@ -259,112 +325,129 @@ namespace HiSql
             return (bool)handler(obj1, obj2);
         }
 
-        public static List<T> ToList<T>(IDataReader dataReader, bool closeDataReader = true) where T : class, new()
-        {
-            List<T> list = new List<T>();
-            if (dataReader == null)
-                return list;
-            Func<IDataRecord, List<string>, object> handler = null;
-            string key = "DataReader_" + typeof(T).Name;
 
-            if (DataRecordHandler.ContainsKey(key))
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static T GetValue<T>(Type effectiveType, object val)
+        {
+            if (val is T tVal)
             {
-                handler = (Func<IDataRecord, List<string>, object>)DataRecordHandler[key];
+                return tVal;
+            }
+            else if (val == null && (!effectiveType.IsValueType || Nullable.GetUnderlyingType(effectiveType) != null))
+            {
+                return default;
+            }
+            else if (val is Array array && typeof(T).IsArray)
+            {
+                var elementType = typeof(T).GetElementType();
+                var result = Array.CreateInstance(elementType, array.Length);
+                for (int i = 0; i < array.Length; i++)
+                    result.SetValue(Convert.ChangeType(array.GetValue(i), elementType, CultureInfo.InvariantCulture), i);
+                return (T)(object)result;
             }
             else
             {
-                lock (lockDataRecordHandler)
-                {
-                    if (DataRecordHandler.ContainsKey(key))
-                    {
-                        handler = (Func<IDataRecord, List<string>, object>)DataRecordHandler[key];
-                    }
-                    else
-                    {
-                        DataTableEntityBuilder<T> eblist = DataTableEntityBuilder<T>.CreateBuilderOfDataRecord();
-                        handler = eblist.DataRecordHandler;
-                        DataRecordHandler.Add(key, handler);
-                    }
-                }
-
+                return default;
             }
-            List<string> cols = new List<string>();
-            for (int i = 0; i < dataReader.FieldCount; i++)
-            {
-                cols.Add(dataReader.GetName(i).ToLower());
-            }
-            try
-            {
-                while (dataReader.Read())
-                {
-                    list.Add((T)handler(dataReader, cols));
-                }
-            }
-            finally
-            {
-                if (closeDataReader)
-                {
-                    dataReader.Close();
-                    dataReader.Dispose();
-                    dataReader = null;
-                }
-            }
-
-            return list;
         }
 
-        private static List<Hi_FieldModel> ToList2(IDataReader dataReader, bool closeDataReader = true)
+        public static List<T> ToList<T>(DataTable table, DBType dbtype) // where T : class, new()
         {
-            List<Hi_FieldModel> list = new List<Hi_FieldModel>();
-            if (dataReader == null)
+            List<T> list = new List<T>();
+            if (table == null || table.Rows.Count == 0)
                 return list;
-            Func<IDataRecord, List<string>, object> handler = null;
-            string key = "DataReader_" + typeof(Hi_FieldModel).Name;
 
-            HiColumn hiColumn = new HiColumn();
+            Type type = typeof(T);
 
-            List<string> cols = new List<string>();
-            dataReader.Read();
-            for (int i = 0; i < dataReader.FieldCount; i++)
+            string cacheKey = GetDataTableCacheInfo(table, type, dbtype);// string.IsNullOrEmpty(table.TableName) ? "DataTable" : table.TableName + "_" + type.Name + dbtype.ToString();
+
+            DataTableToEntityHandlerInfo cacheHandlerInfo = null;
+
+            if (DataRowToEntityHandler.ContainsKey(cacheKey))
             {
-                cols.Add(dataReader.GetName(i).ToLower());
-
-                var type = dataReader.GetFieldType(i);
-                Console.WriteLine(type.Name);
-                var a = dataReader.GetValue(i, new HiModelFeildsInfo() { DataType = type.Name, FieldName = dataReader.GetName(i).ToLower() });
+                cacheHandlerInfo = DataRowToEntityHandler[cacheKey];
             }
+            else
+            {
+                cacheHandlerInfo = new DataTableToEntityHandlerInfo() {
+                    Columns = table.Columns, EntityType = type
+                };
+                cacheHandlerInfo.PropertyInfo = cacheHandlerInfo.EntityType
+            .GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                  .Where(p => p.GetSetMethod(true) != null)
+                  .ToList();
+                DataTableEntityBuilder<T> eblist = DataTableEntityBuilder<T>.CreateBuilderOfDataRow(cacheHandlerInfo, dbtype);
+                cacheHandlerInfo.Fun = eblist.DataRowHandler;
+                DataRowToEntityHandler.TryAdd(cacheKey, cacheHandlerInfo);
+            }
+
+            foreach (DataRow info in table.Rows)
+            {
+                list.Add((T)cacheHandlerInfo.Fun(info));
+            }
+
+            return list;
+        }
+
+        /// <summary>
+        /// IDataReader to  List<T>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dataReader"></param>
+        /// <param name="dbType"></param>
+        /// <param name="closeDataReader"></param>
+        /// <returns></returns>
+        public static List<T> ToList<T>(IDataReader dataReader, DBType dbType, bool closeDataReader = true)
+        {
+            return ToIEnumerable<T>(dataReader,  dbType,  closeDataReader).ToList();
+        }
+
+        private static IEnumerable<T> ToIEnumerable<T>(IDataReader dataReader, DBType dbType, bool closeDataReader = true)
+        {
+            string cacheKey = GetDataReaderCacheInfo(dataReader, null);
+            DataReaderToEntityHandlerInfo cacheHandlerInfo = null;
+            if (DataConverterCache<object>.DataReaderToEntityHandler.ContainsKey(cacheKey))
+            {
+                cacheHandlerInfo = DataConverterCache<object>.DataReaderToEntityHandler[cacheKey];
+            }
+            else
+            {
+                var type = typeof(T);
+                cacheHandlerInfo = new DataReaderToEntityHandlerInfo() { EntityType = type };
+                cacheHandlerInfo.PropertyInfo = cacheHandlerInfo.EntityType
+            .GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                  .Where(p => p.GetSetMethod(true) != null)
+                  .ToList();
+
+                DataTableEntityBuilder<T> eblist = DataTableEntityBuilder<T>.CreateBuilderOfDataRecord(cacheHandlerInfo, dataReader, dbType);
+                cacheHandlerInfo.Fun = eblist.DataRecordHandler;
+                DataConverterCache<object>.DataReaderToEntityHandler.TryAdd(cacheKey, cacheHandlerInfo);
+            }
+
             try
             {
                 while (dataReader.Read())
                 {
-                    //list.Add(DynamicCreateEntity2(dataReader, cols));
+                    object val = cacheHandlerInfo.Fun(dataReader);                
+                    yield return GetValue<T>(cacheHandlerInfo.EntityType, val);
                 }
+                if (closeDataReader)
+                {
+                    dataReader.Dispose();
+                    dataReader = null;
+                }
+               
             }
             finally
             {
-                if (closeDataReader)
+                if (closeDataReader && dataReader != null)
                 {
-                    dataReader.Close();
                     dataReader.Dispose();
                     dataReader = null;
                 }
             }
-            return list;
         }
-
-        private static string CreateBuilderOfCollectGetValueKey(object P_0)
-        {
-            //IL_0015: Expected I4, but got O
-            string text = "";
-            text = ((Hi_FieldModel)P_0).TabName + text;
-            return text;
-        }
-        private static string CreateBuilderOfCollectGetValueKey2(Hi_FieldModel P_0)
-        {
-            string text = "";
-            return P_0.DbName + text;
-        }
-
+        
         /// <summary>
         /// 对数据进行分类汇总--有问题
         /// </summary>
@@ -426,14 +509,14 @@ namespace HiSql
             {
                 _keyvalue = string.Empty;
 
-                _keyvalue = CollectGetValueKeyWithILHandler(aTemp);
-               
-                //foreach (var bProp in bStrLst)
-                //{
-                //    aProp = aType.GetProperty(bProp.Name);
-                //    _keyvalue += aProp.GetValue(aTemp, null).ToString();
-                //}
-                
+                //_keyvalue = CollectGetValueKeyWithILHandler(aTemp);
+
+                foreach (var bProp in bStrLst)
+                {
+                    aProp = aType.GetProperty(bProp.Name);
+                    _keyvalue += aProp.GetValue(aTemp, null).ToString();
+                }
+
                 //_keyvalue = _keyvalue.ToMd5();
                 T1 item;
                 if (!indexDic.ContainsKey(_keyvalue))
@@ -552,31 +635,12 @@ namespace HiSql
     /// <typeparam name="Entity"></typeparam>
     public class DataTableEntityBuilder<Entity>
     {
-        //数据类型和对应的强制转换方法的methodinfo，供实体属性赋值时调用
-        private static Dictionary<Type, MethodInfo> ConvertMethods = new Dictionary<Type, MethodInfo>()
-           {
-               {typeof(int),typeof(Convert).GetMethod("ToInt32",new Type[]{typeof(object)})},
-               {typeof(Int16),typeof(Convert).GetMethod("ToInt16",new Type[]{typeof(object)})},
-               {typeof(Int64),typeof(Convert).GetMethod("ToInt64",new Type[]{typeof(object)})},
-               {typeof(DateTime),typeof(Convert).GetMethod("ToDateTime",new Type[]{typeof(object)})},
-               {typeof(decimal),typeof(Convert).GetMethod("ToDecimal",new Type[]{typeof(object)})},
-               {typeof(Double),typeof(Convert).GetMethod("ToDouble",new Type[]{typeof(object)})},
-               {typeof(Boolean),typeof(Convert).GetMethod("ToBoolean",new Type[]{typeof(object)})},
-               {typeof(string),typeof(Convert).GetMethod("ToString",new Type[]{typeof(object)})},
-			   //{typeof(Nullable<int>),typeof(Convert).GetMethod("ToInt32",new Type[]{typeof(object)})},
-			   //{typeof(Nullable<Int16>),typeof(Convert).GetMethod("ToInt16",new Type[]{typeof(object)})},
-			   //{typeof(Nullable<Int64>),typeof(Convert).GetMethod("ToInt64",new Type[]{typeof(object)})},
-			   //{typeof(Nullable<DateTime>),typeof(Convert).GetMethod("ToDateTime",new Type[]{typeof(object)})},
-			   //{typeof(Nullable<decimal>),typeof(Convert).GetMethod("ToDecimal",new Type[]{typeof(object)})},
-			   //{typeof(Nullable<Double>),typeof(Convert).GetMethod("ToDouble",new Type[]{typeof(object)})},
-			   //{typeof(Nullable<Boolean>),typeof(Convert).GetMethod("ToBoolean",new Type[]{typeof(object)})},
-			   //{typeof(string),typeof(Convert).GetMethod("ToString",new Type[]{typeof(object)})}
-		   };
-
         #region DataRow
-
+        private static readonly MethodInfo setRowValueByIndexMethod = typeof(DataRow).GetMethod("set_Item", new Type[] { typeof(string), typeof(object) });
+        private static readonly MethodInfo getValueByIndexMethod = typeof(DataRow).GetMethod("get_Item", new Type[] { typeof(int) });
         private static readonly MethodInfo getValueMethod = typeof(DataRow).GetMethod("get_Item", new Type[] { typeof(string) });
-        private static readonly MethodInfo isDBNullMethod = typeof(DataRow).GetMethod("IsNull", new Type[] { typeof(string) });
+        private static readonly MethodInfo isDBNullMethodWithDataRow = typeof(DataRow).GetMethod("IsNull", new Type[] { typeof(string) });
+        private static readonly MethodInfo isDBNullMethodWithDataRowByIndex = typeof(DataRow).GetMethod("IsNull", new Type[] { typeof(int) });
         private static readonly MethodInfo getTableMethod = typeof(DataRow).GetMethod("get_Table", new Type[] { });
         private static readonly MethodInfo getColumns = typeof(DataTable).GetMethod("get_Columns", new Type[] { });
         private static readonly MethodInfo Contains = typeof(DataColumnCollection).GetMethod("Contains", new Type[] { typeof(string) });
@@ -588,15 +652,27 @@ namespace HiSql
 
         private static readonly MethodInfo IndexOf = typeof(List<string>).GetMethod("IndexOf", new Type[] { typeof(string) });
         private static readonly MethodInfo getCount = typeof(List<string>).GetMethod("get_Count", new Type[] { });
-        private static readonly MethodInfo IsDBNull = typeof(IDataRecord).GetMethod("IsDBNull", new Type[] { typeof(int) });
-        private static readonly MethodInfo getItem = typeof(IDataRecord).GetMethod("get_Item", new Type[] { typeof(int) });
+        private static readonly MethodInfo IsDBNullWithDataRecord = typeof(IDataRecord).GetMethod("IsDBNull", new Type[] { typeof(int) });
+        private static readonly MethodInfo getDataRecordItemByIndex = typeof(IDataRecord).GetMethod("get_Item", new Type[] { typeof(int) });
+        private static readonly MethodInfo getDataRecordItemByName = typeof(IDataRecord).GetMethod("get_Item", new Type[] { typeof(string) });
 
         private static readonly MethodInfo getObjectEqualsMethod = typeof(System.Object).GetMethod("Equals", new Type[] { typeof(object), typeof(object) });
 
         private static readonly MethodInfo getDateTimeEqualsMethod = typeof(System.DateTime).GetMethod("Equals", new Type[] { typeof(DateTime), typeof(DateTime) });
 
+        private static Dictionary<Type, MethodInfo> ConvertMethods = new Dictionary<Type, MethodInfo>()
+           {
+               {typeof(int),typeof(Convert).GetMethod("ToInt32",new Type[]{typeof(object)})},
+               {typeof(Int16),typeof(Convert).GetMethod("ToInt16",new Type[]{typeof(object)})},
+               {typeof(Int64),typeof(Convert).GetMethod("ToInt64",new Type[]{typeof(object)})},
+               {typeof(DateTime),typeof(Convert).GetMethod("ToDateTime",new Type[]{typeof(object)})},
+               {typeof(decimal),typeof(Convert).GetMethod("ToDecimal",new Type[]{typeof(object)})},
+               {typeof(Double),typeof(Convert).GetMethod("ToDouble",new Type[]{typeof(object)})},
+               {typeof(Boolean),typeof(Convert).GetMethod("ToBoolean",new Type[]{typeof(object)})},
+               {typeof(string),typeof(Convert).GetMethod("ToString",new Type[]{typeof(object)})}
+		   };
 
-        public Func<IDataRecord, List<string>, object> DataRecordHandler { get; set; }
+        public Func<IDataRecord, object> DataRecordHandler { get; set; }
         public Func<object, object, bool> CompareEntityHandler { get; set; }
 
         public Func<object, object> CloneEntityHandler { get; set; }
@@ -610,133 +686,146 @@ namespace HiSql
         /// </summary>
         /// <param name="dataRow"></param>
         /// <returns></returns>
-        public static DataTableEntityBuilder<Entity> CreateBuilder(DataRow dataRow)
+        public static Func<DataRow, Entity, bool> CreateBuilderOfEntity2Row(Type elementType)
         {
-            DataTableEntityBuilder<Entity> dynamicBuilder = new DataTableEntityBuilder<Entity>();
-            DynamicMethod method = new DynamicMethod("DynamicCreateEntity", typeof(Entity), new Type[] { typeof(DataRow) }, typeof(Entity), true);
-
-
+            DynamicMethod method = new DynamicMethod("CreateBuilderOfEntity2Row", typeof(bool), new Type[] { typeof(DataRow), typeof(Entity) }, typeof(Entity), true);
             ILGenerator generator = method.GetILGenerator();
-            LocalBuilder result = generator.DeclareLocal(typeof(Entity));
-            generator.Emit(OpCodes.Newobj, typeof(Entity).GetConstructor(Type.EmptyTypes));
-            generator.Emit(OpCodes.Stloc, result);
+            var pros = elementType.GetProperties().Where(t=>t.CanRead && t.GetGetMethod() !=null).ToArray();
 
-            for (int index = 0; index < dataRow.ItemArray.Length; index++)
+            var compare = generator.DeclareLocal(typeof(bool));
+            var valueCopyDiagnosticLocal = generator.DeclareLocal(typeof(object));
+
+            for (int index = 0; index < pros.Length; index++)
             {
-                PropertyInfo propertyInfo = typeof(Entity).GetProperty(dataRow.Table.Columns[index].ColumnName);
-                Label endIfLabel = generator.DefineLabel();
-                if (propertyInfo != null && propertyInfo.GetSetMethod() != null)
-                {
-                    generator.Emit(OpCodes.Ldarg_0);
-                    generator.Emit(OpCodes.Ldc_I4, index);
-                    generator.Emit(OpCodes.Callvirt, isDBNullMethod);
-                    generator.Emit(OpCodes.Brtrue, endIfLabel);
-                    generator.Emit(OpCodes.Ldloc, result);
-                    generator.Emit(OpCodes.Ldarg_0);
-                    generator.Emit(OpCodes.Ldc_I4, index);
-                    generator.Emit(OpCodes.Callvirt, getValueMethod);
-                    generator.Emit(OpCodes.Unbox_Any, propertyInfo.PropertyType);
-                    generator.Emit(OpCodes.Callvirt, propertyInfo.GetSetMethod());
-                    generator.MarkLabel(endIfLabel);
-                }
+                PropertyInfo propertyInfo = pros[index];
+                generator.Emit(OpCodes.Ldarg_0);              
+                generator.Emit(OpCodes.Ldstr, propertyInfo.Name);
+                generator.Emit(OpCodes.Ldarg_1);
+                generator.Emit(OpCodes.Callvirt, propertyInfo.GetGetMethod());
+                if (propertyInfo.PropertyType.IsValueType || propertyInfo.PropertyType == typeof(string))  //
+                    generator.Emit(OpCodes.Box, propertyInfo.PropertyType);//一直在折腾这个地方，哎
+                else
+                    generator.Emit(OpCodes.Castclass, propertyInfo.PropertyType);
+
+                generator.Emit(OpCodes.Call, typeof(DataRow).GetMethod("set_Item", new Type[] { typeof(string), typeof(object) }));
+                //类型转换  Call 方法参数
             }
-            generator.Emit(OpCodes.Ldloc, result);
+            generator.Emit(OpCodes.Ldc_I4, 1);
             generator.Emit(OpCodes.Ret);
-            dynamicBuilder.DataRowHandler = (Func<DataRow, object>)method.CreateDelegate(typeof(Func<DataRow, object>));
-            return dynamicBuilder;
+            var handler = (Func<DataRow, Entity,bool>)method.CreateDelegate(typeof(Func<DataRow, Entity,bool>));
+            return handler;
         }
 
         /// <summary>
         /// DataRow转Entity
         /// </summary>
         /// <returns></returns>
-        public static DataTableEntityBuilder<Entity> CreateBuilderOfDataRow()
+        public static DataTableEntityBuilder<Entity> CreateBuilderOfDataRow(DataTableToEntityHandlerInfo handlerInfo, DBType dbtype)
         {
             DataTableEntityBuilder<Entity> dynamicBuilder = new DataTableEntityBuilder<Entity>();
-            DynamicMethod method = new DynamicMethod("DataRow2Entity", typeof(Entity), new Type[] { typeof(DataRow) }, typeof(Entity), true);
+            DynamicMethod method = new DynamicMethod("CreateBuilderOfDataRow", typeof(Entity), new Type[] { typeof(DataRow) }, typeof(Entity), true);
             ILGenerator generator = method.GetILGenerator();
             // 返回值(如Role对象)
             // T result;
-            LocalBuilder result = generator.DeclareLocal(typeof(Entity));
+            LocalBuilder result = generator.DeclareLocal(handlerInfo.EntityType);
             // result = new T();
-            generator.Emit(OpCodes.Newobj, typeof(Entity).GetConstructor(Type.EmptyTypes));
+            generator.Emit(OpCodes.Newobj, handlerInfo.EntityType.GetConstructor(Type.EmptyTypes));
             generator.Emit(OpCodes.Stloc, result);
 
-            foreach (PropertyInfo property in typeof(Entity).GetProperties())
-            {
-                // if (dr.Table.Columns.Contains(property.Name))
-                Label endIfContains = generator.DefineLabel();
-                generator.Emit(OpCodes.Ldarg_0);
-                generator.Emit(OpCodes.Callvirt, getTableMethod);
-                generator.Emit(OpCodes.Callvirt, getColumns);
-                generator.Emit(OpCodes.Ldstr, property.Name);
-                generator.Emit(OpCodes.Callvirt, Contains);
-                // 为false，则到generator.MarkLabel(endIfContains);中的代码不执行
-                generator.Emit(OpCodes.Brfalse, endIfContains);
+            LocalBuilder resultStr = generator.DeclareLocal(typeof(string));
+            var cols = handlerInfo.Columns;
+            int colIndex = 0;
 
-                // if (!dr.IsNull(property.Name))
+            foreach (DataColumn column in handlerInfo.Columns)
+            {
+                PropertyInfo property = handlerInfo.PropertyInfo.Find(t => string.Equals(t.Name, column.ColumnName, StringComparison.OrdinalIgnoreCase));
+                if (property == null)
+                    continue;
                 Label endIfDBNull = generator.DefineLabel();
                 generator.Emit(OpCodes.Ldarg_0);
-                generator.Emit(OpCodes.Ldstr, property.Name);
-                generator.Emit(OpCodes.Callvirt, isDBNullMethod);
+                generator.Emit(OpCodes.Ldstr, column.ColumnName);
+                generator.Emit(OpCodes.Callvirt, isDBNullMethodWithDataRow);
                 // 如果dr.IsNull(property.Name)为true,则到generator.MarkLabel(endIfDBNull)间的代码不执行
                 generator.Emit(OpCodes.Brtrue, endIfDBNull);
 
-                //generator.Emit(OpCodes.Ldstr, "I'm test");
-                //generator.Emit(OpCodes.Call, typeof(Console).GetMethod("WriteLine", new Type[] { typeof(String) }));
-
+                //赋值操作
                 generator.Emit(OpCodes.Ldloc, result);
                 generator.Emit(OpCodes.Ldarg_0);
-                generator.Emit(OpCodes.Ldstr, property.Name);
+                generator.Emit(OpCodes.Ldstr, column.ColumnName);
                 generator.Emit(OpCodes.Callvirt, getValueMethod);
 
-                bool bIsNullable = false;
-                Type columnType = property.PropertyType;
+                var nullUnderlyingType = Nullable.GetUnderlyingType(property.PropertyType);
+                var unboxType = nullUnderlyingType?.IsEnum == true ? nullUnderlyingType : property.PropertyType;
+
                 if (property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
                 {
-                    bIsNullable = true;
-                    // If it is NULLABLE, then get the underlying type. eg if "Nullable<int>" then this will return just "int"
-                    columnType = property.PropertyType.GetGenericArguments()[0];
+                    unboxType = property.PropertyType.GetGenericArguments()[0];
                 }
 
-                var castMethod = typeof(Convert).GetMethod("To" + columnType.Name, new Type[] { typeof(object) });
-                if (columnType == typeof(DateTime))
+
+                if (dbtype == DBType.Sqlite || dbtype == DBType.Oracle || dbtype == DBType.MySql)
                 {
-                    //generator.Emit(OpCodes.Unbox_Any, columnType);
-                    //generator.Emit(OpCodes.Callvirt, property.GetSetMethod());
-                    if (bIsNullable)
+                   
+                    if (unboxType.IsValueType)
                     {
-                        generator.Emit(OpCodes.Call, castMethod);
-                        generator.Emit(OpCodes.Newobj, property.PropertyType.GetConstructor(new[] { columnType }));
-                    }
-                    else
-                    {
-                        generator.Emit(OpCodes.Unbox_Any, columnType);
+                        var castMethod = typeof(Convert).GetMethod("To" + unboxType.Name, new Type[] { typeof(object) });
+                        generator.Emit(OpCodes.Call, castMethod); //类型转换
                     }
                 }
+               
                 else
                 {
-                    // 使用下面的方法时，日期类型会出错
-                    if ((columnType.IsValueType ||
-                        columnType == typeof(string))
-                        && ConvertMethods.ContainsKey(columnType))
-                    {
-                        //generator.Emit(OpCodes.Call, ConvertMethods[columnType]);
-                        generator.Emit(OpCodes.Call, castMethod);
-                        if (bIsNullable)
-                        {
-                            generator.Emit(OpCodes.Newobj, property.PropertyType.GetConstructor(new[] { columnType }));
-                        }
-                    }
-                    else
-                        generator.Emit(OpCodes.Castclass, columnType);
-                    //generator.Emit(OpCodes.Callvirt, property.GetSetMethod());
+                    generator.Emit(OpCodes.Unbox_Any, unboxType); //拆箱
                 }
-                generator.Emit(OpCodes.Callvirt, property.GetSetMethod());
 
+                generator.Emit(OpCodes.Callvirt, property.GetSetMethod());
                 generator.MarkLabel(endIfDBNull);
-                generator.MarkLabel(endIfContains);
+                colIndex++;
             }
+
+            //foreach (PropertyInfo property in typeof(Entity).GetProperties())
+            //{
+            //    // if (dr.Table.Columns.Contains(property.Name))
+            //    Label endIfContains = generator.DefineLabel();
+            //    generator.Emit(OpCodes.Ldarg_0);
+            //    generator.Emit(OpCodes.Callvirt, getTableMethod);
+            //    generator.Emit(OpCodes.Callvirt, getColumns);
+            //    generator.Emit(OpCodes.Ldstr, property.Name);
+            //    generator.Emit(OpCodes.Callvirt, Contains);
+            //    // 为false，则到generator.MarkLabel(endIfContains);中的代码不执行
+            //    generator.Emit(OpCodes.Brfalse, endIfContains);
+
+            //    // if (!dr.IsNull(property.Name))
+            //    Label endIfDBNull = generator.DefineLabel();
+            //    generator.Emit(OpCodes.Ldarg_0);
+            //    generator.Emit(OpCodes.Ldstr, property.Name);
+            //    generator.Emit(OpCodes.Callvirt, isDBNullMethodWithDataRow);
+            //    // 如果dr.IsNull(property.Name)为true,则到generator.MarkLabel(endIfDBNull)间的代码不执行
+            //    generator.Emit(OpCodes.Brtrue, endIfDBNull);
+
+
+            //    //输出测试
+            //    //generator.Emit(OpCodes.Ldarg_0);
+            //    //generator.Emit(OpCodes.Ldstr, property.Name);
+            //    //generator.Emit(OpCodes.Callvirt, getValueMethod);
+            //    //generator.Emit(OpCodes.Call, typeof(Console).GetMethod("WriteLine", new Type[] { typeof(object) }));
+
+
+            //    generator.Emit(OpCodes.Ldloc, result);
+            //    generator.Emit(OpCodes.Ldarg_0);
+            //    generator.Emit(OpCodes.Ldstr, property.Name);
+            //    generator.Emit(OpCodes.Callvirt, getValueMethod);
+
+            //    var nullUnderlyingType = Nullable.GetUnderlyingType(property.PropertyType);
+            //    var unboxType = nullUnderlyingType?.IsEnum == true ? nullUnderlyingType : property.PropertyType;
+            //    if (property.PropertyType.IsValueType)
+            //    {
+            //        generator.Emit(OpCodes.Unbox_Any, unboxType);
+            //    }
+            //    generator.Emit(OpCodes.Callvirt, property.GetSetMethod());
+               
+            //    generator.MarkLabel(endIfDBNull);
+            //}
             generator.Emit(OpCodes.Ldloc, result);
             generator.Emit(OpCodes.Ret);
 
@@ -960,7 +1049,7 @@ namespace HiSql
             return  (Func<object, object,bool>)delegatea;
         }
 
-       
+        
 
 
         public static Func<Entity, string> CreateBuilderOfCollectGetValueKey(List<PropertyInfo> property = null)
@@ -1089,138 +1178,269 @@ namespace HiSql
             dynamicBuilder.CompareEntityHandler = (Func<object, object, bool>)delegatea;
             return dynamicBuilder;
         }
+        private static void EmitIntValue(ILGenerator il, int value)
+        {
+            switch (value)
+            {
+                case -1: il.Emit(OpCodes.Ldc_I4_M1); break;
+                case 0: il.Emit(OpCodes.Ldc_I4_0); break;
+                case 1: il.Emit(OpCodes.Ldc_I4_1); break;
+                case 2: il.Emit(OpCodes.Ldc_I4_2); break;
+                case 3: il.Emit(OpCodes.Ldc_I4_3); break;
+                case 4: il.Emit(OpCodes.Ldc_I4_4); break;
+                case 5: il.Emit(OpCodes.Ldc_I4_5); break;
+                case 6: il.Emit(OpCodes.Ldc_I4_6); break;
+                case 7: il.Emit(OpCodes.Ldc_I4_7); break;
+                case 8: il.Emit(OpCodes.Ldc_I4_8); break;
+                default:
+                    if (value >= -128 && value <= 127)
+                    {
+                        il.Emit(OpCodes.Ldc_I4_S, (sbyte)value);
+                    }
+                    else
+                    {
+                        il.Emit(OpCodes.Ldc_I4, value);
+                    }
+                    break;
+            }
+        }
+
+
+
+
+      
+
+#if NET5_0_OR_GREATER
+        private static readonly Guid s_guid = new Guid("87D4DBE1-1143-4FAD-AAB3-1001F92068E6");
+        private static readonly BlobContentId s_contentId = new BlobContentId(s_guid, 0x04030201);
+        private static void WritePEImage(Stream peStream, MetadataBuilder metadataBuilder, BlobBuilder ilBuilder, MethodDefinitionHandle entryPointHandle
+  )
+        {
+            // Create executable with the managed metadata from the specified MetadataBuilder.
+            var peHeaderBuilder = new PEHeaderBuilder(
+                imageCharacteristics: Characteristics.ExecutableImage
+                );
+
+            var peBuilder = new ManagedPEBuilder(
+                peHeaderBuilder,
+                new MetadataRootBuilder(metadataBuilder),
+                ilBuilder,
+                entryPoint: entryPointHandle,
+                flags: CorFlags.ILOnly,
+                deterministicIdProvider: content => s_contentId);
+
+            // Write executable into the specified stream.
+            var peBlob = new BlobBuilder();
+            BlobContentId contentId = peBuilder.Serialize(peBlob);
+            peBlob.WriteContentTo(peStream);
+        }
+#endif        
+
+        internal static MethodInfo GetPropertySetter(PropertyInfo propertyInfo, Type type)
+        {
+            if (propertyInfo.DeclaringType == type) return propertyInfo.GetSetMethod(true);
+
+            return propertyInfo.DeclaringType.GetProperty(
+                   propertyInfo.Name,
+                   BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance,
+                   Type.DefaultBinder,
+                   propertyInfo.PropertyType,
+                   propertyInfo.GetIndexParameters().Select(p => p.ParameterType).ToArray(),
+                   null).GetSetMethod(true);
+        }
+
+        private static readonly MethodInfo
+                   enumParse = typeof(Enum).GetMethod(nameof(Enum.Parse), new Type[] { typeof(Type), typeof(string), typeof(bool) }),
+                   getItem = typeof(IDataRecord).GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                       .Where(p => p.GetIndexParameters().Length > 0 && p.GetIndexParameters()[0].ParameterType == typeof(int))
+                       .Select(p => p.GetGetMethod()).First();
 
         /// <summary>
         /// DataReader转Entity
         /// </summary>
         /// <returns></returns>
-        public static DataTableEntityBuilder<Entity> CreateBuilderOfDataRecord()
+        public static DataTableEntityBuilder<Entity> CreateBuilderOfDataRecord(DataReaderToEntityHandlerInfo handlerInfo,IDataReader reader, DBType dbtype)
         {
             DataTableEntityBuilder<Entity> dynamicBuilder = new DataTableEntityBuilder<Entity>();
-            DynamicMethod method = new DynamicMethod("DataReader2Entity", typeof(Entity), new Type[] { typeof(IDataRecord), typeof(List<string>) }, typeof(Entity), true);
+            DynamicMethod method = new DynamicMethod("CreateBuilderOfDataRecord", typeof(Entity), new Type[] { typeof(IDataRecord)}, typeof(Entity), true);
+
             ILGenerator generator = method.GetILGenerator();
             // 返回值(如Role对象)
             // T result;
-            LocalBuilder result = generator.DeclareLocal(typeof(Entity));
+            LocalBuilder result = generator.DeclareLocal(handlerInfo.EntityType);
             LocalBuilder j = generator.DeclareLocal(typeof(int));
             // result = new T();
             generator.Emit(OpCodes.Newobj, typeof(Entity).GetConstructor(Type.EmptyTypes));
             generator.Emit(OpCodes.Stloc, result);
-            foreach (PropertyInfo property in typeof(Entity).GetProperties())
-            {
-                //int j = cols.IndexOf(property.Name.ToLower());
-                generator.Emit(OpCodes.Ldarg_1);
-                generator.Emit(OpCodes.Ldstr, property.Name.ToLower());
-                generator.Emit(OpCodes.Callvirt, IndexOf);
-                generator.Emit(OpCodes.Stloc, j);
-                // if (j >= 0)
-                Label endIfBlt = generator.DefineLabel();
-                generator.Emit(OpCodes.Ldloc_S, j);
-                generator.Emit(OpCodes.Ldc_I4_0);
-                // 为false，则到generator.MarkLabel(endIfContains); 中的代码不执行
-                generator.Emit(OpCodes.Blt_S, endIfBlt);
+            int colsCount = reader.FieldCount;
+            var cols = Enumerable.Range(0, colsCount).Select(i => reader.GetName(i)).ToArray(); 
 
-                // if (j < cols.Count)
-                Label endIfBge = generator.DefineLabel();
-                generator.Emit(OpCodes.Ldloc_S, j);
-                generator.Emit(OpCodes.Ldarg_1);
-                generator.Emit(OpCodes.Callvirt, getCount);
-                generator.Emit(OpCodes.Bge_S, endIfBge);
+            var valueCopyDiagnosticLocal = generator.DeclareLocal(typeof(object));
+           
+            //取值 赋值
+            //generator.Emit(OpCodes.Ldloc, result);
+
+            for (int i = 0; i < colsCount; i++)
+            {
+                PropertyInfo property = handlerInfo.PropertyInfo.Find(t => string.Equals(t.Name, cols[i], StringComparison.OrdinalIgnoreCase));
+                if (property == null)
+                    continue;
+
+
+                Label endIfDBNull = generator.DefineLabel();
+
+                //输出测试
+                //generator.Emit(OpCodes.Ldarg_0);
+                //generator.Emit(OpCodes.Ldstr, property.Name);
+                //generator.Emit(OpCodes.Callvirt, getDataRecordItemByName);
+                //generator.Emit(OpCodes.Call, typeof(Console).GetMethod("WriteLine", new Type[] { typeof(object) }));
+                //generator.Emit(OpCodes.Br, endIfDBNull);
 
                 // if (!dr.IsDBNull(j))
-                Label endIfDBNull = generator.DefineLabel();
                 generator.Emit(OpCodes.Ldarg_0);
-                generator.Emit(OpCodes.Ldloc_S, j);
-                generator.Emit(OpCodes.Callvirt, IsDBNull);
-                // 如果dr.IsNull(property.Name)为true,则到generator.MarkLabel(endIfDBNull)间的代码不执行
+                EmitIntValue(generator, i);
+                generator.Emit(OpCodes.Callvirt, IsDBNullWithDataRecord);
                 generator.Emit(OpCodes.Brtrue, endIfDBNull);
 
-                //generator.Emit(OpCodes.Ldstr, "I'm test");
-                //generator.Emit(OpCodes.Call, typeof(Console).GetMethod("WriteLine", new Type[] { typeof(String) }));
 
+                //取值 赋值
                 generator.Emit(OpCodes.Ldloc, result);
                 generator.Emit(OpCodes.Ldarg_0);
-                generator.Emit(OpCodes.Ldloc_S, j);
+                EmitIntValue(generator, i);
                 generator.Emit(OpCodes.Callvirt, getItem);
-                generator.Emit(OpCodes.Unbox_Any, property.PropertyType);
+
+                var nullUnderlyingType = Nullable.GetUnderlyingType(property.PropertyType);
+                var unboxType = nullUnderlyingType?.IsEnum == true ? nullUnderlyingType : property.PropertyType;
+
+                if (property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+                {
+                    unboxType = property.PropertyType.GetGenericArguments()[0];
+                }
+
+
+                if (dbtype == DBType.Sqlite || dbtype == DBType.Oracle || dbtype == DBType.MySql)
+                {
+
+                    if (unboxType.IsValueType)
+                    {
+                        var castMethod = typeof(Convert).GetMethod("To" + unboxType.Name, new Type[] { typeof(object) });
+                        generator.Emit(OpCodes.Call, castMethod); //类型转换
+                    }
+                }
+                else
+                {
+                    generator.Emit(OpCodes.Unbox_Any, unboxType);
+                }
                 generator.Emit(OpCodes.Callvirt, property.GetSetMethod());
-
-                // System.Nullable`1<int32>
-                // 使用下面的方法时，日期类型会出错
-                //if ((property.PropertyType.IsValueType ||
-                //    property.PropertyType == typeof(string))
-                //    && ConvertMethods.ContainsKey(property.PropertyType))
-                //    generator.Emit(OpCodes.Call, ConvertMethods[property.PropertyType]);
-                //else
-                //    generator.Emit(OpCodes.Castclass, property.PropertyType);
-                //generator.Emit(OpCodes.Callvirt, property.GetSetMethod());
-
                 generator.MarkLabel(endIfDBNull);
-                generator.MarkLabel(endIfBge);
-                generator.MarkLabel(endIfBlt);
             }
             generator.Emit(OpCodes.Ldloc, result);
             generator.Emit(OpCodes.Ret);
 
-            dynamicBuilder.DataRecordHandler = (Func<IDataRecord, List<string>, object>)method.CreateDelegate(typeof(Func<IDataRecord, List<string>, object>));
+            dynamicBuilder.DataRecordHandler = (Func<IDataRecord, object>)method.CreateDelegate(typeof(Func<IDataRecord,object>));
             return dynamicBuilder;
         }
+       
 
-
-        /// <summary>
-        /// DataReader转Entity
-        /// </summary>
-        /// <returns></returns>
-        public static DataTableEntityBuilder<TDynamic> CreateBuilderOfTDynamicDataRecord()
+        public static DataTableEntityBuilder<Entity> CreateBuilderOfDataRecordBakok(DataReaderToEntityHandlerInfo handlerInfo, IDataReader reader)
         {
-            DataTableEntityBuilder<TDynamic> dynamicBuilder = new DataTableEntityBuilder<TDynamic>();
-            DynamicMethod method = new DynamicMethod("DataReader2Entity", typeof(TDynamic), new Type[] { typeof(IDataRecord), typeof(List<string>) }, typeof(TDynamic), true);
+            DataTableEntityBuilder<Entity> dynamicBuilder = new DataTableEntityBuilder<Entity>();
+            DynamicMethod method = new DynamicMethod("CreateBuilderOfDataRecord", typeof(Entity), new Type[] { typeof(IDataRecord),  }, typeof(Entity), true);
+
             ILGenerator generator = method.GetILGenerator();
             // 返回值(如Role对象)
             // T result;
-            LocalBuilder result = generator.DeclareLocal(typeof(TDynamic));
+            LocalBuilder result = generator.DeclareLocal(handlerInfo.EntityType);
             LocalBuilder j = generator.DeclareLocal(typeof(int));
             // result = new T();
-            generator.Emit(OpCodes.Newobj, typeof(TDynamic).GetConstructor(Type.EmptyTypes));
+            generator.Emit(OpCodes.Newobj, typeof(Entity).GetConstructor(Type.EmptyTypes));
             generator.Emit(OpCodes.Stloc, result);
-            foreach (PropertyInfo property in typeof(TDynamic).GetProperties())
-            {
-                //int j = cols.IndexOf(property.Name.ToLower());
-                generator.Emit(OpCodes.Ldarg_1);
-                generator.Emit(OpCodes.Ldstr, property.Name.ToLower());
-                generator.Emit(OpCodes.Callvirt, IndexOf);
-                generator.Emit(OpCodes.Stloc, j);
-                // if (j >= 0)
-                Label endIfBlt = generator.DefineLabel();
-                generator.Emit(OpCodes.Ldloc_S, j);
-                generator.Emit(OpCodes.Ldc_I4_0);
-                // 为false，则到generator.MarkLabel(endIfContains); 中的代码不执行
-                generator.Emit(OpCodes.Blt_S, endIfBlt);
+            int colsCount = reader.FieldCount;
+            var cols = Enumerable.Range(0, colsCount).Select(i => reader.GetName(i)).ToArray();
 
-                // if (j < cols.Count)
-                Label endIfBge = generator.DefineLabel();
-                generator.Emit(OpCodes.Ldloc_S, j);
-                generator.Emit(OpCodes.Ldarg_1);
-                generator.Emit(OpCodes.Callvirt, getCount);
-                generator.Emit(OpCodes.Bge_S, endIfBge);
+            for (int i = 0; i < colsCount; i++)
+            {
+                PropertyInfo property = handlerInfo.PropertyInfo.FirstOrDefault(t => string.Compare(t.Name, cols[i], StringComparison.OrdinalIgnoreCase) == 0);
+                if (property == null)
+                    continue;
 
                 // if (!dr.IsDBNull(j))
                 Label endIfDBNull = generator.DefineLabel();
-                generator.Emit(OpCodes.Ldarg_0);
-                generator.Emit(OpCodes.Ldloc_S, j);
-                generator.Emit(OpCodes.Callvirt, IsDBNull);
-                // 如果dr.IsNull(property.Name)为true,则到generator.MarkLabel(endIfDBNull)间的代码不执行
-                generator.Emit(OpCodes.Brtrue, endIfDBNull);
+
+                //输出测试
+                //generator.Emit(OpCodes.Ldarg_0);
+                //generator.Emit(OpCodes.Ldstr, property.Name);
+                //generator.Emit(OpCodes.Callvirt, getDataRecordItemByName);
+                //generator.Emit(OpCodes.Call, typeof(Console).GetMethod("WriteLine", new Type[] { typeof(object) }));
+
+                //generator.Emit(OpCodes.Br, endIfDBNull);
+
+
+                //generator.Emit(OpCodes.Ldarg_0);
+                //EmitInt32(generator, i);
+                //generator.Emit(OpCodes.Callvirt, IsDBNull);
+                //// 如果dr.IsNull(property.Name)为true,则到generator.MarkLabel(endIfDBNull)间的代码不执行
+                //generator.Emit(OpCodes.Brtrue, endIfDBNull);
 
                 //generator.Emit(OpCodes.Ldstr, "I'm test");
                 //generator.Emit(OpCodes.Call, typeof(Console).GetMethod("WriteLine", new Type[] { typeof(String) }));
 
                 generator.Emit(OpCodes.Ldloc, result);
                 generator.Emit(OpCodes.Ldarg_0);
-                generator.Emit(OpCodes.Ldloc_S, j);
-                generator.Emit(OpCodes.Callvirt, getItem);
-                generator.Emit(OpCodes.Unbox_Any, property.PropertyType);
-                generator.Emit(OpCodes.Callvirt, property.GetSetMethod());
+
+
+                generator.Emit(OpCodes.Ldstr, property.Name.ToLower());
+                generator.Emit(OpCodes.Callvirt, getDataRecordItemByName);
+
+                //EmitInt32(generator, i);
+                //generator.Emit(OpCodes.Callvirt, getItem); // stack is now [...][value-as-object]
+
+                bool bIsNullable = false;
+                Type columnType = property.PropertyType;
+                if (property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+                {
+                    bIsNullable = true;
+                    // If it is NULLABLE, then get the underlying type. eg if "Nullable<int>" then this will return just "int"
+                    columnType = property.PropertyType.GetGenericArguments()[0];
+                }
+
+                var castMethod = typeof(Convert).GetMethod("To" + columnType.Name, new Type[] { typeof(object) });
+                if (columnType == typeof(DateTime))
+                {
+                    if (bIsNullable)
+                    {
+                        generator.Emit(OpCodes.Call, castMethod);
+                        generator.Emit(OpCodes.Newobj, property.PropertyType.GetConstructor(new[] { columnType }));
+                    }
+                    else
+                    {
+                        generator.Emit(OpCodes.Call, castMethod);
+                        //generator.Emit(OpCodes.Unbox_Any, columnType);
+                    }
+                }
+                else
+                {
+
+                    if (columnType == typeof(bool))
+                    {
+                        generator.Emit(OpCodes.Call, castMethod);
+                        if (bIsNullable)
+                        {
+                            generator.Emit(OpCodes.Newobj, property.PropertyType.GetConstructor(new[] { columnType }));
+                        }
+                    }
+                    else if (columnType == typeof(int))
+                    {
+                        generator.Emit(OpCodes.Unbox_Any, property.PropertyType);
+                        //generator.Emit(OpCodes.Castclass, property.PropertyType);
+                    }
+                }
+               generator.Emit(OpCodes.Callvirt, property.GetSetMethod());
+
+                //generator.Emit(columnType.IsValueType ? OpCodes.Call : OpCodes.Callvirt, GetPropertySetter(property, handlerInfo.EntityType));
+
+                //generator.Emit(OpCodes.Unbox_Any, property.PropertyType);
+                //generator.Emit(OpCodes.Callvirt, property.GetSetMethod());
 
                 // System.Nullable`1<int32>
                 // 使用下面的方法时，日期类型会出错
@@ -1233,15 +1453,91 @@ namespace HiSql
                 //generator.Emit(OpCodes.Callvirt, property.GetSetMethod());
 
                 generator.MarkLabel(endIfDBNull);
-                generator.MarkLabel(endIfBge);
-                generator.MarkLabel(endIfBlt);
+
             }
             generator.Emit(OpCodes.Ldloc, result);
             generator.Emit(OpCodes.Ret);
 
-            dynamicBuilder.DataRecordHandler = (Func<IDataRecord, List<string>, object>)method.CreateDelegate(typeof(Func<IDataRecord, List<string>, object>));
+
+            dynamicBuilder.DataRecordHandler = (Func<IDataRecord, object>)method.CreateDelegate(typeof(Func<IDataRecord,object>));
             return dynamicBuilder;
         }
+
+        ///// <summary>
+        ///// DataReader转Entity
+        ///// </summary>
+        ///// <returns></returns>
+        //public static DataTableEntityBuilder<TDynamic> CreateBuilderOfTDynamicDataRecord()
+        //{
+        //    DataTableEntityBuilder<TDynamic> dynamicBuilder = new DataTableEntityBuilder<TDynamic>();
+        //    DynamicMethod method = new DynamicMethod("DataReader2Entity", typeof(TDynamic), new Type[] { typeof(IDataRecord), typeof(List<string>) }, typeof(TDynamic), true);
+        //    ILGenerator generator = method.GetILGenerator();
+        //    // 返回值(如Role对象)
+        //    // T result;
+        //    LocalBuilder result = generator.DeclareLocal(typeof(TDynamic));
+        //    LocalBuilder j = generator.DeclareLocal(typeof(int));
+        //    // result = new T();
+        //    generator.Emit(OpCodes.Newobj, typeof(TDynamic).GetConstructor(Type.EmptyTypes));
+        //    generator.Emit(OpCodes.Stloc, result);
+        //    foreach (PropertyInfo property in typeof(TDynamic).GetProperties())
+        //    {
+        //        //int j = cols.IndexOf(property.Name.ToLower());
+        //        generator.Emit(OpCodes.Ldarg_1);
+        //        generator.Emit(OpCodes.Ldstr, property.Name.ToLower());
+        //        generator.Emit(OpCodes.Callvirt, IndexOf);
+        //        generator.Emit(OpCodes.Stloc, j);
+        //        // if (j >= 0)
+        //        Label endIfBlt = generator.DefineLabel();
+        //        generator.Emit(OpCodes.Ldloc_S, j);
+        //        generator.Emit(OpCodes.Ldc_I4_0);
+        //        // 为false，则到generator.MarkLabel(endIfContains); 中的代码不执行
+        //        generator.Emit(OpCodes.Blt_S, endIfBlt);
+
+        //        // if (j < cols.Count)
+        //        Label endIfBge = generator.DefineLabel();
+        //        generator.Emit(OpCodes.Ldloc_S, j);
+        //        generator.Emit(OpCodes.Ldarg_1);
+        //        generator.Emit(OpCodes.Callvirt, getCount);
+        //        generator.Emit(OpCodes.Bge_S, endIfBge);
+
+        //        // if (!dr.IsDBNull(j))
+        //        Label endIfDBNull = generator.DefineLabel();
+        //        generator.Emit(OpCodes.Ldarg_0);
+        //        generator.Emit(OpCodes.Ldloc_S, j);
+        //        generator.Emit(OpCodes.Callvirt, IsDBNull);
+        //        // 如果dr.IsNull(property.Name)为true,则到generator.MarkLabel(endIfDBNull)间的代码不执行
+        //        generator.Emit(OpCodes.Brtrue, endIfDBNull);
+
+        //        //generator.Emit(OpCodes.Ldstr, "I'm test");
+        //        //generator.Emit(OpCodes.Call, typeof(Console).GetMethod("WriteLine", new Type[] { typeof(String) }));
+
+        //        generator.Emit(OpCodes.Ldloc, result);
+        //        generator.Emit(OpCodes.Ldarg_0);
+        //        generator.Emit(OpCodes.Ldloc_S, j);
+        //        generator.Emit(OpCodes.Callvirt, getItem);
+        //        generator.Emit(OpCodes.Unbox_Any, property.PropertyType);
+        //        generator.Emit(OpCodes.Callvirt, property.GetSetMethod());
+
+        //        // System.Nullable`1<int32>
+        //        // 使用下面的方法时，日期类型会出错
+        //        //if ((property.PropertyType.IsValueType ||
+        //        //    property.PropertyType == typeof(string))
+        //        //    && ConvertMethods.ContainsKey(property.PropertyType))
+        //        //    generator.Emit(OpCodes.Call, ConvertMethods[property.PropertyType]);
+        //        //else
+        //        //    generator.Emit(OpCodes.Castclass, property.PropertyType);
+        //        //generator.Emit(OpCodes.Callvirt, property.GetSetMethod());
+
+        //        generator.MarkLabel(endIfDBNull);
+        //        generator.MarkLabel(endIfBge);
+        //        generator.MarkLabel(endIfBlt);
+        //    }
+        //    generator.Emit(OpCodes.Ldloc, result);
+        //    generator.Emit(OpCodes.Ret);
+
+        //    dynamicBuilder.DataRecordHandler = (Func<IDataRecord, List<string>, object>)method.CreateDelegate(typeof(Func<IDataRecord, List<string>, object>));
+        //    return dynamicBuilder;
+        //}
     }
 
     /// <summary>
