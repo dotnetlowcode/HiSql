@@ -713,7 +713,7 @@ UNION ALL
 
 
 
-                .AppendLine(" case when a.\"DATA_TYPE_NAME\" = 'INTEGER' or a.\"DATA_TYPE_NAME\" = 'BIGINT' or a.\"DATA_TYPE_NAME\" = 'SMALLINT' or a.\"DATA_TYPE_NAME\" = 'TINYINT' or a.\"DATA_TYPE_NAME\" = 'BOOLEAN'  or a.\"DATA_TYPE_NAME\" = 'SECONDDATE'  or a.\"DATA_TYPE_NAME\" = 'TIMESTAMP'   then 0   else    a.\"LENGTH\"    end   AS \"Lens\",")
+                .AppendLine(" case when a.\"DATA_TYPE_NAME\" = 'INTEGER' or a.\"DATA_TYPE_NAME\" = 'BIGINT' or a.\"DATA_TYPE_NAME\" = 'SMALLINT' or a.\"DATA_TYPE_NAME\" = 'TINYINT' or a.\"DATA_TYPE_NAME\" = 'BOOLEAN'  or a.\"DATA_TYPE_NAME\" = 'SECONDDATE'  or a.\"DATA_TYPE_NAME\" = 'TIMESTAMP' OR a.\"DATA_TYPE_NAME\" = 'DATE'   or a.\"DATA_TYPE_NAME\" = 'TEXT'  then 0   else    a.\"LENGTH\"    end   AS \"Lens\",")
                 .AppendLine("a.\"SCALE\" AS \"PointDec\",a.\"IS_NULLABLE\"  as \"IsNull\",")
                 .AppendLine("a.\"DEFAULT_VALUE\" as \"DbDefault\",a.\"COMMENTS\" as \"FieldDesc\"")
                 .AppendLine(" FROM SYS.TABLE_COLUMNS as a")
@@ -745,7 +745,7 @@ UNION ALL
                 .AppendLine("       ELSE 'nvarchar'")
                 .AppendLine("   end   AS \"FieldType\",")
                 .AppendLine("case   WHEN A.\"DATA_TYPE_NAME\" = 'TEXT' then 0 else A.\"LENGTH\" * 2  end AS \"USEBYTES\",")
-                .AppendLine(" case when a.\"DATA_TYPE_NAME\" = 'INTEGER' or a.\"DATA_TYPE_NAME\" = 'BIGINT' or a.\"DATA_TYPE_NAME\" = 'SMALLINT' or a.\"DATA_TYPE_NAME\" = 'TINYINT' or a.\"DATA_TYPE_NAME\" = 'BOOLEAN'  or a.\"DATA_TYPE_NAME\" = 'SECONDDATE'  or a.\"DATA_TYPE_NAME\" = 'TIMESTAMP'   then 0   else    a.\"LENGTH\"    end   AS \"Lens\",")
+                .AppendLine(" case when a.\"DATA_TYPE_NAME\" = 'INTEGER' or a.\"DATA_TYPE_NAME\" = 'BIGINT' or a.\"DATA_TYPE_NAME\" = 'SMALLINT' or a.\"DATA_TYPE_NAME\" = 'TINYINT' or a.\"DATA_TYPE_NAME\" = 'BOOLEAN'  or a.\"DATA_TYPE_NAME\" = 'SECONDDATE'  or a.\"DATA_TYPE_NAME\" = 'TIMESTAMP' OR a.\"DATA_TYPE_NAME\" = 'DATE'   or a.\"DATA_TYPE_NAME\" = 'TEXT'   then 0   else    a.\"LENGTH\"    end   AS \"Lens\",")
                 .AppendLine("a.\"SCALE\" AS \"PointDec\",a.\"IS_NULLABLE\"  as \"IsNull\",")
                 .AppendLine("a.\"DEFAULT_VALUE\" as \"DbDefault\",a.\"COMMENTS\" as \"FieldDesc\"")
                 .AppendLine(" FROM SYS.VIEW_COLUMNS as a")

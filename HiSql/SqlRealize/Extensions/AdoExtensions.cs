@@ -46,6 +46,9 @@ namespace HiSql
         /// <returns></returns>
         public static int LengthZH(this string value)
         {
+
+            int _gbklen = 2;
+            int _enlen = 1;
             if (value.Length == 0)
                 return 0;
             ASCIIEncoding ascii = new ASCIIEncoding();
@@ -55,11 +58,11 @@ namespace HiSql
             {
                 if ((int)s[i] == 63)
                 {
-                    tempLen += 2;
+                    tempLen += _gbklen;
                 }
                 else
                 {
-                    tempLen += 1;
+                    tempLen += _enlen;
                 }
             }
             return tempLen;

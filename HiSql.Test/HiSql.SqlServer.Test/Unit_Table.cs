@@ -237,10 +237,13 @@ namespace HiSql.Unit.Test
             _outputHelper.WriteLine($"检测表[{tabname1}] 是否在当前库中存在");
             if (sqlClient.DbFirst.CheckTabExists(tabname1))
             {
+                TabInfo tabInfo2 = sqlClient.DbFirst.GetTabStruct(tabname1);
                 _outputHelper.WriteLine($"表[{tabname1}] 存在正在执行删除并清除表结构信息");
                 sqlClient.DbFirst.DropTable(tabname1);
                 _outputHelper.WriteLine($"表[{tabname1}] 已经删除");
             }
+
+            
             bool iscreate = sqlClient.DbFirst.CreateTable(Test.TestTable.DynTable.BuildTabInfo(tabname1, true));
             if (iscreate)
                 _outputHelper.WriteLine($"表[{tabname1}] 已经成功创建");
@@ -251,7 +254,14 @@ namespace HiSql.Unit.Test
             Assert.True(iscreate);
 
 
-            List<object> lstdata = TestTable.DynTable.BuildTabDataList(tabname1, 100);
+            TabInfo tabInfo= sqlClient.DbFirst.GetTabStruct(tabname1);
+
+            string str = "魏凤和回应佩洛台：中国军队敌人SSSDFADFADSFASDFASDF";
+
+            int len = str.Length;
+            int len2 = str.LengthZH();
+
+            List<object> lstdata = TestTable.DynTable.BuildTabDataList(tabname1, 5);
 
 
             int v=sqlClient.Insert(tabname1,lstdata).ExecCommand();

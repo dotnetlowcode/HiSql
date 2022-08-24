@@ -21,7 +21,9 @@ namespace HiSql
         }
 
         private HiSqlClient _sqlClient;
+        private IDM Idm = null;
 
+        private object _obkey=new object ();
 
         public DbFirst(HiSqlClient sqlClient)
         {
@@ -33,6 +35,19 @@ namespace HiSql
 
         }
 
+
+        IDM buildIDM(DBType dBType)
+        {
+            lock (_obkey)
+            {
+                if (Idm == null)
+                {
+                    Idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{dBType.ToString()}{DbInterFace.DM.ToString()}");
+                    Idm.Context = SqlClient.Context;
+                }
+            }
+            return Idm;
+        }
 
 
         Tuple<bool, string, string> addColumn(IDM idm, TabInfo tabInfo, HiColumn hiColumn, OpLevel opLevel)
@@ -92,9 +107,8 @@ namespace HiSql
             //string _msg = "";
             //string _sql = "";
 
-            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
+            IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
 
-            idm.Context = SqlClient.Context;
             //获取当前最新物理表结构信息
             HiSqlCommProvider.RemoveTabInfoCache(tabname, _sqlClient.Context.CurrentConnectionConfig.DbType);
             //获取最新
@@ -113,9 +127,7 @@ namespace HiSql
             string _msg = "";
             string _sql = "";
 
-            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
-
-            idm.Context = SqlClient.Context;
+            IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
 
             List<TabIndex> lstindex = idm.GetIndexs(tabname);
             if (lstindex.Any(i => string.Equals(i.IndexType, "Key_Index", StringComparison.OrdinalIgnoreCase)))
@@ -182,9 +194,7 @@ namespace HiSql
             bool _isok = false;
             string _msg = "";
             string _sql = "";
-            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
-
-            idm.Context = SqlClient.Context;
+            IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
 
             List<TabIndex> lstindex = idm.GetIndexs(tabname);
             if (lstindex.Any(i => i.IndexName.ToLower() == indexname.ToLower()))
@@ -247,8 +257,7 @@ namespace HiSql
         /// <returns></returns>
         public bool CheckTabExists(string tableName)
         {
-            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
-            idm.Context = SqlClient.Context;
+            IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
             return idm.CheckTabExists(tableName);
         }
         /// <summary>
@@ -324,8 +333,7 @@ namespace HiSql
             bool _isok = false;
             string _msg = "";
             string _sql = "";
-            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
-            idm.Context = SqlClient.Context;
+            IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
 
             if (_sqlClient != null)
             {
@@ -370,8 +378,7 @@ namespace HiSql
             bool _isok = false;
             string _msg = "";
             string _sql = "";
-            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
-            idm.Context = SqlClient.Context;
+            IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
 
             if (_sqlClient != null)
             {
@@ -416,8 +423,7 @@ namespace HiSql
             bool _isok = false;
             string _msg = "";
             string _sql = "";
-            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
-            idm.Context = SqlClient.Context;
+            IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
 
             if (_sqlClient != null)
             {
@@ -510,9 +516,8 @@ namespace HiSql
             bool _isok = false;
             string _msg = "";
             string _sql = "";
-            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
+            IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
 
-            idm.Context = SqlClient.Context;
             //获取当前最新物理表结构信息
             HiSqlCommProvider.RemoveTabInfoCache(tabname, _sqlClient.Context.CurrentConnectionConfig.DbType);
             //获取最新
@@ -531,8 +536,7 @@ namespace HiSql
             bool _isok = false;
             string _msg = "";
             string _sql = "";
-            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
-            idm.Context = SqlClient.Context;
+            IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
 
             if (idm.Context.CurrentConnectionConfig.UpperCase)
             {
@@ -594,8 +598,7 @@ namespace HiSql
             bool _isok = false;
             string _msg = "";
             string _sql = "";
-            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
-            idm.Context = SqlClient.Context;
+            IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
 
             if (idm.Context.CurrentConnectionConfig.UpperCase)
             {
@@ -675,12 +678,23 @@ namespace HiSql
                     if (nolog)
                         _sqlClient.TrunCate(tabname).ExecCommand();
                     int v = _sqlClient.Drop(tabname).ExecCommand();
-                    _sqlClient.Delete(Constants.HiSysTable["Hi_TabModel"].ToString(), new { TabName = tabname, DbServer="", DbName="" }).ExecCommand();
+                    _sqlClient.Delete(Constants.HiSysTable["Hi_TabModel"].ToString(), new { TabName = tabname, DbServer = "", DbName = "" }).ExecCommand();
                     _sqlClient.Delete(Constants.HiSysTable["Hi_FieldModel"].ToString()).Where($"TabName='{tabname.ToSqlInject()}' and DbServer='' and DbName='' ").ExecCommand();
+
+                    HiSqlCommProvider.RemoveTabInfoCache(tabname, _sqlClient.CurrentConnectionConfig.DbType);
                     return v > 0;
                 }
                 else
+                {
+                    HiSqlCommProvider.RemoveTabInfoCache(tabname, _sqlClient.CurrentConnectionConfig.DbType);
                     return _sqlClient.Drop(tabname).ExecCommand() > 0;
+                }
+
+
+
+                
+
+
             }
             else
                 throw new Exception($"请先指定数据库连接!");
@@ -691,8 +705,7 @@ namespace HiSql
         /// <returns></returns>
         public int GetTableDataCount(string tabname)
         {
-            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
-            idm.Context = SqlClient.Context;
+            IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
             int dataCount = idm.GetTableDataCount(tabname);
             return dataCount;
         }
@@ -702,8 +715,7 @@ namespace HiSql
         /// <returns></returns>
         public List<TableInfo> GetAllTables()
         {
-            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
-            idm.Context = SqlClient.Context;
+            IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
             DataTable dt = idm.GetAllTables();
             List<string> lst = new List<string>();
             List<TableInfo> lsttabinfo = new List<TableInfo>();
@@ -750,8 +762,7 @@ namespace HiSql
      
         public List<TableInfo> GetAllTables(string viewName, int pageSize, int pageIndex, out int totalCount)
         {
-            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
-            idm.Context = SqlClient.Context;
+            IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
             DataTable dt = idm.GetAllTables(viewName, pageSize, pageIndex, out totalCount);
             List<string> lst = new List<string>();
             List<TableInfo> lsttabinfo = new List<TableInfo>();
@@ -803,8 +814,7 @@ namespace HiSql
         /// <returns></returns>
         public List<TableInfo> GetGlobalTempTables()
         {
-            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
-            idm.Context = SqlClient.Context;
+            IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
             DataTable dt = idm.GetGlobalTables();
 
             List<string> lst = new List<string>();
@@ -865,9 +875,7 @@ namespace HiSql
         /// <returns></returns>
         public List<TabIndex> GetTabIndexs(string tabname)
         {
-            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
-            idm.Context = SqlClient.Context;
-
+            IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
             return idm.GetIndexs(tabname);
         }
 
@@ -879,9 +887,7 @@ namespace HiSql
         /// <returns></returns>
         public List<TabIndexDetail> GetTabIndexDetail(string tabname, string indexname)
         {
-            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
-            idm.Context = SqlClient.Context;
-
+            IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
             return idm.GetIndexDetails(tabname, indexname);
         }
 
@@ -892,8 +898,7 @@ namespace HiSql
         /// <returns></returns>
         public List<TableInfo> GetTables()
         {
-            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
-            idm.Context = SqlClient.Context;
+            IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
             DataTable dt = idm.GetTableList();
             List<string> lst = new List<string>();
             List<TableInfo> lsttabinfo = new List<TableInfo>();
@@ -941,8 +946,7 @@ namespace HiSql
         public List<TableInfo> GetTables(string tableName, int pageSize, int pageIndex, out int totalCount)
         {
 
-            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
-            idm.Context = SqlClient.Context;
+            IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
             DataTable dt = idm.GetTableList(tableName, pageSize, pageIndex, out totalCount);
             List<string> lst = new List<string>();
             List<TableInfo> lsttabinfo = new List<TableInfo>();
@@ -998,8 +1002,7 @@ namespace HiSql
         /// <returns></returns>
         public DataTable GetTabPhyInfo(string tabname)
         {
-            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
-            idm.Context = SqlClient.Context;
+            IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
             return idm.GetTableDefinition(tabname);
 
         }
@@ -1020,8 +1023,7 @@ namespace HiSql
         /// <returns></returns>
         public List<TableInfo> GetViews()
         {
-            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
-            idm.Context = SqlClient.Context;
+            IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
             DataTable dt = idm.GetViewList();
             List<string> lst = new List<string>();
             List<TableInfo> lsttabinfo = new List<TableInfo>();
@@ -1071,8 +1073,7 @@ namespace HiSql
         /// <returns></returns>
         public List<TableInfo> GetViews(string viewName, int pageSize, int pageIndex, out int totalCount)
         {
-            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
-            idm.Context = SqlClient.Context;
+            IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
             DataTable dt = idm.GetViewList(viewName, pageSize, pageIndex, out totalCount);
             List<string> lst = new List<string>();
             List<TableInfo> lsttabinfo = new List<TableInfo>();
@@ -1178,9 +1179,7 @@ namespace HiSql
             bool _isok = false;
             string _msg = "";
             string _sql = "";
-            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
-
-            idm.Context = SqlClient.Context;
+            IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
             //获取当前最新物理表结构信息
             HiSqlCommProvider.RemoveTabInfoCache(tabname, _sqlClient.Context.CurrentConnectionConfig.DbType);
             //获取最新
@@ -1269,9 +1268,7 @@ namespace HiSql
             bool _isok = false;
             string _msg = "";
             string _sql = "";
-            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
-
-            idm.Context = SqlClient.Context;
+            IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
             //获取当前最新物理表结构信息
             HiSqlCommProvider.RemoveTabInfoCache(tabname, _sqlClient.Context.CurrentConnectionConfig.DbType);
             //获取最新
@@ -1279,6 +1276,19 @@ namespace HiSql
 
             return reColumn(idm, tabinfo, hiColumn, opLevel);
         }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <returns></returns>
+        public TabInfo GetTabStruct(string tabname)
+        {
+            IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
+            return idm.GetTabStruct(tabname);
+        }
+
         /// <summary>
         /// 表不存在则创建，存在则修改
         /// </summary>
@@ -1288,12 +1298,7 @@ namespace HiSql
         public Tuple<bool, string, string> ModiTable(TabInfo tabInfo, OpLevel opLevel, bool onlychangetable = false)
         {
             TabInfo tab = _sqlClient.Context.DMInitalize.GetTabStruct(tabInfo.TabModel.TabName);
-
-
-            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
-
-
-            idm.Context = SqlClient.Context;
+            IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
             //获取当前最新物理表结构信息
             HiSqlCommProvider.RemoveTabInfoCache(tabInfo.TabModel.TabName, _sqlClient.Context.CurrentConnectionConfig.DbType);
             //获取最新
@@ -1618,9 +1623,7 @@ namespace HiSql
             string _msg = "";
             string _sql = "";
 
-            IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
-
-            idm.Context = SqlClient.Context;
+            IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
             //获取当前最新物理表结构信息
             HiSqlCommProvider.RemoveTabInfoCache(tabname, _sqlClient.Context.CurrentConnectionConfig.DbType);
             //获取最新

@@ -681,12 +681,12 @@ namespace HiSql
             {
                 if (_i != _values.Count - 1)
                 {
-                    _sb_field.Append($"{n},");
+                    _sb_field.Append($"{dbConfig.Field_Pre}{n}{dbConfig.Field_After},");
                     _sb_value.Append($"{_values[n]},");
                 }
                 else
                 {
-                    _sb_field.Append($"{n}");
+                    _sb_field.Append($"{dbConfig.Field_Pre}{n}{dbConfig.Field_After}");
                     _sb_value.Append($"{_values[n]}");
                 }
                 _i++;
@@ -1093,12 +1093,24 @@ namespace HiSql
 
                     bool _isnull = isalteraddkey && hiColumn.IsPrimary;
 
+                    decimal _lenxs = 1.5M;
+
+
                     switch (dbConfig.DbMapping[hiColumn.FieldType].ToString())
                     {
+                        case "char":
+                            _str_temp_field = _str_temp_field.Replace("[$FieldName$]", hiColumn.FieldName)
+                                .Replace("[$FieldLen$]", Math.Ceiling(hiColumn.FieldLen * _lenxs).ToString())
+                                .Replace("[$IsNull$]", _isnull ? "" : hiColumn.IsPrimary ? "NOT NULL" : hiColumn.IsNull == true ? hiColumn.DBDefault != HiTypeDBDefault.NONE ? "" : "null" : hiColumn.DBDefault == HiTypeDBDefault.NONE ? "NOT NULL" : "")
+                                //.Replace("[$Default$]", hiColumn.IsPrimary ? "" : GetDbDefault( hiColumn, hiTable.TabName))
+                                .Replace("[$Default$]", _isnull ? "" : hiColumn.IsPrimary ? GetDbDefault(hiColumn, hiTable.TabName) : GetDbDefault(hiColumn, hiTable.TabName))
+                                .Replace("[$EXTEND$]", hiTable.TableType == TableType.Var && hiColumn.IsPrimary ? "primary key" : "")
+                                ;
+                            break;
                         case "nvarchar":
                         case "varchar":
                         case "nchar":
-                        case "char":
+                        
                             _str_temp_field = _str_temp_field.Replace("[$FieldName$]", hiColumn.FieldName)
                                 .Replace("[$FieldLen$]", hiColumn.FieldLen.ToString())
                                 .Replace("[$IsNull$]", _isnull ? "" : hiColumn.IsPrimary ? "NOT NULL" : hiColumn.IsNull == true ? hiColumn.DBDefault != HiTypeDBDefault.NONE ? "" : "null" : hiColumn.DBDefault == HiTypeDBDefault.NONE ? "NOT NULL" : "")
@@ -1172,10 +1184,10 @@ namespace HiSql
                     }
                 }
                 else
-                    throw new Exception($"字段类型[{dbConfig.DbMapping[hiColumn.FieldType].ToString()} 在SqlServer中没有配置字段模版");
+                    throw new Exception($"字段类型[{dbConfig.DbMapping[hiColumn.FieldType].ToString()} 在[{Context.CurrentConnectionConfig.DbType}]中没有配置字段模版");
             }
             else
-                throw new Exception($"字段[{hiColumn.FieldName}] 对应的字段类型在SqlServer中没有做实现,帮该库不支持该类型");
+                throw new Exception($"字段[{hiColumn.FieldName}] 对应的字段类型在[{Context.CurrentConnectionConfig.DbType}]中没有做实现,帮该库不支持该类型");
 
             return _str_temp_field;
         }

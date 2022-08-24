@@ -1101,13 +1101,21 @@ namespace HiSql
                 if (dbConfig.FieldTempMapping.ContainsKey(dbConfig.DbMapping[hiColumn.FieldType].ToString()))
                 {
                     _str_temp_field = dbConfig.FieldTempMapping[dbConfig.DbMapping[hiColumn.FieldType].ToString()].ToString();
-
+                    decimal _lenxs = 1.5M;
                     switch (dbConfig.DbMapping[hiColumn.FieldType].ToString())
                     {
+                        case "char":
+                            _str_temp_field = _str_temp_field.Replace("[$FieldName$]", hiColumn.FieldName)
+                                 .Replace("[$FieldLen$]", Math.Ceiling(hiColumn.FieldLen * _lenxs).ToString())
+                                .Replace("[$IsNull$]", hiColumn.IsPrimary ? "NOT NULL" : hiColumn.IsNull == true ? "" : "NOT NULL")
+                                //.Replace("[$Default$]", hiColumn.IsPrimary ? "" : GetDbDefault(hiColumn))
+                                .Replace("[$Default$]", hiColumn.IsPrimary ? GetDbDefault(hiColumn) : GetDbDefault(hiColumn))
+                                .Replace("[$EXTEND$]", hiTable.TableType == TableType.Var && hiColumn.IsPrimary ? "primary key" : "")
+                                ;
+                            break;
                         case "nvarchar":
                         case "varchar":
                         case "nchar":
-                        case "char":
                             _str_temp_field = _str_temp_field.Replace("[$FieldName$]", hiColumn.FieldName)
                                 .Replace("[$FieldLen$]", hiColumn.FieldLen.ToString())
                                 .Replace("[$IsNull$]", hiColumn.IsPrimary ? "NOT NULL" : hiColumn.IsNull == true ? "" : "NOT NULL")
