@@ -523,7 +523,7 @@ namespace HiSql
                 { "text",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  LONGVARCHAR  [$IsNull$] [$Default$] [$EXTEND$] "},
 
                 { "int",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  integer  [$IsIdentity$] [$IsNull$] [$Default$] [$EXTEND$] "},
-                { "bigint",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  bigint(18)  [$IsIdentity$] [$IsNull$] [$Default$] [$EXTEND$] " },
+                { "bigint",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  bigint  [$IsIdentity$] [$IsNull$] [$Default$] [$EXTEND$] " },
                 { "smallint",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  smallint   [$IsNull$] [$Default$] [$EXTEND$] "},
                 { "decimal",$"{_temp_field_pre}[$FieldName$]{_temp_field_after}  decimal ([$FieldLen$],[$FieldDec$])  [$IsNull$] [$Default$] [$EXTEND$] "},
 

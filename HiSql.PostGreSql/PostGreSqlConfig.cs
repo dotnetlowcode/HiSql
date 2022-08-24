@@ -839,7 +839,7 @@ UNION ALL
                 .AppendLine("       WHEN t.typname ='timestamp' then 'datetime'  ")
                 .AppendLine("       WHEN t.typname ='date' then 'date'  ")
                 .AppendLine("       WHEN t.typname ='bool' then 'bit'  ")
-                .AppendLine("       WHEN t.typname ='bpchar' then 'char'  ")
+                .AppendLine("       WHEN t.typname ='bpchar' then 'nchar'  ")
                 .AppendLine("       WHEN t.typname ='text' then 'text'  ")
                 .AppendLine("       WHEN t.typname ='xml' then 'text'  ")
                 .AppendLine("       WHEN t.typname ='json' then 'text'  ")

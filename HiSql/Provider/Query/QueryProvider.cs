@@ -1171,7 +1171,7 @@ namespace HiSql
             }
             
                 IDataReader dr = this.Context.DBO.GetDataReader(_sql, null);
-                _result = DataConverter.ToList<T>(dr, this.Context.CurrentConnectionConfig.DbType);
+                _result = DataConvert.ToList<T>(dr, this.Context.CurrentConnectionConfig.DbType);
                 dr.Close();
             }
             

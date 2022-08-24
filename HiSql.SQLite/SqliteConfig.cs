@@ -547,7 +547,7 @@ PRAGMA [main].legacy_alter_table = 'off';"; }
                 { "date",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} date  [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}" },
 
                 //{ "image",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} {_temp_field_pre}binary{_temp_field_after}   [$IsNull$] [$EXTEND$]{_temp_field_split}"},
-                //{ "uniqueidentifier",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} {_temp_field_pre}uniqueidentifier{_temp_field_after}   [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}"},
+                { "uniqueidentifier",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} varchar(36)   [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}"},
             };
 
 

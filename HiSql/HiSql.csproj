@@ -49,10 +49,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\..\个人\BaiduNetdiskDownload\架构班02期资料分享\20210529Architect02Course014ElasticSearch-3-ELK\emit\A+B\A+B\Dapper-main\Dapper\Dapper.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
 	  <Compile Update="Properties\Resources.Designer.cs">
 	    <DesignTime>True</DesignTime>
 	    <AutoGen>True</AutoGen>

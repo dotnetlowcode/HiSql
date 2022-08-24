@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,14 +8,7 @@ namespace HiSql.UnitTest
 {
     class Demo_Init
     {
-        #region dapper 连接
-
-        public static IDbConnection GetDapperSqlClient()
-        {
-            return new SqlConnection("server=(local);uid=sa;pwd=Hone@123;database=HiSql;Encrypt=True; TrustServerCertificate=True;");
-        }
-
-        #endregion
+        
         public static HiSqlClient GetSqlClient()
         {
             //Global.RedisOn = true;
@@ -27,10 +18,10 @@ namespace HiSql.UnitTest
                      {
                          DbType = DBType.SqlServer,
                          DbServer = "local-HoneBI",
-                         ConnectionString = "server=(local);uid=sa;pwd=Hone@123;database=HiSql;Encrypt=True; TrustServerCertificate=True;",//; MultipleActiveResultSets = true;
-                         User = "sa",//可以指定登陆用户的帐号
+                         ConnectionString = "server=(local);uid=sa;pwd=Hone@123;database=Hone;Encrypt=True; TrustServerCertificate=True;",//; MultipleActiveResultSets = true;
+                         User = "tansar",//可以指定登陆用户的帐号
                          SlaveConnectionConfigs = new List<SlaveConnectionConfig> {
-                             //{ new SlaveConnectionConfig{ ConnectionString=" server=(local);uid=sa;pwd=Hone@123;database=Hone;Encrypt=True; TrustServerCertificate=True;" , Weight=3} },
+                             { new SlaveConnectionConfig{ ConnectionString=" server=(local);uid=sa;pwd=Hone@123;database=Hone;Encrypt=True; TrustServerCertificate=True;" , Weight=3} },
                              //{ new SlaveConnectionConfig{ ConnectionString=" server=(local);uid=sa;pwd=Hone@123;database=HiSql; " , Weight=3} },
                              //{ new SlaveConnectionConfig{ ConnectionString="  server=(local);uid=sa;pwd=Hone@123;database=HiSql;" , Weight=4} },
                              //{ new SlaveConnectionConfig{ ConnectionString="    erver=(local);uid=sa;pwd=Hone@123;database=HiSql;" , Weight=10} }
