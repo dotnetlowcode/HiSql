@@ -144,7 +144,7 @@ namespace HiSql.UnitTest
                 int cnt = 10;
                 for (int i = 0; i < cnt; i++)
                 {
-                    DataConverter.ListToDataTable<Hi_FieldModel>(modelList);
+                    DataConverter.ListToDataTable<Hi_FieldModel>(modelList, sqlClient.Context.CurrentConnectionConfig.DbType);
                 }
                 Console.WriteLine($"测试 ToDataTable emit {cnt}次 耗时{stopwatch.ElapsedMilliseconds}");
                 

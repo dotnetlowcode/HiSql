@@ -82,6 +82,7 @@ namespace HiSql.Unit.Test
         {
             DataTable table = sqlClient.Query("Hi_FieldModel").Field("*").Take(10).Skip(1).ToTable();
             var dataList= sqlClient.Query("Hi_FieldModel").Field("*").Take(10).Skip(1).ToList<Hi_FieldModel>();
+            //测试 table to list
             List<Hi_FieldModel> _FieldModelsB = DataConverter.ToList<Hi_FieldModel>(table, sqlClient.Context.CurrentConnectionConfig.DbType);
             List<Hi_FieldModel> _FieldModelsA = DataConvert.ToEntityList<Hi_FieldModel>(table);
             var strA = JsonConverter.ToJson(_FieldModelsA);
@@ -90,17 +91,27 @@ namespace HiSql.Unit.Test
 
             bool tabletolistIsOk = strA.Equals(strB) && strA.Equals(strC);
 
-            int total = 0;
+           
             _outputHelper.WriteLine($"测试 DataTable 转 List<T>  一致性：  {tabletolistIsOk}");
-            _FieldModelsB = sqlClient.Query("Hi_FieldModel").Field("*").Take(10).Skip(1).ToList<Hi_FieldModel>( ref total);
-
+            //测试 datareader to list
+            int total = 0;
+             _FieldModelsB = sqlClient.Query("Hi_FieldModel").Field("*").Take(10).Skip(1).ToList<Hi_FieldModel>( ref total);
              _FieldModelsA = sqlClient.Query("Hi_FieldModel").Field("*").Take(10).Skip(1).ToList<Hi_FieldModel>();
-
              bool datareader2listIsOk = JsonConverter.ToJson(_FieldModelsA).Equals(JsonConverter.ToJson(_FieldModelsB));
 
             _outputHelper.WriteLine($"测试 IDataReader 转 List<T>  一致性：  {datareader2listIsOk}");
 
-            Assert.True(tabletolistIsOk && datareader2listIsOk);
+
+            //测试 list to table
+            var listJson = JsonConverter.ToJson(_FieldModelsB);
+
+            var listToTable2List = DataConverter.ToList<Hi_FieldModel>(DataConverter.ListToDataTable(_FieldModelsB, sqlClient.Context.CurrentConnectionConfig.DbType), sqlClient.Context.CurrentConnectionConfig.DbType);
+            var listToTableJson = JsonConverter.ToJson(listToTable2List);
+            var listTOtableIsOk = listToTableJson.Equals(listJson);
+
+            _outputHelper.WriteLine($"测试 ListToDataTable 再转 List<T>  一致性：  {listTOtableIsOk}");
+
+            Assert.True(tabletolistIsOk && datareader2listIsOk&& listTOtableIsOk);
         }
 
         #endregion
