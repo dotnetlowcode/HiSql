@@ -1492,7 +1492,10 @@ namespace HiSql
             {
                 if (hiColumn.DBDefault != HiTypeDBDefault.FUNDATE)
                 {
-                    _value = $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'";
+                    if(Context.CurrentConnectionConfig.DbType==DBType.Oracle)
+                        _value = $"timestamp'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'";
+                    else
+                        _value = $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'";
                     rtn = new Tuple<bool, string>(true, _value);
 
                 }
@@ -1593,7 +1596,10 @@ namespace HiSql
                         //DateTime dtime = DateTime.Now;
                         if (dtime != null)
                         {
-                            rtn = new Tuple<bool, string>(true, $"'{dtime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                            if (Context.CurrentConnectionConfig.DbType == DBType.Oracle)
+                                rtn = new Tuple<bool, string>(true, $"timestamp'{dtime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                            else
+                                rtn = new Tuple<bool, string>(true, $"'{dtime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
                         }
                     }
                 }

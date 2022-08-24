@@ -1144,13 +1144,14 @@ namespace HiSql
 
                     string _null = string.Empty;
 
+                    int _lenxs = 2;
                     switch (dbConfig.DbMapping[hiColumn.FieldType].ToString())
                     {
 
                         case "nchar":
                         case "nvarchar":
                             _str_temp_field = _str_temp_field.Replace("[$FieldName$]", hiColumn.FieldName)
-                                .Replace("[$FieldLen$]", (hiColumn.FieldLen*2).ToString())
+                                .Replace("[$FieldLen$]", (hiColumn.FieldLen* _lenxs).ToString())
                                 .Replace("[$IsNull$]", hiColumn.IsPrimary ? "NOT NULL" : hiColumn.IsNull == true ? hiColumn.DBDefault != HiTypeDBDefault.NONE ? "" : "null" : hiColumn.DBDefault == HiTypeDBDefault.NONE ? "NOT NULL" : "")
                                 //.Replace("[$Default$]", hiColumn.IsPrimary ? "" : GetDbDefault(hiColumn, hiTable.TabName))
                                 .Replace("[$Default$]", hiColumn.IsPrimary ? GetDbDefault(hiColumn, hiTable.TabName) : GetDbDefault(hiColumn, hiTable.TabName))

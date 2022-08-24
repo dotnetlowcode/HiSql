@@ -36,10 +36,19 @@ namespace HiSql
     public class FieldChangeDetail
     { 
 
+        /// <summary>
+        /// 属性名称
+        /// </summary>
         public string AttrName { get; set; }
 
+        /// <summary>
+        /// 需要变更后的值
+        /// </summary>
         public string ValueA { get; set; }
 
+        /// <summary>
+        /// 当前的值
+        /// </summary>
         public string ValueB { get; set; }
     }
 }
