@@ -916,7 +916,7 @@ namespace HiSql
         /// <param name="dic_primary"></param>
         /// <param name="_where"></param>
         /// <returns></returns>
-        public string BuildUpdateSql(TableDefinition table, Dictionary<string, string> dic_value, Dictionary<string, string> dic_primary, string _where)
+        public string BuildUpdateSql(TableDefinition table, Dictionary<string, string> dic_value, Dictionary<string, string> dic_primary, string _where, bool onlywhere = false)
         {
             string _temp_sql = string.Empty;
             int i = 0;
@@ -944,16 +944,30 @@ namespace HiSql
             i = 0;
             foreach (string n in dic_primary.Keys)
             {
-                sb_primary.Append($"{dbConfig.Field_Pre}{n}{dbConfig.Field_After}={dic_primary[n].ToString()}");
+                string _val = dic_primary[n].ToString();
+                if (_val == "''")
+                    _val = $"'{dbConfig.Key_Char_Default}'";
+
+                sb_primary.Append($"{dbConfig.Field_Pre}{n}{dbConfig.Field_After}={_val}");
                 if (i != dic_primary.Count() - 1)
                     sb_primary.Append($" and ");
                 i++;
             }
 
-            if (!string.IsNullOrEmpty(sb_primary.ToString()) && !string.IsNullOrEmpty(_where))
+            if (!string.IsNullOrEmpty(sb_primary.ToString()) && !string.IsNullOrEmpty(_where) && !onlywhere)
                 sb_primary.Append($" and {_where}");
             else
-                sb_primary.Append($"{_where}");
+            {
+                if (!string.IsNullOrEmpty(_where.Trim()))
+                {
+                    sb_primary = new StringBuilder();
+                    sb_primary.Append($"{_where}");
+                }
+                else
+                {
+                    sb_primary.Append($"{_where}");
+                }
+            }
 
             _temp_sql = _temp_sql
                 .Replace("[$Schema$]", _schema)
@@ -973,7 +987,7 @@ namespace HiSql
         /// <param name="dic_primary"></param>
         /// <param name="_where"></param>
         /// <returns></returns>
-        public string BuildUpdateSql(TabInfo tabinfo, TableDefinition table, Dictionary<string, string> dic_value, Dictionary<string, string> dic_primary, string _where)
+        public string BuildUpdateSql(TabInfo tabinfo, TableDefinition table, Dictionary<string, string> dic_value, Dictionary<string, string> dic_primary, string _where, bool onlywhere = false)
         {
             string _temp_sql = string.Empty;
             int i = 0;
@@ -1021,16 +1035,30 @@ namespace HiSql
             i = 0;
             foreach (string n in dic_primary.Keys)
             {
-                sb_primary.Append($"{dbConfig.Field_Pre}{n}{dbConfig.Field_After}={dic_primary[n].ToString()}");
+                string _val = dic_primary[n].ToString();
+                if (_val == "''")
+                    _val = $"'{dbConfig.Key_Char_Default}'";
+
+                sb_primary.Append($"{dbConfig.Field_Pre}{n}{dbConfig.Field_After}={_val}");
                 if (i != dic_primary.Count() - 1)
                     sb_primary.Append($" and ");
                 i++;
             }
 
-            if (!string.IsNullOrEmpty(sb_primary.ToString()) && !string.IsNullOrEmpty(_where))
+            if (!string.IsNullOrEmpty(sb_primary.ToString()) && !string.IsNullOrEmpty(_where) && !onlywhere)
                 sb_primary.Append($" and {_where}");
             else
-                sb_primary.Append($"{_where}");
+            {
+                if (!string.IsNullOrEmpty(_where.Trim()))
+                {
+                    sb_primary = new StringBuilder();
+                    sb_primary.Append($"{_where}");
+                }
+                else
+                {
+                    sb_primary.Append($"{_where}");
+                }
+            }
 
             _temp_sql = _temp_sql
                 .Replace("[$Schema$]", _schema)
@@ -1144,13 +1172,14 @@ namespace HiSql
 
                     string _null = string.Empty;
 
+                    int _lenxs = 2;
                     switch (dbConfig.DbMapping[hiColumn.FieldType].ToString())
                     {
 
                         case "nchar":
                         case "nvarchar":
                             _str_temp_field = _str_temp_field.Replace("[$FieldName$]", hiColumn.FieldName)
-                                .Replace("[$FieldLen$]", (hiColumn.FieldLen*2).ToString())
+                                .Replace("[$FieldLen$]", (hiColumn.FieldLen* _lenxs).ToString())
                                 .Replace("[$IsNull$]", hiColumn.IsPrimary ? "NOT NULL" : hiColumn.IsNull == true ? hiColumn.DBDefault != HiTypeDBDefault.NONE ? "" : "null" : hiColumn.DBDefault == HiTypeDBDefault.NONE ? "NOT NULL" : "")
                                 //.Replace("[$Default$]", hiColumn.IsPrimary ? "" : GetDbDefault(hiColumn, hiTable.TabName))
                                 .Replace("[$Default$]", hiColumn.IsPrimary ? GetDbDefault(hiColumn, hiTable.TabName) : GetDbDefault(hiColumn, hiTable.TabName))

@@ -99,6 +99,24 @@ namespace HiSql
         /// <returns></returns>
         IUpdate Where(string sqlwhere);
 
+
+        /// <summary>
+        /// 仅使用该方法指定的where进行条件更新
+        /// hisql语法
+        /// </summary>
+        /// <param name="sqlwhere"></param>
+        /// <returns></returns>
+        IUpdate OnlyWhere(string sqlwhere);
+
+
+        /// <summary>
+        /// 仅使用该方法指定的where进行条件更新
+        /// 
+        /// </summary>
+        /// <param name="where"></param>
+        /// <returns></returns>
+        IUpdate OnlyWhere(Filter where);
+
         /// <summary>
         /// 更新条件
         /// </summary>

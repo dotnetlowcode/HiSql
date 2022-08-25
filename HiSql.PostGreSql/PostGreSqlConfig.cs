@@ -839,7 +839,7 @@ UNION ALL
                 .AppendLine("       WHEN t.typname ='timestamp' then 'datetime'  ")
                 .AppendLine("       WHEN t.typname ='date' then 'date'  ")
                 .AppendLine("       WHEN t.typname ='bool' then 'bit'  ")
-                .AppendLine("       WHEN t.typname ='bpchar' then 'char'  ")
+                .AppendLine("       WHEN t.typname ='bpchar' then 'nchar'  ")
                 .AppendLine("       WHEN t.typname ='text' then 'text'  ")
                 .AppendLine("       WHEN t.typname ='xml' then 'text'  ")
                 .AppendLine("       WHEN t.typname ='json' then 'text'  ")
@@ -887,7 +887,7 @@ SET "DomainDesc" = excluded."DomainDesc";
             _temp_update = $"update {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} set [$Fields$];";
 
             //表更新 带条件 
-            _temp_update_where = $"update {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} set [$Fields$] where [$Where$];";
+            _temp_update_where = $"update {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} [$AsTabName$] set [$Fields$] where [$Where$];";
 
             _temp_delete = $"delete from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after};";
 

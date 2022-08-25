@@ -104,7 +104,7 @@ namespace HiSql
                     //{
                     //    sb.AppendLine(Context.DMTab.BuildUpdateSql(tabinfo, this.Table, result.Item1, result.Item2, sql_where));
                     //}
-                    string _sql = Context.DMTab.BuildUpdateSql(tabinfo, this.Table, rtn_check.Item1[_idx], rtn_check.Item2[_idx], sql_where);
+                    string _sql = Context.DMTab.BuildUpdateSql(tabinfo, this.Table, rtn_check.Item1[_idx], rtn_check.Item2[_idx], sql_where,IsOnlyWhere);
                     if (!string.IsNullOrEmpty(_sql) && this.Data.Count > 1)
                     {
                         sb.AppendLine($"    execute immediate '{_sql.Replace("'", "''")}';");

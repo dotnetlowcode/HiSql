@@ -312,18 +312,18 @@ namespace HiSql
             var columns = tabInfo.GetColumns;
 
             //以物理表为基准匹配
-            foreach (HiColumn column in phycolumns)
+            foreach (HiColumn _newcolumn in phycolumns)
             {
-                var _column = columns.Where(h => h.FieldName.ToLower() == column.FieldName.ToLower()).FirstOrDefault();
-                if (_column != null && column.FieldName.ToLower().Equals(column.ReFieldName.ToLower()))
+                var _oldcolumn = columns.Where(h => h.FieldName.ToLower() == _newcolumn.FieldName.ToLower()).FirstOrDefault();
+                if (_oldcolumn != null && _newcolumn.FieldName.ToLower().Equals(_newcolumn.ReFieldName.ToLower()))
                 {
 
                     //可能变更也可能没有变更
 
-                    if (string.IsNullOrEmpty(column.TabName))
-                        column.TabName = _column.TabName;
+                    if (string.IsNullOrEmpty(_newcolumn.TabName))
+                        _newcolumn.TabName = _oldcolumn.TabName;
 
-                    var rtntuple = ClassExtensions.CompareTabProperties(column, _column, dbtype);
+                    var rtntuple = ClassExtensions.CompareTabProperties(_newcolumn, _oldcolumn, dbtype);
 
                     //if (!ClassExtensions.CompareProperties(column, _column))
                     //{
@@ -338,26 +338,14 @@ namespace HiSql
 
                     if (!rtntuple.Item1)
                     {
-                        if (dbtype != DBType.DaMeng)
+                        if (dbtype == DBType.DaMeng)
                         {
-                            if (rtntuple.Item3.Count == 1 && rtntuple.Item3.Where(fc => fc.AttrName.Equals("DBDefault", StringComparison.OrdinalIgnoreCase)
-                                && (
-                                    fc.ValueA.Equals("EMPTY", StringComparison.OrdinalIgnoreCase) || fc.ValueA.Equals("VALUE", StringComparison.OrdinalIgnoreCase)
-                                    ||
-                                    fc.ValueB.Equals("EMPTY", StringComparison.OrdinalIgnoreCase) || fc.ValueB.Equals("VALUE", StringComparison.OrdinalIgnoreCase)
-                                    )
-                                ).Count() > 0)
-                            { 
-                                
-                            }else
-                                fieldChanges.Add(new FieldChange { IsTabChange = rtntuple.Item2, OldColumn = _column, NewColumn = column, FieldName = column.FieldName, Action = TabFieldAction.MODI, ChangeDetail = rtntuple.Item3 });
-                        }
-                        else
-                        {
+
+                            #region 达梦特殊业务处理
                             //达梦数据没有nvarchar的概念
                             FieldChangeDetail fieldlen = rtntuple.Item3.Where(fc => fc.AttrName.Equals("FieldLen", StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-                            FieldChangeDetail fieldtype = rtntuple.Item3.Where(fc =>( fc.AttrName.Equals("FieldType", StringComparison.OrdinalIgnoreCase) 
-                            && fc.ValueA.Equals("varchar",StringComparison.OrdinalIgnoreCase)
+                            FieldChangeDetail fieldtype = rtntuple.Item3.Where(fc => (fc.AttrName.Equals("FieldType", StringComparison.OrdinalIgnoreCase)
+                            && fc.ValueA.Equals("varchar", StringComparison.OrdinalIgnoreCase)
                             && fc.ValueB.Equals("nvarchar", StringComparison.OrdinalIgnoreCase)) || (fc.AttrName.Equals("FieldType", StringComparison.OrdinalIgnoreCase)
                             && fc.ValueA.Equals("char", StringComparison.OrdinalIgnoreCase)
                             && fc.ValueB.Equals("nchar", StringComparison.OrdinalIgnoreCase))
@@ -366,33 +354,108 @@ namespace HiSql
                             {
                                 int _va = int.Parse(fieldlen.ValueA);
                                 int _vb = int.Parse(fieldlen.ValueB);
-                                column.FieldType = _column.FieldType;
+                                _newcolumn.FieldType = _oldcolumn.FieldType;
                                 if (_va / 2 == _vb && _va % 2 == 0)
                                 {
                                     //表结构无变化 
-                                    column.FieldLen = _vb;
+                                    _newcolumn.FieldLen = _vb;
                                 }
                                 else
                                 {
-                                    column.FieldLen = _va / 2;
-                                    fieldChanges.Add(new FieldChange { IsTabChange = rtntuple.Item2, OldColumn = _column, NewColumn = column, FieldName = column.FieldName, Action = TabFieldAction.MODI, ChangeDetail = rtntuple.Item3 });
+                                    _newcolumn.FieldLen = _va / 2;
+                                    fieldChanges.Add(new FieldChange { IsTabChange = rtntuple.Item2, OldColumn = _oldcolumn, NewColumn = _newcolumn, FieldName = _newcolumn.FieldName, Action = TabFieldAction.MODI, ChangeDetail = rtntuple.Item3 });
 
                                 }
                             }
                             else
                             {
-                                if (rtntuple.Item3.Count == 1 && rtntuple.Item3.Where(fc=>fc.AttrName.Equals("DBDefault", StringComparison.OrdinalIgnoreCase)
+                                if (rtntuple.Item3.Count == 1 && rtntuple.Item3.Where(fc => fc.AttrName.Equals("DBDefault", StringComparison.OrdinalIgnoreCase)
                                 && (
                                     fc.ValueA.Equals("EMPTY", StringComparison.OrdinalIgnoreCase) || fc.ValueA.Equals("VALUE", StringComparison.OrdinalIgnoreCase)
                                     ||
                                     fc.ValueB.Equals("EMPTY", StringComparison.OrdinalIgnoreCase) || fc.ValueB.Equals("VALUE", StringComparison.OrdinalIgnoreCase)
                                     )
-                                ).Count()>0)
-                                { 
+                                ).Count() > 0)
+                                {
                                     //达梦数据库忽略此种差异
-                                }else
-                                    fieldChanges.Add(new FieldChange { IsTabChange = rtntuple.Item2, OldColumn = _column, NewColumn = column, FieldName = column.FieldName, Action = TabFieldAction.MODI, ChangeDetail = rtntuple.Item3 });
+                                }
+                                else
+                                    fieldChanges.Add(new FieldChange { IsTabChange = rtntuple.Item2, OldColumn = _oldcolumn, NewColumn = _newcolumn, FieldName = _newcolumn.FieldName, Action = TabFieldAction.MODI, ChangeDetail = rtntuple.Item3 });
                             }
+                            #endregion
+
+
+                        }
+                        else if (dbtype == DBType.Oracle  || dbtype==DBType.Hana)
+                        {
+
+                            //oralce 和hana 的char 一个中文占3个字符 其它库占2位 
+                            decimal _lenxs = 1.5M;
+
+                            FieldChangeDetail fieldlen = rtntuple.Item3.Where(fc => fc.AttrName.Equals("FieldLen", StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                            if (fieldlen != null)
+                            {
+                                int _va = int.Parse(fieldlen.ValueA);
+                                int _vb = int.Parse(fieldlen.ValueB);
+
+
+                                decimal _deca = Convert.ToDecimal(_va);
+                                decimal _decb = _lenxs * _vb;
+                                if (_deca != _decb)
+                                {
+                                    int len = Convert.ToInt32(Math.Floor(_deca / _lenxs));
+                                    if (len!=_vb)
+                                        fieldChanges.Add(new FieldChange { IsTabChange = rtntuple.Item2, OldColumn = _oldcolumn, NewColumn = _newcolumn, FieldName = _newcolumn.FieldName, Action = TabFieldAction.MODI, ChangeDetail = rtntuple.Item3 });
+
+                                }
+                                
+
+
+
+                            }
+                            else
+                            {
+                                if (rtntuple.Item3.Count == 1 && rtntuple.Item3.Where(fc => fc.AttrName.Equals("DBDefault", StringComparison.OrdinalIgnoreCase)
+                                && (
+                                    fc.ValueA.Equals("EMPTY", StringComparison.OrdinalIgnoreCase) || fc.ValueA.Equals("VALUE", StringComparison.OrdinalIgnoreCase)
+                                    ||
+                                    fc.ValueB.Equals("EMPTY", StringComparison.OrdinalIgnoreCase) || fc.ValueB.Equals("VALUE", StringComparison.OrdinalIgnoreCase)
+                                    )
+                                ).Count() > 0)
+                                {
+
+                                }
+                                else
+                                    fieldChanges.Add(new FieldChange { IsTabChange = rtntuple.Item2, OldColumn = _oldcolumn, NewColumn = _newcolumn, FieldName = _newcolumn.FieldName, Action = TabFieldAction.MODI, ChangeDetail = rtntuple.Item3 });
+                            }
+                            
+
+                            //FieldChangeDetail fieldtype = rtntuple.Item3.Where(fc => (fc.AttrName.Equals("FieldType", StringComparison.OrdinalIgnoreCase)
+                            //&& fc.ValueA.Equals("varchar", StringComparison.OrdinalIgnoreCase)
+                            //&& fc.ValueB.Equals("nvarchar", StringComparison.OrdinalIgnoreCase)) || 
+                            //(fc.AttrName.Equals("FieldType", StringComparison.OrdinalIgnoreCase)
+                            //&& fc.ValueA.Equals("char", StringComparison.OrdinalIgnoreCase)
+                            //&& fc.ValueB.Equals("nchar", StringComparison.OrdinalIgnoreCase))
+                            //).FirstOrDefault();
+
+                        }
+                        else
+                        {
+
+                            //不需要特殊处理
+
+                            if (rtntuple.Item3.Count == 1 && rtntuple.Item3.Where(fc => fc.AttrName.Equals("DBDefault", StringComparison.OrdinalIgnoreCase)
+                                && (
+                                    fc.ValueA.Equals("EMPTY", StringComparison.OrdinalIgnoreCase) || fc.ValueA.Equals("VALUE", StringComparison.OrdinalIgnoreCase)
+                                    ||
+                                    fc.ValueB.Equals("EMPTY", StringComparison.OrdinalIgnoreCase) || fc.ValueB.Equals("VALUE", StringComparison.OrdinalIgnoreCase)
+                                    )
+                                ).Count() > 0)
+                            {
+
+                            }
+                            else
+                                fieldChanges.Add(new FieldChange { IsTabChange = rtntuple.Item2, OldColumn = _oldcolumn, NewColumn = _newcolumn, FieldName = _newcolumn.FieldName, Action = TabFieldAction.MODI, ChangeDetail = rtntuple.Item3 });
                         }
                     }
                 }
@@ -400,13 +463,13 @@ namespace HiSql
                 {
                     //说明是有新增字段或重命名字段
 
-                    if (!column.FieldName.ToLower().Equals(column.ReFieldName.ToLower()) && !string.IsNullOrEmpty(column.ReFieldName))
+                    if (!_newcolumn.FieldName.ToLower().Equals(_newcolumn.ReFieldName.ToLower()) && !string.IsNullOrEmpty(_newcolumn.ReFieldName))
                     {
                         //重命名字段
-                        fieldChanges.Add(new FieldChange { IsTabChange = true, NewColumn = column, FieldName = column.FieldName, Action = TabFieldAction.RENAME });
+                        fieldChanges.Add(new FieldChange { IsTabChange = true, NewColumn = _newcolumn, FieldName = _newcolumn.FieldName, Action = TabFieldAction.RENAME });
                     }
                     else
-                        fieldChanges.Add(new FieldChange { IsTabChange = true, NewColumn = column, FieldName = column.FieldName, Action = TabFieldAction.ADD });
+                        fieldChanges.Add(new FieldChange { IsTabChange = true, NewColumn = _newcolumn, FieldName = _newcolumn.FieldName, Action = TabFieldAction.ADD });
                 }
             }
 

@@ -213,6 +213,14 @@ namespace HiSql
         /// <returns></returns>
         bool CreateTable(TabInfo tabInfo);
 
+
+        /// <summary>
+        /// 获取表结构信息
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <returns></returns>
+        TabInfo GetTabStruct(string tabname);
+
         /// <summary>
         /// 根据实体类型创建表
         /// </summary>

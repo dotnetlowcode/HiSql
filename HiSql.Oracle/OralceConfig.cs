@@ -752,6 +752,12 @@ UNION ALL
                 .AppendLine("	T1.COLUMN_ID AS \"FieldNo\", ")
                 .AppendLine("	T1.COLUMN_NAME AS \"FieldName\",")
                 .AppendLine("	case ")
+                .AppendLine("	    WHEN T1.DATA_TYPE = 'NUMBER' AND ( T1.DATA_PRECISION =1 AND  ( T1.DATA_SCALE=0 OR T1.DATA_SCALE IS NULL ) ) THEN 0")
+                .AppendLine("	    WHEN T1.DATA_TYPE = 'NUMBER' AND ( T1.DATA_PRECISION <=5 AND  ( T1.DATA_SCALE=0 OR T1.DATA_SCALE IS NULL ) ) THEN 0")
+                .AppendLine("	    WHEN T1.DATA_TYPE = 'NUMBER' AND ( ( T1.DATA_SCALE=0 OR T1.DATA_SCALE IS NULL ) and  (T1.DATA_PRECISION is null OR T1.DATA_PRECISION <10) ) THEN 0")
+                .AppendLine("	    WHEN T1.DATA_TYPE = 'NUMBER' AND ( T1.DATA_PRECISION > 10 AND  ( T1.DATA_SCALE=0 OR T1.DATA_SCALE IS NULL ) ) THEN 0")
+
+
                 .AppendLine("	    when t1.CHAR_LENGTH > 0 then t1.CHAR_LENGTH")
                 .AppendLine("		when t1.data_precision > 0 then t1.data_precision")
                 .AppendLine("	    else 0")
@@ -773,8 +779,13 @@ UNION ALL
                 .AppendLine("	    else 0")
                 .AppendLine("	end as \"IsPrimary\",")
                 .AppendLine("	case ")
-                .AppendLine("	    when T1.DATA_TYPE = 'NUMBER' AND ( t1.data_scale=0 or t1.data_scale is null ) then 'int'")
-                .AppendLine("	    when T1.DATA_TYPE = 'NUMBER' AND t1.data_scale>0 then 'decimal'")
+                .AppendLine("	    WHEN T1.DATA_TYPE = 'NUMBER' AND ( T1.DATA_PRECISION =1 AND  ( T1.DATA_SCALE=0 OR T1.DATA_SCALE IS NULL ) ) THEN 'bit'")
+                .AppendLine("	    WHEN T1.DATA_TYPE = 'NUMBER' AND ( T1.DATA_PRECISION <=5 AND  ( T1.DATA_SCALE=0 OR T1.DATA_SCALE IS NULL ) ) THEN 'smallint'")
+                .AppendLine("	    WHEN T1.DATA_TYPE = 'NUMBER' AND ( ( T1.DATA_SCALE=0 OR T1.DATA_SCALE IS NULL ) and  (T1.DATA_PRECISION is null OR T1.DATA_PRECISION <10) ) THEN 'int'")
+                .AppendLine("	    WHEN T1.DATA_TYPE = 'NUMBER' AND ( T1.DATA_PRECISION > 10 AND  ( T1.DATA_SCALE=0 OR T1.DATA_SCALE IS NULL ) ) THEN 'bigint'")
+                .AppendLine("	    WHEN T1.DATA_TYPE = 'NUMBER' AND T1.DATA_SCALE>0 THEN 'decimal'")
+
+
                 .AppendLine("	    when T1.DATA_TYPE = 'FLOAT' then 'decimal'")
                 .AppendLine("	    when T1.DATA_TYPE = 'VARCHAR2' then 'varchar'")
                 .AppendLine("	    when T1.DATA_TYPE = 'CHAR' then 'char'")
