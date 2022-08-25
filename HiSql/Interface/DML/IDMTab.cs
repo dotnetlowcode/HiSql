@@ -274,7 +274,7 @@ namespace HiSql
         //Tuple< Dictionary<string, string>,Dictionary<string,string>> CheckUpdateData(bool requireKey, List<PropertyInfo> attrs, List<HiColumn> hiColumns, object objdata,List<string> fields,bool isonly);
 
         string BuildDeleteSql(TableDefinition table, Dictionary<string, string> dic_value, string _where, bool istruncate = false,bool isdrop=false);
-        string BuildUpdateSql(TableDefinition table, Dictionary<string, string> dic_value, Dictionary<string, string> dic_primary, string _where);
+        string BuildUpdateSql(TableDefinition table, Dictionary<string, string> dic_value, Dictionary<string, string> dic_primary, string _where, bool onlywhere = false);
 
         /// <summary>
         /// 生成更新语句,实现数据 以字段更新字段带表达式的内容
@@ -284,8 +284,9 @@ namespace HiSql
         /// <param name="dic_value"></param>
         /// <param name="dic_primary"></param>
         /// <param name="_where"></param>
+        /// <param name="onlywhere"></param>
         /// <returns></returns>
-        string BuildUpdateSql(TabInfo tabinfo, TableDefinition table, Dictionary<string, string> dic_value, Dictionary<string, string> dic_primary, string _where);
+        string BuildUpdateSql(TabInfo tabinfo, TableDefinition table, Dictionary<string, string> dic_value, Dictionary<string, string> dic_primary, string _where, bool onlywhere = false);
 
         string BuilderWhereSql(List<TableDefinition> TableList, Dictionary<string, TabInfo> dictabinfo, List<FieldDefinition> Fields, List<FilterDefinition> Wheres, bool issubquery);
 

@@ -929,7 +929,7 @@ namespace HiSql
         /// <param name="dic_primary"></param>
         /// <param name="_where"></param>
         /// <returns></returns>
-        public string BuildUpdateSql(TableDefinition table, Dictionary<string, string> dic_value, Dictionary<string, string> dic_primary, string _where)
+        public string BuildUpdateSql(TableDefinition table, Dictionary<string, string> dic_value, Dictionary<string, string> dic_primary, string _where, bool onlywhere = false)
         {
             string _temp_sql = string.Empty;
             int i = 0;
@@ -957,16 +957,30 @@ namespace HiSql
             i = 0;
             foreach (string n in dic_primary.Keys)
             {
-                sb_primary.Append($"{dbConfig.Field_Pre}{n}{dbConfig.Field_After}={dic_primary[n].ToString()}");
+                string _val = dic_primary[n].ToString();
+                if (_val == "''")
+                    _val = $"'{dbConfig.Key_Char_Default}'";
+
+                sb_primary.Append($"{dbConfig.Field_Pre}{n}{dbConfig.Field_After}={_val}");
                 if (i != dic_primary.Count() - 1)
                     sb_primary.Append($" and ");
                 i++;
             }
 
-            if (!string.IsNullOrEmpty(sb_primary.ToString()) && !string.IsNullOrEmpty(_where))
+            if (!string.IsNullOrEmpty(sb_primary.ToString()) && !string.IsNullOrEmpty(_where) && !onlywhere)
                 sb_primary.Append($" and {_where}");
             else
-                sb_primary.Append($"{_where}");
+            {
+                if (!string.IsNullOrEmpty(_where.Trim()))
+                {
+                    sb_primary = new StringBuilder();
+                    sb_primary.Append($"{_where}");
+                }
+                else
+                {
+                    sb_primary.Append($"{_where}");
+                }
+            }
 
             _temp_sql = _temp_sql
                 .Replace("[$Schema$]", _schema)
@@ -987,7 +1001,7 @@ namespace HiSql
         /// <param name="dic_primary"></param>
         /// <param name="_where"></param>
         /// <returns></returns>
-        public string BuildUpdateSql(TabInfo tabinfo, TableDefinition table, Dictionary<string, string> dic_value, Dictionary<string, string> dic_primary, string _where)
+        public string BuildUpdateSql(TabInfo tabinfo, TableDefinition table, Dictionary<string, string> dic_value, Dictionary<string, string> dic_primary, string _where, bool onlywhere = false)
         {
             string _temp_sql = string.Empty;
             int i = 0;
@@ -1035,16 +1049,30 @@ namespace HiSql
             i = 0;
             foreach (string n in dic_primary.Keys)
             {
-                sb_primary.Append($"{dbConfig.Field_Pre}{n}{dbConfig.Field_After}={dic_primary[n].ToString()}");
+                string _val = dic_primary[n].ToString();
+                if (_val == "''")
+                    _val = $"'{dbConfig.Key_Char_Default}'";
+
+                sb_primary.Append($"{dbConfig.Field_Pre}{n}{dbConfig.Field_After}={_val}");
                 if (i != dic_primary.Count() - 1)
                     sb_primary.Append($" and ");
                 i++;
             }
 
-            if (!string.IsNullOrEmpty(sb_primary.ToString()) && !string.IsNullOrEmpty(_where))
+            if (!string.IsNullOrEmpty(sb_primary.ToString()) && !string.IsNullOrEmpty(_where) && !onlywhere)
                 sb_primary.Append($" and {_where}");
             else
-                sb_primary.Append($"{_where}");
+            {
+                if (!string.IsNullOrEmpty(_where.Trim()))
+                {
+                    sb_primary = new StringBuilder();
+                    sb_primary.Append($"{_where}");
+                }
+                else
+                {
+                    sb_primary.Append($"{_where}");
+                }
+            }
 
             _temp_sql = _temp_sql
                 .Replace("[$Schema$]", _schema)
@@ -1180,9 +1208,11 @@ namespace HiSql
                 }
 
 
-                _sql.AppendLine(BuildTabCreateSql(tabInfo.TabModel, tabInfo.Columns));
+                _sql.AppendLine(BuildTabCreateSql(_tabcopy.TabModel, _tabcopy.Columns));
                 var fieldsStr = string.Join(",", tabInfo.Columns.Select(t => dbConfig.Field_Pre + t.FieldName + dbConfig.Field_After).ToArray());
-                _sql.AppendLine($"insert into {dbConfig.Table_Pre}{tabInfo.TabModel.TabName}{dbConfig.Table_After}({fieldsStr}) select {fieldsStr} from {temp_table}  ;");
+
+                var fieldsStrINser = string.Join(",", _tabcopy.Columns.Select(t => dbConfig.Field_Pre + t.FieldName + dbConfig.Field_After).ToArray());
+                _sql.AppendLine($"insert into {dbConfig.Table_Pre}{tabInfo.TabModel.TabName}{dbConfig.Table_After}({fieldsStrINser}) select {fieldsStr} from {temp_table}  ;");
 
                 _sql.AppendLine(dbConfig.Drop_Table.Replace("[$TabName$]", temp_table));
                 _sql.AppendLine(dbConfig.GetModiTableRELEASE);
