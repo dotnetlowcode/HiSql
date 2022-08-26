@@ -19,6 +19,9 @@ namespace HiSql
 
         List<Dictionary<string, string>> _values = new List<Dictionary<string, string>>();
         Filter _where;
+
+        bool _onlywhere = false;
+
         List<object> _list_data = new List<object>();
 
         SynTaxQueue _queue = new SynTaxQueue();
@@ -52,10 +55,32 @@ namespace HiSql
         {
             get { return _where; }
         }
+
+        public bool IsOnlyWhere
+        {
+            get { return _onlywhere; }
+        }
+
+        object _obkey=new object ();
+
+        IDbConfig _dbConfig = null;
         public UpdateProvider()
         {
-
+            
         }
+        IDbConfig buildConfig(DBType dBType)
+        {
+            lock (_obkey)
+            {
+                if (_dbConfig == null)
+                {
+                    _dbConfig = (IDbConfig)Instance.CreateInstance<IDbConfig>($"{Constants.NameSpace}.{dBType.ToString()}{DbInterFace.Config.ToString()}");
+                    _dbConfig.Init();
+                }
+            }
+            return _dbConfig;
+        }
+
         public IUpdate Exclude(params string[] fields)
         {
             if (!_queue.HasQueue("only"))
@@ -228,6 +253,35 @@ namespace HiSql
                 throw new Exception($"已经指定了一个Set 不允许重复指定");
             //return this;
         }
+
+
+        /// <summary>
+        /// 仅使用该方法指定的where进行条件更新
+        /// hisql语法
+        /// </summary>
+        /// <param name="sqlwhere"></param>
+        /// <returns></returns>
+        public IUpdate OnlyWhere(string sqlwhere)
+        {
+            Where(sqlwhere);
+            _onlywhere = true;
+            return this;
+        }
+
+
+        /// <summary>
+        /// 仅使用该方法指定的where进行条件更新
+        /// 
+        /// </summary>
+        /// <param name="where"></param>
+        /// <returns></returns>
+        public IUpdate OnlyWhere(Filter where)
+        {
+            Where(where);
+            _onlywhere = true;
+            return this;
+        }
+
         public IUpdate Where(string sqlwhere)
         {
             //需要检测语法
@@ -362,6 +416,7 @@ namespace HiSql
             Tuple<List<Dictionary<string, string>>, List<Dictionary<string, string>>> rtn = new Tuple<List<Dictionary<string, string>>, List<Dictionary<string, string>>>(null, null);
             if (table != null)
             {
+                _dbConfig = buildConfig(Context.CurrentConnectionConfig.DbType);
                 List<Dictionary<string, string>> lst_value = new List<Dictionary<string, string>>();
                 List<Dictionary<string, string>> lst_primary = new List<Dictionary<string, string>>();
                 if (lstdata.Count > 0)
@@ -486,6 +541,24 @@ namespace HiSql
                                 }
                                 if (_values.Count > 0)
                                 {
+                                    var _column = hiColumns.Where(h => h.FieldName.ToLower() == "moditime").FirstOrDefault();
+                                    if (_column != null)
+                                    {
+                                        if (_values.ContainsKey(_column.FieldName))
+                                            _values.Remove(_column.FieldName);
+                                        
+                                        if(Context.CurrentConnectionConfig.DbType== DBType.Oracle)
+                                            _values.Add(_column.FieldName, $"timestamp'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                                        else
+                                            _values.Add(_column.FieldName, $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                                    }
+                                    _column = hiColumns.Where(h => h.FieldName.ToLower() == "modiname").FirstOrDefault();
+                                    if (_column != null)
+                                    {
+                                        if (_values.ContainsKey(_column.FieldName))
+                                            _values.Remove(_column.FieldName);
+                                        _values.Add(_column.FieldName, $"'{this.Context.CurrentConnectionConfig.User}'");
+                                    }
                                     lst_value.Add(_values);
                                     lst_primary.Add(_primary);
                                 }
@@ -575,6 +648,23 @@ namespace HiSql
 
                                 if (_values.Count > 0)
                                 {
+                                    var _column = hiColumns.Where(h => h.FieldName.ToLower() == "moditime").FirstOrDefault();
+                                    if (_column != null)
+                                    {
+                                        if (_values.ContainsKey(_column.FieldName))
+                                            _values.Remove(_column.FieldName);
+                                        if (Context.CurrentConnectionConfig.DbType == DBType.Oracle)
+                                            _values.Add(_column.FieldName, $"timestamp'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                                        else
+                                            _values.Add(_column.FieldName, $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                                    }
+                                    _column = hiColumns.Where(h => h.FieldName.ToLower() == "modiname").FirstOrDefault();
+                                    if (_column != null)
+                                    {
+                                        if (_values.ContainsKey(_column.FieldName))
+                                            _values.Remove(_column.FieldName);
+                                        _values.Add(_column.FieldName, $"'{this.Context.CurrentConnectionConfig.User}'");
+                                    }
                                     lst_value.Add(_values);
                                     lst_primary.Add(_primary);
                                 }
@@ -587,6 +677,16 @@ namespace HiSql
                     }
                     else
                     {
+
+                        Dictionary<string, PropertyInfo> _dic_proinfo = new Dictionary<string, PropertyInfo>(StringComparer.OrdinalIgnoreCase);
+                        foreach (PropertyInfo pinfo in attrs)
+                        {
+                            if (!_dic_proinfo.ContainsKey(pinfo.Name.ToLower()))
+                            {
+                                _dic_proinfo.Add(pinfo.Name.ToLower(),pinfo);
+                            }
+                        }
+
                         foreach (object objdata in lstdata)
                         {
                             _rowidx++;
@@ -596,12 +696,22 @@ namespace HiSql
                             foreach (HiColumn hiColumn in hiColumns)
                             {
                                 _value = "";
-                                var objprop = attrs.Where(p => p.Name.ToLower() == hiColumn.FieldName.ToLower()).FirstOrDefault();
+                                //var objprop = attrs.Where(p => p.Name.ToLower() == hiColumn.FieldName.ToLower()).FirstOrDefault();
+                                PropertyInfo objprop = null;
+                                if (_dic_proinfo.ContainsKey(hiColumn.FieldName.ToLower()))
+                                {
+                                    objprop = _dic_proinfo[hiColumn.FieldName.ToLower()];
+                                }
+
                                 #region  判断必填 及自增长
                                 if (hiColumn.IsRequire && !hiColumn.IsIdentity && objprop == null && !hisqlwhere)
                                 {
                                     throw new Exception($"行[{_rowidx}] 缺少字段[{hiColumn.FieldName}] 为必填字段");
                                 }
+
+                                
+
+
                                 if (hiColumn.IsIdentity && _dic.ContainsKey(hiColumn.FieldName))
                                 {
                                     _value = _dic[hiColumn.FieldName].ToString();
@@ -635,9 +745,32 @@ namespace HiSql
                                         else
                                             _dic.Add(hiColumn.FieldName, "0");
                                     }
+                                    else if (hiColumn.FieldType.IsIn<HiType>(HiType.INT, HiType.SMALLINT))
+                                    {
+                                        //可能是枚举型 枚举型需要获取数值
+                                        if (objprop.PropertyType.Name.Contains("Bool"))
+                                        {
+                                            bool _boolval = (bool)objprop.GetValue(objdata);
+                                            _dic.Add(hiColumn.FieldName, _boolval?"1":"0");
+                                        }
+                                        else
+                                        {
+                                            _dic.Add(hiColumn.FieldName, ((int)objprop.GetValue(objdata)).ToString());
+                                        }
+                                        
+                                    }
                                     else
                                     {
-                                        _dic.Add(hiColumn.FieldName, objprop.GetValue(objdata).ToString());
+                                        if (hiColumn.IsPrimary && hiColumn.FieldType.IsIn<HiType>(HiType.VARCHAR,HiType.NVARCHAR,HiType.CHAR,HiType.NCHAR,HiType.GUID))
+                                        {
+                                            string _val = objprop.GetValue(objdata).ToString();
+                                            if(string.IsNullOrEmpty(_val))
+                                                _dic.Add(hiColumn.FieldName, _dbConfig.Key_Char_Default);
+                                            else
+                                                _dic.Add(hiColumn.FieldName, _val);
+                                        }
+                                        else
+                                            _dic.Add(hiColumn.FieldName, objprop.GetValue(objdata).ToString());
                                     }
                                     _value = _dic[hiColumn.FieldName];
                                     #endregion
@@ -709,7 +842,10 @@ namespace HiSql
                                 {
                                     if (_values.ContainsKey(_column.FieldName))
                                         _values.Remove(_column.FieldName);
-                                    _values.Add(_column.FieldName, $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                                    if (Context.CurrentConnectionConfig.DbType == DBType.Oracle)
+                                        _values.Add(_column.FieldName, $"timestamp'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                                    else
+                                        _values.Add(_column.FieldName, $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
                                 }
                                 _column= hiColumns.Where(h => h.FieldName.ToLower() == "modiname").FirstOrDefault();
                                 if (_column != null)

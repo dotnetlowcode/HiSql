@@ -77,13 +77,96 @@ namespace HiSql.Unit.Test
 
         void tableGroups(HiSqlClient sqlClient)
         {
+            //表重命名
             reTabName(sqlClient);
 
+
+            //索引创建 删除修改
             indexDemo(sqlClient);
 
-            createDemoDynTable(sqlClient);
+            //动态创建表
+            createDemoDynTable(sqlClient, "H_dyntab1");
+
+            reCol(sqlClient, "H_dyntab1");
+
         }
 
+
+        void reCol(HiSqlClient sqlClient, string tabname)
+        {
+            string fieldname = "Unchar";
+            string newfieldname = "Unchar2";
+            _outputHelper.WriteLine($"正在修改表[{tabname}]中的字段 将字段[{fieldname}] 改为[{newfieldname}]");
+
+
+            TabInfo tabinfo= sqlClient.DbFirst.GetTabStruct(tabname);
+
+
+            
+
+            HiColumn hiColumn=tabinfo.Columns.Where(c=>c.FieldName.Equals(fieldname, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+            hiColumn.FieldDesc = "测试Unchar字段 修改";
+            hiColumn.ReFieldName = newfieldname;
+
+            var tuple= sqlClient.DbFirst.ReColumn(tabname, hiColumn, OpLevel.Execute);
+
+            if (tuple.Item1)
+            {
+                TabInfo tabinfo2 = sqlClient.DbFirst.GetTabStruct(tabname);
+
+                _outputHelper.WriteLine($"将字段[{fieldname}] 改为[{newfieldname}] 成功");
+                HiColumn hiColumn2 = tabinfo2.Columns.Where(c => c.FieldName.Equals(newfieldname, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                hiColumn2.FieldDesc = "测试Unchar字段";
+                hiColumn2.ReFieldName = fieldname;
+                var tuple2 = sqlClient.DbFirst.ReColumn(tabname, hiColumn2, OpLevel.Execute);
+                if (tuple2.Item1)
+                {
+                    _outputHelper.WriteLine($"将字段[{newfieldname}] 改为[{fieldname}] 成功");
+
+                    _outputHelper.WriteLine($" msg:{tuple2.Item2}");
+                    _outputHelper.WriteLine($"  sql:{tuple2.Item3}");
+
+                    Assert.True(true);
+                }
+                else
+                {
+
+                    _outputHelper.WriteLine($"字段改回失败:{tuple2.Item2}");
+
+                    _outputHelper.WriteLine($"  sql:{tuple2.Item3}");
+
+                    Assert.True(false);
+                }
+            }
+            else
+            {
+
+                _outputHelper.WriteLine($"修改失败:{tuple.Item2}");
+
+                _outputHelper.WriteLine($"  sql:{tuple.Item3}");
+
+                Assert.True(false);
+            }
+
+
+
+
+
+            
+
+
+
+        }
+
+
+        void truncateTable(HiSqlClient sqlClient, string tabname)
+        {
+            //清除表中数据
+
+            _outputHelper.WriteLine($"正在清除表[{tabname}]中所有数据");
+            sqlClient.DbFirst.Truncate(tabname);
+        }
+        
 
         void showIndexList(HiSqlClient sqlClient,string tabname)
         {
@@ -226,11 +309,11 @@ namespace HiSql.Unit.Test
 
         }
 
-        void createDemoDynTable(HiSqlClient sqlClient)
+        void createDemoDynTable(HiSqlClient sqlClient, string tabname1)
         {
             sqlClient.CurrentConnectionConfig.AppEvents = GetAopEvent();
 
-            string tabname1 = "H_dyntab1";
+            
 
             
 
@@ -256,12 +339,7 @@ namespace HiSql.Unit.Test
 
             TabInfo tabInfo= sqlClient.DbFirst.GetTabStruct(tabname1);
 
-            string str = "魏凤和回应佩洛台：中国军队敌人SSSDFADFADSFASDFASDF";
-
-            int len = str.Length;
-            int len2 = str.LengthZH();
-
-            List<object> lstdata = TestTable.DynTable.BuildTabDataList(tabname1, 5);
+            List<object> lstdata = TestTable.DynTable.BuildTabDataList(tabname1, 5000);
 
 
             int v=sqlClient.Insert(tabname1,lstdata).ExecCommand();

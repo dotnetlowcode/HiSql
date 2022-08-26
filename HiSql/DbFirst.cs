@@ -1190,6 +1190,14 @@ namespace HiSql
 
         }
 
+        /// <summary>
+        /// 修改表字段
+        /// </summary>
+        /// <param name="idm"></param>
+        /// <param name="tabInfo"></param>
+        /// <param name="hiColumn"></param>
+        /// <param name="opLevel"></param>
+        /// <returns></returns>
         Tuple<bool, string, string> reColumn(IDM idm, TabInfo tabInfo, HiColumn hiColumn, OpLevel opLevel)
         {
             bool _isok = false;
@@ -1268,13 +1276,21 @@ namespace HiSql
             bool _isok = false;
             string _msg = "";
             string _sql = "";
+
+            HiColumn _col = hiColumn.CloneProperoty();
             IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
             //获取当前最新物理表结构信息
             HiSqlCommProvider.RemoveTabInfoCache(tabname, _sqlClient.Context.CurrentConnectionConfig.DbType);
             //获取最新
             TabInfo tabinfo = idm.GetTabStruct(tabname);
-
-            return reColumn(idm, tabinfo, hiColumn, opLevel);
+            var rtn = reColumn(idm, tabinfo, hiColumn, opLevel);
+            if (opLevel == OpLevel.Execute && rtn.Item1)
+            {
+                _sqlClient.Update(Constants.HiSysTable["Hi_FieldModel"], hiColumn).OnlyWhere($"TabName='{hiColumn.TabName}' and FieldName='{_col.FieldName}' and DbServer='{hiColumn.DbServer}' and DbName='{hiColumn.DbName}'").ExecCommand();
+                HiSqlCommProvider.RemoveTabInfoCache(tabname, _sqlClient.Context.CurrentConnectionConfig.DbType);
+            }
+       
+            return rtn;
         }
 
 

@@ -107,7 +107,7 @@ namespace HiSql
                     }
                     else
                     {
-                        sb.AppendLine(Context.DMTab.BuildUpdateSql(tabinfo, this.Table, rtn_check.Item1[_idx], rtn_check.Item2[_idx], sql_where));
+                        sb.AppendLine(Context.DMTab.BuildUpdateSql(tabinfo, this.Table, rtn_check.Item1[_idx], rtn_check.Item2[_idx], sql_where, IsOnlyWhere));
                     }
                     
                     _idx++;

@@ -27,7 +27,7 @@ namespace HiSql
         }
 
 
-        #region 私有方法   aa
+        #region 私有方法   
 
         void checkData()
         {
@@ -94,7 +94,7 @@ namespace HiSql
                     //{
                     //    sb.AppendLine(Context.DMTab.BuildUpdateSql(tabinfo, this.Table, result.Item1, result.Item2, sql_where));
                     //}
-                    sb.AppendLine(Context.DMTab.BuildUpdateSql(tabinfo, this.Table, rtn_check.Item1[_idx], rtn_check.Item2[_idx], sql_where));
+                    sb.AppendLine(Context.DMTab.BuildUpdateSql(tabinfo, this.Table, rtn_check.Item1[_idx], rtn_check.Item2[_idx], sql_where,IsOnlyWhere));
                     _idx++;
                 }
             }
