@@ -153,11 +153,7 @@ namespace HiSql.UnitTest
 
             #endregion
 
-            {
-                IDbConnection dapper = Demo_Init.GetDapperSqlClient();
-
-
-            }
+            
 
             #region 测试 查询性能 对比
             {

@@ -540,7 +540,7 @@ namespace HiSql
             }
 
             isgetlock = System.Threading.Monitor.TryEnter(GetCache<LckInfo>(key), getlockElapsed);
-           
+
 
             if (!isgetlock)
             {
@@ -568,10 +568,12 @@ namespace HiSql
                             }
 
                         }
-                        catch (Exception ex)
-                        {
-                            //Console.WriteLine($"线程中断。。");
-                        }
+                        //catch (Exception ex) //不要处理异常，否则上层应用捕获不到异常
+                        //{
+                        //    flag = false;
+                        //    msg = $"操作业务失败!{ex}";
+                        //    //Console.WriteLine($"线程中断。。");
+                        //}
                         finally
                         {
                             //UnLock(lckinfo, key);不可以再此处解锁
@@ -593,7 +595,7 @@ namespace HiSql
                             {
                                 if (!workTask.IsCompleted)
                                 {
-                                  
+
                                     tokenSource.Cancel();
                                     thread.Interrupt();
                                 }
@@ -636,11 +638,11 @@ namespace HiSql
                         flag = true;
                         msg = $"key:[{key}]锁定并操作业务成功!,锁已经自动释放";
                     }
-                    catch (Exception ex)
-                    {
-                        flag = false;
-                        msg = $"key:[{key}]锁定并操作业务失败!{ex}";
-                    }
+                    //catch (Exception ex)  //不要处理异常，否则上层应用捕获不到异常
+                    //{
+                    //    flag = false;
+                    //    msg = $"key:[{key}]锁定并操作业务失败!{ex}";
+                    //}
                     finally
                     {
                         UnLock(lckinfo, key);
@@ -707,10 +709,10 @@ namespace HiSql
                                 action.Invoke();
                             }
                         }
-                        catch (Exception ex)
-                        {
-                            //Console.WriteLine($"线程中断。。");
-                        }
+                        //catch (Exception ex)
+                        //{
+                        //    //Console.WriteLine($"线程中断。。");
+                        //}
                         finally
                         {
                             //UnLock(keys); 不可以再此处解锁，否则会提示跨现场错误
@@ -730,7 +732,7 @@ namespace HiSql
                         {
                             if (_timesa >= _times)
                             {
-                                if (!workTask.IsCompleted )
+                                if (!workTask.IsCompleted)
                                 {
                                     tokenSource.Cancel();
                                     thread.Interrupt();
@@ -781,11 +783,11 @@ namespace HiSql
                         flag = true;
                         msg = $"key:[{keys}]锁定并操作业务成功!,锁已经自动释放";
                     }
-                    catch (Exception ex)
-                    {
-                        flag = false;
-                        msg = $"key:[{keys}]锁定并操作业务失败!{ex}";
-                    }
+                    //catch (Exception ex)  //不要处理异常，否则上层应用捕获不到异常
+                    //{
+                    //    flag = false;
+                    //    msg = $"key:[{keys}]锁定并操作业务失败!{ex}";
+                    //}
                     finally
                     {
                         UnLock(lckinfo, keys);
@@ -836,7 +838,7 @@ namespace HiSql
                 var cacheObj = GetCache<LckInfo>(newkey);
                 if (cacheObj != null)
                 {
-                    if(System.Threading.Monitor.IsEntered(cacheObj))
+                    if (System.Threading.Monitor.IsEntered(cacheObj))
                         System.Threading.Monitor.Exit(cacheObj);
                     //RemoveCache(newkey);  //不能移除缓存，否则多线程下锁对象时候，缓存可能被移除了
                     HDel(_lockhashname, newkey);

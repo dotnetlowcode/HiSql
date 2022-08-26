@@ -1086,23 +1086,31 @@ namespace HiSql
         /// <returns></returns>
         public string BuildTabModiSql(TabInfo tabInfo)
         {
+            string selectFieldsStr = string.Empty;
+            string insertFieldsStr = string.Empty;
 
+            var oldTableInfo = GetTabStruct(tabInfo.TabModel.TabName);
+
+           
             string temp_table = $"_sqliteexpert_temp_table_{DateTime.Now.ToFileTime().ToString()}";
-            StringBuilder _sql = new StringBuilder(dbConfig.GetModiTableSAVEPOINT);
-
+            StringBuilder _sql = new StringBuilder();
+            _sql.AppendLine(dbConfig.GetModiTableSAVEPOINT);
             _sql.AppendLine(dbConfig.Re_Table.Replace("[$ReTabName$]", $"{temp_table}"));
-            foreach (var hiColumn in tabInfo.Columns)
+            foreach (var hiColumn in tabInfo.Columns.Where(t=>!t.FieldName.Equals(t.ReFieldName) && !string.IsNullOrWhiteSpace(t.ReFieldName)))
             {
                 hiColumn.FieldName = hiColumn.ReFieldName;
             }
-
             _sql.AppendLine(BuildTabCreateSql(tabInfo.TabModel, tabInfo.Columns));
-            var fieldsStr = string.Join(",", tabInfo.Columns.Select(t => dbConfig.Field_Pre + t.FieldName + dbConfig.Field_After).ToArray());
-            _sql.AppendLine($"insert into {dbConfig.Table_Pre}{tabInfo.TabModel.TabName}{dbConfig.Table_After}({fieldsStr}) select {fieldsStr} from {temp_table}  ;");
+
+            selectFieldsStr = string.Join(",", oldTableInfo.Columns.Where(b => tabInfo.Columns.Any(a => a.FieldName == b.FieldName)).Select(t => dbConfig.Field_Pre + t.FieldName + dbConfig.Field_After).ToArray());
+
+            insertFieldsStr = string.Join(",", tabInfo.Columns.Where(b => oldTableInfo.Columns.Any(a => a.FieldName == b.FieldName)).Select(t => dbConfig.Field_Pre + t.FieldName + dbConfig.Field_After).ToArray());
+            _sql.AppendLine($"insert into {dbConfig.Table_Pre}{tabInfo.TabModel.TabName}{dbConfig.Table_After}({insertFieldsStr}) select {selectFieldsStr} from {temp_table}  ;");
 
             _sql.AppendLine(dbConfig.Drop_Table.Replace("[$TabName$]", temp_table));
 
-            if (Constants.HiSysTable["Hi_TabModel"].Equals(tabInfo.TabModel.TabName, StringComparison.OrdinalIgnoreCase) || Constants.HiSysTable["Hi_FieldModel"].Equals(tabInfo.TabModel.TabName, StringComparison.OrdinalIgnoreCase))
+            if (Constants.HiSysTable["Hi_TabModel"].Equals(tabInfo.TabModel.TabName, StringComparison.OrdinalIgnoreCase) 
+                || Constants.HiSysTable["Hi_FieldModel"].Equals(tabInfo.TabModel.TabName, StringComparison.OrdinalIgnoreCase))
             {
                 _sql.AppendLine(DeleteTabStruct(tabInfo.TabModel));
                 _sql.AppendLine(inertTabStruct(tabInfo.TabModel, tabInfo.GetColumns));
@@ -1165,28 +1173,36 @@ namespace HiSql
                 {
                     return "";
                 }
-
+                string selectFieldsStr = string.Empty;
+                string insertFieldsStr = string.Empty;
                 if (tabFieldAction == TabFieldAction.DELETE)
                 {
-                    _tabcopy.Columns.RemoveAll(t => t.FieldName == hiColumn.FieldName);
+                    _tabcopy.Columns.RemoveAll(t => t.FieldName == hiColumn.FieldName );
+                    selectFieldsStr = insertFieldsStr = string.Join(",", _tabcopy.Columns.Select(t => dbConfig.Field_Pre + t.FieldName + dbConfig.Field_After).ToArray());
                 }
 
-                if (tabFieldAction == TabFieldAction.MODI || tabFieldAction == TabFieldAction.RENAME)
+                if (tabFieldAction == TabFieldAction.MODI)
                 {
-
                     _tabcopy.Columns[_tabcopy.Columns.FindIndex(t => t.FieldName == hiColumn.FieldName)] = hiColumn;
+                    selectFieldsStr = insertFieldsStr = string.Join(",", _tabcopy.Columns.Select(t => dbConfig.Field_Pre + t.FieldName + dbConfig.Field_After).ToArray());
 
+                }
+
+                if (tabFieldAction == TabFieldAction.RENAME)
+                {
+                    selectFieldsStr = string.Join(",", tabInfo.Columns.Select(t => dbConfig.Field_Pre + t.FieldName + dbConfig.Field_After).ToArray());
+                    _tabcopy.Columns[_tabcopy.Columns.FindIndex(t => t.FieldName == hiColumn.FieldName)] = hiColumn;
                     hiColumn.FieldName = hiColumn.ReFieldName;
+                    insertFieldsStr = string.Join(",", _tabcopy.Columns.Select(t => dbConfig.Field_Pre + t.FieldName + dbConfig.Field_After).ToArray());
                 }
 
 
-                _sql.AppendLine(BuildTabCreateSql(tabInfo.TabModel, tabInfo.Columns));
-                var fieldsStr = string.Join(",", tabInfo.Columns.Select(t => dbConfig.Field_Pre + t.FieldName + dbConfig.Field_After).ToArray());
-                _sql.AppendLine($"insert into {dbConfig.Table_Pre}{tabInfo.TabModel.TabName}{dbConfig.Table_After}({fieldsStr}) select {fieldsStr} from {temp_table}  ;");
+                _sql.AppendLine(BuildTabCreateSql(_tabcopy.TabModel, _tabcopy.Columns));
+                
+                _sql.AppendLine($"insert into {dbConfig.Table_Pre}{_tabcopy.TabModel.TabName}{dbConfig.Table_After}({insertFieldsStr}) select {selectFieldsStr} from {temp_table}  ;");
 
                 _sql.AppendLine(dbConfig.Drop_Table.Replace("[$TabName$]", temp_table));
                 _sql.AppendLine(dbConfig.GetModiTableRELEASE);
-
 
                 _sql = _sql.Replace("[$TabName$]", hiTable.TabName).Replace("[$Schema$]", this.Context.CurrentConnectionConfig.Schema);
                 _changesql = _sql.ToString();

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
-using Microsoft.Data.Sqlite;
+using System.Data.SQLite;
 
 namespace HiSql
 {
@@ -20,11 +20,11 @@ namespace HiSql
         /// </summary>
         /// <param name="hiParameter"></param>
         /// <returns></returns>
-        public static SqliteParameter ConvertToSqlParameter(this HiParameter hiParameter)
+        public static SQLiteParameter ConvertToSqlParameter(this HiParameter hiParameter)
         {
             if (hiParameter != null)
             {
-                SqliteParameter sqlParameter = new SqliteParameter();
+                SQLiteParameter sqlParameter = new SQLiteParameter();
                 sqlParameter.ParameterName = hiParameter.ParameterName;
                 sqlParameter.Size = hiParameter.Size;
                 sqlParameter.Value = hiParameter.Value;
