@@ -744,7 +744,7 @@ namespace HiSql
 
             }
             else
-                throw new Exception($"参数化SQL语句中不能出现[\'\"]单引号和又引号这种特殊字段");
+                throw new Exception($"参数化HiSql语句中不能出现[\'\"]单引号和又引号这种特殊字段且不允许参数化和非参数化混写");
 
 
             IQuery result = null;
