@@ -1555,26 +1555,21 @@ namespace HiSql
 
                             if (lstchg.Count > 0)
                             {
-                                string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", tabInfo.TabModel.TabName.ToLower());
+                              
                                 //if (_sqlClient.Context.CurrentConnectionConfig.DbType.IsIn(DBType.PostGreSql,DBType.Oracle))
                                 //{
-                                    //_sqlClient.CommitTran();
-                                    //_sqlClient.BeginTran();
+                                //_sqlClient.CommitTran();
+                                //_sqlClient.BeginTran();
 
+                                if(tabInfo.TabModel.TabName.Equals(Constants.HiSysTable["Hi_FieldModel"].ToString(),StringComparison.OrdinalIgnoreCase))
                                     HiSqlCommProvider.RemoveTabInfoCache(Constants.HiSysTable["Hi_FieldModel"].ToString(), _sqlClient.Context.CurrentConnectionConfig.DbType);
 
-                                    _sqlClient.Context.MCache.RemoveCache(_keyname);
-                                    _sqlClient.Context.MCache.GetOrCreate<TabInfo>(_keyname, () =>
-                                    {
-                                        return tabInfo.CloneCopy();
-
-                                    });
-                                    TabInfo newtabinfo = _sqlClient.Context.MCache.GetCache<TabInfo>(_keyname);
+                                 
                                 //}
                                 if(!onlychangetable)
                                     modi_count = _sqlClient.Modi(Constants.HiSysTable["Hi_FieldModel"].ToString(), lstchg).ExecCommand();
-                                _sqlClient.Context.MCache.RemoveCache(_keyname);
 
+                               
                             }
                             _sqlClient.CommitTran();
                             _isok = true;
