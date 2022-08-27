@@ -14,14 +14,37 @@ namespace HiSql
         public static void Init(HiSqlClient sqlClient)
         {
 
-            Console.WriteLine("表操作测试");
-            //Demo_AddColumn(sqlClient);//OK
+            if (!sqlClient.DbFirst.CheckTabExists(typeof(H_Test).Name))
+            {
 
-            //Demo_ModiColumn(sqlClient);//OK---
-            // Demo_ReColumn(sqlClient);//OK---
-            // Demo_ModiTable(sqlClient);//OK---
+                sqlClient.DbFirst.CreateTable(typeof(H_Test));
+
+                List<Dictionary<string, string>> list = new List<Dictionary<string, string>>();
+
+                Dictionary<string, string> _dic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "Hid", "2" }, { "UserName", "QXW" }, { "UserAge", "100" }, { "ReName", "xw" } };
+                list.Add(_dic);
+
+                Dictionary<string, string> _dic1 = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "Hid", "3" }, { "UserName", "QXW1" }, { "UserAge", "101" }, { "ReName", "xw1" } };
+                list.Add(_dic1);
+
+                var sql = sqlClient.Update<Dictionary<string, string>>("H_Test", list).ToSql();
+                //sqlClient.Update<Dictionary<string, string>>("H_Test", list).ExecCommand();
+                //var sql = sqlClient.Modi<Dictionary<string, string>>("H_Test", list).ToSql();
+                sqlClient.Modi<Dictionary<string, string>>("H_Test", list).ExecCommand();
+            }
+            if (!sqlClient.DbFirst.CheckTabExists(typeof(HTest01).Name))
+            {
+                sqlClient.DbFirst.CreateTable(typeof(HTest01));
+            }
+            Console.WriteLine("表操作测试");
+
+            Demo_AddColumn(sqlClient);//OK
+
+                //Demo_ModiColumn(sqlClient);//OK---
+             //Demo_ReColumn(sqlClient);//OK---
+             Demo_ModiTable(sqlClient);//OK---
             // Demo_ReTable(sqlClient);//OK
-            // Demo_DelColumn(sqlClient);//OK
+             //Demo_DelColumn(sqlClient);//OK
             // Demo_Tables(sqlClient);//OK
             //Demo_CreateView(sqlClient);//OK
             //Demo_View(sqlClient);//OK
@@ -376,7 +399,7 @@ namespace HiSql
                 FieldLen = 50,
                 DBDefault = HiTypeDBDefault.VALUE,
                 DefaultValue = "TGM",
-                FieldDesc = "测试字段变更"
+                FieldDesc = "测试字段s 变更"
 
             };
 
@@ -392,20 +415,25 @@ namespace HiSql
 
         static void Demo_ModiTable(HiSqlClient sqlClient)
         {
+            
             //OpLevel.Execute  表示执行并返回生成的SQL
             //OpLevel.Check 表示仅做检测失败时返回消息且检测成功时返因生成的SQL
             var tabinfo = sqlClient.Context.DMInitalize.GetTabStruct("H_Test");
 
             TabInfo _tabcopy = ClassExtensions.DeepCopy<TabInfo>(tabinfo);
-            //_tabcopy.Columns.RemoveAt(5);
 
-            HiColumn newcol = ClassExtensions.DeepCopy<HiColumn>(_tabcopy.Columns[3]);
-            newcol.FieldName = "TestAdd3";
-            newcol.ReFieldName = "TestAdd3";
-            newcol.IsNull = true;
+            _tabcopy.TabModel.TabName = _tabcopy.TabModel.TabReName = "H_Test224";
+            _tabcopy.Columns[4].FieldName = _tabcopy.Columns[4].ReFieldName = "Test22";
+            _tabcopy.Columns[3].FieldName = _tabcopy.Columns[3].ReFieldName = "Test22";
+            var a = sqlClient.DbFirst.CreateTable(_tabcopy);
+
+            HiColumn newcol = ClassExtensions.DeepCopy<HiColumn>(_tabcopy.Columns[7]);
+           // newcol.FieldName = newcol.ReFieldName = newcol.FieldName + "1";
+            newcol.IsNull = false;
+            newcol.FieldLen = 263;
             _tabcopy.Columns.Add(newcol);
 
-            _tabcopy.Columns[4].ReFieldName = _tabcopy.Columns[4].FieldName + "test";
+            _tabcopy.Columns[4].ReFieldName = _tabcopy.Columns[4].FieldName + "Rename";
             _tabcopy.Columns[4].IsRequire = true;
 
             _tabcopy.PrimaryKey.ForEach(x => {
@@ -413,11 +441,13 @@ namespace HiSql
             });
            
             _tabcopy.Columns.ForEach(t => {
-                if (t.FieldName == "Hid" || t.FieldName == "TestAdd2")
+                if (t.FieldName == "Hid" || t.FieldName == "UserName")
                 {
                     t.IsPrimary = true;
                 }
             });
+
+            _tabcopy.Columns.RemoveAll(t=>t.FieldName == "ModiName");
 
             var rtn = sqlClient.DbFirst.ModiTable(_tabcopy, OpLevel.Execute);
             if (rtn.Item1)
@@ -437,11 +467,11 @@ namespace HiSql
             HiColumn column = new HiColumn()
             {
                 TabName = "H_Test",
-                FieldName = "TestAdd",
+                FieldName = "TestAdd2",
                 FieldType = HiType.VARCHAR,
                 FieldLen = 511,
                 DBDefault = HiTypeDBDefault.VALUE,
-                DefaultValue = "TGasdfsdM",
+                DefaultValue = "TGasdddfsdM",
                 FieldDesc = "测试字888888段变更"
 
             };
