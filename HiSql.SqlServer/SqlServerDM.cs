@@ -381,7 +381,7 @@ namespace HiSql
             TabInfo newtabinfo = this.Context.MCache.GetCache<TabInfo>(_keyname);
             if (newtabinfo == null)
             {
-                newtabinfo = HiSqlCommProvider.InitTabMaping(_keyname.ToLower(), () =>
+                newtabinfo = HiSqlCommProvider.InitTabMaping(_keyname, () =>
                     {
                         tabname = tabname.ToSqlInject();
                         DataSet ds = GetTabModelInfo(tabname);
@@ -458,10 +458,11 @@ namespace HiSql
                                 //如果不一样（则有变更物理表） 则以物理表的数据为准
 
                                 var phytabInfo = TabDefinitionToEntity(dts, dbConfig.DbMapping);
+                                phytabInfo = HiSqlCommProvider.TabMerge(phytabInfo, tabInfo);
                                 List<FieldChange> fieldChanges = HiSqlCommProvider.TabToCompare(phytabInfo, tabInfo,DBType.SqlServer);
                                 List<HiColumn> lstcolumn = tabInfo.GetColumns;
 
-                                phytabInfo = HiSqlCommProvider.TabMerge(phytabInfo, tabInfo);
+                                
                                 List<HiColumn> phyclumn = phytabInfo.GetColumns;
                                 var delfield = fieldChanges.Where(f => f.Action == TabFieldAction.DELETE).ToList();
                                 var modifield = fieldChanges.Where(f => f.Action == TabFieldAction.ADD || (f.Action == TabFieldAction.MODI && f.IsTabChange == true)).ToList();

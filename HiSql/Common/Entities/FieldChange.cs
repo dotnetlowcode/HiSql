@@ -34,7 +34,10 @@ namespace HiSql
     /// 字段比明细
     /// </summary>
     public class FieldChangeDetail
-    { 
+    {
+
+
+        private bool _istabchange = true;
 
         /// <summary>
         /// 属性名称
@@ -50,5 +53,11 @@ namespace HiSql
         /// 当前的值
         /// </summary>
         public string ValueB { get; set; }
+
+
+        /// <summary>
+        /// 是否表结构变更
+        /// </summary>
+        public bool IsTabChange { get => _istabchange; set => _istabchange = value; }
     }
 }

@@ -15,7 +15,7 @@ namespace HiSql
     /// </summary>
     public class RCache : BaseCache, IRedis
     {
-       
+
         private readonly string UniqueId = Guid.NewGuid().ToString();
         private StackExchange.Redis.IDatabase _cache;
         private ConnectionMultiplexer _connectMulti;
@@ -422,7 +422,7 @@ namespace HiSql
                     {
                         _MemoryCache.SetCache(key, _value);
                     }
-                    
+
                     this.PublishMessage(_cache_notity_channel_remove, GetRegionKeyForNotityKey(key));
 
                 }
@@ -447,7 +447,7 @@ namespace HiSql
         {
             DateTimeOffset currdate = DateTimeOffset.Now;
             int _seconds = int.Parse(time.Subtract(currdate).TotalSeconds.ToString());
-            
+
             return GetOrCreate<T>(key, value, _seconds);
         }
 
@@ -925,7 +925,7 @@ namespace HiSql
                 if (thread != null)
                     thread.Interrupt();
 
-                msg =  isBlockingMode? $"key:[{key}]锁定失败,加锁等待超过{timeoutSeconds}秒!": $"key:[{key}]锁定失败!";
+                msg = isBlockingMode ? $"key:[{key}]锁定失败,加锁等待超过{timeoutSeconds}秒!" : $"key:[{key}]锁定失败!";
             }
             return new Tuple<bool, string>(getlocked, msg);
         }
@@ -946,7 +946,7 @@ namespace HiSql
         {
             var isBlockingMode = timeoutSeconds > 0; //是否
             Tuple<bool, string> tuple = new Tuple<bool, string>(false, "获取锁超时");
-            
+
             if (keys.Length == 1)
             {
                 return LockOn(keys[0], lckinfo, expirySeconds, timeoutSeconds);
@@ -973,7 +973,7 @@ namespace HiSql
                 getlockElapsed = TimeSpan.FromMilliseconds(Global.LockOptions.NoWaitModeGetLockWaitMillSeconds);
             }
             Stopwatch stopwatch = Stopwatch.StartNew();
-            
+
             while (!getlocked && stopwatch.Elapsed <= getlockElapsed)
             {
                 var redisResult = _cache.ScriptEvaluate(luaStr, rediskeys, redisvalues);
@@ -987,7 +987,7 @@ namespace HiSql
                     Thread.Sleep(Global.LockOptions.GetLockRetrySleepMillSeconds);
                 }
             }
-            
+
             if (!getlocked)
             {
                 return new Tuple<bool, string>(false, "获取锁等待超时。");
@@ -1169,16 +1169,16 @@ namespace HiSql
             {
                 getlockElapsed = TimeSpan.FromMilliseconds(Global.LockOptions.NoWaitModeGetLockWaitMillSeconds);
             }
-           
+
             Stopwatch stopwatch = Stopwatch.StartNew();
             while (!getlocked && stopwatch.Elapsed <= getlockElapsed)
             {
                 getlocked = _cache.LockTake(key, lckinfo.UName, TimeSpan.FromSeconds(expirySeconds));
                 if (getlocked) break;
-                    
+
                 Thread.Sleep(Global.LockOptions.GetLockRetrySleepMillSeconds);
             }
-           
+
             string msg = "";
             Thread thread = null;
 
@@ -1207,10 +1207,12 @@ namespace HiSql
                         {
                             action.Invoke();
                         }
-                        catch (Exception ex)
-                        {
-                            //Console.WriteLine($"线程中断。。");
-                        }
+                        //catch (Exception ex) //不要处理异常，否则上层应用捕获不到异常
+                        //{
+                        //    flag = false;
+                        //    msg = $"key:[{key}]锁定并操作业务失败!{ex}";
+                        //    //Console.WriteLine($"线程中断。。");
+                        //}
                         finally
                         {
                             UnLock(lckinfo, key);
@@ -1266,12 +1268,12 @@ namespace HiSql
                         flag = true;
                         msg = $"key:[{key}]锁定并操作业务成功!,锁已经自动释放";
                     }
-                    catch (Exception ex)
-                    {
-                        flag = false;
-                        msg = $"key:[{key}]锁定并操作业务失败!{ex}";
-                        //Console.WriteLine($"线程中断。。");
-                    }
+                    //catch (Exception ex) //不要处理异常，否则上层应用捕获不到异常
+                    //{
+                    //    flag = false;
+                    //    msg = $"key:[{key}]锁定并操作业务失败!{ex}";
+                    //    //Console.WriteLine($"线程中断。。");
+                    //}
                     finally
                     {
                         UnLock(lckinfo, key);
@@ -1287,7 +1289,7 @@ namespace HiSql
 
             return new Tuple<bool, string>(flag, msg);
         }
-                
+
         public override Tuple<bool, string> LockOnExecuteNoWait(string[] keys, Action action, LckInfo lckinfo, int expirySeconds = 30)
         {
             return LockOnExecute(keys, action, lckinfo, expirySeconds, 0);
@@ -1347,10 +1349,10 @@ namespace HiSql
                         {
                             action.Invoke();
                         }
-                        catch (Exception ex)
-                        {
-                            //Console.WriteLine($"线程中断。。");
-                        }
+                        //catch (Exception ex)  //不要处理异常，否则上层应用捕获不到异常
+                        //{
+                        //    //Console.WriteLine($"线程中断。。");
+                        //}
                         finally
                         {
                             UnLock(lckinfo, keys);
@@ -1412,11 +1414,11 @@ namespace HiSql
                         flag = true;
                         msg = $"key:[{keys}]锁定并操作业务成功!,锁已经自动释放";
                     }
-                    catch (Exception ex)
-                    {
-                        flag = false;
-                        msg = $"key:[{keys}]锁定并操作业务失败!{ex}";
-                    }
+                    //catch (Exception ex) //不要处理异常，否则上层应用捕获不到异常
+                    //{
+                    //    flag = false;
+                    //    msg = $"key:[{keys}]锁定并操作业务失败!{ex}";
+                    //}
                     finally
                     {
                         UnLock(lckinfo, keys);
@@ -1474,7 +1476,7 @@ namespace HiSql
                     redisvalues[i] = values[i];
                 }
             }
-              
+
             var redisResult = _cache.ScriptEvaluate(script, rediskeys, redisvalues);
             return redisResult.ToString();
         }

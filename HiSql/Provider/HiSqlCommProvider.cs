@@ -289,6 +289,9 @@ namespace HiSql
                     hiColumn.SNO = column.SNO;
                     hiColumn.SNO_NUM = column.SNO_NUM;
 
+
+                    hiColumn.SortNum = column.SortNum;
+
                     //如果有扩展信息需要在此处赋值
 
                 }
@@ -344,7 +347,7 @@ namespace HiSql
                             #region 达梦特殊业务处理
                             //达梦数据没有nvarchar的概念
                             FieldChangeDetail fieldlen = rtntuple.Item3.Where(fc => fc.AttrName.Equals("FieldLen", StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-                            FieldChangeDetail fieldtype = rtntuple.Item3.Where(fc => (fc.AttrName.Equals("FieldType", StringComparison.OrdinalIgnoreCase)
+                            FieldChangeDetail fieldtype = rtntuple.Item3.Where(fc => (fc.AttrName.Equals("FieldType", StringComparison.OrdinalIgnoreCase) 
                             && fc.ValueA.Equals("varchar", StringComparison.OrdinalIgnoreCase)
                             && fc.ValueB.Equals("nvarchar", StringComparison.OrdinalIgnoreCase)) || (fc.AttrName.Equals("FieldType", StringComparison.OrdinalIgnoreCase)
                             && fc.ValueA.Equals("char", StringComparison.OrdinalIgnoreCase)
@@ -380,7 +383,7 @@ namespace HiSql
                                     //达梦数据库忽略此种差异
                                 }
                                 else
-                                    fieldChanges.Add(new FieldChange { IsTabChange = rtntuple.Item2, OldColumn = _oldcolumn, NewColumn = _newcolumn, FieldName = _newcolumn.FieldName, Action = TabFieldAction.MODI, ChangeDetail = rtntuple.Item3 });
+                                    fieldChanges.Add(new FieldChange { IsTabChange = true, OldColumn = _oldcolumn, NewColumn = _newcolumn, FieldName = _newcolumn.FieldName, Action = TabFieldAction.MODI, ChangeDetail = rtntuple.Item3 });
                             }
                             #endregion
 

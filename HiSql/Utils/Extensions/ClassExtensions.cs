@@ -61,7 +61,7 @@ namespace HiSql
             //比对是否是表结构有变更
 
             bool _resultok = true;//两个结果是否相同
-            bool _isstructchg = false;//是否有结构变更
+            bool _istabchg = false;//是否有结构变更 默认无结构变更
             PropertyInfo[] props = new PropertyInfo[] { };
             if (dbtype != DBType.Sqlite)
             {
@@ -104,8 +104,8 @@ namespace HiSql
                                 
                             }
                             _resultok = false;
-                            _isstructchg = true;//是否有结构变更
-                            fieldChanges.Add(new FieldChangeDetail { AttrName = po.Name, ValueA = _a, ValueB = _b });
+                            _istabchg = true;//是否有结构变更
+                            fieldChanges.Add(new FieldChangeDetail { IsTabChange= true, AttrName = po.Name, ValueA = _a, ValueB = _b });
                         }
                     }
                 }
@@ -117,7 +117,7 @@ namespace HiSql
             }
 
             if (!_resultok)
-                return new Tuple<bool, bool, List<FieldChangeDetail>>(_resultok, _isstructchg, fieldChanges);
+                return new Tuple<bool, bool, List<FieldChangeDetail>>(_resultok, _istabchg, fieldChanges);
 
             //配置有变更
             props = t1.GetProperties().Where(p => p.CanWrite == true && !Constants.IsStandardField(p.Name)
@@ -125,8 +125,8 @@ namespace HiSql
             (
                  p.Name.ToLower().NotIn("FieldDesc".ToLower(), "IsIdentity".ToLower(), "FieldName".ToLower(),
                 "FieldType".ToLower(), "DefaultValue".ToLower(), "FieldLen".ToLower(), "FieldDec".ToLower(), "IsNull".ToLower(),
-                "SortNum".ToLower(), "IsSys".ToLower())
-                )   // "IsPrimary".ToLower(),  是否主键额外处理  pengxy 
+                "IsSys".ToLower())
+                )   // "IsPrimary".ToLower(),  是否主键额外处理  pengxy    "SortNum".ToLower()
 
             && p.MemberType == MemberTypes.Property).ToArray();
 
@@ -140,8 +140,8 @@ namespace HiSql
                     {
 
                         _resultok = false;
-                        _isstructchg = false;//是否有结构变更
-                        fieldChanges.Add(new FieldChangeDetail { AttrName = po.Name, ValueA = _a, ValueB = _b });
+                        //_istabchg = false;//是否有结构变更  如果该字段其中的某一段是物理表变更 那么该字段都是物理变更
+                        fieldChanges.Add(new FieldChangeDetail { IsTabChange= false, AttrName = po.Name, ValueA = _a, ValueB = _b });
                     }
                 }
                 else
@@ -150,7 +150,7 @@ namespace HiSql
                     if (!b.Item1) return b;
                 }
             }
-            return new Tuple<bool, bool, List<FieldChangeDetail>>(_resultok, _isstructchg, fieldChanges);
+            return new Tuple<bool, bool, List<FieldChangeDetail>>(_resultok, _istabchg, fieldChanges);
         }
 
         public static bool CompareProperties<T>(T obj1, T obj2)

@@ -110,10 +110,10 @@ namespace HiSql
         /// <typeparam name="T"></typeparam>
         /// <param name="list"></param>
         /// <returns></returns>
-        public static DataTable ListToDataTable<T>(IList<T> list)
+        public static DataTable ListToDataTable<T>(IList<T> list, DBType dbtype)
         {
             Type elementType = typeof(T);
-            string key = "ListToDataTableWithIL" + elementType.FullName;
+            string key = "ListToDataTableWithIL" + elementType.FullName+ dbtype.ToString();
 
             DataTable table = null;
 
@@ -702,7 +702,7 @@ namespace HiSql
                 generator.Emit(OpCodes.Ldarg_1);
                 generator.Emit(OpCodes.Callvirt, propertyInfo.GetGetMethod());
                 if (propertyInfo.PropertyType.IsValueType || propertyInfo.PropertyType == typeof(string))  //
-                    generator.Emit(OpCodes.Box, propertyInfo.PropertyType);//一直在折腾这个地方，哎
+                    generator.Emit(OpCodes.Box, propertyInfo.PropertyType);//装箱
                 else
                     generator.Emit(OpCodes.Castclass, propertyInfo.PropertyType);
 

@@ -77,20 +77,75 @@ namespace HiSql.Unit.Test
 
         void tableGroups(HiSqlClient sqlClient)
         {
-            //表重命名
-            reTabName(sqlClient);
+            ////表重命名
+            //reTabName(sqlClient);
 
 
-            //索引创建 删除修改
-            indexDemo(sqlClient);
+            ////索引创建 删除修改
+            //indexDemo(sqlClient);
 
-            //动态创建表
-            createDemoDynTable(sqlClient, "H_dyntab1");
+            ////动态创建表
+            //createDemoDynTable(sqlClient, "H_dyntab1");
 
-            reCol(sqlClient, "H_dyntab1");
+            //reCol(sqlClient, "H_dyntab1");
+
+            moditable(sqlClient, "H_dyntab1");
+
+
+
 
         }
 
+        void moditable(HiSqlClient sqlClient, string tabname)
+        {
+            TabInfo tabinfo = sqlClient.DbFirst.GetTabStruct(tabname);
+
+
+            TabInfo newtabinfo = tabinfo.CloneCopy();
+
+            HiColumn col = newtabinfo.GetColumns.Where(c => c.FieldName.Equals("Unchar", StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+
+            col.SortNum =2;
+
+            var rtn=sqlClient.DbFirst.ModiTable(newtabinfo,OpLevel.Execute);
+            if (rtn.Item1)
+            {
+                _outputHelper.WriteLine($"表修改结果：{rtn.Item2}");
+                _outputHelper.WriteLine($"表修改sql：{rtn.Item3}");
+
+
+
+                tabinfo = sqlClient.DbFirst.GetTabStruct(tabname);
+                HiColumn newcol = tabinfo.GetColumns.Where(c => c.FieldName.Equals("Unchar", StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                if (newcol.SortNum == col.SortNum)
+                {
+                    Assert.True(rtn.Item1);
+                    _outputHelper.WriteLine($"修改排序字段成功");
+                }
+                else
+                {
+                    _outputHelper.WriteLine($"修改排序字段失败");
+
+                    Assert.True(rtn.Item1);
+                }
+                
+            }
+            else
+            {
+                _outputHelper.WriteLine($"表修改结果：{rtn.Item2}");
+                _outputHelper.WriteLine($"表修改sql：{rtn.Item3}");
+
+               
+            }
+                
+
+
+
+
+
+
+
+        }
 
         void reCol(HiSqlClient sqlClient, string tabname)
         {
