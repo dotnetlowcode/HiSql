@@ -4,7 +4,7 @@
 	  <TargetFrameworks>net461;net5.0;netcoreapp3.1;net6.0</TargetFrameworks>
     <Authors>tansar</Authors>
     <Company>dotnetlowcode</Company>
-    <Version>1.0.4.7</Version>
+    <Version>1.0.4.8</Version>
     <Description>该包支持Oracle数据库 依赖于HiSql.dll包运行</Description>
     <ApplicationIcon>hisql-oracle-logo.ico</ApplicationIcon>
     <PackageIcon>hisql-oracle-logo.jpg</PackageIcon>

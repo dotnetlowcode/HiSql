@@ -77,6 +77,16 @@ namespace HiSql.Unit.Test
         {
             query(sqlClient);
 
+            queryIn(sqlClient);
+
+        }
+
+
+        void queryIn(HiSqlClient sqlClient)
+        {
+            string sql = sqlClient.HiSql($"select * from Hi_FieldModel  where tabname in ( 'Hi_FieldModel'， 'Hi_FieldModel2')  order by tabname asc")
+                .Take(2).Skip(2)
+                .ToSql();
         }
         void query(HiSqlClient sqlClient)
         {
