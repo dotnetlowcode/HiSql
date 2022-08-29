@@ -109,7 +109,7 @@ namespace HiSql
         /// <param name="sql"></param>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        int ExecCommand(string sql, object parameters);
+        int ExecCommandSynch(string sql, params HiParameter[] parameters);
 
 
         /// <summary>

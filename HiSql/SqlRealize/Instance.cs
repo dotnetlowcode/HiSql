@@ -77,8 +77,8 @@ namespace HiSql
                         }
                         catch (Exception E)
                         {
-
-                            throw new Exception($"HiSql执行异常:请检查是否有引用[{Constants.NameSpace}.{dbtype.ToString()}].dll包!");
+                            return null;
+                            //throw new Exception($"HiSql执行异常:请检查是否有引用[{Constants.NameSpace}.{dbtype.ToString()}].dll包!");
 
                         }
                     }

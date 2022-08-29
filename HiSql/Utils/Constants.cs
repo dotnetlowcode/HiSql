@@ -212,7 +212,7 @@ namespace HiSql
         public static Version GetDbTypeVersion(string dbname)
         {
            
-            Assembly assembly = Instance.GetAssembly(Constants.NameSpace);
+            Assembly assembly = Instance.GetAssembly(dbname);
             if (assembly != null)
                 return assembly.GetName().Version;
             else
