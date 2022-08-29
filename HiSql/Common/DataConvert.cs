@@ -1414,6 +1414,26 @@ namespace HiSql
             return sbcsv.ToString();
         }
 
+        /// <summary>
+        /// 将DataTable转换成动态类型
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <returns></returns>
+        static public List<TDynamic> ToExpandObjectList(this DataTable dt)
+        {
+            var list=new List<TDynamic>();
+           var columns=  dt.Columns;
+            foreach (DataRow item in dt.Rows)
+            {
+                var obj = new TDynamic();
+                foreach (DataColumn columnObj in columns)
+                {
+                    obj[columnObj.ColumnName] = item.Field<object>(columnObj.ColumnName);
+                }
+                list.Add(obj);
+            }
+            return list;
+        }
 
 
         /// <summary>
