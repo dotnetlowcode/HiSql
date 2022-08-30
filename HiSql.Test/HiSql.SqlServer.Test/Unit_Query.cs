@@ -79,9 +79,21 @@ namespace HiSql.Unit.Test
 
             queryIn(sqlClient);
 
+            queryJoin(sqlClient);
+
         }
 
-
+        void queryJoin(HiSqlClient sqlClient)
+        {
+            var query = sqlClient.Query("Hi_FieldModel").As("A").Field("*")
+                .Join("Hi_TabModel").As("B").On(new HiSql.JoinOn() { { "A.TabName", "B.TabName" } })
+                .Where("A.TabName='Hi_TestQuery'")
+                .Sort("A.TabName asc", "A.FieldName asc");
+            string sql = query
+                .ToSql();
+            var cnt = query.ToTable().Rows.Count;
+            Assert.Equal(18, cnt);
+        }
         void queryIn(HiSqlClient sqlClient)
         {
             string sql = sqlClient.HiSql($"select * from Hi_FieldModel  where tabname in ( 'Hi_FieldModel'， 'Hi_FieldModel2')  order by tabname asc")
