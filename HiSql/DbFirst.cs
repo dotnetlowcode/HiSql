@@ -1613,8 +1613,8 @@ namespace HiSql
             if (_sqlClient != null)
             {
                 _sqlClient.TrunCate(tabname).ExecCommand();
-                _sqlClient.Delete(Constants.HiSysTable["Hi_TabModel"].ToString(), new { TabName = tabname, DbServer = "", DbName = "" }).ExecCommand();
-                _sqlClient.Delete(Constants.HiSysTable["Hi_FieldModel"].ToString()).Where($"TabName='{tabname.ToSqlInject()}' and DbServer='' and DbName='' ").ExecCommand();
+                //_sqlClient.Delete(Constants.HiSysTable["Hi_TabModel"].ToString(), new { TabName = tabname, DbServer = "", DbName = "" }).ExecCommand();
+                //_sqlClient.Delete(Constants.HiSysTable["Hi_FieldModel"].ToString()).Where($"TabName='{tabname.ToSqlInject()}' and DbServer='' and DbName='' ").ExecCommand();
                 return true;
             }
             else
