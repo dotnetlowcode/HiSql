@@ -23,7 +23,7 @@ namespace HiSql.OralceUnitTest
                          IsEncrypt = true,
                          IsAutoClose = false,
                          SqlExecTimeOut = 60000,
-                         IgnoreCase=true,
+                        
                          AppEvents = new AopEvent()
                          {
                              OnDbDecryptEvent = (connstr) =>

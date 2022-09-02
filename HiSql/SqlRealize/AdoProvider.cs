@@ -383,8 +383,10 @@ namespace HiSql
         }
         public int ExecCommandSynch(string sql, params HiParameter[] parameters)
         {
-            if (Context.CurrentConnectionConfig.UpperCase)
+            if (Context.CurrentConnectionConfig.StringCase == StringCase.UpperCase)
                 sql = sql.ToUpper();
+            else if (Context.CurrentConnectionConfig.StringCase == StringCase.LowerCase)
+                sql = sql.ToLower();
             deleExeCommand _deleExecCommand = new deleExeCommand(exeCommand);
             var workTask = Task.Run(() => _deleExecCommand.Invoke(sql, parameters));
             //var workTask = execCommandAsync(sql, parameters);
@@ -501,8 +503,11 @@ namespace HiSql
         /// <returns></returns>
         public Task<int> ExecCommandAsync(string sql, params HiParameter[] parameters)
         {
-            if (Context.CurrentConnectionConfig.UpperCase)
+            if (Context.CurrentConnectionConfig.StringCase == StringCase.UpperCase)
                 sql = sql.ToUpper();
+            else if (Context.CurrentConnectionConfig.StringCase == StringCase.LowerCase)
+                sql = sql.ToLower();
+
             //deleExecCommand _deleExecCommand = new deleExecCommand(execCommandAsync);
             //var workTask = Task.Run(() => _deleExecCommand.Invoke(sql, parameters));
             var workTask = execCommandAsync(sql, parameters);
@@ -608,8 +613,11 @@ namespace HiSql
 
         public virtual Task<object> ExecScalarAsync(string sql)
         {
-            if (Context.CurrentConnectionConfig.UpperCase)
+
+            if (Context.CurrentConnectionConfig.StringCase == StringCase.UpperCase)
                 sql = sql.ToUpper();
+            else if (Context.CurrentConnectionConfig.StringCase == StringCase.LowerCase)
+                sql = sql.ToLower();
             //deleExecScalar _deleExecScalar = new deleExecScalar(execScalar);
             var workTask = execScalar(sql); //Task.Run(() => _deleExecScalar.Invoke(sql));
             bool flag = workTask.Wait(this.Context.CurrentConnectionConfig.SqlExecTimeOut, new CancellationToken(false));
@@ -637,9 +645,12 @@ namespace HiSql
         {
             try
             {
-                if (Context.CurrentConnectionConfig.UpperCase)
+                if (Context.CurrentConnectionConfig.StringCase == StringCase.UpperCase)
                     sql = sql.ToUpper();
-#region  执行前操作
+                else if (Context.CurrentConnectionConfig.StringCase == StringCase.LowerCase)
+                    sql = sql.ToLower();
+
+                #region  执行前操作
                 ResolveParameter(ref sql, parameters);
                 if (FormatSql != null)
                 {
@@ -719,9 +730,11 @@ namespace HiSql
         {
             try
             {
-                if (Context.CurrentConnectionConfig.UpperCase)
+                if (Context.CurrentConnectionConfig.StringCase == StringCase.UpperCase)
                     sql = sql.ToUpper();
-#region  执行前操作
+                else if (Context.CurrentConnectionConfig.StringCase == StringCase.LowerCase)
+                    sql = sql.ToLower();
+                #region  执行前操作
                 ResolveParameter(ref sql, parameters);
                 if (FormatSql != null)
                 {
@@ -952,8 +965,10 @@ namespace HiSql
         }
         public DataTable GetDataTable(string sql, params HiParameter[] parameters)
         {
-            if (Context.CurrentConnectionConfig.UpperCase)
+            if (Context.CurrentConnectionConfig.StringCase == StringCase.UpperCase)
                 sql = sql.ToUpper();
+            else if (Context.CurrentConnectionConfig.StringCase == StringCase.LowerCase)
+                sql = sql.ToLower();
             lock (this.Context)
             {
                 deleGetTable _deleGetTable = new deleGetTable(getDataTable);
@@ -981,8 +996,10 @@ namespace HiSql
         {
             for (int i = 0; i < sqlList.Count; i++)
             {
-                if (Context.CurrentConnectionConfig.UpperCase)
-                    sqlList[i]= sqlList[i].ToUpper();
+                if (Context.CurrentConnectionConfig.StringCase == StringCase.UpperCase)
+                    sqlList[i] = sqlList[i].ToUpper();
+                else if (Context.CurrentConnectionConfig.StringCase == StringCase.LowerCase)
+                    sqlList[i] = sqlList[i].ToLower();
             }
             List<Task<DataTable>> taskList = new List<Task<DataTable>>();
             DataSet ds = new DataSet();
@@ -1197,8 +1214,10 @@ namespace HiSql
                     else
                         throw new Exception($"参数化名称[{item.ParameterName}]错误!格式为【@+名称】如@TabName");
                 }
-                if (Context.CurrentConnectionConfig.UpperCase)
+                if (Context.CurrentConnectionConfig.StringCase == StringCase.UpperCase)
                     sql = sql.ToUpper();
+                else if (Context.CurrentConnectionConfig.StringCase == StringCase.LowerCase)
+                    sql = sql.ToLower();
             }
         }
 
