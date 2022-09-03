@@ -148,11 +148,13 @@ namespace HiSql
 
                 _sql = idm.CreatePrimaryKey(tabname, columns);
 
-                if (idm.Context.CurrentConnectionConfig.UpperCase)
+                if (idm.Context.CurrentConnectionConfig.StringCase==StringCase.UpperCase)
                 {
                     _sql = _sql.ToUpper();
 
-                }
+                }else if (idm.Context.CurrentConnectionConfig.StringCase == StringCase.LowerCase)
+                        _sql = _sql.ToLower();
+
                 if (opLevel == OpLevel.Execute)
                 {
                     _sqlClient.BeginTran();
@@ -217,11 +219,15 @@ namespace HiSql
                 {
                     _sql = idm.CreateIndex(tabname, indexname, columns);
                 }
-                if (idm.Context.CurrentConnectionConfig.UpperCase)
+      
+                if (idm.Context.CurrentConnectionConfig.StringCase == StringCase.UpperCase)
                 {
                     _sql = _sql.ToUpper();
 
                 }
+                else if (idm.Context.CurrentConnectionConfig.StringCase == StringCase.LowerCase)
+                    _sql = _sql.ToLower();
+
                 if (opLevel == OpLevel.Execute)
                 {
                     _sqlClient.BeginTran();
@@ -338,11 +344,11 @@ namespace HiSql
             if (_sqlClient != null)
             {
                 _sql = idm.CreateView(viewname, viewsql);
-                if (idm.Context.CurrentConnectionConfig.UpperCase)
-                {
+                if (idm.Context.CurrentConnectionConfig.StringCase == StringCase.UpperCase)
                     _sql = _sql.ToUpper();
-
-                }
+                else if (idm.Context.CurrentConnectionConfig.StringCase == StringCase.LowerCase)
+                    _sql = _sql.ToLower();
+            
                 if (opLevel == OpLevel.Execute)
                 {
                     _sqlClient.BeginTran();
@@ -383,8 +389,10 @@ namespace HiSql
             if (_sqlClient != null)
             {
                 _sql = idm.ModiView(viewname, viewsql);
-                if (idm.Context.CurrentConnectionConfig.UpperCase)
+                if (idm.Context.CurrentConnectionConfig.StringCase == StringCase.UpperCase)
                     _sql = _sql.ToUpper();
+                else if (idm.Context.CurrentConnectionConfig.StringCase == StringCase.LowerCase)
+                    _sql = _sql.ToLower();
 
                 if (opLevel == OpLevel.Execute)
                 {
@@ -428,8 +436,10 @@ namespace HiSql
             if (_sqlClient != null)
             {
                 _sql = idm.DropView(viewname);
-                if (idm.Context.CurrentConnectionConfig.UpperCase)
+                if (idm.Context.CurrentConnectionConfig.StringCase == StringCase.UpperCase)
                     _sql = _sql.ToUpper();
+                else if (idm.Context.CurrentConnectionConfig.StringCase == StringCase.LowerCase)
+                    _sql = _sql.ToLower();
                 if (opLevel == OpLevel.Execute)
                 {
                     _sqlClient.BeginTran();
@@ -473,8 +483,10 @@ namespace HiSql
             else
             {
                 _sql = idm.BuildChangeFieldStatement(tabInfo.TabModel, hiColumn, TabFieldAction.DELETE);
-                if (idm.Context.CurrentConnectionConfig.UpperCase)
+                if (idm.Context.CurrentConnectionConfig.StringCase == StringCase.UpperCase)
                     _sql = _sql.ToUpper();
+                else if (idm.Context.CurrentConnectionConfig.StringCase == StringCase.LowerCase)
+                    _sql = _sql.ToLower();
                 if (opLevel == OpLevel.Execute)
                 {
                     //执行数据库命令
@@ -538,11 +550,11 @@ namespace HiSql
             string _sql = "";
             IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
 
-            if (idm.Context.CurrentConnectionConfig.UpperCase)
-            {
+            if (idm.Context.CurrentConnectionConfig.StringCase == StringCase.UpperCase)
                 tabname = tabname.ToUpper();
-            }
-
+            else if (idm.Context.CurrentConnectionConfig.StringCase == StringCase.LowerCase)
+                tabname = tabname.ToLower();
+            
             List<TabIndex> lst = idm.GetIndexs(tabname);
             if (!lst.Any(t => string.Equals(t.IndexType,"Key_Index", StringComparison.OrdinalIgnoreCase)))
             {
@@ -551,13 +563,11 @@ namespace HiSql
             }
             string primaryKeyName = lst.FirstOrDefault(t => string.Equals(t.IndexType, "Key_Index", StringComparison.OrdinalIgnoreCase)).IndexName;
             _sql = idm.DropIndex(tabname, primaryKeyName, true);
-                 
             {
-                if (idm.Context.CurrentConnectionConfig.UpperCase)
-                {
+                if (idm.Context.CurrentConnectionConfig.StringCase == StringCase.UpperCase)
                     _sql = _sql.ToUpper();
-
-                }
+                else if (idm.Context.CurrentConnectionConfig.StringCase == StringCase.LowerCase)
+                    _sql = _sql.ToLower();
                 if (opLevel == OpLevel.Execute)
                 {
                     //执行数据库命令
@@ -600,11 +610,11 @@ namespace HiSql
             string _sql = "";
             IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
 
-            if (idm.Context.CurrentConnectionConfig.UpperCase)
-            {
+            if (idm.Context.CurrentConnectionConfig.StringCase == StringCase.UpperCase)
                 tabname = tabname.ToUpper();
-            }
-
+            else if (idm.Context.CurrentConnectionConfig.StringCase == StringCase.LowerCase)
+                tabname = tabname.ToLower();
+            
             List<TabIndex> lst = idm.GetIndexs(tabname);
             if (!lst.Any(t => t.IndexName.ToLower() == indexname.ToLower()))
             {
@@ -626,11 +636,10 @@ namespace HiSql
             }
             else
             {
-                if (idm.Context.CurrentConnectionConfig.UpperCase)
-                {
+                if (idm.Context.CurrentConnectionConfig.StringCase == StringCase.UpperCase)
                     _sql = _sql.ToUpper();
-
-                }
+                else if (idm.Context.CurrentConnectionConfig.StringCase == StringCase.LowerCase)
+                    _sql = _sql.ToLower();
                 if (opLevel == OpLevel.Execute)
                 {
                     //执行数据库命令
@@ -1613,8 +1622,8 @@ namespace HiSql
             if (_sqlClient != null)
             {
                 _sqlClient.TrunCate(tabname).ExecCommand();
-                _sqlClient.Delete(Constants.HiSysTable["Hi_TabModel"].ToString(), new { TabName = tabname, DbServer = "", DbName = "" }).ExecCommand();
-                _sqlClient.Delete(Constants.HiSysTable["Hi_FieldModel"].ToString()).Where($"TabName='{tabname.ToSqlInject()}' and DbServer='' and DbName='' ").ExecCommand();
+                //_sqlClient.Delete(Constants.HiSysTable["Hi_TabModel"].ToString(), new { TabName = tabname, DbServer = "", DbName = "" }).ExecCommand();
+                //_sqlClient.Delete(Constants.HiSysTable["Hi_FieldModel"].ToString()).Where($"TabName='{tabname.ToSqlInject()}' and DbServer='' and DbName='' ").ExecCommand();
                 return true;
             }
             else

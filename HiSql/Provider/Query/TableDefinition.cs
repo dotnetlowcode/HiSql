@@ -98,7 +98,7 @@ namespace HiSql
                 if (string.IsNullOrEmpty(_rename))
                     return _tabname;
                 else
-                    return _rename;
+                    return _rename.ToLower();
             
             }
             set { _rename = value; }

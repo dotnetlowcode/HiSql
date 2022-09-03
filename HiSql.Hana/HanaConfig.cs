@@ -510,7 +510,7 @@ namespace HiSql
                 .AppendLine("do begin")
                 .AppendLine($"  DECLARE _count int:=0;")
                 .AppendLine($"  DECLARE _status int:=0;")
-                .AppendLine("   select count(*) into _count  from OBJECTS  where ( OBJECT_TYPE='TABLE' or OBJECT_TYPE='TABLE' ) AND OBJECT_NAME='[$TabName$]';")
+                .AppendLine("   select count(*) into _count  from OBJECTS  where ( OBJECT_TYPE='TABLE' or OBJECT_TYPE='TABLE' ) AND upper(OBJECT_NAME)=upper('[$TabName$]');")
                 .AppendLine("   if :_count = 0 then")
                 .AppendLine($"      CREATE COLUMN TABLE  {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} (")
                 .AppendLine("           [$Fields$]")
@@ -604,7 +604,7 @@ namespace HiSql
                 //.AppendLine("do begin")
                 .AppendLine("   DECLARE _count int:=0;")
                 .AppendLine("   DECLARE _status int:=0;")
-                .AppendLine("   select count(*) into _count from M_TEMPORARY_TABLES where schema_name ='[$Schema$]' and table_name='[$TabName$]' ;")
+                .AppendLine("   select count(*) into _count from M_TEMPORARY_TABLES where schema_name ='[$Schema$]' and upper(table_name)=upper('[$TabName$]') ;")
                 .AppendLine("   if :_count > 0 then")
                 .AppendLine($"       drop table   {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after};")
                 .AppendLine("   end if;")
@@ -718,7 +718,7 @@ UNION ALL
                 .AppendLine("a.\"DEFAULT_VALUE\" as \"DbDefault\",a.\"COMMENTS\" as \"FieldDesc\"")
                 .AppendLine(" FROM SYS.TABLE_COLUMNS as a")
                 .AppendLine("  INNER JOIN \"SYS\".\"OBJECTS\" AS b on a.\"TABLE_NAME\" = b.\"OBJECT_NAME\" AND b.\"OBJECT_TYPE\" in ('VIEW','TABLE')")
-                .AppendLine("  WHERE TABLE_NAME = '[$TabName$]'")
+                .AppendLine("  WHERE upper(TABLE_NAME) = upper('[$TabName$]')")
 
                 .AppendLine(" union all")
 
@@ -750,7 +750,7 @@ UNION ALL
                 .AppendLine("a.\"DEFAULT_VALUE\" as \"DbDefault\",a.\"COMMENTS\" as \"FieldDesc\"")
                 .AppendLine(" FROM SYS.VIEW_COLUMNS as a")
                 .AppendLine("  INNER JOIN \"SYS\".\"OBJECTS\" AS b on a.\"VIEW_NAME\" = b.\"OBJECT_NAME\" AND b.\"OBJECT_TYPE\" in ('VIEW','TABLE')")
-                .AppendLine("  WHERE VIEW_NAME = '[$TabName$]' order by \"FIELDNO\" asc;")
+                .AppendLine("  WHERE upper(VIEW_NAME) = upper('[$TabName$]') order by \"FieldNo\" asc;")
                 .ToString();
 
 
@@ -772,11 +772,11 @@ UNION ALL
             _temp_update = $"update {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} set [$Fields$]";
 
             //表更新 带条件 
-            _temp_update_where = $"update {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} set [$Fields$] where [$Where$]";
+            _temp_update_where = $"update {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} [$AsTabName$] set [$Fields$] where [$Where$]";
 
             _temp_delete = $"DELETE  FROM {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after}";
 
-            _temp_delete_where = $"DELETE  FROM {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} where [$Where$]";
+            _temp_delete_where = $"DELETE  FROM {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after}  [$AsTabName$] where [$Where$]";
 
             //删除不会留下任何痕迹
             _temp_truncate = $"TRUNCATE TABLE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after};";
@@ -851,7 +851,7 @@ UNION ALL
                 .AppendLine("union all")
                 .AppendLine("select \"VIEW_NAME\"  as \"TabName\", 'View' AS \"TabType\", \"CREATE_TIME\" as \"CreateTime\" FROM \"SYS\".\"VIEWS\" where \"SCHEMA_NAME\" = '[$Schema$]' and \"VIEW_NAME\" not like '/%' ")
 
-               .AppendLine(")as temp WHERE \"TabName\" = '[$TabName$]'")
+               .AppendLine(")as temp WHERE upper(\"TabName\") = upper('[$TabName$]')")
                .AppendLine("ORDER BY \"TabName\" ASC, \"CreateTime\" desc ")
                .ToString();
 

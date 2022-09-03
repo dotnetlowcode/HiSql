@@ -554,8 +554,8 @@ namespace HiSql
                 .ToString();
 
 
-            _temp_delete_tabmodel = $"   execute immediate 'delete from {Constants.HiSysTable["Hi_TabModel"].ToString()} where lower(TabName)=lower(''[$TabName$]'')';";
-            _temp_delete_fieldmodel = $"   execute immediate 'delete from {Constants.HiSysTable["Hi_FieldModel"].ToString()} where lower(TabName)=lower(''[$TabName$]'')';";
+            _temp_delete_tabmodel = $"   execute immediate 'delete from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{_temp_table_after} where lower({_temp_field_pre}TabName{_temp_field_after})=lower(''[$TabName$]'')';";
+            _temp_delete_fieldmodel = $"   execute immediate 'delete from  {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_FieldModel"].ToString()}{_temp_table_after} where lower({_temp_field_pre}TabName{_temp_field_after})=lower(''[$TabName$]'')';";
 
 
             _temp_delete_tabstruct = new StringBuilder()
@@ -568,10 +568,10 @@ namespace HiSql
                 .AppendLine($"  v_number2 integer;")
                 .AppendLine("   v_secout integer;")
                 .AppendLine($"begin")
-                .AppendLine($"   select count(*)  into v_number  from user_tables  where  table_name=upper('[$TabName$]');")
-                .AppendLine($"   select count(*)  into v_number2  from user_views  where  view_name=upper('[$TabName$]');")
+                .AppendLine($"   select count(*)  into v_number  from user_tables  where  upper(table_name)=upper('[$TabName$]');")
+                .AppendLine($"   select count(*)  into v_number2  from user_views  where  upper(view_name)=upper('[$TabName$]');")
                 .AppendLine($"   IF v_number = 0  and v_number2=0 then")
-                .AppendLine($"      execute immediate  'create table [$TabName$]('")
+                .AppendLine($"      execute immediate  'create table {_temp_table_pre}[$TabName$]{_temp_table_after}('")
                 .AppendLine("           [$Fields$]")
                 .AppendLine($"      || ') ';")
                 .AppendLine($"      [$Sequence$]")
@@ -602,11 +602,11 @@ namespace HiSql
                 .AppendLine($"  v_number integer;")
                 .AppendLine("   v_secout integer;")
                 .AppendLine($"begin")
-                .AppendLine($"   select count(*)  into v_number  from user_tables  where  table_name=upper('[$TabName$]') AND TEMPORARY='Y';")
+                .AppendLine($"   select count(*)  into v_number  from user_tables  where  upper(table_name)=upper('[$TabName$]') AND TEMPORARY='Y';")
                 .AppendLine($"   IF v_number = 0 then")
 
                 .AppendLine($"      [$Sequence$]")
-                .AppendLine($"      execute immediate  'create  Global Temporary table [$TabName$]('")
+                .AppendLine($"      execute immediate  'create  Global Temporary table {_temp_table_pre}[$TabName$]{_temp_table_after}('")
                 .AppendLine("           [$Fields$]")
                 .AppendLine($"      || ') ';")
 
@@ -621,14 +621,14 @@ namespace HiSql
                 .AppendLine($"  v_number integer;")
                 .AppendLine("   v_secout integer;")
                 .AppendLine($"begin")
-                .AppendLine($"   select count(*)  into v_number  from user_tables  where  table_name=upper('[$TabName$]') AND TEMPORARY='Y';")
+                .AppendLine($"   select count(*)  into v_number  from user_tables  where   upper(table_name)=upper('[$TabName$]') AND TEMPORARY='Y';")
                 .AppendLine($"   IF v_number > 0 then")
                 .AppendLine($"      execute immediate 'TRUNCATE TABLE [$TabName$] ';")
                 .AppendLine($"      execute immediate 'drop table [$TabName$] ';")
                 .AppendLine($"   end if;")
 
                 .AppendLine($"  [$Sequence$]")
-                .AppendLine($"  execute immediate  'create  Global Temporary table [$TabName$]('")
+                .AppendLine($"  execute immediate  'create  Global Temporary table  {_temp_table_pre}[$TabName$]{_temp_table_after}('")
                 .AppendLine("       [$Fields$]")
                 .AppendLine($"  || ') ';")
 
@@ -644,16 +644,16 @@ namespace HiSql
                 .AppendLine($"  v_number integer;")
                 .AppendLine("   v_secout integer;")
                 .AppendLine($"begin")
-                .AppendLine($"   select count(*)  into v_number  from user_tables  where  table_name=upper('[$TabName$]') AND TEMPORARY='Y';")
+                .AppendLine($"   select count(*)  into v_number  from user_tables  where  upper(table_name)=upper('[$TabName$]') AND TEMPORARY='Y';")
                 .AppendLine($"   IF v_number = 0 then")
 
                 .AppendLine($"      [$Sequence$]")
-                .AppendLine($"      execute immediate  'create  Global Temporary table [$TabName$]('")
+                .AppendLine($"      execute immediate  'create  Global Temporary table  {_temp_table_pre}[$TabName$]{_temp_table_after}('")
                 .AppendLine("           [$Fields$]")
                 .AppendLine($"      || ')ON COMMIT PRESERVE ROWS ';")
 
                 .AppendLine("       [$Primary$]")
-                .AppendLine("   execute immediate 'delete [$TabName$] ';")
+                .AppendLine("   execute immediate 'delete {_temp_table_pre}[$TabName$]{_temp_table_after} ';")
                 .AppendLine($"   end if;")
                 .AppendLine("end;")
                 .ToString();
@@ -663,14 +663,14 @@ namespace HiSql
                 .AppendLine($"  v_number integer;")
                 .AppendLine("   v_secout integer;")
                 .AppendLine($"begin")
-                .AppendLine($"   select count(*)  into v_number  from user_tables  where  table_name=upper('[$TabName$]') AND TEMPORARY='Y';")
+                .AppendLine($"   select count(*)  into v_number  from user_tables  where  upper(table_name)=upper('[$TabName$]') AND TEMPORARY='Y';")
                 .AppendLine($"   IF v_number > 0 then")
-                .AppendLine($"      execute immediate 'TRUNCATE TABLE [$TabName$] ';")
-                .AppendLine($"      execute immediate 'drop table [$TabName$] ';")
+                .AppendLine($"      execute immediate 'TRUNCATE TABLE {_temp_table_pre}[$TabName$]{_temp_table_after} ';")
+                .AppendLine($"      execute immediate 'drop table   {_temp_table_pre}[$TabName$]{_temp_table_after} ';")
                 .AppendLine($"   end if;")
 
                 .AppendLine($"  [$Sequence$]")
-                .AppendLine($"  execute immediate  'create  Global Temporary table [$TabName$]('")
+                .AppendLine($"  execute immediate  'create  Global Temporary table  {_temp_table_pre}[$TabName$]{_temp_table_after}('")
                 .AppendLine("       [$Fields$]")
                 .AppendLine($"  || ')ON COMMIT PRESERVE ROWS ';")
 
@@ -814,7 +814,7 @@ UNION ALL
                 .AppendLine("	FROM USER_TAB_COLS T1, USER_COL_COMMENTS T2")
                 .AppendLine("	WHERE T1.TABLE_NAME = T2.TABLE_NAME")
                 .AppendLine("	    AND T1.COLUMN_NAME = T2.COLUMN_NAME")
-                .AppendLine("	    AND T1.TABLE_NAME =upper('[$TabName$]') ")
+                .AppendLine("	    AND upper(T1.TABLE_NAME) =upper('[$TabName$]') ")
                 .ToString();
 
 
@@ -921,7 +921,7 @@ UNION ALL
                 .AppendLine("union all")
                 .AppendLine(@"select VIEW_NAME as ""TabName"", 'View' AS ""TabType"",  '' as ""CreateTime"" from SYS.user_views  ")
 
-              .AppendLine(") temp WHERE \"TabName\" = '[$TabName$]'")
+              .AppendLine(") temp WHERE upper(\"TabName\") = upper('[$TabName$]')")
               .AppendLine("ORDER BY \"TabName\" ASC, \"CreateTime\" desc ")
               .ToString();
 
@@ -942,7 +942,7 @@ UNION ALL
             //表索引
             _temp_get_tabindex = @"SELECT distinct TABLE_NAME as ""TableName"" , INDEX_NAME as ""IndexName"", 
         case when UNIQUENESS='UNIQUE' AND  CONSTRAINT_INDEX ='YES' then 'Key_Index' ELSE 'Index' end as ""IndexType"" 
-, '' as ""Disabled""   FROM user_indexes WHERE ""TABLE_NAME"" = '[$TabName$]' ";
+, '' as ""Disabled""   FROM user_indexes WHERE upper(""TABLE_NAME"") = upper('[$TabName$]') ";
 
 
             //表索引明细
@@ -953,7 +953,7 @@ select 1 as ""TableId"",  idx.TABLE_NAME as ""TableName"", 1 as IndexId , idx.IN
                               , case when UNIQUENESS = 'UNIQUE' AND CONSTRAINT_INDEX = 'YES' then 'Y' ELSE 'N' end as  ""IsPrimary"" ,'' as ""IsIncludedColumn""
                                      , case when UNIQUENESS = 'UNIQUE' then 'Y' ELSE '' end as ""IsUnique""   , '' AS ""Ignore_dup_key""  , '' as ""Disabled""  , '' AS ""Fill_factor""  , '' AS ""Padded""
                                      from user_indexes idx join user_ind_columns idxc on idx.index_name = idxc.index_name
-where idx.TABLE_NAME = '[$TabName$]' and idxc.INDEX_NAME = '[$IndexName$]' ";
+where upper(idx.TABLE_NAME) = upper('[$TabName$]') and idxc.INDEX_NAME = '[$IndexName$]' ";
 
 
             //创建索引

@@ -40,6 +40,9 @@ namespace HiSql
 
         private string _user = "Hone";
 
+        private StringCase stringCase = StringCase.Default;
+
+
         /// <summary>
         /// 仅包含的表走从库 如果排除表也配置了那么优先包含表
         /// </summary>
@@ -79,36 +82,46 @@ namespace HiSql
         public string ConnectionString { get; set; }
 
         //数据忽略大小写
-        public bool IgnoreCase { 
-            get {
+        //public bool IgnoreCase { 
+        //    get {
                 
-                return _ignorecase; 
+        //        return _ignorecase; 
             
-            }
-            set {
+        //    }
+        //    set {
                 
-                _ignorecase = value; 
-            } 
+        //        _ignorecase = value; 
+        //    } 
         
+        //}
+
+        /// <summary>
+        /// 数据库字符串大小写控制
+        /// </summary>
+        public StringCase StringCase
+        {
+            get { return stringCase; }
+            set { stringCase = value; }
         }
+
         /// <summary>
         /// 是否转成大写
         /// </summary>
-        public bool UpperCase
-        {
-            get {
+        //public bool UpperCase
+        //{
+        //    get {
 
-                //这两种库本身是区分大小写的 忽略大小写对转成大写
-                if (DbType.IsIn<DBType>(DBType.Hana, DBType.Oracle,DBType.DaMeng) && _ignorecase && !_iscustomupper)
-                {
-                    _uppercase = true;
-                }
-                return _uppercase;
-            }
-            set {
-                _iscustomupper = true;
-                _uppercase = value; }
-        }
+        //        //这两种库本身是区分大小写的 忽略大小写对转成大写
+        //        if (DbType.IsIn<DBType>(DBType.Hana, DBType.Oracle,DBType.DaMeng) && _ignorecase && !_iscustomupper)
+        //        {
+        //            _uppercase = true;
+        //        }
+        //        return _uppercase;
+        //    }
+        //    set {
+        //        _iscustomupper = true;
+        //        _uppercase = value; }
+        //}
 
         /// <summary>
         /// 数据库所在的服务器 格式 host:databasename  如 local:hisqldb

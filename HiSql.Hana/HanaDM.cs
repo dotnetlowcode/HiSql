@@ -836,6 +836,7 @@ namespace HiSql
             if ((!istrunctate && !isdrop && dic_value.Count > 0) || !string.IsNullOrEmpty(_where))
             {
                 _temp_delete = dbConfig.Delete_Statement_Where;
+                string _astabname = string.Empty;
                 if (dic_value.Count > 0)
                 {
                     foreach (string n in dic_value.Keys)
@@ -848,11 +849,13 @@ namespace HiSql
                 }
                 else
                 {
+                    _astabname = $" as {dbConfig.Table_Pre}{table.TabName.ToLower()}{dbConfig.Table_After}";
                     sb_field.Append(_where);
                 }
                 _temp_delete = _temp_delete
                     .Replace("[$Schema$]", _schema)
                     .Replace("[$TabName$]", table.TabName)
+                    .Replace("[$AsTabName$]", _astabname)
                     .Replace("[$Where$]", sb_field.ToString());
                 ;
             }
@@ -952,6 +955,7 @@ namespace HiSql
             _temp_sql = _temp_sql
                 .Replace("[$Schema$]", _schema)
                 .Replace("[$TabName$]", table.TabName)
+                .Replace("[$AsTabName$]", $" as {dbConfig.Table_Pre}{table.TabName.ToLower()}{dbConfig.Table_After}")
                 .Replace("[$Fields$]", sb_field.ToString())
                 .Replace("[$Where$]", sb_primary.ToString())
                 ;
@@ -1033,6 +1037,7 @@ namespace HiSql
             _temp_sql = _temp_sql
                 .Replace("[$Schema$]", _schema)
                 .Replace("[$TabName$]", table.TabName)
+                .Replace("[$AsTabName$]", $" as {dbConfig.Table_Pre}{table.TabName.ToLower()}{dbConfig.Table_After}")
                 .Replace("[$Fields$]", sb_field.ToString())
                 .Replace("[$Where$]", sb_primary.ToString())
                 ;
@@ -1079,25 +1084,25 @@ namespace HiSql
             string _changesql = string.Empty;
             if (tabFieldAction == TabFieldAction.ADD)
             {
-                _changesql = dbConfig.Add_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$TempColumn$]", _fieldsql);
+                _changesql = dbConfig.Add_Column.Replace("[$TabName$]", $"{dbConfig.Table_Pre}{hiTable.TabName}{dbConfig.Table_After}").Replace("[$TempColumn$]", _fieldsql);
                 return " EXEC  '" + _changesql.Replace("'", "''") + "';";
             }
 
             else if (tabFieldAction == TabFieldAction.DELETE)
             {
-                _changesql = dbConfig.Del_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$FieldName$]", hiColumn.FieldName).Replace("[$Schema$]", string.IsNullOrEmpty(hiTable.Schema) ? this.Context.CurrentConnectionConfig.Schema : hiTable.Schema);
+                _changesql = dbConfig.Del_Column.Replace("[$TabName$]", $"{dbConfig.Table_Pre}{hiTable.TabName}{dbConfig.Table_After}").Replace("[$FieldName$]", $"{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}").Replace("[$Schema$]", string.IsNullOrEmpty(hiTable.Schema) ? this.Context.CurrentConnectionConfig.Schema : hiTable.Schema);
 
                 return " EXEC  '" + _changesql.Replace("'", "''") + "';";
             }
             else if (tabFieldAction == TabFieldAction.MODI)
             {
 
-                return " EXEC  '" + dbConfig.Modi_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$TempColumn$]", _fieldsql).Replace("'", "''") + "';";
+                return " EXEC  '" + dbConfig.Modi_Column.Replace("[$TabName$]", $"{dbConfig.Table_Pre}{hiTable.TabName}{dbConfig.Table_After}").Replace("[$TempColumn$]", _fieldsql).Replace("'", "''") + "';";
 
             }
             else if (tabFieldAction == TabFieldAction.RENAME)
             {
-                _changesql = dbConfig.Re_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$ReFieldName$]", hiColumn.ReFieldName).Replace("[$FieldName$]", hiColumn.FieldName);
+                _changesql = dbConfig.Re_Column.Replace("[$TabName$]", $"{dbConfig.Table_Pre}{hiTable.TabName}{dbConfig.Table_After}").Replace("[$ReFieldName$]", $"{dbConfig.Field_Pre}{hiColumn.ReFieldName}{dbConfig.Field_After}").Replace("[$FieldName$]", $"{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}");
 
                 hiColumn.FieldName = hiColumn.ReFieldName;
                 var _changesqlUpdate = BuildChangeFieldStatement(hiTable, hiColumn, TabFieldAction.MODI);
@@ -1289,7 +1294,7 @@ namespace HiSql
 
             string v = this.Context.DBO.ExecCommand(_sql).ToString();
             int _effect = Convert.ToInt32(v);
-            _effect = _effect > 1 ? 1 : _effect;
+            _effect = _effect > 1 ? 1 : 1;
             return _effect;
         }
         /// <summary>
@@ -3151,7 +3156,7 @@ namespace HiSql
 
                 sb.Append("end;");
 
-                return sb.ToString().ToUpper();
+                return sb.ToString();
 
             }
             else
@@ -3276,7 +3281,7 @@ namespace HiSql
                         if (!dt.AsEnumerable().Any(t => t.Field<string>("FieldName").ToLower() == hiColumn.FieldName.ToLower()))
                             throw new Exception($"为表[{tabname}]创建的索引指的字段[{hiColumn.FieldName}]不存在于表[{tabname}]中");
 
-                        string _tempkey = dbConfig.Table_Key2.Replace("[$FieldName$]", hiColumn.FieldName);
+                        string _tempkey = dbConfig.Table_Key2.Replace("[$FieldName$]", $"{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}");
                         if (i < hiColumns.Count - 1)
                             keys.AppendLine($"{_tempkey}{dbConfig.Field_Split}");
                         else

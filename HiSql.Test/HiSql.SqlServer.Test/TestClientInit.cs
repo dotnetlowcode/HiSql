@@ -213,15 +213,15 @@ namespace HiSql.Unit.Test
                      {
                          DbType = DBType.Oracle,
                          DbServer = "local-HoneBI",
-                         ConnectionString = "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.10.172)(PORT=1524))(CONNECT_DATA=(SERVICE_NAME=ORCLPDB1)));User Id=system;Password=system",
+                         //ConnectionString = "server=192.168.1.90,8433;uid=sa;pwd=Hone@123;database=HoneBI",
+                         ConnectionString = "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.10.172)(PORT=1524))(CONNECT_DATA=(SERVICE_NAME=ORCLPDB1)));User Id=system;Password=system",//; MultipleActiveResultSets = true;
+                         //ConnectionString = "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=orcl)));User Id=SYSTEM;Password=root",//; MultipleActiveResultSets = true;
                          Schema = "SYSTEM",
-                         //Schema = "SYSTEM",
-                         //ConnectionString = "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.10.172)(PORT=1524))(CONNECT_DATA=(SERVICE_NAME=ORCLPDB1)));User Id=SYSTEM;Password=SYSTEM",//; MultipleActiveResultSets = true;
+                         //ConnectionString = "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.10.172)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=helowinXDB)));User Id=test;Password=test",//; MultipleActiveResultSets = true;
                          //Schema = "test",
                          IsEncrypt = true,
                          IsAutoClose = false,
                          SqlExecTimeOut = 60000,
-                         IgnoreCase = true,
                          AppEvents = new AopEvent()
                          {
                              OnDbDecryptEvent = (connstr) =>
@@ -278,9 +278,9 @@ namespace HiSql.Unit.Test
                          DbType = DBType.MySql,
                          DbServer = "local-HoneBI",
                          //ConnectionString = "server=192.168.1.90,8433;uid=sa;pwd=Hone@123;database=HoneBI",
-                         // ConnectionString = "data source=127.0.0.1,3306;database=hone;user id=root;password=Hone@123;pooling=false;charset=utf8;AllowLoadLocalInfile=true",//; MultipleActiveResultSets = true;
-                         //ConnectionString = "data source=192.168.10.172;database=hone;user id=root;password=hone@123;charset=utf8",//; MultipleActiveResultSets = true;
-                         ConnectionString = "data source=192.168.10.172;Port=8029;database=hone;user id=root;password=hone@123;charset=utf8",//; MultipleActiveResultSets = true;
+                         ConnectionString = "data source=127.0.0.1,3306;database=hone;user id=root;password=Hone@123;pooling=false;charset=utf8;AllowLoadLocalInfile=true",//; MultipleActiveResultSets = true;
+                                                                                                                                                                           //ConnectionString = "data source=192.168.10.172;database=hone;user id=root;password=hone@123;charset=utf8",//; MultipleActiveResultSets = true;
+                                                                                                                                                                           // ConnectionString = "data source=192.168.10.172;Port=8029;database=hone;user id=root;password=hone@123;charset=utf8",//; MultipleActiveResultSets = true;
                                                                                                                                                                            //ConnectionString = "data source=192.168.10.172;Port=8000;database=hone;user id=root;password=hone@123;charset=utf8",
                                                                                                                                                                            //ConnectionString = "data source=127.0.0.1;Port=5706;database=hone;user id=root;password=hone@123;charset=utf8",
 
@@ -340,14 +340,14 @@ namespace HiSql.Unit.Test
         public static HiSqlClient GetHanaClient()
         {
 
-            string dbstr = "DRIVER=HDBODBC;UID=SAPHANADB;PWD=Hone@crd@2019;SERVERNODE =192.168.10.243:31013;DATABASENAME =QAS";
+            string dbstr = "DRIVER=HDBODBC;UID=BIUSER;PWD=Hone@2022;SERVERNODE =192.168.10.243:31013;DATABASENAME =QAS";
             HiSqlClient sqlclient = new HiSqlClient(
                      new ConnectionConfig()
                      {
                          DbType = DBType.Hana,
                          DbServer = "local-HoneBI",
                          ConnectionString = dbstr,//; MultipleActiveResultSets = true;
-                         Schema = "SAPHANADB",
+                         Schema = "BIUSER",
                          IsEncrypt = true,
                          IsAutoClose = false,
                          SqlExecTimeOut = 60000,
@@ -412,6 +412,7 @@ namespace HiSql.Unit.Test
                          Schema = "SYSDBA",
                          IsEncrypt = true,
                          IsAutoClose = false,
+                       
                          SqlExecTimeOut = 60000,
                          AppEvents = new AopEvent()
                          {

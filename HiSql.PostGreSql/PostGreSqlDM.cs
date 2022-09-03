@@ -1033,6 +1033,7 @@ namespace HiSql
             _temp_sql = _temp_sql
                 .Replace("[$Schema$]", _schema)
                 .Replace("[$TabName$]", table.TabName)
+                .Replace("[$AsTabName$]", $" as {dbConfig.Table_Pre}{table.TabName.ToLower()}{dbConfig.Table_After}")
                 .Replace("[$Fields$]", sb_field.ToString())
                 .Replace("[$Where$]", sb_primary.ToString())
                 ;
