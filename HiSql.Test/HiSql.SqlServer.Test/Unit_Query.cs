@@ -76,7 +76,7 @@ namespace HiSql.Unit.Test
         void QueryGroups(HiSqlClient sqlClient)
         {
             //初始化
-            //initDemoDynTable(sqlClient, "Hi_TestQuery");
+            initDemoDynTable(sqlClient, "Hi_TestQuery");
             //query(sqlClient);
 
            //queryIn(sqlClient);
@@ -195,7 +195,28 @@ namespace HiSql.Unit.Test
             _outputHelper.WriteLine(query.ToSql()); successCount++;
             successActCount += query.ToTable().Rows.Count == 18? 1 : 0;
 
+            if (sqlClient.CurrentConnectionConfig.DbType != DBType.Sqlite)
+            {
+                query = sqlClient.Query("Hi_FieldModel").As("A").Field("*")
+                 .Join("Hi_TabModel", JoinType.Right).As("B").On(@"A.TabName=B.TabName  AND B.TabName = 'Hi_TestQuery'  AND A.FieldName = 'CreateTime'")
+                 .Where("A.TabName='Hi_TestQuery'");
+                _outputHelper.WriteLine(query.ToSql()); successCount++;
+                successActCount += query.ToTable().Rows.Count == 1 ? 1 : 0;
+
+            }
+
+
+            query = sqlClient.Query("Hi_FieldModel").As("A").Field("*")
+           .Join("Hi_TabModel", JoinType.Inner ).As("B").On(@"A.TabName=B.TabName  AND B.TabName = 'Hi_TestQuery'  AND A.FieldName = 'CreateTime' and A.TabName='Hi_TestQuery'")
+           .Where("A.TabName='Hi_TestQuery'");
+            _outputHelper.WriteLine(query.ToSql()); successCount++;
+            successActCount += query.ToTable().Rows.Count == 1 ? 1 : 0;
+
             Assert.Equal(successActCount, successCount);
+
+            /*
+            
+             */
         }
 
         void query(HiSqlClient sqlClient)
@@ -256,7 +277,7 @@ namespace HiSql.Unit.Test
 
             TabInfo tabInfo = sqlClient.DbFirst.GetTabStruct(tabname1);
 
-            List<object> lstdata = TestTable.DynTable.BuildTabDataList(tabname1, 5000);
+            List<object> lstdata = TestTable.DynTable.BuildTabDataList(tabname1, 5);
 
 
             int v = sqlClient.Insert(tabname1, lstdata).ExecCommand();

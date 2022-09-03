@@ -28,17 +28,20 @@ namespace HiSql
                 var table = Context.DBO.GetDataTable(dbConfig.GetVersion);
                 if (table.Rows.Count > 0)
                 {
-                    var id_code = table.Rows[0]["id_code"]?.ToString();
+                    //var id_code = table.Rows[0]["id_code"]?.ToString();
                     var Desc = table.Rows[0]["BANNER"]?.ToString();
                     string versionStr = "";
                     Match match = Regex.Match(Desc, @"V(?<ver>\d)", RegexOptions.ECMAScript);
                     if (match.Success)
                     {
-                        versionStr = match.Groups["ver"].Value + "." + (id_code.Substring(0, id_code.IndexOf("."))).Replace("-", ".");
+                        //versionStr = match.Groups["ver"].Value + "." + (id_code.Substring(0, id_code.IndexOf("."))).Replace("-", ".");
                     }
                     match = Regex.Match(Desc, @"V(?<ver>\d)", RegexOptions.ECMAScript);
-
-                    _version.VersionDesc = table.Rows[0]["BANNER"]?.ToString();
+                    if (versionStr == "")
+                    {
+                        versionStr = match.Groups[1].Value+".0.0";
+                    }
+                _version.VersionDesc = table.Rows[0]["BANNER"]?.ToString();
                     _version.Version = new Version(String.Join(".", versionStr.Split('.').Take(3).ToArray()));
                 }
                 return _version;
