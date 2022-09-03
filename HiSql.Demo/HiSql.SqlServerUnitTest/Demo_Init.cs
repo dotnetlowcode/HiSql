@@ -18,8 +18,9 @@ namespace HiSql.UnitTest
                      {
                          DbType = DBType.SqlServer,
                          DbServer = "local-HoneBI",
-                         ConnectionString = "server=(local);uid=sa;pwd=Hone@123;database=Hone;Encrypt=True; TrustServerCertificate=True;",//; MultipleActiveResultSets = true;
-                         User = "tansar",//可以指定登陆用户的帐号
+                         //ConnectionString = "server=(local);uid=sa;pwd=Hone@123;database=Hone;Encrypt=True; TrustServerCertificate=True;",//; MultipleActiveResultSets = true;
+                         //User = "tansar",//可以指定登陆用户的帐号
+                         ConnectionString = "server=192.168.10.172;uid=sa;pwd=Hone@123456;database=HiSql;Encrypt=True; TrustServerCertificate=True;",//; MultipleActiveResultSets = true;
                          SlaveConnectionConfigs = new List<SlaveConnectionConfig> {
                              { new SlaveConnectionConfig{ ConnectionString=" server=(local);uid=sa;pwd=Hone@123;database=Hone;Encrypt=True; TrustServerCertificate=True;" , Weight=3} },
                              //{ new SlaveConnectionConfig{ ConnectionString=" server=(local);uid=sa;pwd=Hone@123;database=HiSql; " , Weight=3} },
@@ -63,7 +64,7 @@ namespace HiSql.UnitTest
                      );
 
 
-            //sqlclient.CodeFirst.InstallHisql();
+            sqlclient.CodeFirst.InstallHisql();
 
             Console.WriteLine($" 版本号：{sqlclient.Context.DMTab.DBVersion().Version}  版本描述：{sqlclient.Context.DMTab.DBVersion().VersionDesc}");
             return sqlclient;

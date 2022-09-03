@@ -16,7 +16,7 @@ namespace HiSql.DaMengUnitTest
                          DbType = DBType.DaMeng,
                          DbServer = "local-HoneBI",
                          //ConnectionString = "server=192.168.1.90,8433;uid=sa;pwd=Hone@123;database=HoneBI",
-                         ConnectionString = "Server=127.0.0.1; UserId=SYSDBA; PWD=SYSDBA",//; MultipleActiveResultSets = true;
+                         ConnectionString = "Server=192.168.10.172; UserId=SYSDBA; PWD=SYSDBA",//; MultipleActiveResultSets = true;
                          Schema = "SYSDBA",
                          IsEncrypt = true,
                          IsAutoClose = false,

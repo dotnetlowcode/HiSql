@@ -75,19 +75,129 @@ namespace HiSql.Unit.Test
         #region
         void QueryGroups(HiSqlClient sqlClient)
         {
-            query(sqlClient);
+            //初始化
+            //initDemoDynTable(sqlClient, "Hi_TestQuery");
+            //query(sqlClient);
 
-            queryIn(sqlClient);
-
+           //queryIn(sqlClient);
+           
+            queryJoin(sqlClient);
+            //queryGroupBy(sqlClient); 有问题
         }
 
 
         void queryIn(HiSqlClient sqlClient)
         {
-            string sql = sqlClient.HiSql($"select * from Hi_FieldModel  where tabname in ( 'Hi_FieldModel'， 'Hi_FieldModel2')  order by tabname asc")
-                .Take(2).Skip(2)
-                .ToSql();
+            int successCount = 0;
+            int successActCount = 0;
+
+            var query = sqlClient.HiSql(@$"select * from Hi_FieldModel  where tabname in ( 'Hi_FieldModel', 'Hi_TestQuery')  
+                    and FieldType in (11,41,21) AND FieldName IN( SELECT FieldName from Hi_FieldModel WHERE FieldName='CreateTime')");
+            successCount++;
+            _outputHelper.WriteLine(query.ToSql());
+            successActCount += query.ToTable().Rows.Count == 2?1:0;
+
+            query = sqlClient.HiSql($"select * from Hi_FieldModel  where tabname in ( @TabName)   and FieldType in (@FieldType)  "
+            , new { TabName = new List<string> { "Hi_FieldModel", "Hi_TestQuery" }, FieldType = new List<int> { 11, 41, 21 } });
+            _outputHelper.WriteLine(query.ToSql());
+            successCount++;
+            successActCount += query.ToTable().Rows.Count == 29 ? 1 : 0;
+
+            //错误写法
+            //query = sqlClient.HiSql($"select * from Hi_FieldModel  where tabname in (@TanName)  "
+            //   , new HiParameter("TabName", new List<string> { "Hi_FieldModel", "Hi_TestQuery" })
+            //   );
+            //_outputHelper.WriteLine(query.ToSql());
+            //resultCnt += query.ToTable().Rows.Count == 53 ? 1 : 0;
+
+            query = sqlClient.Query("Hi_FieldModel").Field("*").Where(@$"tabname in ( 'Hi_FieldModel', 'Hi_TestQuery')  
+                    and FieldType in (11, 41, 21) AND FieldName IN(SELECT FieldName from Hi_FieldModel WHERE FieldName = 'CreateTime')  ");
+            _outputHelper.WriteLine(query.ToSql());
+            successCount++;
+            successActCount += query.ToTable().Rows.Count == 2 ? 1 : 0;
+
+            
+            query = sqlClient.Query("Hi_FieldModel").Field("*").Where(new Filter() { { "tabname", OperType.IN, new List<string> { "Hi_FieldModel", "Hi_TestQuery" } },
+            { "FieldType", OperType.IN, new List<int> { 11, 41, 21 } }
+            });
+            successCount++;
+            _outputHelper.WriteLine(query.ToSql());
+            successActCount += query.ToTable().Rows.Count == 29  ? 1 : 0;
+
+
+            query = sqlClient.Query("Hi_FieldModel").Field(@"TabName, FieldName, FieldDesc, IsIdentity, IsPrimary, IsBllKey , FieldType , SortNum, Regex, DBDefault, DefaultValue, FieldLen , FieldDec , SNO, SNO_NUM, IsSys, IsNull, IsRequire, IsIgnore".Split(",")).Where(new Filter() { { "tabname", OperType.IN, new List<string> { "Hi_FieldModel", "Hi_TestQuery" } },
+            { "FieldType", OperType.IN, new List<int> { 11, 41, 21 } }
+            });
+            successCount++;
+            _outputHelper.WriteLine(query.ToSql());
+            successActCount += query.ToTable().Rows.Count == 29 ? 1 : 0;
+
+            Assert.Equal(successActCount, successCount);
+            /*
+                DM Hi_FieldModel 值大小写问题
+             */
         }
+        void queryGroupBy(HiSqlClient sqlClient)
+        {
+            int successCount = 0;
+            int successActCount = 0;
+
+            var query = sqlClient.Query("Hi_FieldModel").As("A").Field("A.FieldName as FieldName", "count(*) as _COUNT")
+                .Join("Hi_TabModel").As("B").On(new HiSql.JoinOn() { { "A.TabName", "B.TabName" } })
+                .Where("A.TabName='Hi_TestQuery'")
+                .Group(new GroupBy { { "A.FieldName" } })
+                //.Having("_COUNT >= 0")
+                .Having("count(*)>=0")
+                //.Having(new Having() { { "count(*)", OperType.GE, "0" } } )
+                .Sort("A.TabName asc", "A.FieldName asc");
+
+            _outputHelper.WriteLine(query.ToSql()); successCount++;
+            successActCount += query.ToTable().Rows.Count == 3 ? 1 : 0;
+            var cnt = query.ToTable().Rows.Count;
+
+            Assert.Equal(successActCount, successCount);
+        }
+
+        void queryJoin(HiSqlClient sqlClient)
+        {
+            int successCount = 0;
+            int successActCount = 0;
+            var query = sqlClient.Query("Hi_FieldModel").As("A").Field("*")
+                .Join("Hi_TabModel").As("B").On(new HiSql.JoinOn() { { "A.TabName", "B.TabName" } })
+                .Where("A.TabName='Hi_TestQuery'");
+            _outputHelper.WriteLine(query.ToSql()); successCount++;
+            successActCount += query.ToTable().Rows.Count == 18 ? 1 : 0;
+
+            // { "A.FieldName", "'CreateTime'" }, { "B.TabName", "Hi_TestQuery" }  不支持  
+            query = sqlClient.Query("Hi_FieldModel").As("A").Field("*")
+                .Join("Hi_TabModel").As("B").On(new HiSql.JoinOn() { { "A.TabName", "B.TabName" } })
+                .Where("A.TabName='Hi_TestQuery'");
+            _outputHelper.WriteLine(query.ToSql()); successCount++;
+            successActCount += query.ToTable().Rows.Count == 18 ? 1 : 0;
+
+
+            query = sqlClient.Query("Hi_FieldModel").As("A").Field("*")
+               .Join("Hi_TabModel").As("B").On("A.TabName", "B.TabName")
+               .Where("A.TabName='Hi_TestQuery'");
+            _outputHelper.WriteLine(query.ToSql()); successCount++;
+            successActCount += query.ToTable().Rows.Count == 18 ? 1 : 0;
+
+            query = sqlClient.Query("Hi_FieldModel").As("A").Field("*")
+              .Join("Hi_TabModel").As("B").On(@"A.TabName=B.TabName  AND B.TabName = 'Hi_TestQuery'  AND A.FieldName = 'CreateTime'")
+              .Where("A.TabName='Hi_TestQuery'");
+            _outputHelper.WriteLine(query.ToSql()); successCount++;
+            successActCount += query.ToTable().Rows.Count == 1 ? 1 : 0;
+
+
+            query = sqlClient.Query("Hi_FieldModel").As("A").Field("*")
+              .Join("Hi_TabModel", JoinType.Left).As("B").On(@"A.TabName=B.TabName  AND B.TabName = 'Hi_TestQuery'  AND A.FieldName = 'CreateTime'")
+              .Where("A.TabName='Hi_TestQuery'");
+            _outputHelper.WriteLine(query.ToSql()); successCount++;
+            successActCount += query.ToTable().Rows.Count == 18? 1 : 0;
+
+            Assert.Equal(successActCount, successCount);
+        }
+
         void query(HiSqlClient sqlClient)
         {
             DataTable table = sqlClient.Query("Hi_FieldModel").Field("*").Take(10).Skip(1).ToTable();
@@ -123,7 +233,36 @@ namespace HiSql.Unit.Test
 
             Assert.True(tabletolistIsOk && datareader2listIsOk&& listTOtableIsOk);
         }
+        void initDemoDynTable(HiSqlClient sqlClient, string tabname1)
+        {
+            sqlClient.CurrentConnectionConfig.AppEvents = HisqlTestExt.GetAopEvent(_outputHelper);
 
+            _outputHelper.WriteLine($"检测表[{tabname1}] 是否在当前库中存在");
+            if (sqlClient.DbFirst.CheckTabExists(tabname1))
+            {
+                TabInfo tabInfo2 = sqlClient.DbFirst.GetTabStruct(tabname1);
+                _outputHelper.WriteLine($"表[{tabname1}] 存在正在执行删除并清除表结构信息");
+                sqlClient.DbFirst.DropTable(tabname1);
+                _outputHelper.WriteLine($"表[{tabname1}] 已经删除");
+            }
+
+
+            bool iscreate = sqlClient.DbFirst.CreateTable(Test.TestTable.DynTable.BuildTabInfo(tabname1, true));
+            if (iscreate)
+                _outputHelper.WriteLine($"表[{tabname1}] 已经成功创建");
+            else
+                _outputHelper.WriteLine($"表[{tabname1}] 创建失败");
+
+
+            TabInfo tabInfo = sqlClient.DbFirst.GetTabStruct(tabname1);
+
+            List<object> lstdata = TestTable.DynTable.BuildTabDataList(tabname1, 5000);
+
+
+            int v = sqlClient.Insert(tabname1, lstdata).ExecCommand();
+
+
+        }
         #endregion
     }
 }

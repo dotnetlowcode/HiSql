@@ -153,7 +153,7 @@ namespace HiSql.Unit.Test
                          DbType = DBType.PostGreSql,
                          DbServer = "local-HoneBI",
                          //ConnectionString = "server=192.168.1.90,8433;uid=sa;pwd=Hone@123;database=HoneBI",
-                         ConnectionString = "PORT=5432;DATABASE=postgres;HOST=localhost;PASSWORD=Hone@123;USER ID=postgres",//; MultipleActiveResultSets = true;
+                         ConnectionString = "PORT=5432;DATABASE=postgres;HOST=192.168.10.175;PASSWORD=postgres;USER ID=postgres",//; MultipleActiveResultSets = true;
                          Schema = "public",
                          IsEncrypt = true,
                          IsAutoClose = false,
@@ -213,10 +213,10 @@ namespace HiSql.Unit.Test
                      {
                          DbType = DBType.Oracle,
                          DbServer = "local-HoneBI",
-                         //ConnectionString = "server=192.168.1.90,8433;uid=sa;pwd=Hone@123;database=HoneBI",
-                         ConnectionString = "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=orcl)));User Id=SYSTEM;Password=root",//; MultipleActiveResultSets = true;
+                         ConnectionString = "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.10.172)(PORT=1524))(CONNECT_DATA=(SERVICE_NAME=ORCLPDB1)));User Id=system;Password=system",
                          Schema = "SYSTEM",
-                         //ConnectionString = "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.10.172)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=helowinXDB)));User Id=test;Password=test",//; MultipleActiveResultSets = true;
+                         //Schema = "SYSTEM",
+                         //ConnectionString = "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.10.172)(PORT=1524))(CONNECT_DATA=(SERVICE_NAME=ORCLPDB1)));User Id=SYSTEM;Password=SYSTEM",//; MultipleActiveResultSets = true;
                          //Schema = "test",
                          IsEncrypt = true,
                          IsAutoClose = false,
@@ -278,9 +278,9 @@ namespace HiSql.Unit.Test
                          DbType = DBType.MySql,
                          DbServer = "local-HoneBI",
                          //ConnectionString = "server=192.168.1.90,8433;uid=sa;pwd=Hone@123;database=HoneBI",
-                         ConnectionString = "data source=127.0.0.1,3306;database=hone;user id=root;password=Hone@123;pooling=false;charset=utf8;AllowLoadLocalInfile=true",//; MultipleActiveResultSets = true;
-                                                                                                                                                                           //ConnectionString = "data source=192.168.10.172;database=hone;user id=root;password=hone@123;charset=utf8",//; MultipleActiveResultSets = true;
-                                                                                                                                                                           // ConnectionString = "data source=192.168.10.172;Port=8029;database=hone;user id=root;password=hone@123;charset=utf8",//; MultipleActiveResultSets = true;
+                         // ConnectionString = "data source=127.0.0.1,3306;database=hone;user id=root;password=Hone@123;pooling=false;charset=utf8;AllowLoadLocalInfile=true",//; MultipleActiveResultSets = true;
+                         //ConnectionString = "data source=192.168.10.172;database=hone;user id=root;password=hone@123;charset=utf8",//; MultipleActiveResultSets = true;
+                         ConnectionString = "data source=192.168.10.172;Port=8029;database=hone;user id=root;password=hone@123;charset=utf8",//; MultipleActiveResultSets = true;
                                                                                                                                                                            //ConnectionString = "data source=192.168.10.172;Port=8000;database=hone;user id=root;password=hone@123;charset=utf8",
                                                                                                                                                                            //ConnectionString = "data source=127.0.0.1;Port=5706;database=hone;user id=root;password=hone@123;charset=utf8",
 
