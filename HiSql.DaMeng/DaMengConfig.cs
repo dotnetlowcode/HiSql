@@ -554,8 +554,8 @@ namespace HiSql
                 .ToString();
 
 
-            _temp_delete_tabmodel = $"   execute immediate 'delete from {Constants.HiSysTable["Hi_TabModel"].ToString()} where lower(TabName)=lower(''[$TabName$]'')';";
-            _temp_delete_fieldmodel = $"   execute immediate 'delete from {Constants.HiSysTable["Hi_FieldModel"].ToString()} where lower(TabName)=lower(''[$TabName$]'')';";
+            _temp_delete_tabmodel = $"   execute immediate 'delete from {Constants.HiSysTable["Hi_TabModel"].ToString()} where lower({_temp_field_pre}TabName{_temp_field_after})=lower(''[$TabName$]'')';";
+            _temp_delete_fieldmodel = $"   execute immediate 'delete from {Constants.HiSysTable["Hi_FieldModel"].ToString()} where lower({_temp_field_pre}TabName{_temp_field_after})=lower(''[$TabName$]'')';";
 
 
             _temp_delete_tabstruct = new StringBuilder()
@@ -568,10 +568,10 @@ namespace HiSql
                 .AppendLine($"  v_number2 integer;")
                 .AppendLine("   v_secout integer;")
                 .AppendLine($"begin")
-                .AppendLine($"   select count(*)  into v_number  from SYS.ALL_tables  where  table_name='[$TabName$]';")
-                .AppendLine($"   select count(*)  into v_number2  from SYS.all_views  where  view_name='[$TabName$]';")
+                .AppendLine($"   select count(*)  into v_number  from SYS.ALL_tables  where  lower(table_name)=lower('[$TabName$]');")
+                .AppendLine($"   select count(*)  into v_number2  from SYS.all_views  where  lower(view_name)=lower('[$TabName$]');")
                 .AppendLine($"   IF v_number = 0  and v_number2=0 then")
-                .AppendLine($"      execute immediate  'create table [$TabName$]('")
+                .AppendLine($"      execute immediate  'create table {_temp_table_pre}[$TabName$]{_temp_table_after}('")
                 .AppendLine("           [$Fields$]")
                 .AppendLine($"      || ') ';")
                 .AppendLine($"      [$Sequence$]")
@@ -604,11 +604,11 @@ namespace HiSql
                 .AppendLine($"  v_number integer;")
                 .AppendLine("   v_secout integer;")
                 .AppendLine($"begin")
-                .AppendLine($"   select count(*)  into v_number  from SYS.ALL_tables  where  table_name='[$TabName$]' AND TEMPORARY='Y';")
+                .AppendLine($"   select count(*)  into v_number  from SYS.ALL_tables  where  lower(table_name)=lower('[$TabName$]') AND TEMPORARY='Y';")
                 .AppendLine($"   IF v_number = 0 then")
 
                 .AppendLine($"      [$Sequence$]")
-                .AppendLine($"      execute immediate  'create  Global Temporary table [$TabName$]('")
+                .AppendLine($"      execute immediate  'create  Global Temporary table {_temp_table_pre}[$TabName$]{_temp_table_after}('")
                 .AppendLine("           [$Fields$]")
                 .AppendLine($"      || ') ';")
 
@@ -623,14 +623,14 @@ namespace HiSql
                 .AppendLine($"  v_number integer;")
                 .AppendLine("   v_secout integer;")
                 .AppendLine($"begin")
-                .AppendLine($"   select count(*)  into v_number  from SYS.ALL_tables  where table_name='[$TabName$]' AND TEMPORARY='Y';")
+                .AppendLine($"   select count(*)  into v_number  from SYS.ALL_tables  where lower(table_name)=lower('[$TabName$]') AND TEMPORARY='Y';")
                 .AppendLine($"   IF v_number > 0 then")
                 .AppendLine($"      execute immediate 'TRUNCATE TABLE [$TabName$] ';")
                 .AppendLine($"      execute immediate 'drop table [$TabName$] ';")
                 .AppendLine($"   end if;")
 
                 .AppendLine($"  [$Sequence$]")
-                .AppendLine($"  execute immediate  'create  Global Temporary table [$TabName$]('")
+                .AppendLine($"  execute immediate  'create  Global Temporary table {_temp_table_pre}[$TabName$]{_temp_table_after}('")
                 .AppendLine("       [$Fields$]")
                 .AppendLine($"  || ') ';")
 
@@ -646,11 +646,11 @@ namespace HiSql
                 .AppendLine($"  v_number integer;")
                 .AppendLine("   v_secout integer;")
                 .AppendLine($"begin")
-                .AppendLine($"   select count(*)  into v_number  from SYS.ALL_tables  where  table_name='[$TabName$]' AND TEMPORARY='Y';")
+                .AppendLine($"   select count(*)  into v_number  from SYS.ALL_tables  where  lower(table_name)=lower('[$TabName$]') AND TEMPORARY='Y';")
                 .AppendLine($"   IF v_number = 0 then")
 
                 .AppendLine($"      [$Sequence$]")
-                .AppendLine($"      execute immediate  'create  Global Temporary table [$TabName$]('")
+                .AppendLine($"      execute immediate  'create  Global Temporary table {_temp_table_pre}[$TabName$]{_temp_table_after}('")
                 .AppendLine("           [$Fields$]")
                 .AppendLine($"      || ')ON COMMIT PRESERVE ROWS ';")
 
@@ -665,14 +665,14 @@ namespace HiSql
                 .AppendLine($"  v_number integer;")
                 .AppendLine("   v_secout integer;")
                 .AppendLine($"begin")
-                .AppendLine($"   select count(*)  into v_number  from SYS.ALL_tables  where  table_name='[$TabName$]' AND TEMPORARY='Y';")
+                .AppendLine($"   select count(*)  into v_number  from SYS.ALL_tables  where  lower(table_name)=lower('[$TabName$]') AND TEMPORARY='Y';")
                 .AppendLine($"   IF v_number > 0 then")
                 .AppendLine($"      execute immediate 'TRUNCATE TABLE [$TabName$] ';")
                 .AppendLine($"      execute immediate 'drop table [$TabName$] ';")
                 .AppendLine($"   end if;")
 
                 .AppendLine($"  [$Sequence$]")
-                .AppendLine($"  execute immediate  'create  Global Temporary table [$TabName$]('")
+                .AppendLine($"  execute immediate  'create  Global Temporary table {_temp_table_pre}[$TabName$]{_temp_table_after}('")
                 .AppendLine("       [$Fields$]")
                 .AppendLine($"  || ')ON COMMIT PRESERVE ROWS ';")
 
@@ -809,7 +809,7 @@ UNION ALL
                 .AppendLine("	FROM ALL_TAB_COLS T1, ALL_COL_COMMENTS T2")
                 .AppendLine("	WHERE T1.TABLE_NAME = T2.TABLE_NAME")
                 .AppendLine("	    AND T1.COLUMN_NAME = T2.COLUMN_NAME")
-                .AppendLine("	    AND T1.TABLE_NAME =upper('[$TabName$]') AND T1.OWNER ='[$Schema$]' and T2.SCHEMA_NAME ='[$Schema$]' ")
+                .AppendLine("	    AND lower(T1.TABLE_NAME) =lower('[$TabName$]') AND T1.OWNER ='[$Schema$]' and T2.SCHEMA_NAME ='[$Schema$]' ")
                 .ToString();
 
 
@@ -916,7 +916,7 @@ UNION ALL
                 .AppendLine("union all")
                 .AppendLine(@"select VIEW_NAME as ""TabName"", 'View' AS ""TabType"",  '' as ""CreateTime"" from SYS.all_views  where OWNER ='[$Schema$]' ")
 
-              .AppendLine(") temp WHERE \"TabName\" = '[$TabName$]'")
+              .AppendLine(") temp WHERE lower(\"TabName\") = lower('[$TabName$]')")
               .AppendLine("ORDER BY \"TabName\" ASC, \"CreateTime\" desc ")
               .ToString();
 
@@ -940,7 +940,7 @@ SELECT distinct idx.TABLE_NAME as ""TableName"" , isnull(con.constraint_name, id
         case when con.constraint_type = 'P' then 'Key_Index' ELSE 'Index' end as ""IndexType""
 , '' as ""Disabled""   FROM ALL_INDEXES idx
         LEFT join ""SYS"".""ALL_CONSTRAINTS"" con on con.INDEX_NAME = idx.INDEX_NAME
- WHERE idx.""TABLE_NAME"" = '[$TabName$]' and idx.GENERATED = 'N'";
+ WHERE lower(idx.""TABLE_NAME"") = lower('[$TabName$]') and idx.GENERATED = 'N'";
 
 
             //表索引明细
@@ -955,7 +955,7 @@ SELECT distinct idx.TABLE_NAME as ""TableName"" , isnull(con.constraint_name, id
  from ""SYS"".""ALL_IND_COLUMNS"" idxc 
  	join ALL_INDEXES idx on idxc.INDEX_NAME = IDX.INDEX_NAME
  	LEFT join ""SYS"".""ALL_CONSTRAINTS"" con on con.INDEX_NAME = idx.INDEX_NAME 
-where idx.TABLE_NAME = '[$TabName$]' and idxc.INDEX_NAME = '[$IndexName$]' ";
+where lower(idx.TABLE_NAME) = lower('[$TabName$]') and idxc.INDEX_NAME = '[$IndexName$]' ";
 
 
             //创建索引

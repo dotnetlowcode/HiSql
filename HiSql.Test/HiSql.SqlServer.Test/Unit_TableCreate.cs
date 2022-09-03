@@ -123,11 +123,10 @@ namespace HiSql.Unit.Test
 
 
 
-            //_outputHelper.WriteLine($"正在Truncate 表[{tabname1}]");
-            //sqlClient.DbFirst.Truncate(tabname1);
-            //_outputHelper.WriteLine($"正在Truncate 表[{tabname2}]");
-            //sqlClient.DbFirst.Truncate(tabname2);
-
+            _outputHelper.WriteLine($"正在Truncate 表[{tabname1}]");
+            sqlClient.DbFirst.Truncate(tabname1);
+            _outputHelper.WriteLine($"正在Truncate 表[{tabname2}]");
+            sqlClient.DbFirst.Truncate(tabname2);
 
 
             //_outputHelper.WriteLine($"正在准备创建表[{tabname1}]");

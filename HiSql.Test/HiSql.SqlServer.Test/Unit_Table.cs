@@ -77,17 +77,20 @@ namespace HiSql.Unit.Test
 
         void tableGroups(HiSqlClient sqlClient)
         {
+
+            TabInfo tabinfo = sqlClient.DbFirst.GetTabStruct(Constants.HiSysTable["Hi_FieldModel"]);
+
             ////表重命名
-            //reTabName(sqlClient);
+            reTabName(sqlClient);
 
 
             ////索引创建 删除修改
-            //indexDemo(sqlClient);
+            indexDemo(sqlClient);
 
             ////动态创建表
-            //createDemoDynTable(sqlClient, "H_dyntab1");
+            createDemoDynTable(sqlClient, "H_dyntab1");
 
-            //reCol(sqlClient, "H_dyntab1");
+            reCol(sqlClient, "H_dyntab1");
 
             moditable(sqlClient, "H_dyntab1");
 
@@ -397,7 +400,6 @@ namespace HiSql.Unit.Test
             List<object> lstdata = TestTable.DynTable.BuildTabDataList(tabname1, 5000);
 
 
-            int v=sqlClient.Insert(tabname1,lstdata).ExecCommand();
 
 
         }

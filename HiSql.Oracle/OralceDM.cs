@@ -1034,17 +1034,17 @@ namespace HiSql
             {
                 _fieldsql = rtn.Item3;
             }
-            string _schema = string.IsNullOrEmpty(Context.CurrentConnectionConfig.Schema) ? "public" : Context.CurrentConnectionConfig.Schema;
+            string _schema = string.IsNullOrEmpty(Context.CurrentConnectionConfig.Schema) ? "SYSTEM" : Context.CurrentConnectionConfig.Schema;
 
             var _changesql = new StringBuilder();
             if (tabFieldAction == TabFieldAction.ADD)
             {
 
-                _changesql.AppendLine($"    execute immediate '{dbConfig.Add_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$TempColumn$]", _fieldsql).ToString().Replace("'", "''")}';");
+                _changesql.AppendLine($"    execute immediate '{dbConfig.Add_Column.Replace("[$TabName$]", $"{dbConfig.Table_Pre}{hiTable.TabName}{dbConfig.Table_After}").Replace("[$TempColumn$]", _fieldsql).ToString().Replace("'", "''")}';");
 
                 if (!hiColumn.FieldDesc.IsNullOrEmpty())
                 {
-                    _changesql.AppendLine($"    execute immediate '{dbConfig.Field_Comment.Replace("[$TabName$]", hiTable.TabName).Replace("[$Schema$]", _schema).Replace("[$FieldName$]", hiColumn.FieldName).Replace("[$FieldDesc$]", hiColumn.FieldDesc).ToString().Replace("'", "''")}';");
+                    _changesql.AppendLine($"    execute immediate '{dbConfig.Field_Comment.Replace("[$TabName$]", $"{dbConfig.Table_Pre}{hiTable.TabName}{dbConfig.Table_After}").Replace("[$Schema$]", _schema).Replace("[$FieldName$]", $"{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}").Replace("[$FieldDesc$]", hiColumn.FieldDesc).ToString().Replace("'", "''")}';");
                 }
                 if (hiColumn.IsPrimary)
                 {
@@ -1069,23 +1069,23 @@ namespace HiSql
 
             else if (tabFieldAction == TabFieldAction.DELETE)
             {
-                _changesql.AppendLine($"    execute immediate '{dbConfig.Del_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$FieldName$]", hiColumn.FieldName).ToString().Replace("'", "''")}';");
+                _changesql.AppendLine($"    execute immediate '{dbConfig.Del_Column.Replace("[$TabName$]", $"{dbConfig.Table_Pre}{hiTable.TabName}{dbConfig.Table_After}").Replace("[$FieldName$]", $"{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}").ToString().Replace("'", "''")}';");
 
             }
 
             else if (tabFieldAction == TabFieldAction.MODI)
             {
-                _changesql.AppendLine($"    execute immediate '{dbConfig.Modi_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$TempColumn$]", _fieldsql).ToString().Replace("'", "''")}';");
+                _changesql.AppendLine($"    execute immediate '{dbConfig.Modi_Column.Replace("[$TabName$]", $"{dbConfig.Table_Pre}{hiTable.TabName}{dbConfig.Table_After}").Replace("[$TempColumn$]", _fieldsql).ToString().Replace("'", "''")}';");
 
                 if (!hiColumn.FieldDesc.IsNullOrEmpty())
                 {
-                    _changesql.AppendLine($"    execute immediate '{dbConfig.Field_Comment.Replace("[$TabName$]", hiTable.TabName).Replace("[$Schema$]", _schema).Replace("[$FieldName$]", hiColumn.FieldName).Replace("[$FieldDesc$]", hiColumn.FieldDesc).ToString().Replace("'", "''")}';");
+                    _changesql.AppendLine($"    execute immediate '{dbConfig.Field_Comment.Replace("[$TabName$]", $"{dbConfig.Table_Pre}{hiTable.TabName}{dbConfig.Table_After}").Replace("[$Schema$]", _schema).Replace("[$FieldName$]", $"{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}").Replace("[$FieldDesc$]", hiColumn.FieldDesc).ToString().Replace("'", "''")}';");
                 }
             }
 
             else if (tabFieldAction == TabFieldAction.RENAME)
             {
-                _changesql.AppendLine($"    execute immediate '{dbConfig.Re_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$ReFieldName$]", hiColumn.ReFieldName).Replace("[$FieldName$]", hiColumn.FieldName).ToString().Replace("'", "''")}';");
+                _changesql.AppendLine($"    execute immediate '{dbConfig.Re_Column.Replace("[$TabName$]", $"{dbConfig.Table_Pre}{hiTable.TabName}{dbConfig.Table_After}").Replace("[$ReFieldName$]", $"{dbConfig.Field_Pre}{hiColumn.ReFieldName}{dbConfig.Field_After}").Replace("[$FieldName$]", $"{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}").ToString().Replace("'", "''")}';");
 
                 hiColumn.FieldName = hiColumn.ReFieldName;
                 _fieldsql = BuildFieldStatement(hiTable, hiColumn);
@@ -1094,11 +1094,11 @@ namespace HiSql
                 {
                     _fieldsql = rtn.Item3;
                 }
-                _changesql.AppendLine($"    execute immediate '{dbConfig.Modi_Column.Replace("[$TabName$]", hiTable.TabName).Replace("[$TempColumn$]", _fieldsql).ToString().Replace("'", "''")}';");
+                _changesql.AppendLine($"    execute immediate '{dbConfig.Modi_Column.Replace("[$TabName$]", $"{dbConfig.Table_Pre}{hiTable.TabName}{dbConfig.Table_After}").Replace("[$TempColumn$]", _fieldsql).ToString().Replace("'", "''")}';");
 
                 if (!hiColumn.FieldDesc.IsNullOrEmpty())
                 {
-                    _changesql.AppendLine($"    execute immediate '{dbConfig.Field_Comment.Replace("[$TabName$]", hiTable.TabName).Replace("[$Schema$]", _schema).Replace("[$FieldName$]", hiColumn.FieldName).Replace("[$FieldDesc$]", hiColumn.FieldDesc).ToString().Replace("'", "''")}';");
+                    _changesql.AppendLine($"    execute immediate '{dbConfig.Field_Comment.Replace("[$TabName$]", $"{hiTable.TabName}").Replace("[$Schema$]", _schema).Replace("[$FieldName$]", $"{hiColumn.FieldName}").Replace("[$FieldDesc$]", hiColumn.FieldDesc).ToString().Replace("'", "''")}';");
                 }
             }
 
@@ -3270,7 +3270,7 @@ namespace HiSql
                         if (!dt.AsEnumerable().Any(t => t.Field<string>("FieldName").ToLower() == hiColumn.FieldName.ToLower()))
                             throw new Exception($"为表[{tabname}]创建的索引指的字段[{hiColumn.FieldName}]不存在于表[{tabname}]中");
 
-                        string _tempkey = dbConfig.Table_Key2.Replace("[$FieldName$]", hiColumn.FieldName);
+                        string _tempkey = dbConfig.Table_Key2.Replace("[$FieldName$]", $"{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}");
                         if (i < hiColumns.Count - 1)
                             keys.AppendLine($"{_tempkey}{dbConfig.Field_Split}");
                         else

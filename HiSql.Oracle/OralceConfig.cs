@@ -814,7 +814,7 @@ UNION ALL
                 .AppendLine("	FROM USER_TAB_COLS T1, USER_COL_COMMENTS T2")
                 .AppendLine("	WHERE T1.TABLE_NAME = T2.TABLE_NAME")
                 .AppendLine("	    AND T1.COLUMN_NAME = T2.COLUMN_NAME")
-                .AppendLine("	    AND T1.TABLE_NAME =upper('[$TabName$]') ")
+                .AppendLine("	    AND upper(T1.TABLE_NAME) =upper('[$TabName$]') ")
                 .ToString();
 
 
@@ -942,7 +942,7 @@ UNION ALL
             //表索引
             _temp_get_tabindex = @"SELECT distinct TABLE_NAME as ""TableName"" , INDEX_NAME as ""IndexName"", 
         case when UNIQUENESS='UNIQUE' AND  CONSTRAINT_INDEX ='YES' then 'Key_Index' ELSE 'Index' end as ""IndexType"" 
-, '' as ""Disabled""   FROM user_indexes WHERE ""TABLE_NAME"" = '[$TabName$]' ";
+, '' as ""Disabled""   FROM user_indexes WHERE upper(""TABLE_NAME"") = upper('[$TabName$]') ";
 
 
             //表索引明细
@@ -953,7 +953,7 @@ select 1 as ""TableId"",  idx.TABLE_NAME as ""TableName"", 1 as IndexId , idx.IN
                               , case when UNIQUENESS = 'UNIQUE' AND CONSTRAINT_INDEX = 'YES' then 'Y' ELSE 'N' end as  ""IsPrimary"" ,'' as ""IsIncludedColumn""
                                      , case when UNIQUENESS = 'UNIQUE' then 'Y' ELSE '' end as ""IsUnique""   , '' AS ""Ignore_dup_key""  , '' as ""Disabled""  , '' AS ""Fill_factor""  , '' AS ""Padded""
                                      from user_indexes idx join user_ind_columns idxc on idx.index_name = idxc.index_name
-where idx.TABLE_NAME = '[$TabName$]' and idxc.INDEX_NAME = '[$IndexName$]' ";
+where upper(idx.TABLE_NAME) = upper('[$TabName$]') and idxc.INDEX_NAME = '[$IndexName$]' ";
 
 
             //创建索引
