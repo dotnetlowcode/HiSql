@@ -255,6 +255,7 @@ namespace HiSql
         }
         public override IQuery WithRank(DbRank rank, DbFunction dbFunction, string field, string asname, SortType sortType)
         {
+            dbFunction.VerifyDbFunction(field);
             if (field.Trim() != "*" && !string.IsNullOrEmpty(field))
                 field = $"{dbConfig.Field_Pre}{field}{dbConfig.Field_After}";
             switch (rank)

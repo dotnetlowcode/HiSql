@@ -244,19 +244,20 @@ namespace HiSql
         }
         public override IQuery WithRank(DbRank rank, DbFunction dbFunction, string field, string asname, SortType sortType)
         {
+            dbFunction.VerifyDbFunction(field);
             if (field.Trim() != "*" && !string.IsNullOrEmpty(field))
                 field = $"{dbConfig.Field_Pre}{field}{dbConfig.Field_After}";
             switch (rank)
             {
                 case DbRank.DENSERANK:
                     if (dbFunction.IsIn<DbFunction>(DbFunction.AVG, DbFunction.SUM))
-                        this.Ranks.Add($"dense_rank() over( order by {dbFunction.ToString()}({dbConfig.Field_Pre}{field}{dbConfig.Field_After}) {sortType.ToString()}) as {dbConfig.Field_Pre}{asname}{dbConfig.Field_After}");
+                        this.Ranks.Add($"dense_rank() over( order by {dbFunction.ToString()}({field}) {sortType.ToString()}) as {dbConfig.Field_Pre}{asname}{dbConfig.Field_After}");
                     
                     else if (dbFunction.IsIn<DbFunction>(  DbFunction.COUNT ))
                         this.Ranks.Add($"dense_rank() over( order by {dbFunction.ToString()}({field}) {sortType.ToString()}) as {dbConfig.Field_Pre}{asname}{dbConfig.Field_After}");
                     else if (dbFunction.IsIn<DbFunction>(DbFunction.NONE))
                     {
-                        this.Ranks.Add($"dense_rank() over( order by  {dbConfig.Field_Pre}{field}{dbConfig.Field_After} {sortType.ToString()}) as {dbConfig.Field_Pre}{asname}{dbConfig.Field_After}");
+                        this.Ranks.Add($"dense_rank() over( order by {field} {sortType.ToString()}) as {dbConfig.Field_Pre}{asname}{dbConfig.Field_After}");
                     }
                     else
                         throw new Exception($"{rank.ToString()} 不支持[{dbFunction.ToString()}]此函数");
@@ -273,12 +274,12 @@ namespace HiSql
                     break;
                 case DbRank.ROWNUMBER:
                     if (dbFunction.IsIn<DbFunction>(DbFunction.AVG,  DbFunction.SUM))
-                        this.Ranks.Add($"row_number() over( order by {dbFunction.ToString()}({dbConfig.Field_Pre}{field}{dbConfig.Field_After}) {sortType.ToString()}) as {dbConfig.Field_Pre}{asname}{dbConfig.Field_After}");
+                        this.Ranks.Add($"row_number() over( order by {dbFunction.ToString()}({field}) {sortType.ToString()}) as {dbConfig.Field_Pre}{asname}{dbConfig.Field_After}");
                     else if (dbFunction.IsIn<DbFunction>(DbFunction.COUNT))
                         this.Ranks.Add($"row_number() over( order by {dbFunction.ToString()}({field}) {sortType.ToString()}) as {dbConfig.Field_Pre}{asname}{dbConfig.Field_After}");
                     else if (dbFunction.IsIn<DbFunction>(DbFunction.NONE))
                     {
-                        this.Ranks.Add($"row_number() over( order by  {field} {sortType.ToString()}) as {dbConfig.Field_Pre}{asname}{dbConfig.Field_After}");
+                        this.Ranks.Add($"row_number() over( order by {field} {sortType.ToString()}) as {dbConfig.Field_Pre}{asname}{dbConfig.Field_After}");
                     }
                     else
                         throw new Exception($"{rank.ToString()} 不支持[{dbFunction.ToString()}]此函数");

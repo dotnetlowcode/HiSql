@@ -260,12 +260,28 @@ namespace HiSql
         }
 
 
-        public HiSqlProvider Context { get; set; }
+        HiSqlProvider _context = null;
+        public HiSqlProvider Context
+        {
+            get => _context;
+            set
+            {
+                _context = value;
+                if (dbConfig == null)
+                {
+                    dbConfig = (IDbConfig)Instance.CreateInstance<IDbConfig>($"{Constants.NameSpace}.{_context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.Config.ToString()}");
+                    dbConfig.Init();
+                }
+            }
+        }
+
+        //public HiSqlProvider Context { get; set; }
 
         public QueryProvider()
         {
-
+            
         }
+
 
         public IQuery Query(params IQuery[] query)
         {
@@ -316,9 +332,9 @@ namespace HiSql
                     Dictionary<string, string> _dic = Tool.RegexGrp(Constants.REG_TABNAME, tabname);
 
                     _table = new TableDefinition();
-                    _table.Schema = Context.CurrentConnectionConfig.Schema == null ? "" : Context.CurrentConnectionConfig.Schema;
+                    _table.Schema = _context.CurrentConnectionConfig.Schema == null ? "" : _context.CurrentConnectionConfig.Schema;
                     _table.TabName = tabname;
-                    _table.DbServer = Context.CurrentConnectionConfig.DbServer;
+                    _table.DbServer = _context.CurrentConnectionConfig.DbServer;
 
                     switch (_table.TableType)
                     {
@@ -361,9 +377,9 @@ namespace HiSql
                 if (Tool.CheckTabName(tabname).Item1 == true && Tool.CheckFieldName(rename).Item1 == true)
                 {
                     _table = new TableDefinition();
-                    _table.Schema = Context.CurrentConnectionConfig.Schema;
+                    _table.Schema = _context.CurrentConnectionConfig.Schema;
                     _table.TabName = tabname;
-                    _table.DbServer = Context.CurrentConnectionConfig.DbServer;
+                    _table.DbServer = _context.CurrentConnectionConfig.DbServer;
                     _table.AsTabName = rename;
                     mergeTable(_table);
                     _queue.Add("table|rename");
@@ -390,8 +406,8 @@ namespace HiSql
                 foreach (string f in fields)
                 {
                     FieldDefinition _fieldd = new FieldDefinition(f);
-                    _fieldd.Schema = Context.CurrentConnectionConfig.Schema;
-                    _fieldd.DbServer = Context.CurrentConnectionConfig.DbServer;
+                    _fieldd.Schema = _context.CurrentConnectionConfig.Schema;
+                    _fieldd.DbServer = _context.CurrentConnectionConfig.DbServer;
                     _fieldd.IsVirtualFeild = this.IsMultiSubQuery;//是否多表子查询
 
                     //当没有指定表时默认是 Query的表
@@ -912,7 +928,7 @@ namespace HiSql
                 _itabname = GetDbName(tabname);
                 string _sql = this.ToSql();
 
-                this.Context.DBO.ExecCommand(_sql, null);
+                this._context.DBO.ExecCommand(_sql, null);
                 return this.ITabName;
             }
 
@@ -920,19 +936,21 @@ namespace HiSql
         }
         public virtual IQuery WithRank(DbRank rank, DbFunction dbFunction, string field, string asname, SortType sortType)
         {
+            dbFunction.VerifyDbFunction(field);
+
             asname = asname.ToSqlInject();
             if (field.Trim() != "*" && !string.IsNullOrEmpty(field))
                 field = $"{dbConfig.Field_Pre}{field}{dbConfig.Field_After}";
             switch (rank)
             {
                 case DbRank.DENSERANK:
-                    _list_rank.Add($"dense_rank() over( order by {dbFunction.ToString()}({field}) {sortType.ToString()}) as {asname}");
+                    _list_rank.Add($"dense_rank() over( order by {dbFunction.GetDbFunctionName()}({field}) {sortType.ToString()}) as {asname}");
                     break;
                 case DbRank.RANK:
-                    _list_rank.Add($"rank() over( order by {dbFunction.ToString()}({field}) {sortType.ToString()}) as {asname}");
+                    _list_rank.Add($"rank() over( order by {dbFunction.GetDbFunctionName()}({field}) {sortType.ToString()}) as {asname}");
                     break;
                 case DbRank.ROWNUMBER:
-                    _list_rank.Add($"row_number() over( order by {dbFunction.ToString()}({field}) {sortType.ToString()}) as {asname}");
+                    _list_rank.Add($"row_number() over( order by {dbFunction.GetDbFunctionName()}({field}) {sortType.ToString()}) as {asname}");
                     break;
                 default:
                     break;
@@ -962,11 +980,13 @@ namespace HiSql
             List<string> _lstorderby = new List<string>();
             foreach (RankDefinition rankDefinition in ranks.Elements)
             {
+                rankDefinition.DbFunction.VerifyDbFunction(rankDefinition.Field);
                 rankDefinition.Field = rankDefinition.Field.ToSqlInject();
+
                 if (rankDefinition.Field.Trim() != "*")
-                    _lstorderby.Add($"{rankDefinition.DbFunction.ToString()}({dbConfig.Field_Pre}{rankDefinition.Field}{dbConfig.Field_After}) {rankDefinition.SortType.ToString()}");
+                    _lstorderby.Add($"{rankDefinition.DbFunction.GetDbFunctionName()}({dbConfig.Field_Pre}{rankDefinition.Field}{dbConfig.Field_After}) {rankDefinition.SortType.ToString()}");
                 else
-                    _lstorderby.Add($"{rankDefinition.DbFunction.ToString()}({rankDefinition.Field}) {rankDefinition.SortType.ToString()}");
+                    _lstorderby.Add($"{rankDefinition.DbFunction.GetDbFunctionName()}({rankDefinition.Field}) {rankDefinition.SortType.ToString()}");
             }
 
 
@@ -1088,14 +1108,14 @@ namespace HiSql
             string _sql = this.ToSql();
             total = 0;
            
-            lock (this.Context)
+            lock (this._context)
             {
                 if (this.IsPage && !string.IsNullOrEmpty(this.PageTotalSql.ToString().Trim()))
                 {
-                    var obj = this.Context.DBO.ExecScalar(this.PageTotalSql.ToString());
+                    var obj = this._context.DBO.ExecScalar(this.PageTotalSql.ToString());
                     total = Convert.ToInt32(obj.ToString());
                 }
-                var dr = this.Context.DBO.GetDataReaderAsync(_sql, null);
+                var dr = this._context.DBO.GetDataReaderAsync(_sql, null);
                 var _result = DataConvert.ToEObjectSync(dr);
                 
                 return _result;
@@ -1108,7 +1128,7 @@ namespace HiSql
         {
             string _sql = this.ToSql();
      
-            IDataReader dr = await this.Context.DBO.GetDataReaderAsync(_sql, null);
+            IDataReader dr = await this._context.DBO.GetDataReaderAsync(_sql, null);
             List<ExpandoObject> _result = DataConvert.ToEObject(dr);
             dr.Close();
             return _result;
@@ -1118,7 +1138,7 @@ namespace HiSql
 
         public List<ExpandoObject> ToEObject()
         {
-            lock (this.Context)
+            lock (this._context)
             {
                 return ToEObjectAsync().ConfigureAwait(false).GetAwaiter().GetResult();
             }
@@ -1130,12 +1150,12 @@ namespace HiSql
         {
             string _sql = this.ToSql();
             List<T> _result = null;
-            lock (this.Context)
+            lock (this._context)
             {
-                IDataReader dr = this.Context.DBO.GetDataReader(_sql, null);
+                IDataReader dr = this._context.DBO.GetDataReader(_sql, null);
                 try
                 {
-                    _result = DataConvert.ToList<T>(dr,this.Context.CurrentConnectionConfig.DbType);
+                    _result = DataConvert.ToList<T>(dr,this._context.CurrentConnectionConfig.DbType);
                 }
                 catch (Exception ex)
                 {
@@ -1159,19 +1179,19 @@ namespace HiSql
             string _sql = this.ToSql();
             total = 0;
             List<T> _result = null;
-            lock (this.Context)
+            lock (this._context)
             {
             if (this.IsPage && !string.IsNullOrEmpty(this.PageTotalSql.ToString().Trim()))
             {
                 
-                var obj = this.Context.DBO.ExecScalar(this.PageTotalSql.ToString());
+                var obj = this._context.DBO.ExecScalar(this.PageTotalSql.ToString());
 
                 total = Convert.ToInt32(obj.ToString());
                 
             }
             
-                IDataReader dr = this.Context.DBO.GetDataReader(_sql, null);
-                _result = DataConvert.ToList<T>(dr, this.Context.CurrentConnectionConfig.DbType);
+                IDataReader dr = this._context.DBO.GetDataReader(_sql, null);
+                _result = DataConvert.ToList<T>(dr, this._context.CurrentConnectionConfig.DbType);
                 dr.Close();
             }
             
@@ -1180,9 +1200,9 @@ namespace HiSql
         public DataTable ToTable()
         {
             string _sql = this.ToSql();
-            lock (this.Context)
+            lock (this._context)
             {
-                return this.Context.DBO.GetDataTable(_sql, null);
+                return this._context.DBO.GetDataTable(_sql, null);
             }
                 
         }
@@ -1190,27 +1210,27 @@ namespace HiSql
         {
             string _sql = this.ToSql();
             total = 0;
-            lock (this.Context)
+            lock (this._context)
             {
                 if (this.IsPage && !string.IsNullOrEmpty(this.PageTotalSql.ToString().Trim()))
                 {
-                    var obj = this.Context.DBO.ExecScalar(this.PageTotalSql.ToString());
+                    var obj = this._context.DBO.ExecScalar(this.PageTotalSql.ToString());
 
                     total = Convert.ToInt32(obj.ToString());
 
                 }
 
 
-                return this.Context.DBO.GetDataTable(_sql, null);
+                return this._context.DBO.GetDataTable(_sql, null);
             }
         }
         public List<TDynamic> ToDynamic()
         {
             string _sql = this.ToSql();
 
-            lock (this.Context)
+            lock (this._context)
             { 
-                IDataReader dr = this.Context.DBO.GetDataReader(_sql, null);
+                IDataReader dr = this._context.DBO.GetDataReader(_sql, null);
                 List<TDynamic> result = DataConvert.ToDynamic(dr);
         
                 dr.Close();
@@ -1221,16 +1241,16 @@ namespace HiSql
         {
             string _sql = this.ToSql();
             total = 0;
-            lock (this.Context)
+            lock (this._context)
             {
                 if (this.IsPage && !string.IsNullOrEmpty(this.PageTotalSql.ToString().Trim()))
                 {
-                    var obj = this.Context.DBO.ExecScalar(this.PageTotalSql.ToString());
+                    var obj = this._context.DBO.ExecScalar(this.PageTotalSql.ToString());
 
                     total = Convert.ToInt32(obj.ToString());
 
                 }
-                IDataReader dr = this.Context.DBO.GetDataReader(_sql, null);
+                IDataReader dr = this._context.DBO.GetDataReader(_sql, null);
                 List<TDynamic> result = DataConvert.ToDynamic(dr);
                 dr.Close();
                 return result;
@@ -1241,13 +1261,13 @@ namespace HiSql
         {
             string _sql = this.ToSql();
             List<ExpandoObject> lstobj = null;
-            lock (this.Context)
+            lock (this._context)
             {
-                IDataReader dr = this.Context.DBO.GetDataReader(_sql, null);
+                IDataReader dr = this._context.DBO.GetDataReader(_sql, null);
                 lstobj = DataConvert.ToEObject(dr);
                 dr.Close();
-                if(this.Context.CurrentConnectionConfig.IsAutoClose)
-                    this.Context.DBO.Close();
+                if(this._context.CurrentConnectionConfig.IsAutoClose)
+                    this._context.DBO.Close();
 
             }
             if (lstobj != null)
@@ -1259,16 +1279,16 @@ namespace HiSql
             string _sql = this.ToSql();
             total = 0;
             List<ExpandoObject> lstobj = null;
-            lock (this.Context)
+            lock (this._context)
             {
                 if (this.IsPage && !string.IsNullOrEmpty(this.PageTotalSql.ToString().Trim()))
                 {
-                    var obj = this.Context.DBO.ExecScalar(this.PageTotalSql.ToString());
+                    var obj = this._context.DBO.ExecScalar(this.PageTotalSql.ToString());
 
                     total = Convert.ToInt32(obj.ToString());
 
                 }
-                IDataReader dr = this.Context.DBO.GetDataReader(_sql, null);
+                IDataReader dr = this._context.DBO.GetDataReader(_sql, null);
                 lstobj = DataConvert.ToEObject(dr);
                 dr.Close();
 

@@ -238,12 +238,13 @@ namespace HiSql
 
         public override IQuery WithRank(DbRank rank, DbFunction dbFunction, string field, string asname, SortType sortType)
         {
+            dbFunction.VerifyDbFunction(field);
             if (field.Trim() != "*" && !string.IsNullOrEmpty(field))
                 field = $"{dbConfig.Field_Pre}{field}{dbConfig.Field_After}";
             switch (rank)
             {
                 case DbRank.DENSERANK:
-                    if (dbFunction.IsIn<DbFunction>(DbFunction.AVG, DbFunction.COUNT, DbFunction.SUM))
+                    if (dbFunction.IsIn<DbFunction>(DbFunction.AVG, DbFunction.COUNT, DbFunction.SUM, DbFunction.MIN, DbFunction.MAX))
                         this.Ranks.Add($"dense_rank() over( order by {dbFunction.ToString()}({field}) {sortType.ToString()}) as {asname}");
                     else if (dbFunction.IsIn<DbFunction>(DbFunction.NONE))
                     {
@@ -253,7 +254,7 @@ namespace HiSql
                         throw new Exception($"{rank.ToString()} 不支持[{dbFunction.ToString()}]此函数");
                     break;
                 case DbRank.RANK:
-                    if (dbFunction.IsIn<DbFunction>(DbFunction.AVG, DbFunction.COUNT, DbFunction.SUM))
+                    if (dbFunction.IsIn<DbFunction>(DbFunction.AVG, DbFunction.COUNT, DbFunction.SUM, DbFunction.MIN, DbFunction.MAX))
                         this.Ranks.Add($"rank() over( order by {dbFunction.ToString()}({field}) {sortType.ToString()}) as {asname}");
                     else if (dbFunction.IsIn<DbFunction>(DbFunction.NONE))
                     {
@@ -263,7 +264,7 @@ namespace HiSql
                         throw new Exception($"{rank.ToString()} 不支持[{dbFunction.ToString()}]此函数");
                     break;
                 case DbRank.ROWNUMBER:
-                    if (dbFunction.IsIn<DbFunction>(DbFunction.AVG, DbFunction.COUNT, DbFunction.SUM))
+                    if (dbFunction.IsIn<DbFunction>(DbFunction.AVG, DbFunction.COUNT, DbFunction.SUM, DbFunction.MIN, DbFunction.MAX))
                         this.Ranks.Add($"row_number() over( order by {dbFunction.ToString()}({field}) {sortType.ToString()}) as {asname}");
                     else if (dbFunction.IsIn<DbFunction>(DbFunction.NONE))
                     {
