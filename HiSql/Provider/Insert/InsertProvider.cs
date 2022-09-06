@@ -965,7 +965,7 @@ namespace HiSql
                                     #region 是否需要正则校验
                                     if (arrcol.Count>0 && arrcol.Any(h => h.FieldName == hiColumn.FieldName))
                                     {
-                                        dic_hash_reg[hiColumn.FieldName].Add(_value);
+                                        dic_hash_reg[hiColumn.FieldName].Add(_value.ToLower());
                                     }
 
 
@@ -1060,7 +1060,7 @@ namespace HiSql
                                     #region 是否需要正则校验
                                     if (arrcol.Any(h => h.FieldName == hiColumn.FieldName))
                                     {
-                                        dic_hash_reg[hiColumn.FieldName].Add(_value);
+                                        dic_hash_reg[hiColumn.FieldName].Add(_value.ToLower());
                                     }
 
                                     #endregion
@@ -1206,7 +1206,7 @@ namespace HiSql
                                     #region 是否需要正则校验
                                     if (arrcol.Count>0 && arrcol.Any(h => h.FieldName == hiColumn.FieldName))
                                     {
-                                        dic_hash_reg[hiColumn.FieldName].Add(_dic[hiColumn.FieldName]);
+                                        dic_hash_reg[hiColumn.FieldName].Add(_dic[hiColumn.FieldName].ToLower());
                                     }
 
                                     #endregion

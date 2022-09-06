@@ -64,6 +64,10 @@ namespace HiSql
                         {
                             pinfo.SetValue(ef, Convert.ToInt32(value.ToString()));
                         }
+                        else if (string.Equals(_fullname, "System.String") && dic_type[fname.ToLower()].Equals("System.Guid"))
+                        {
+                            pinfo.SetValue(ef, value.ToString());
+                        }
                         else
                         {
                             pinfo.SetValue(ef, value);
@@ -1549,7 +1553,7 @@ namespace HiSql
             {
                 foreach (DataRow drow in dt.Rows)
                 {
-                    hash.Add(drow[field].ToString());
+                    hash.Add(drow[field].ToString().ToLower());
                 }
             }
             return hash;
