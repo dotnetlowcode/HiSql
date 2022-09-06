@@ -83,9 +83,9 @@ namespace HiSql.Unit.Test
 
             //queryJoin(sqlClient);
 
-           // queryWhere(sqlClient);
-
-            queryGroupBy(sqlClient);    //有问题
+            // queryWhere(sqlClient);
+            queryCase(sqlClient);
+            //queryGroupBy(sqlClient);    //有问题
         }
 
         void queryWhere(HiSqlClient sqlClient)
@@ -132,6 +132,53 @@ namespace HiSql.Unit.Test
             Assert.Equal(successActCount, successCount);
             /*
                函数 Count()
+             */
+        }
+
+        void queryCase(HiSqlClient sqlClient)
+        {
+            int successCount = 0;
+            int successActCount = 0;
+
+            IQuery query = null;
+            // hisql直接使用 case 
+//            query = sqlClient.HiSql(@$"select CASE WHEN FieldType > 21 THEN '大于21' WHEN FieldType = 21 THEN '等于21' ELSE '小于21' END as CaseValue,* from Hi_FieldModel  where (tabname =  'Hi_FieldModel' or  tabname = 'Hi_TestQuery') and FieldType in (11,41,21)
+
+//");     //  where 条件  and CASE WHEN FieldType > 21 THEN '大于21' WHEN FieldType = 21 THEN '等于21' ELSE '小于21' END = '小于21'
+//            successCount++;
+//            _outputHelper.WriteLine(query.ToSql());
+//            successActCount += query.ToTable().Rows.Count == 29 ? 1 : 0;
+
+            // CASE WHEN FieldType > 21 THEN '大于21' WHEN FieldType = 21 THEN '等于21' ELSE '小于21' end as Case1 ,
+
+            query = sqlClient.Query("Hi_FieldModel").Field(@"*").WithLock( LockMode.NOLOCK)
+              //.Case("FieldType")
+              //.When("FieldType > 21  and FieldType <> 1").Then("'大于21'")
+              //.When("FieldType = 21").Then("'等于21'")
+              //.When("FieldType < 21").Then("'小于21'").Else("'test'").EndAs("Case1", typeof(string))
+               .Where(new Filter() {   { "("},{ "tabname", OperType.EQ,"Hi_FieldModel"},{ LogiType.OR},{ "tabname", OperType.EQ,"Hi_TestQuery"} , { ")"}
+               , { LogiType.AND},{ "FieldType", OperType.IN, new List<int> { 11, 41, 21 } }
+           });
+            successCount++;
+            _outputHelper.WriteLine(query.ToSql());
+            successActCount += query.ToTable().Rows.Count == 29 ? 1 : 0;
+
+            //case 别名
+            query = sqlClient.Query("Hi_FieldModel").As("a").Field(@"*")
+               .Case("a.FieldType").When("a.FieldType > 21 and a.FieldType <> 1").Then("'大于21'")
+               .When("a.FieldType = 21").Then("'等于21'")
+               .When("a.FieldType < 21").Then("'小于21'").Else("'test'").EndAs("Case1", typeof(string))
+                .Where(new Filter() {   { "("},{ "tabname", OperType.EQ,"Hi_FieldModel"},{ LogiType.OR},{ "tabname", OperType.EQ,"Hi_TestQuery"} , { ")"}
+               , { LogiType.AND},{ "FieldType", OperType.IN, new List<int> { 11, 41, 21 } }
+            });
+            successCount++;
+            _outputHelper.WriteLine(query.ToSql());
+            successActCount += query.ToTable().Rows.Count == 29 ? 1 : 0;
+
+
+            Assert.Equal(successActCount, successCount);
+            /*
+               
              */
         }
         void queryIn(HiSqlClient sqlClient)
