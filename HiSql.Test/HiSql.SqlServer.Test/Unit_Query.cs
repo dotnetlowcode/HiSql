@@ -76,14 +76,14 @@ namespace HiSql.Unit.Test
         void QueryGroups(HiSqlClient sqlClient)
         {
             //初始化
-            //initDemoDynTable(sqlClient, "Hi_TestQuery");
-            //query(sqlClient);
+            initDemoDynTable(sqlClient, "Hi_TestQuery");
+            query(sqlClient);
 
-            //queryIn(sqlClient);
+            queryIn(sqlClient);
 
-            //queryJoin(sqlClient);
+            queryJoin(sqlClient);
 
-            // queryWhere(sqlClient);
+             queryWhere(sqlClient);
             queryCase(sqlClient);
             //queryGroupBy(sqlClient);    //有问题
         }
