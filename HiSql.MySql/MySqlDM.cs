@@ -2385,26 +2385,26 @@ namespace HiSql
                 switch (whenDefinition.OperSymbol)
                 {
                     case OperType.EQ:
-                        sb_case.AppendLine($"   when {dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, whenDefinition.Field)}{dbConfig.Table_After}{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, whenDefinition.Field)}{dbConfig.Field_After} = {whenDefinition.Value} then {whenDefinition.Then.ThenValue}");
+                        sb_case.AppendLine($"   when {dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, whenDefinition.Field)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, whenDefinition.Field)}{dbConfig.Field_After} = {whenDefinition.Value} then {whenDefinition.Then.ThenValue}");
                         break;
                     case OperType.GT:
-                        sb_case.AppendLine($"   when {dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, whenDefinition.Field)}{dbConfig.Table_After}{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, whenDefinition.Field)}{dbConfig.Field_After} > {whenDefinition.Value} then {whenDefinition.Then.ThenValue}");
+                        sb_case.AppendLine($"   when {dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, whenDefinition.Field)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, whenDefinition.Field)}{dbConfig.Field_After} > {whenDefinition.Value} then {whenDefinition.Then.ThenValue}");
                         break;
                     case OperType.LT:
-                        sb_case.AppendLine($"   when {dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, whenDefinition.Field)}{dbConfig.Table_After}{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, whenDefinition.Field)}{dbConfig.Field_After} < {whenDefinition.Value} then {whenDefinition.Then.ThenValue}");
+                        sb_case.AppendLine($"   when {dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, whenDefinition.Field)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, whenDefinition.Field)}{dbConfig.Field_After} < {whenDefinition.Value} then {whenDefinition.Then.ThenValue}");
                         break;
                     case OperType.GE:
-                        sb_case.AppendLine($"   when {dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, whenDefinition.Field)}{dbConfig.Table_After}{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, whenDefinition.Field)}{dbConfig.Field_After} >= {whenDefinition.Value} then {whenDefinition.Then.ThenValue}");
+                        sb_case.AppendLine($"   when {dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, whenDefinition.Field)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, whenDefinition.Field)}{dbConfig.Field_After} >= {whenDefinition.Value} then {whenDefinition.Then.ThenValue}");
                         break;
                     case OperType.LE:
-                        sb_case.AppendLine($"   when {dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, whenDefinition.Field)}{dbConfig.Table_After}{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, whenDefinition.Field)}{dbConfig.Field_After} <= {whenDefinition.Value} then {whenDefinition.Then.ThenValue}");
+                        sb_case.AppendLine($"   when {dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, whenDefinition.Field)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, whenDefinition.Field)}{dbConfig.Field_After} <= {whenDefinition.Value} then {whenDefinition.Then.ThenValue}");
                         break;
                     case OperType.NE:
-                        sb_case.AppendLine($"   when {dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, whenDefinition.Field)}{dbConfig.Table_After}{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, whenDefinition.Field)}{dbConfig.Field_After} <> {whenDefinition.Value} then {whenDefinition.Then.ThenValue}");
+                        sb_case.AppendLine($"   when {dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, whenDefinition.Field)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, whenDefinition.Field)}{dbConfig.Field_After} <> {whenDefinition.Value} then {whenDefinition.Then.ThenValue}");
                         break;
 
                     default:
-                        sb_case.AppendLine($"   when {dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, whenDefinition.Field)}{dbConfig.Table_After}{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, whenDefinition.Field)}{dbConfig.Field_After} = {whenDefinition.Value} then {whenDefinition.Then.ThenValue}");
+                        sb_case.AppendLine($"   when {dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, whenDefinition.Field)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, whenDefinition.Field)}{dbConfig.Field_After} = {whenDefinition.Value} then {whenDefinition.Then.ThenValue}");
                         break;
                 }
 

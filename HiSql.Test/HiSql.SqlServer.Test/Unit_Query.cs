@@ -152,10 +152,10 @@ namespace HiSql.Unit.Test
             // CASE WHEN FieldType > 21 THEN '大于21' WHEN FieldType = 21 THEN '等于21' ELSE '小于21' end as Case1 ,
 
             query = sqlClient.Query("Hi_FieldModel").Field(@"*").WithLock( LockMode.NOLOCK)
-              //.Case("FieldType")
-              //.When("FieldType > 21  and FieldType <> 1").Then("'大于21'")
-              //.When("FieldType = 21").Then("'等于21'")
-              //.When("FieldType < 21").Then("'小于21'").Else("'test'").EndAs("Case1", typeof(string))
+              .Case("FieldType")
+              .When("FieldType > 21  and FieldType <> 1").Then("'大于21'")
+              .When("FieldType = 21").Then("'等于21'")
+              .When("FieldType < 21").Then("'小于21'").Else("'test'").EndAs("Case1", typeof(string))
                .Where(new Filter() {   { "("},{ "tabname", OperType.EQ,"Hi_FieldModel"},{ LogiType.OR},{ "tabname", OperType.EQ,"Hi_TestQuery"} , { ")"}
                , { LogiType.AND},{ "FieldType", OperType.IN, new List<int> { 11, 41, 21 } }
            });
@@ -255,7 +255,7 @@ namespace HiSql.Unit.Test
                 .Group(new GroupBy { { "A.TabName" }, { "A.FieldName" } })
 
         //.Having("count(*)>=0") //此处语法错误
-        //.Having(new Having() { { "count(*)", OperType.GE, "0" } } )
+        .Having(new Having() { { "count(*)", OperType.GE, "0" } } )
         .Sort("A.TabName asc", "A.FieldName asc");
       
             _outputHelper.WriteLine(query.ToSql()); successCount++;
