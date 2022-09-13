@@ -647,9 +647,21 @@ namespace HiSql
                 throw new Exception($"已经指定了[Modi]不允许再指定[Insert]");
             _list_data = new List<object>();
             _table = new TableDefinition(tabname);
+
+            if (lstdata == null || lstdata.Count == 0)
+                throw new Exception($"未指定插入的数据集");
+
+
+            Type typ=lstdata[0].GetType();
+
+
+            Type typ_dicobj=typeof(Dictionary<string, object>);
+
+            Type typ_dicstr = typeof(Dictionary<string, string>);
+
             foreach (var obj in lstdata)
             {
-                var _typname = obj.GetType().FullName;
+                var _typname = typ.FullName;
                 if (_typname.IndexOf("TDynamic") >= 0)
                 {
                     TDynamic dyn = (dynamic)obj;
@@ -661,7 +673,10 @@ namespace HiSql
                     _list_data.Add((Dictionary<string, object>)dyn);
                 }
                 else
+                {
                     _list_data.Add((object)obj);
+                }
+                    
             }
             checkData();
             _queue.Add("insert");
@@ -937,11 +952,14 @@ namespace HiSql
                                         {
                                             dtime = Convert.ToDateTime(_o[hiColumn.FieldName]);
                                         }
-                                        
+
                                         if (dtime != null && dtime != DateTime.MinValue)
                                         {
                                             _value = dtime.ToString("yyyy-MM-dd HH:mm:ss.fff");
                                         }
+                                        else _value = null;
+
+
                                     }
                                     else if (hiColumn.FieldType.IsIn<HiType>(HiType.BOOL))
                                     {
@@ -954,7 +972,10 @@ namespace HiSql
                                     }
                                     else if (_o.ContainsKey(hiColumn.FieldName))
                                     {
-                                        _value = _o[hiColumn.FieldName].ToString();
+                                        if (_o[hiColumn.FieldName] != null)
+                                            _value = _o[hiColumn.FieldName].ToString();
+                                        else
+                                            _value = null;
                                     }
                                     else
                                     {
@@ -962,24 +983,32 @@ namespace HiSql
                                     }
                                     #endregion
 
-                                    #region 是否需要正则校验
-                                    if (arrcol.Count>0 && arrcol.Any(h => h.FieldName == hiColumn.FieldName))
+                                    if (_value != null)
                                     {
-                                        dic_hash_reg[hiColumn.FieldName].Add(_value.ToLower());
+                                        #region 是否需要正则校验
+                                        if (arrcol.Count > 0 && arrcol.Any(h => h.FieldName == hiColumn.FieldName))
+                                        {
+                                            dic_hash_reg[hiColumn.FieldName].Add(_value.ToLower());
+                                        }
+
+
+
+
+                                        #endregion
+
+                                        #region 通用数据有效性校验
+                                        var result = checkFieldValue(hiColumn, _rowidx, _value);
+                                        if (result.Item1)
+                                        {
+                                            _rowdic.Add(hiColumn.FieldName, result.Item2);
+                                        }
+                                        #endregion
                                     }
-
-
-
-
-                                    #endregion
-
-                                    #region 通用数据有效性校验
-                                    var result = checkFieldValue(hiColumn, _rowidx, _value);
-                                    if (result.Item1)
+                                    else
                                     {
-                                        _rowdic.Add(hiColumn.FieldName, result.Item2);
+                                        _value = null;
+                                        _rowdic.Add(hiColumn.FieldName, _value);
                                     }
-                                    #endregion
                                 }
                                 else
                                 {
@@ -999,6 +1028,13 @@ namespace HiSql
                                         {
                                             _rowdic.Add(hiColumn.FieldName, result.Item2);
                                         }
+                                    }
+                                    else
+                                    {
+
+                                        var rtn = defaultValue(hiColumn, _rowidx);
+                                        _rowdic.Add(hiColumn.FieldName, rtn.Item2);
+
                                     }
                                     #endregion
                                 }
@@ -1049,29 +1085,37 @@ namespace HiSql
 
                                 if (_o.ContainsKey(hiColumn.FieldName) || _o.ContainsKey(hiColumn.FieldName.ToLower()))
                                 {
-                                    _value = _o[hiColumn.FieldName].ToString();
-                                    if (_issnro)
+                                    if (_o[hiColumn.FieldName] != null)
                                     {
-                                        if (string.IsNullOrEmpty(_value))
-                                            dic_snro_num[hiColumn.FieldName] = dic_snro_num[hiColumn.FieldName] + 1;
+                                        _value = _o[hiColumn.FieldName].ToString();
+                                        if (_issnro)
+                                        {
+                                            if (string.IsNullOrEmpty(_value))
+                                                dic_snro_num[hiColumn.FieldName] = dic_snro_num[hiColumn.FieldName] + 1;
+                                        }
+
+
+                                        #region 是否需要正则校验
+                                        if (arrcol.Any(h => h.FieldName == hiColumn.FieldName))
+                                        {
+                                            dic_hash_reg[hiColumn.FieldName].Add(_value.ToLower());
+                                        }
+
+                                        #endregion
+
+                                        #region 通用数据有效性校验
+                                        var result = checkFieldValue(hiColumn, _rowidx, _value);
+                                        if (result.Item1)
+                                        {
+                                            _rowdic.Add(hiColumn.FieldName, result.Item2);
+                                        }
+                                        #endregion
                                     }
-
-
-                                    #region 是否需要正则校验
-                                    if (arrcol.Any(h => h.FieldName == hiColumn.FieldName))
+                                    else
                                     {
-                                        dic_hash_reg[hiColumn.FieldName].Add(_value.ToLower());
+                                        _value = null;
+                                        _rowdic.Add(hiColumn.FieldName, _value);
                                     }
-
-                                    #endregion
-
-                                    #region 通用数据有效性校验
-                                    var result = checkFieldValue(hiColumn, _rowidx, _value);
-                                    if (result.Item1)
-                                    {
-                                        _rowdic.Add(hiColumn.FieldName, result.Item2);
-                                    }
-                                    #endregion
                                 }
                                 else
                                 {
@@ -1168,7 +1212,7 @@ namespace HiSql
                                             _dic.Add(hiColumn.FieldName, dtime.ToString("yyyy-MM-dd HH:mm:ss.fff"));
                                         }
                                         else
-                                            _dic.Add(hiColumn.FieldName, DateTime.MinValue.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+                                            _dic.Add(hiColumn.FieldName, null);
                                     }
                                     else if (hiColumn.FieldType.IsIn<HiType>(HiType.BOOL))
                                     {
@@ -1238,6 +1282,12 @@ namespace HiSql
                                             _rowdic.Add(hiColumn.FieldName, result.Item2);
                                         }
                                     }
+                                    else
+                                    {
+                                        var rtn = defaultValue(hiColumn, _rowidx);
+                                        _rowdic.Add(hiColumn.FieldName, rtn.Item2);
+                                    }
+
                                     #endregion
                                 }
 
@@ -1261,6 +1311,14 @@ namespace HiSql
                                         _rowdic.Add(hiColumn.FieldName, result.Item2);
                                     }
                                 }
+                                else
+                                {
+
+                                   var rtn=  defaultValue(hiColumn, _rowidx);
+                                    _rowdic.Add(hiColumn.FieldName, rtn.Item2);
+
+                                }
+
                                 #endregion
                             }
 
@@ -1475,6 +1533,104 @@ namespace HiSql
         }
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="hiColumn"></param>
+        /// <param name="rowidx"></param>
+        /// <returns></returns>
+        Tuple<bool, string> defaultValue(HiColumn hiColumn, int rowidx)
+        {
+            string _value = string.Empty;
+            bool _isok = true;
+            Tuple<bool, string> rtn = new Tuple<bool, string>(_isok, _value);
+
+            if (hiColumn.IsPrimary )
+            {
+                if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.Oracle, DBType.DaMeng))
+                    _value = $"' '";
+                else
+                    _value = "''";
+            }
+
+            if (hiColumn.DBDefault == HiTypeDBDefault.NONE) // || hiColumn.DBDefault==HiTypeDBDefault.EMPTY
+            {
+                if (hiColumn.IsPrimary)
+                {
+                    if (hiColumn.FieldType.IsIn<HiType>(HiType.VARCHAR, HiType.CHAR, HiType.NCHAR, HiType.NVARCHAR, HiType.GUID, HiType.TEXT))
+                    {
+                        if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.Oracle, DBType.DaMeng))
+                            _value = $"' '";
+                        else
+                            _value = "''";
+                    }
+                    else
+                        _value = "null";
+                }
+                else
+                    _value = "null";
+            }
+            else
+            {
+                if (hiColumn.IsPrimary)
+                {
+                    if (hiColumn.FieldType.IsIn<HiType>(HiType.VARCHAR, HiType.CHAR, HiType.NCHAR, HiType.NVARCHAR, HiType.GUID, HiType.TEXT))
+                    {
+                        if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.Oracle, DBType.DaMeng))
+                            _value = $"' '";
+                        else
+                            _value = "''";
+                    }
+                    else
+                        _value = "null";
+                }
+                else
+                {
+                    if (hiColumn.FieldType.IsIn<HiType>(HiType.VARCHAR, HiType.CHAR, HiType.NCHAR, HiType.NVARCHAR, HiType.GUID, HiType.TEXT))
+                    {
+                        if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.Oracle, DBType.DaMeng))
+                            _value = $"' '";
+                        else
+                            _value = "''";
+                    }
+                    else if (hiColumn.FieldType.IsIn<HiType>(HiType.BIGINT, HiType.INT, HiType.DECIMAL, HiType.SMALLINT))
+                    {
+                        _value = hiColumn.DefaultValue;
+                        if (string.IsNullOrEmpty(_value))
+                            _value = "0";
+                    }
+                    else if (hiColumn.FieldType.IsIn<HiType>(HiType.DATE, HiType.DATETIME))
+                    {
+                        if (hiColumn.DBDefault == HiTypeDBDefault.FUNDATE)
+                        {
+                            if (Context.CurrentConnectionConfig.DbType == DBType.Oracle)
+                                _value = $"timestamp'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'";
+                            else
+                                _value = $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'";
+                        }
+                        else
+                            _value = "null";
+                    }
+                    else if (hiColumn.FieldType.IsIn<HiType>(HiType.BOOL))
+                    {
+                        if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.PostGreSql, DBType.Hana, DBType.MySql))
+                        {
+                            _value = "True";
+                        }
+                        else
+                        {
+                            _value = "1";
+                        }
+                    }
+                    else
+                        _value = "null";
+                        
+                }
+            }
+            rtn = new Tuple<bool, string>(_isok, _value);
+            return rtn;
+        }
+
         Tuple<bool, string> checkFieldValue(HiColumn hiColumn, int rowidx, string value)
         {
 
@@ -1590,7 +1746,7 @@ namespace HiSql
                 }
                 else if (hiColumn.FieldType.IsIn<HiType>(HiType.DATE, HiType.DATETIME))
                 {
-                    if (!string.IsNullOrEmpty(_value))
+                    if (!string.IsNullOrEmpty(_value) && _value!=null)
                     {
                         DateTime dtime = DateTime.Parse(_value);
                         //DateTime dtime = DateTime.Now;
@@ -1601,7 +1757,8 @@ namespace HiSql
                             else
                                 rtn = new Tuple<bool, string>(true, $"'{dtime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
                         }
-                    }
+                    }else
+                        rtn = new Tuple<bool, string>(true, $"null");
                 }
                 else
                 {

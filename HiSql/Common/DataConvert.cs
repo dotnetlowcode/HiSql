@@ -196,19 +196,19 @@ namespace HiSql
                                 }
                                 else
                                 {
-                                    //暂不启用默认值
-                                    //if (pinfo.PropertyType.IsIn<Type>(Constants.LongType, Constants.IntType, Constants.DecType, Constants.FloatType, Constants.ShortType,Constants.DobType))
-                                    //{
-                                    //    pinfo.SetValue(t1, 0);
-                                    //}
-                                    //else if (pinfo.PropertyType.IsIn<Type>(Constants.StringType))
-                                    //{
-                                    //    pinfo.SetValue(t1, "");
-                                    //}
-                                    //else if (pinfo.PropertyType.IsIn<Type>(Constants.BoolType))
-                                    //{
-                                    //    pinfo.SetValue(t1, false);
-                                    //}
+
+                                    if (pinfo.PropertyType.IsIn<Type>(Constants.LongType, Constants.IntType, Constants.DecType, Constants.FloatType, Constants.ShortType, Constants.DobType))
+                                    {
+                                        pinfo.SetValue(t1, 0);
+                                    }
+                                    else if (pinfo.PropertyType.IsIn<Type>(Constants.StringType))
+                                    {
+                                        pinfo.SetValue(t1, "");
+                                    }
+                                    else
+                                    {
+                                        pinfo.SetValue(t1, null);//add by tansar 2022.9.13
+                                    }
 
                                 }
                             }
@@ -258,15 +258,19 @@ namespace HiSql
                                 }
                                 else
                                 {
-                                    //暂不启用默认值
-                                    //if (pinfo.PropertyType.IsIn<Type>(Constants.LongType, Constants.IntType, Constants.DecType, Constants.FloatType, Constants.ShortType, Constants.DobType))
-                                    //{
-                                    //    pinfo.SetValue(t1, 0);
-                                    //}
-                                    //else if (pinfo.PropertyType.IsIn<Type>(Constants.StringType))
-                                    //{
-                                    //    pinfo.SetValue(t1, "");
-                                    //}
+                        
+                                    if (pinfo.PropertyType.IsIn<Type>(Constants.LongType, Constants.IntType, Constants.DecType, Constants.FloatType, Constants.ShortType, Constants.DobType))
+                                    {
+                                        pinfo.SetValue(t1, 0);
+                                    }
+                                    else if (pinfo.PropertyType.IsIn<Type>(Constants.StringType))
+                                    {
+                                        pinfo.SetValue(t1, "");
+                                    }
+                                    else
+                                    {
+                                        pinfo.SetValue(t1, null);//add by tansar 2022.9.13
+                                    }
                                     //else if (pinfo.PropertyType.IsIn<Type>(Constants.BoolType))
                                     //{
                                     //    pinfo.SetValue(t1, false);
@@ -310,6 +314,8 @@ namespace HiSql
                     {
                         if (dataReader[n] is not DBNull)
                             _dyn[n] = dataReader[n];
+                        else
+                            _dyn[n] = null;
                     }
                 }
                 result.Add((ExpandoObject)_dyn);
@@ -362,12 +368,15 @@ namespace HiSql
             }
             while (dataReader.Read())
             {
-
                 TDynamic _dyn = new TDynamic();
                 foreach (string n in fieldNameList)
                 {
                     if (dataReader[n] is not DBNull)
                         _dyn[n] = dataReader[n];
+                    else
+                    {
+                        _dyn[n] = null;
+                    }
                 }
                 result.Add(_dyn);
             }

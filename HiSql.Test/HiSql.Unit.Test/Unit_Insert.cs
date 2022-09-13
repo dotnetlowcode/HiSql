@@ -129,6 +129,60 @@ namespace HiSql.Unit.Test
             insertData(sqlClient, count);
         }
 
+
+        void insertNullData(HiSqlClient sqlClient)
+        {
+            string tabname = "H_tst10";
+            if (sqlClient.DbFirst.CheckTabExists("H_tst10"))
+            {
+                sqlClient.Drop(tabname).ExecCommand();
+                _outputHelper.WriteLine($" 已经删除Null值 测试表[{tabname}]");
+            }
+
+            TabInfo tabInfo = TestTable.DynTable.BuildNullTest(tabname, true);
+
+            bool iscreate = sqlClient.DbFirst.CreateTable(tabInfo);
+
+            if (iscreate)
+            {
+                _outputHelper.WriteLine($" 已经创建Null值 测试表[{tabname}]");
+                sqlClient.Insert(tabname, new List<Dictionary<string, object>> {
+                    new Dictionary<string, object>
+                    {
+                        { "SID",1},
+                        { "uname","tansar"}
+                    },
+                    new Dictionary<string, object>
+                    {
+                        { "SID",2},
+                        { "uname","tansar"},
+                        { "birth",DateTime.Now}
+                    },
+                    new Dictionary<string, object>
+                    {
+                        { "SID",2},
+                        { "gname","tgm"},
+                        { "birth",DateTime.Now}
+                    },
+                    new Dictionary<string, object>
+                    {
+                        { "SID",4},
+                         { "uname","tansar"},
+                        { "gname","tgm"}
+                   
+                    }
+                }).ExecCommand();
+
+
+            }
+            else
+            {
+                _outputHelper.WriteLine($" 创建Null值 测试表[{tabname}]失败");
+                Assert.True(false);
+            }
+
+        }
+
         void insertData(HiSqlClient sqlClient,int count)
         {
             string tabname1 =typeof(H_Test01).Name;

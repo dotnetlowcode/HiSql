@@ -64,7 +64,7 @@ namespace HiSql.UnitTest
                      );
 
 
-            sqlclient.CodeFirst.InstallHisql();
+            //sqlclient.CodeFirst.InstallHisql();
 
             Console.WriteLine($" 版本号：{sqlclient.Context.DMTab.DBVersion().Version}  版本描述：{sqlclient.Context.DMTab.DBVersion().VersionDesc}");
             return sqlclient;

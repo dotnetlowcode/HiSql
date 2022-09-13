@@ -1452,7 +1452,7 @@ namespace HiSql
         /// <param name="lstresult"></param>
         /// <param name="issubquery"></param>
         /// <returns></returns>
-        public string BuilderWhereSql(List<TableDefinition> TableList, Dictionary<string, TabInfo> dictabinfo, List<FieldDefinition> Fields, List<WhereResult> lstresult, bool issubquery)
+        public string BuilderWhereSql(List<TableDefinition> TableList, Dictionary<string, TabInfo> dictabinfo, List<FieldDefinition> Fields, List<WhereResult> lstresult, bool issubquery, bool hastabname = true)
         {
             StringBuilder sb_sql = new StringBuilder();
             if (lstresult != null && lstresult.Count() > 0)
@@ -1470,7 +1470,10 @@ namespace HiSql
 
                             if (hiColumn != null)
                             {
-                                sb_sql.Append($"{dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, field)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, field)}{dbConfig.Field_After}");
+                                if (hastabname)
+                                    sb_sql.Append($"{dbConfig.Table_Pre}{ Tool.GetDbTabName(hiColumn, field)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{ Tool.GetDbFieldName(hiColumn, field)}{dbConfig.Field_After}");
+                                else
+                                    sb_sql.Append($"{dbConfig.Field_Pre}{ Tool.GetDbFieldName(hiColumn, field)}{dbConfig.Field_After}");
                                 string _value = whereResult.Result["value"].ToString();
                                 if (hiColumn != null)
                                 {
@@ -1503,9 +1506,16 @@ namespace HiSql
 
                             if (hiColumn != null && rhiColumn != null)
                             {
-                                sb_sql.Append($"{dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, field)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, field)}{dbConfig.Field_After}");
+                                if (hastabname)
+                                    sb_sql.Append($"{dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, field)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, field)}{dbConfig.Field_After}");
+                                else
+                                    sb_sql.Append($"{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, field)}{dbConfig.Field_After}");
                                 sb_sql.Append($" {whereResult.Result["op"].ToString()} ");
-                                sb_sql.Append($"{dbConfig.Table_Pre}{Tool.GetDbTabName(rhiColumn, rfield)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(rhiColumn, rfield)}{dbConfig.Field_After}");
+
+                                if (hastabname)
+                                    sb_sql.Append($"{dbConfig.Table_Pre}{Tool.GetDbTabName(rhiColumn, rfield)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(rhiColumn, rfield)}{dbConfig.Field_After}");
+                                else
+                                    sb_sql.Append($"{dbConfig.Field_Pre}{Tool.GetDbFieldName(rhiColumn, rfield)}{dbConfig.Field_After}");
                             }
                         }
                         else
@@ -1517,7 +1527,7 @@ namespace HiSql
                         if (whereResult.Result != null)
                         {
                             WhereParse whereParse = new WhereParse(whereResult.Result["content"].ToString());
-                            sb_sql.Append($" ({BuilderWhereSql(TableList, dictabinfo, Fields, whereParse.Result, issubquery)})");
+                            sb_sql.Append($" ({BuilderWhereSql(TableList, dictabinfo, Fields, whereParse.Result, issubquery, hastabname)})");
                         }
                     }
                     else if (whereResult.SType == StatementType.FieldBetweenValue)
@@ -1530,8 +1540,10 @@ namespace HiSql
 
                             FieldDefinition field = new FieldDefinition(whereResult.Result["fields"].ToString());
                             HiColumn hiColumn = CheckField(TableList, dictabinfo, Fields, field);
-                            sb_sql.Append($"{dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, field)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, field)}{dbConfig.Field_After}");
-
+                            if (hastabname)
+                                sb_sql.Append($"{dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, field)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, field)}{dbConfig.Field_After}");
+                            else
+                                sb_sql.Append($"{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, field)}{dbConfig.Field_After}");
                             if (hiColumn != null)
                             {
                                 string _value = whereResult.Result["value"].ToString();
@@ -1569,8 +1581,10 @@ namespace HiSql
                         {
                             FieldDefinition field = new FieldDefinition(whereResult.Result["fields"].ToString());
                             HiColumn hiColumn = CheckField(TableList, dictabinfo, Fields, field);
-                            sb_sql.Append($"{dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, field)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, field)}{dbConfig.Field_After}");
-
+                            if (hastabname)
+                                sb_sql.Append($"{dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, field)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, field)}{dbConfig.Field_After}");
+                            else
+                                sb_sql.Append($"{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, field)}{dbConfig.Field_After}");
                             if (hiColumn == null)
                                 throw new Exception($"字段[{whereResult.Result["fields"].ToString()}]出现错误");
 
@@ -1585,7 +1599,6 @@ namespace HiSql
                                 {
                                     throw new Exception($"语句[{_content}] 附近语法错误 select in 中的子查询仅允许查询一个字段");
                                 }
-
                                 string _sql = selectParse.Query.ToSql();
 
 
@@ -1640,8 +1653,10 @@ namespace HiSql
                         {
                             FieldDefinition field = new FieldDefinition(whereResult.Result["fields"].ToString());
                             HiColumn hiColumn = CheckField(TableList, dictabinfo, Fields, field);
-                            sb_sql.Append($"{dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, field)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, field)}{dbConfig.Field_After}");
-
+                            if (hastabname)
+                                sb_sql.Append($"{dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, field)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, field)}{dbConfig.Field_After}");
+                            else
+                                sb_sql.Append($"{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, field)}{dbConfig.Field_After}");
                             if (hiColumn == null)
                                 throw new Exception($"字段[{whereResult.Result["fields"].ToString()}]出现错误");
 
@@ -1695,12 +1710,11 @@ namespace HiSql
             return sb_sql.ToString();
         }
 
-
         /// <summary>
         /// 生成WHERE语句
         /// </summary>
         /// <returns></returns>
-        public string BuilderWhereSql(List<TableDefinition> TableList, Dictionary<string, TabInfo> dictabinfo, List<FieldDefinition> Fields, List<FilterDefinition> Wheres, bool issubquery)
+        public string BuilderWhereSql(List<TableDefinition> TableList, Dictionary<string, TabInfo> dictabinfo, List<FieldDefinition> Fields, List<FilterDefinition> Wheres, bool issubquery, bool hastabname = true)
         {
             StringBuilder sb_where = new StringBuilder();
             int _idx = 0;
@@ -1732,7 +1746,10 @@ namespace HiSql
                     if (hiColumn == null)
                         throw new Exception($"字段[{filterDefinition.Field.AsFieldName}]在表[{filterDefinition.Field.AsTabName}]中不存在");
 
-                    sb_where.Append($"{dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, filterDefinition.Field)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, filterDefinition.Field)}{dbConfig.Field_After}");
+                    if (hastabname)
+                        sb_where.Append($"{dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, filterDefinition.Field)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, filterDefinition.Field)}{dbConfig.Field_After}");
+                    else
+                        sb_where.Append($"{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, filterDefinition.Field)}{dbConfig.Field_After}");
                     switch (filterDefinition.OpFilter)
                     {
                         case OperType.EQ:

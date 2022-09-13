@@ -10,6 +10,29 @@ namespace HiSql.Unit.Test.TestTable
     {
 
 
+
+        public static TabInfo BuildNullTest(string tabname, bool standardfeild)
+        {
+            TabInfo tabinfo = new TabInfo();
+            tabinfo.TabModel = new HiTable { DbServer = "", DbName = "", TabName = tabname.ToSqlInject(), TabDescript = $"{tabname}自定义表", TabStoreType = TabStoreType.Column, TabStatus = TabStatus.Use };
+            tabinfo.Columns.Add(new HiColumn { DbServer = tabinfo.TabModel.DbServer, DbName = tabinfo.TabModel.DbName, FieldName = "SID", FieldType = HiType.INT, IsPrimary = true, IsBllKey = true, SortNum = 1, IsSys = false, DBDefault = HiTypeDBDefault.EMPTY });
+            tabinfo.Columns.Add(new HiColumn { DbServer = tabinfo.TabModel.DbServer, DbName = tabinfo.TabModel.DbName, FieldName = "uname", FieldType = HiType.VARCHAR, FieldLen=20, SortNum = 2, IsSys = false});
+            tabinfo.Columns.Add(new HiColumn { DbServer = tabinfo.TabModel.DbServer, DbName = tabinfo.TabModel.DbName, FieldName = "gname", FieldType = HiType.NVARCHAR, FieldLen = 50, SortNum = 3, IsSys = false });
+            tabinfo.Columns.Add(new HiColumn { DbServer = tabinfo.TabModel.DbServer, DbName = tabinfo.TabModel.DbName, FieldName = "birth", FieldType = HiType.DATETIME,  SortNum = 4, IsSys = false });
+            tabinfo.Columns.Add(new HiColumn { DbServer = tabinfo.TabModel.DbServer, DbName = tabinfo.TabModel.DbName, FieldName = "sage", FieldType = HiType.INT,  SortNum =5, IsSys = false });
+
+            if (standardfeild)
+            {
+                tabinfo.Columns.Add(new HiColumn { FieldName = "CreateTime", FieldDesc = "创建时间", FieldType = HiType.DATETIME, SortNum = 990, DBDefault = HiTypeDBDefault.FUNDATE, DefaultValue = "FUNDATE" });
+                tabinfo.Columns.Add(new HiColumn { FieldName = "CreateName", FieldDesc = "创建人", FieldType = HiType.NVARCHAR, FieldLen = 50, SortNum = 991, DBDefault = HiTypeDBDefault.EMPTY });
+                tabinfo.Columns.Add(new HiColumn { FieldName = "ModiTime", FieldDesc = "修改时间", FieldType = HiType.DATETIME, SortNum = 995, DBDefault = HiTypeDBDefault.FUNDATE, DefaultValue = "FUNDATE" });
+                tabinfo.Columns.Add(new HiColumn { FieldName = "ModiName", FieldDesc = "修改人", FieldType = HiType.NVARCHAR, FieldLen = 50, DBDefault = HiTypeDBDefault.EMPTY, SortNum = 998 });
+
+            }
+            return tabinfo;
+
+        }
+
         public static TabInfo BuildTabInfo(string tabname,bool standardfeild)
         { 
             TabInfo tabinfo = new TabInfo();
