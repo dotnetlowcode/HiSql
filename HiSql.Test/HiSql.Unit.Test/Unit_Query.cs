@@ -424,6 +424,11 @@ namespace HiSql.Unit.Test
             string jsonstr = sqlClient.HiSql("select * from H_tst10").ToJson();
             List<H_tst10> lsttst = sqlClient.HiSql("select * from H_tst10").ToList<H_tst10>();
 
+
+            jsonstr = sqlClient.HiSql("select * from H_tst10 where birth is  null").ToJson();
+
+            jsonstr = sqlClient.HiSql("select * from H_tst10 where birth is not null").ToJson();
+
         }
         void insertNullData(HiSqlClient sqlClient)
         {

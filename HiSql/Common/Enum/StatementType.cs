@@ -53,6 +53,11 @@ namespace HiSql
         /// </summary>
         FieldTemplate=7,
 
+        /// <summary>
+        /// 判断值是否为null 如 birth is null  ,birth is not null
+        /// </summary>
+        Null=8,
+
 
 
     }

@@ -88,6 +88,14 @@ namespace HiSql.AST
                     .Append(@"(?!\d+)(?<rfields>(?:(?<rflag>[\#]{1,2}|[\@]{1})?(?!\d+)(?<rtab>[\w]+)(?:[\.]{1}))?(?!\d+)(?<rfield>[\w]+)")
                     .Append(")").ToString()
                    
+                },
+                new WhereGrp()
+                { 
+                    SType=StatementType.Null,
+                    Reg = new StringBuilder()
+                    .Append(@"^(?:[\s]*)[`]?(?<fields>(?:(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w]+)(?:[\.]{1}))?(?<field>[\w]+))\s*[`]?[\s]*")
+                    .Append(@"(?<symbol>is[\s]+null\b|is[\s]+not[\s]+null\b)")
+                    .ToString()
                 }
                 
 
