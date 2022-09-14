@@ -321,7 +321,8 @@ namespace HiSql.Unit.Test
 
             query = sqlClient.Query("Hi_FieldModel").As("A").Field("*")
               .Join("Hi_TabModel", JoinType.Left).As("B").On(@"A.TabName=B.TabName  AND B.TabName = 'Hi_TestQuery'  AND A.FieldName = 'CreateTime'")
-              .Where("A.TabName='Hi_TestQuery'");
+              .Where("A.TabName='Hi_TestQuery'")
+              ;
             _outputHelper.WriteLine(query.ToSql()); successCount++;
             successActCount += query.ToTable().Rows.Count == 18? 1 : 0;
 
@@ -370,7 +371,15 @@ namespace HiSql.Unit.Test
              _FieldModelsA = sqlClient.Query("Hi_FieldModel").Field("*").Take(10).Skip(1).ToList<Hi_FieldModel>();
              bool datareader2listIsOk = JsonConverter.ToJson(_FieldModelsA).Equals(JsonConverter.ToJson(_FieldModelsB));
 
-            _outputHelper.WriteLine($"测试 IDataReader 转 List<T>  一致性：  {datareader2listIsOk}");
+
+            _FieldModelsB = sqlClient.Query("Hi_TestQuery").Field("*").Take(10).Skip(1).ToList<Hi_FieldModel>(ref total);
+            _FieldModelsA = sqlClient.Query("Hi_TestQuery").Field("*").Take(10).Skip(1).ToList<Hi_FieldModel>();
+
+            bool datareader2Hi_TestQueryIsOk = JsonConverter.ToJson(_FieldModelsA).Equals(JsonConverter.ToJson(_FieldModelsB));
+
+
+            _outputHelper.WriteLine($"测试 IDataReader 转 List<T>  一致性：  {datareader2listIsOk && datareader2Hi_TestQueryIsOk}");
+
 
 
             //测试 list to table

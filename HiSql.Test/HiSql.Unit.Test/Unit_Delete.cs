@@ -119,6 +119,16 @@ namespace HiSql.Unit.Test
             rltcnt = delete.ExecCommand();
             successActCount += rltcnt == 0 ? 1 : 0;
 
+            //delete = sqlClient.Delete("Hi_TestDelete").Where(new Filter { { "Uid", OperType.BETWEEN, new RangDefinition() { Low = 1, High = 4 } } })
+                
+            //    .Where(" Uid >=498 and Uvarchar = 'asdf' or  Uid >=498 or ( Uid BETWEEN '1' and '4' and Uid >=498 ) ");
+            //successCount++;
+            //_outputHelper.WriteLine(delete.ToSql());
+            //rltcnt = delete.ExecCommand();
+            //successActCount += rltcnt == 0 ? 1 : 0;
+
+
+
             delete = sqlClient.Delete("Hi_TestDelete", new List<Hi_TestDelete>() { new Hi_TestDelete { Uid = 7, Uvarchar = "testlen7", Unvarchar = "新店开业通告 广东广州天河城购物广场店新店开业通告 广东广州天河城购物广场店新店开业通告 广东广州天" } });
             successCount++;
             _outputHelper.WriteLine(delete.ToSql());
@@ -131,7 +141,7 @@ namespace HiSql.Unit.Test
             successCount++;
             _outputHelper.WriteLine(delete.ToSql());
             rltcnt = delete.ExecCommand();
-            successActCount += rltcnt == 491 ? 1 : 0;
+            successActCount += rltcnt >0 ? 1 : 0;
 
 
             delete = sqlClient.TrunCate("Hi_TestDelete");

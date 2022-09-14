@@ -1192,7 +1192,10 @@ namespace HiSql
             }
             
                 IDataReader dr = this._context.DBO.GetDataReader(_sql, null);
-                _result = DataConvert.ToList<T>(dr, this._context.CurrentConnectionConfig.DbType);
+               // _result = DataConvert.ToList<T>(dr, this._context.CurrentConnectionConfig.DbType);
+                _result = DataConverter.ToList<T>(dr, this._context.CurrentConnectionConfig.DbType);
+
+
                 dr.Close();
             }
             

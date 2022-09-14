@@ -201,10 +201,10 @@ namespace HiSql
                                     {
                                         pinfo.SetValue(t1, 0);
                                     }
-                                    else if (pinfo.PropertyType.IsIn<Type>(Constants.StringType))
-                                    {
-                                        pinfo.SetValue(t1, "");
-                                    }
+                                    //else if (pinfo.PropertyType.IsIn<Type>(Constants.StringType))
+                                    //{
+                                    //    pinfo.SetValue(t1, "");
+                                    //}
                                     else
                                     {
                                         pinfo.SetValue(t1, null);//add by tansar 2022.9.13
@@ -263,10 +263,11 @@ namespace HiSql
                                     {
                                         pinfo.SetValue(t1, 0);
                                     }
-                                    else if (pinfo.PropertyType.IsIn<Type>(Constants.StringType))
-                                    {
-                                        pinfo.SetValue(t1, "");
-                                    }
+                                    //允许为null
+                                    //else if (pinfo.PropertyType.IsIn<Type>(Constants.StringType))
+                                    //{
+                                    //    pinfo.SetValue(t1, "");
+                                    //}
                                     else
                                     {
                                         pinfo.SetValue(t1, null);//add by tansar 2022.9.13
