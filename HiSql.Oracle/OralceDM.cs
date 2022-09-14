@@ -1709,6 +1709,24 @@ namespace HiSql
                         }
 
                     }
+                    else if (whereResult.SType == StatementType.Null)
+                    {
+                        // field is null | field is not null  两种写法
+                        if (whereResult.Result.ContainsKey("fields") && whereResult.Result.ContainsKey("fields"))
+                        {
+                            FieldDefinition field = new FieldDefinition(whereResult.Result["fields"].ToString());
+                            HiColumn hiColumn = CheckField(TableList, dictabinfo, Fields, field);
+                            if (hastabname)
+                                sb_sql.Append($"{dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, field)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, field)}{dbConfig.Field_After}");
+                            else
+                                sb_sql.Append($"{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, field)}{dbConfig.Field_After}");
+                            if (hiColumn == null)
+                                throw new Exception($"字段[{whereResult.Result["fields"].ToString()}]出现错误");
+
+
+                            sb_sql.Append($" {whereResult.Result["symbol"].ToString()} ");
+                        }
+                    }
                     else
                         throw new Exception("暂时不支持该语法");
                 }
