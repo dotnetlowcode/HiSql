@@ -365,7 +365,7 @@ namespace HiSql.Extension
             }
 
             //保存抬头数据
- 
+
 
             using (FileStream fs = File.OpenWrite(newfile))
             {
@@ -477,12 +477,23 @@ namespace HiSql.Extension
                 var dt = dataResult.Item1;
                 for (var i = 0; i < dt.Rows.Count; i++)
                 {
-                    beginRow += 1;
+                    if (beginRow == 0)
+                    {
+                        beginRow = beginRow + 1 + headerRowNumber;//从表头的下一行开始写
+                    }
+                    else
+                    {
+                        beginRow = beginRow + 1;
+                    }
                     var excelRow = xssfsheet.CreateRow(beginRow);
                     var dtRow = dt.Rows[i];
                     for (int j = 0; j < headerMap.Keys.Count; j++)
                     {
-                        var headKey = headerRow.GetCell(j).StringCellValue;
+                        var headKey = headerRow.GetCell(j)?.StringCellValue;
+                        if (headKey == null)
+                        {
+                            continue;
+                        }
                         var dtKey = headerMap[headKey];
                         var dtCell = dtRow[dtKey];
                         var dtColumn = dt.Columns[dtKey];
