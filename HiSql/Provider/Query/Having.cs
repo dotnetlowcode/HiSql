@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HiSql.AST;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,8 @@ namespace HiSql
     public class Having : IEnumerable<HavingDefinition>
     {
         private readonly List<HavingDefinition> _elements = new List<HavingDefinition>();
+
+
 
         AST.HavingParse havingParse = null;
 
@@ -32,7 +35,24 @@ namespace HiSql
         {
             //解析字符串条件
             havingParse = new AST.HavingParse(havingstr);
-            
+
+            //解析 出 HavingDefinition
+            var havingResult = havingParse.Result;
+            LogiType logitype = LogiType.AND;
+            foreach (HavingResult whereResult in havingResult)
+            {
+                if (whereResult.SType == StatementType.FieldValue)
+                {
+                    HavingDefinition havingDefinition = new HavingDefinition(whereResult.Result["left"].ToString(), whereResult.Result["op"].ToString().GetOperType(), logitype, whereResult.Result["value"]);
+                    _elements.Add(havingDefinition);
+                    logitype = LogiType.AND;
+                }
+                else if (whereResult.SType == StatementType.Symbol)
+                {
+                    logitype = whereResult.Result["mode"].ToString().GetLogiType();
+                }
+            }
+
         }
         public Having()
         { 
@@ -43,6 +63,7 @@ namespace HiSql
         {
             HavingDefinition havingDefinition = new HavingDefinition(fieldname, opertype, value);
             _elements.Add(havingDefinition);
+
             return this;
         }
 

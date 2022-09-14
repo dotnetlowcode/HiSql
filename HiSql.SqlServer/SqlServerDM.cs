@@ -874,10 +874,10 @@ namespace HiSql
             StringBuilder sb_field = new StringBuilder();
             string _schema = string.IsNullOrEmpty(Context.CurrentConnectionConfig.Schema) ? "dbo" : Context.CurrentConnectionConfig.Schema;
             int i = 0;
-            if ((!istrunctate && !isdrop && dic_value.Count > 0) || !string.IsNullOrEmpty(_where))
+            if ((!istrunctate && !isdrop && dic_value !=null && dic_value.Count > 0) || !string.IsNullOrEmpty(_where))
             {
                 _temp_delete = dbConfig.Delete_Statement_Where;
-                if (dic_value.Count > 0)
+                if (dic_value !=null && dic_value.Count > 0)
                 {
                     foreach (string n in dic_value.Keys)
                     {
@@ -2291,9 +2291,6 @@ namespace HiSql
                     {
                         FieldDefinition field = new FieldDefinition(whereResult.Result["left"].ToString(), true);
 
-                        HiColumn hiColumn = CheckField(TableList, dictabinfo, Fields, field, true);
-
-
                         if (field.IsFun)
                         {
                             if (Tool.IsDecimal(whereResult.Result["value"].ToString()))
@@ -2331,6 +2328,7 @@ namespace HiSql
                         }
                         else
                         {
+                            HiColumn hiColumn = CheckField(TableList, dictabinfo, Fields, field, true);
                             if (hiColumn != null)
                                 sb_sql.Append($"{dbConfig.Table_Pre}{field.AsTabName}{dbConfig.Table_After}.{dbConfig.Table_Pre}{field.AsFieldName}{dbConfig.Table_After} {whereResult.Result["op"].ToString()} '{whereResult.Result["value"].ToString()}'");
                             else
@@ -2384,6 +2382,8 @@ namespace HiSql
 
             return sb_sql.ToString();
         }
+
+       
 
         /// <summary>
         /// 生成查询字段清单
@@ -2665,7 +2665,10 @@ namespace HiSql
                 }
                 else
                 {
-                    throw new Exception($"查询多张表时 字段[{fieldDefinition.FieldName}]需要指定表");
+                    if (!"*".Equals(fieldDefinition.FieldName))
+                    {
+                        throw new Exception($"查询多张表时 字段[{fieldDefinition.FieldName}]需要指定表");
+                    }
                 }
             }
             TableDefinition tabinfo = TableList.Where(t => t.AsTabName.ToLower() == fieldDefinition.AsTabName.ToLower()).FirstOrDefault();//&& t.Columns.Any(c=>c.FieldName==fieldDefinition.FieldName)

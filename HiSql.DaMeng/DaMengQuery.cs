@@ -253,49 +253,49 @@ namespace HiSql
             }
             return colist;
         }
-        public override IQuery WithRank(DbRank rank, DbFunction dbFunction, string field, string asname, SortType sortType)
-        {
-            dbFunction.VerifyDbFunction(field);
-            if (field.Trim() != "*" && !string.IsNullOrEmpty(field))
-                field = $"{dbConfig.Field_Pre}{field}{dbConfig.Field_After}";
-            switch (rank)
-            {
-                case DbRank.DENSERANK:
-                    if (dbFunction.IsIn<DbFunction>(DbFunction.AVG, DbFunction.COUNT, DbFunction.SUM))
-                        this.Ranks.Add($"dense_rank() over( order by {dbFunction.ToString()}({field}) {sortType.ToString()}) as {asname}");
-                    else if (dbFunction.IsIn<DbFunction>(DbFunction.NONE))
-                    {
-                        this.Ranks.Add($"dense_rank() over( order by  {field} {sortType.ToString()}) as {asname}");
-                    }
-                    else
-                        throw new Exception($"{rank.ToString()} 不支持[{dbFunction.ToString()}]此函数");
-                    break;
-                case DbRank.RANK:
-                    if (dbFunction.IsIn<DbFunction>(DbFunction.AVG, DbFunction.COUNT, DbFunction.SUM))
-                        this.Ranks.Add($"rank() over( order by {dbFunction.ToString()}({field}) {sortType.ToString()}) as {asname}");
-                    else if (dbFunction.IsIn<DbFunction>(DbFunction.NONE))
-                    {
-                        this.Ranks.Add($"rank() over( order by  {field} {sortType.ToString()}) as {asname}");
-                    }
-                    else
-                        throw new Exception($"{rank.ToString()} 不支持[{dbFunction.ToString()}]此函数");
-                    break;
-                case DbRank.ROWNUMBER:
-                    if (dbFunction.IsIn<DbFunction>(DbFunction.AVG, DbFunction.COUNT, DbFunction.SUM))
-                        this.Ranks.Add($"row_number() over( order by {dbFunction.ToString()}({field}) {sortType.ToString()}) as {asname}");
-                    else if (dbFunction.IsIn<DbFunction>(DbFunction.NONE))
-                    {
-                        this.Ranks.Add($"row_number() over( order by  {field} {sortType.ToString()}) as {asname}");
-                    }
-                    else
-                        throw new Exception($"{rank.ToString()} 不支持[{dbFunction.ToString()}]此函数");
-                    break;
-                default:
-                    break;
-            }
+        //public override IQuery WithRank(DbRank rank, DbFunction dbFunction, string field, string asname, SortType sortType)
+        //{
+        //    dbFunction.VerifyDbFunction(field);
+        //    if (field.Trim() != "*" && !string.IsNullOrEmpty(field))
+        //        field = $"{dbConfig.Field_Pre}{field}{dbConfig.Field_After}";
+        //    switch (rank)
+        //    {
+        //        case DbRank.DENSERANK:
+        //            if (dbFunction.IsIn<DbFunction>(DbFunction.AVG, DbFunction.COUNT, DbFunction.SUM))
+        //                this.Ranks.Add($"dense_rank() over( order by {dbFunction.ToString()}({field}) {sortType.ToString()}) as {asname}");
+        //            else if (dbFunction.IsIn<DbFunction>(DbFunction.NONE))
+        //            {
+        //                this.Ranks.Add($"dense_rank() over( order by  {field} {sortType.ToString()}) as {asname}");
+        //            }
+        //            else
+        //                throw new Exception($"{rank.ToString()} 不支持[{dbFunction.ToString()}]此函数");
+        //            break;
+        //        case DbRank.RANK:
+        //            if (dbFunction.IsIn<DbFunction>(DbFunction.AVG, DbFunction.COUNT, DbFunction.SUM))
+        //                this.Ranks.Add($"rank() over( order by {dbFunction.ToString()}({field}) {sortType.ToString()}) as {asname}");
+        //            else if (dbFunction.IsIn<DbFunction>(DbFunction.NONE))
+        //            {
+        //                this.Ranks.Add($"rank() over( order by  {field} {sortType.ToString()}) as {asname}");
+        //            }
+        //            else
+        //                throw new Exception($"{rank.ToString()} 不支持[{dbFunction.ToString()}]此函数");
+        //            break;
+        //        case DbRank.ROWNUMBER:
+        //            if (dbFunction.IsIn<DbFunction>(DbFunction.AVG, DbFunction.COUNT, DbFunction.SUM))
+        //                this.Ranks.Add($"row_number() over( order by {dbFunction.ToString()}({field}) {sortType.ToString()}) as {asname}");
+        //            else if (dbFunction.IsIn<DbFunction>(DbFunction.NONE))
+        //            {
+        //                this.Ranks.Add($"row_number() over( order by  {field} {sortType.ToString()}) as {asname}");
+        //            }
+        //            else
+        //                throw new Exception($"{rank.ToString()} 不支持[{dbFunction.ToString()}]此函数");
+        //            break;
+        //        default:
+        //            break;
+        //    }
 
-            return this;
-        }
+        //    return this;
+        //}
 
 
         /// <summary>
@@ -445,7 +445,11 @@ namespace HiSql
 
             //having
             if (this.Havings != null)
-                sb_having.Append(damengDM.BuildHavingSql(this.TableList, dictabinfo, this.Fields, this.Havings.HavingParse.Result, this.IsMultiSubQuery));
+            {
+                //sb_having.Append(damengDM.BuildHavingSql(this.TableList, dictabinfo, this.Fields, this.Havings.HavingParse.Result, this.IsMultiSubQuery));
+                //统一采用 父类的方法
+                sb_having.Append(base.BuildHavingSql(this.TableList, dictabinfo, this.Fields, this.Havings.Elements, this.IsMultiSubQuery));
+            }
 
             //排序字段
             sb_sort.Append(damengDM.BuildOrderBySql(ref sb_group, dictabinfo, (QueryProvider)this));

@@ -78,14 +78,11 @@ namespace HiSql.Unit.Test
             //初始化
             initDemoDynTable(sqlClient, "Hi_TestQuery");
             query(sqlClient);
-
             queryIn(sqlClient);
-
             queryJoin(sqlClient);
-
-             queryWhere(sqlClient);
+            queryWhere(sqlClient);
             queryCase(sqlClient);
-            //queryGroupBy(sqlClient);    //有问题
+            queryGroupBy(sqlClient);    //有问题
         }
 
         void queryWhere(HiSqlClient sqlClient)
@@ -240,10 +237,10 @@ namespace HiSql.Unit.Test
             var query = sqlClient.Query("Hi_FieldModel").As("A")
                 .Field("A.FieldName as FieldName, count(*) as _COUNT, AVG(FieldLen) as _AVG, MIN(FieldLen) as _MIN,MAX(FieldLen) as _MAX,SUM(FieldLen) as _SUM ".Split(","))
                  .WithRank(DbRank.DENSERANK, DbFunction.NONE, "FieldName", "rowidx1", SortType.ASC)
-             .WithRank(DbRank.DENSERANK, DbFunction.AVG, "FieldLen", "rowidx2", SortType.ASC)
-             .WithRank(DbRank.DENSERANK, DbFunction.MIN, "FieldLen", "rowidx3", SortType.ASC)
-             .WithRank(DbRank.DENSERANK, DbFunction.MAX, "FieldLen", "rowidx4", SortType.ASC)
-              .WithRank(DbRank.DENSERANK, DbFunction.SUM, "FieldLen", "rowidx5", SortType.ASC)
+                .WithRank(DbRank.DENSERANK, DbFunction.AVG, "FieldLen", "rowidx2", SortType.ASC)
+                 .WithRank(DbRank.DENSERANK, DbFunction.MIN, "FieldLen", "rowidx3", SortType.ASC)
+                 .WithRank(DbRank.DENSERANK, DbFunction.MAX, "FieldLen", "rowidx4", SortType.ASC)
+                 .WithRank(DbRank.DENSERANK, DbFunction.SUM, "FieldLen", "rowidx5", SortType.ASC)
                 .WithRank(DbRank.DENSERANK, DbFunction.COUNT, "FieldLen", "rowidx6", SortType.ASC)
 
                 .WithRank(DbRank.DENSERANK, new Ranks { { DbFunction.NONE, "FieldName" }, { DbFunction.MAX, "FieldLen", SortType.DESC }, { DbFunction.MIN, "FieldLen", SortType.DESC }, { DbFunction.COUNT, "FieldLen", SortType.DESC }, { DbFunction.AVG, "FieldLen", SortType.DESC }, { DbFunction.SUM, "FieldLen", SortType.DESC } }, "rowidx234")
@@ -253,22 +250,21 @@ namespace HiSql.Unit.Test
                 .Join("Hi_TabModel").As("B").On(new HiSql.JoinOn() { { "A.TabName", "B.TabName" } })
                 .Where("A.TabName='Hi_TestQuery'")
                 .Group(new GroupBy { { "A.TabName" }, { "A.FieldName" } })
-
-        //.Having("count(*)>=0") //此处语法错误
-        .Having(new Having() { { "count(*)", OperType.GE, "0" } } )
-        .Sort("A.TabName asc", "A.FieldName asc");
-      
+        .Having("count(*) <> 0  and  count(*)   <77 or  count(*)   <77  and  count(*)   <77 ")
+        //.Having(new Having() { { "count(*)", OperType.GE, "0" },{ "AVG(FieldLen)", OperType.GE, "0" } } )
+        .Sort("A.TabName asc", "A.FieldName asc")
+        ;
             _outputHelper.WriteLine(query.ToSql()); successCount++;
             successActCount += query.ToTable().Rows.Count == 18 ? 1 : 0;
 
-//            //样例2 有问题
-//            query = sqlClient.HiSql(@"select A.FieldName as FieldName , count(*) as _COUNT, AVG(FieldLen) as _AVG, MIN(FieldLen) as _MIN,MAX(FieldLen) as _MAX,SUM(FieldLen) as _SUM 
+            //            //样例2 有问题
+//           query = sqlClient.HiSql(@"select A.FieldName as FieldName , count(*) as _COUNT, AVG(FieldLen) as _AVG, MIN(FieldLen) as _MIN,MAX(FieldLen) as _MAX,SUM(FieldLen) as _SUM 
 //from Hi_FieldModel as A join Hi_TabModel as b on A.TabName = B.TabName where A.TabName='Hi_TestQuery' group by A.TabName,A.FieldName having count(*)>=0 order by A.TabName asc, A.FieldName asc");
 
-//            //order by  HiSql语法检测错误: 子查询语句[A.TabName = 'Hi_TestQuery' group by A.TabName, A.FieldName having count(*) >= 0 order by A.TabName asc, A.FieldName asc]不允许[order by]排序
+            //order by  HiSql语法检测错误: 子查询语句[A.TabName = 'Hi_TestQuery' group by A.TabName, A.FieldName having count(*) >= 0 order by A.TabName asc, A.FieldName asc]不允许[order by]排序
 
-//            _outputHelper.WriteLine(query.ToSql()); successCount++;
-//            successActCount += query.ToTable().Rows.Count == 3 ? 1 : 0;
+            //_outputHelper.WriteLine(query.ToSql()); successCount++;
+            //successActCount += query.ToTable().Rows.Count == 3 ? 1 : 0;
 
             Assert.Equal(successActCount, successCount);
         }

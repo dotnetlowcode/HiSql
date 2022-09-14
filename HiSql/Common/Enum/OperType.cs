@@ -65,4 +65,44 @@ namespace HiSql
         //JOIN=40,//关于
 
     }
+    public static class OperTypeExt
+    {
+        private static Dictionary<string, OperType> TextMapOperType = new Dictionary<string, OperType>(StringComparer.OrdinalIgnoreCase);
+        private static Dictionary<OperType, string> OperTypeMapText = new Dictionary<OperType, string>();
+        static OperTypeExt()
+        {
+            TextMapOperType.Add("not like", OperType.NOLIKE);
+            TextMapOperType.Add("like", OperType.LIKE);
+            TextMapOperType.Add("BETWEEN", OperType.BETWEEN);
+            TextMapOperType.Add("not in", OperType.NOIN);
+            TextMapOperType.Add("in", OperType.IN);
+            TextMapOperType.Add("<=", OperType.LE);
+            TextMapOperType.Add(">=", OperType.GE);
+            TextMapOperType.Add("<", OperType.LT);
+            TextMapOperType.Add(">", OperType.GT);
+            TextMapOperType.Add("<>", OperType.NE);
+            TextMapOperType.Add("=", OperType.EQ);
+
+            foreach (string key in TextMapOperType.Keys)
+            {
+                OperTypeMapText.Add(TextMapOperType[key], key);
+            }
+        }
+        public static string GetOperTypeText(this OperType operType)
+        {
+            if (!OperTypeMapText.ContainsKey(operType))
+            {
+                throw new HiSqlException($"类型【{operType.ToString()}】错误");
+            }
+            return OperTypeMapText[operType];
+        }
+        public static OperType GetOperType(this string operTypeText)
+        {
+            if (!TextMapOperType.ContainsKey(operTypeText))
+            {
+                throw new HiSqlException($"类型【{operTypeText.ToString()}】错误");
+            }
+            return TextMapOperType[operTypeText];
+        }
+    }
 }

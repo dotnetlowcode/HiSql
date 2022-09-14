@@ -2405,7 +2405,10 @@ namespace HiSql
                 }
                 else
                 {
-                    throw new Exception($"查询多张表时 字段[{fieldDefinition.FieldName}]需要指定表");
+                    if (!"*".Equals(fieldDefinition.FieldName))
+                    {
+                        throw new Exception($"查询多张表时 字段[{fieldDefinition.FieldName}]需要指定表");
+                    }
                 }
             }
             TableDefinition tabinfo = TableList.Where(t => t.AsTabName.ToLower() == fieldDefinition.AsTabName.ToLower()).FirstOrDefault();//&& t.Columns.Any(c=>c.FieldName==fieldDefinition.FieldName)

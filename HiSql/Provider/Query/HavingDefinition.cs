@@ -38,7 +38,7 @@ namespace HiSql
         public HavingDefinition(string fieldname, OperType opertype,object value)
         {
 
-            _field = new FieldDefinition(fieldname);
+            _field = new FieldDefinition(fieldname, true);
             _opertype = opertype;
             _havingtype = HavingType.CONDITION;
             _value = value;
@@ -59,7 +59,7 @@ namespace HiSql
         public HavingDefinition(string fieldname, OperType opertype, LogiType logitype, object value)
         {
 
-            _field = new FieldDefinition(fieldname);
+            _field = new FieldDefinition(fieldname, true);
             _opertype = opertype;
             _havingtype = HavingType.CONDITION;
             _logitype = logitype;

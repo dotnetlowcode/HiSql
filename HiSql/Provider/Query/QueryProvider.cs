@@ -568,7 +568,7 @@ namespace HiSql
         {
             if (_queue.LastQueue() == "group")
             {
-
+                _having = havings;
 
                 if (havings == null || havings.Elements.Count == 0)
                 {
@@ -1007,6 +1007,7 @@ namespace HiSql
             return this;
         }
 
+       
         /// <summary>
         /// 显示第几页的数据
         /// </summary>
@@ -1484,7 +1485,114 @@ namespace HiSql
             return this;
         }
 
+        
+        protected string BuildHavingSql(List<TableDefinition> TableList, Dictionary<string, TabInfo> dictabinfo, List<FieldDefinition> Fields, List<HavingDefinition> lstresult, bool issubquery)
+        {
+            StringBuilder sb_sql = new StringBuilder();
+            if (lstresult != null && lstresult.Count() > 0)
+            {
+                foreach (HavingDefinition fieldHaving in lstresult)
+                {
+                    FieldDefinition field = fieldHaving.Field;
+                    if (sb_sql.Length  == 0)
+                    {
+                    }
+                    else
+                    {
+                        sb_sql.Append($"{(fieldHaving.LogiType == LogiType.AND ? " and " : " or ")}");
+                    }
+                    //if (Tool.IsDecimal(fieldHaving.Value.ToString()))
+                    //{
+                    //表示函数
+                        switch (field.DbFun)
+                        {
+                            case DbFunction.AVG:
+                            case DbFunction.MAX:
+                            case DbFunction.MIN:
+                            case DbFunction.SUM:
+                                sb_sql.Append($"{field.DbFun.GetDbFunctionName()}({dbConfig.Field_Pre}{field.FieldName}{dbConfig.Field_After}) {fieldHaving.OperType.GetOperTypeText()} {fieldHaving.Value.ToString()}");
+                                break;
+                            case DbFunction.COUNT:
+                                sb_sql.Append($"count(*) {fieldHaving.OperType.GetOperTypeText()} {fieldHaving.Value.ToString()}");
+                                break;
+                        }
+                        //}
+                        //else
+                        //    throw new Exception($"Having字段[{field.FieldName}] 值 [{whereResult.Result["value"].ToString()}] 非数字有注入风险");
+                }
+            }
 
+            return sb_sql.ToString();
+        }
+
+        /// <summary>
+        /// 字段检测合法性
+        /// </summary>
+        /// <param name="TableList"></param>
+        /// <param name="dictabinfo"></param>
+        /// <param name="Fields"></param>
+        /// <param name="fieldDefinition"></param>
+        /// <param name="allowstart"></param>
+        /// <returns></returns>
+        private HiColumn CheckField(List<TableDefinition> TableList, Dictionary<string, TabInfo> dictabinfo, List<FieldDefinition> Fields, FieldDefinition fieldDefinition, bool allowstart = false)
+        {
+            HiColumn hiColumn = null;
+
+            //2021.12.8 add by tgm
+            if (string.IsNullOrEmpty(fieldDefinition.AsTabName))
+            {
+                if (TableList.Count == 1)
+                {
+                    fieldDefinition.AsTabName = TableList[0].AsTabName;
+                }
+                else
+                {
+                    if (!"*".Equals(fieldDefinition.FieldName))
+                    {
+                        throw new Exception($"查询多张表时 字段[{fieldDefinition.FieldName}]需要指定表");
+                    }
+                }
+            }
+            TableDefinition tabinfo = TableList.Where(t => t.AsTabName.ToLower() == fieldDefinition.AsTabName.ToLower()).FirstOrDefault();//&& t.Columns.Any(c=>c.FieldName==fieldDefinition.FieldName)
+            if (tabinfo != null)
+            {
+                if (dictabinfo.ContainsKey(tabinfo.TabName))
+                {
+                    hiColumn = dictabinfo[tabinfo.TabName].Columns.Where(f => f.FieldName.ToLower() == fieldDefinition.FieldName.ToLower()).FirstOrDefault();
+                    if (hiColumn == null && Fields != null && Fields.Count > 0)
+                    {
+                        FieldDefinition fieldDefinition1 = Fields.Where(f => f.AsFieldName.ToLower() == fieldDefinition.FieldName.ToLower()).FirstOrDefault();
+                        if (fieldDefinition1 != null)
+                        {
+                            hiColumn = dictabinfo[tabinfo.TabName].Columns.Where(f => f.FieldName.ToLower() == fieldDefinition1.FieldName.ToLower()).FirstOrDefault();
+                            if (hiColumn == null)
+                            {
+                                if (fieldDefinition1.FieldName.Trim() != "*" && allowstart == true)
+                                    throw new Exception($"字段[{fieldDefinition1.FieldName}]在表[{fieldDefinition1.AsTabName}]中不存在");
+                            }
+                            else
+                            {
+                                //以库中的字段名为准
+                                hiColumn.FieldName = fieldDefinition1.FieldName;
+                            }
+                        }
+                        else
+                        {
+                            if (fieldDefinition.FieldName.Trim() != "*" && allowstart == true)
+                                throw new Exception($"字段[{fieldDefinition.FieldName}]在表[{fieldDefinition.AsTabName}]中不存在");
+                        }
+                    }
+                    else
+                    {
+                        //以库中的字段名为准
+                        //hiColumn.FieldName = fieldDefinition.FieldName;
+                    }
+
+
+                }
+            }
+            return hiColumn;
+        }
     }
 
 

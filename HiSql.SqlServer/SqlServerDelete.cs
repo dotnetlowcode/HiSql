@@ -40,6 +40,11 @@ namespace HiSql
             else
                 throw new Exception("未指定要更新的表");
 
+            if (this.Data.Count > 0 && (this.Filters != null || this.Wheres.Count > 0))
+            {
+                throw new Exception($"已经指定了按主键删除就不能再指定Where条件删除");
+               
+            }
             if (this.Data.Count > 0)
             {
                 List<string> _field = new List<string>();
@@ -49,9 +54,13 @@ namespace HiSql
                 {
                     throw new Exception($"已经指定了按指定数据集合删除就不能再指定Where条件删除");
                     //sql_where=Context.DMTab.BuilderWhereSql(new List<TableDefinition> { this.Table }, dictabinfo, null, this.Filters.WhereParse.Result, false);
-                }else  if (this.Wheres.Count > 0)
+                } 
+                
+                if (this.Wheres.Count > 0)
                 {
                     sql_where = Context.DMTab.BuilderWhereSql(new List<TableDefinition> { this.Table }, dictabinfo, null, this.Wheres, false);
+                    
+                    sb.AppendLine(Context.DMTab.BuildDeleteSql(this.Table, null, sql_where, false, false));
                 }
                 else
                 {
