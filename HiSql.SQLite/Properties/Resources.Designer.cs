@@ -72,7 +72,7 @@ namespace HiSql.Sqlite.Properties {
         ///	[TabType] [int]  NULL default ((0)) ,
         ///	[TabCacheType] [int]  NULL default ((0)) ,
         ///	[TabStatus] [int]  NULL default ((0)) ,
-        ///	[IsSys] [bit]   NULL [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///	[IsSys] [bit]   NULL default (( [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string HiSql {
             get {

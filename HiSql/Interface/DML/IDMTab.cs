@@ -288,7 +288,7 @@ namespace HiSql
         /// <returns></returns>
         string BuildUpdateSql(TabInfo tabinfo, TableDefinition table, Dictionary<string, string> dic_value, Dictionary<string, string> dic_primary, string _where, bool onlywhere = false);
 
-        string BuilderWhereSql(List<TableDefinition> TableList, Dictionary<string, TabInfo> dictabinfo, List<FieldDefinition> Fields, List<FilterDefinition> Wheres, bool issubquery);
+        string BuilderWhereSql(List<TableDefinition> TableList, Dictionary<string, TabInfo> dictabinfo, List<FieldDefinition> Fields, List<FilterDefinition> Wheres, bool issubquery, bool hastabname = true);
 
         /// <summary>
         /// 生成去重命令
@@ -296,7 +296,17 @@ namespace HiSql
         /// <returns></returns>
         string BuilderDistinct();
 
-        string BuilderWhereSql(List<TableDefinition> TableList, Dictionary<string, TabInfo> dictabinfo, List<FieldDefinition> Fields, List<WhereResult> lstresult, bool issubquery);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="TableList"></param>
+        /// <param name="dictabinfo"></param>
+        /// <param name="Fields"></param>
+        /// <param name="lstresult"></param>
+        /// <param name="issubquery"></param>
+        /// <param name="hastabname">是否条件带表别名</param>
+        /// <returns></returns>
+        string BuilderWhereSql(List<TableDefinition> TableList, Dictionary<string, TabInfo> dictabinfo, List<FieldDefinition> Fields, List<WhereResult> lstresult, bool issubquery,bool hastabname=true);
 
         /// <summary>
         /// 构建Group sql

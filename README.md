@@ -42,6 +42,46 @@
 
 
 
+### 2022.9.13 更新
+1. `HiSql`语句新增`is null` 和 `is not null` 查询语法
+```c#
+ sqlClient.HiSql("select * from H_tst10 where birth is  null").ToJson();
+```
+
+
+2. 数据插入时可以允许集合中的字段数不一样 如下更新所示
+
+
+```c#
+    sqlClient.Insert(tabname, new List<Dictionary<string, object>> {
+            new Dictionary<string, object>
+            {
+                { "SID",1},
+                { "uname","tansar"}
+            },
+            new Dictionary<string, object>
+            {
+                { "SID",2},
+                { "uname","tansar"},
+                { "birth",DateTime.Now}
+            },
+            new Dictionary<string, object>
+            {
+                { "SID",3},
+                { "gname","tgm"},
+                { "birth",DateTime.Now}
+            },
+            new Dictionary<string, object>
+            {
+                { "SID",5},
+                    { "uname","tansar"},
+                { "gname","tgm"}
+
+            }
+        }).ExecCommand();
+
+```
+
 
 ### 2022.8.10 更新
 1. 新增支持sqlite 目前已经支持sqlserver,oracle,hana,,mysql,postgresql,达梦,sqlite

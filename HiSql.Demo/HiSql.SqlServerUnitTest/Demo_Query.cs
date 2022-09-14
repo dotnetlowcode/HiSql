@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Dynamic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -24,6 +25,17 @@ namespace HiSql.UnitTest
             public double Low { get; set; }
             public double High { get; set; }
             public string Key { get; set; }
+        }
+
+        public class H_tst10
+        { 
+            public int SID { get; set; }
+            public string uname { get; set; }
+            public string gname { get; set; }
+
+            public DateTime birth { get; set; }
+
+            public int sage { get; set; }
         }
 
         public static void Init(HiSqlClient sqlClient)
@@ -51,9 +63,123 @@ namespace HiSql.UnitTest
             //Query_Demo19(sqlClient);
             // Query_Demo20(sqlClient);
             //Query_Demo21();
-            Query_DemoEmit(sqlClient);
+            //Query_DemoEmit(sqlClient);
+
+            Query_Null(sqlClient);
             var s = Console.ReadLine();
         }
+
+        static void Query_Null(HiSqlClient sqlClient)
+        {
+
+            //转到动态类
+            List<TDynamic> lstdyn= sqlClient.HiSql("select * from H_tst10").ToDynamic();
+            int sid = 3;
+            if (lstdyn.Count > 0)
+            {
+                foreach (TDynamic dyn in lstdyn)
+                {
+
+                    Dictionary<string, object> dic = (Dictionary<string, object>)dyn;
+
+
+                    if (dic.Count > 0)
+                    {
+                        dic["SID"] = sid;
+
+                        sqlClient.Insert("H_tst10", dic).ExecCommand();
+
+                        sid++;
+                    }
+                }
+
+                sqlClient.Delete("H_tst10",new List<dynamic>(){ new { SID = 3 }, new { SID = 4 } }).ExecCommand();
+            }
+            sid = 3;
+            List<ExpandoObject> lstexp = sqlClient.HiSql("select * from H_tst10").ToEObject();
+            if (lstdyn.Count > 0)
+            {
+                foreach (ExpandoObject dyn in lstexp)
+                {
+
+                    TDynamic dynamic=new TDynamic(dyn);
+
+                    Dictionary<string, object> dic = (Dictionary<string, object>)dynamic;
+                    if (dic.Count > 0)
+                    {
+                        dic["SID"] = sid;
+
+                        sqlClient.Insert("H_tst10", dic).ExecCommand();
+
+                        sid++;
+                    }
+                }
+                sqlClient.Delete("H_tst10", new List<dynamic>() { new { SID = 3 }, new { SID = 4 } }).ExecCommand();
+            }
+
+
+            string jsonstr= sqlClient.HiSql("select * from H_tst10").ToJson();
+
+            if (jsonstr.Length > 0)
+            { 
+                
+            }
+
+            DataTable DT= sqlClient.HiSql("select * from H_tst10").ToTable();
+
+
+
+            List<H_tst10> lsttst = sqlClient.HiSql("select * from H_tst10").ToList<H_tst10>();
+            sid = 3;
+
+            H_tst10 tst1 = new H_tst10 { SID=3,uname="tansar" };
+            List<H_tst10> lsttst2 = new List<H_tst10>();
+            lsttst2.Add(tst1);
+            H_tst10 tst2 = new H_tst10 { SID = 4, uname = "tansar" ,birth=DateTime.Now};
+            lsttst2.Add(tst2);
+
+            sqlClient.Insert("H_tst10", lsttst2).ExecCommand();
+
+
+            sqlClient.Delete("H_tst10", new List<dynamic>() { new { SID = 3 }, new { SID = 4 } }).ExecCommand();
+
+
+
+            sqlClient.Insert("H_tst10", new List<Dictionary<string, object>> { 
+                new Dictionary<string, object>
+                {
+                    { "SID",3},
+                    { "uname","tansar"}
+                },
+                new Dictionary<string, object>
+                {
+                    { "SID",4},
+                    { "uname","tansar"},
+                    { "birth",DateTime.Now}
+                }
+            }).ExecCommand();
+
+            sqlClient.Delete("H_tst10", new List<dynamic>() { new { SID = 3 }, new { SID = 4 } }).ExecCommand();
+
+            sqlClient.Modi("H_tst10", new List<Dictionary<string, object>> {
+                new Dictionary<string, object>
+                {
+                    { "SID",3},
+                    { "uname","tansar"}
+                },
+                new Dictionary<string, object>
+                {
+                    { "SID",4},
+                    { "uname","tansar"},
+                    { "birth",DateTime.Now}
+                }
+            }).ExecCommand();
+
+
+            sqlClient.Delete("H_tst10", new List<dynamic>() { new { SID = 3 }, new { SID = 4 } }).ExecCommand();
+
+        }
+
 
         static void Query_DemoEmit(HiSqlClient sqlClient)
         {

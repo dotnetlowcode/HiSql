@@ -20,8 +20,8 @@ namespace HiSql
         string _temp_schema_pre = "";
         string _temp_schema_after = "";
 
-        string _temp_table_pre = "";
-        string _temp_table_after = "";
+        string _temp_table_pre = "\"";
+        string _temp_table_after = "\"";
 
         string _temp_field_pre = "\"";
         string _temp_field_after = "\"";
@@ -691,7 +691,7 @@ namespace HiSql
 
             //表创建时的KEY模版
             _temp_tabel_key = new StringBuilder()
-                .Append($"alter table [$TabName$]  add constraint {_temp_table_pre}PK_[$TabName$][$ConnectID$]{_temp_table_after} primary key ([$Keys$])")
+                .Append($"alter table {_temp_table_pre}[$TabName$]{_temp_table_after}  add constraint {_temp_table_pre}PK_[$TabName$][$ConnectID$]{_temp_table_after} primary key ([$Keys$])")
                 .ToString();
             _temp_table_key2 = "[$FieldName$] ";//定义主键的排序方式
 
@@ -840,7 +840,7 @@ UNION ALL
 
             _temp_delete = $"delete {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} ";
 
-            _temp_delete_where = $"delete {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} where [$Where$] ";
+            _temp_delete_where = $"delete {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after}   where [$Where$] ";
 
             //删除不会留下任何痕迹
             _temp_truncate = $"execute immediate 'TRUNCATE TABLE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after}';";
