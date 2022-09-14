@@ -119,8 +119,16 @@ namespace HiSql.Unit.Test
             rltcnt = delete.ExecCommand();
             successActCount += rltcnt == 0 ? 1 : 0;
 
+            delete = sqlClient.Delete("Hi_TestDelete").Where(new Filter { { "Uid", OperType.GE, 498 } , { "Uvarchar", OperType.EQ, "asdf" }
+             , { "Uid", OperType.GE, 498 } ,{ "("},  { "Uid", OperType.BETWEEN, new RangDefinition() { Low = 1, High = 4 } },{ LogiType.OR},  { "Uid", OperType.GE, 498 } ,   { ")"},
+            });
+            successCount++;
+            _outputHelper.WriteLine(delete.ToSql());
+            rltcnt = delete.ExecCommand();
+            successActCount += rltcnt == 0 ? 1 : 0;
+
             //delete = sqlClient.Delete("Hi_TestDelete").Where(new Filter { { "Uid", OperType.BETWEEN, new RangDefinition() { Low = 1, High = 4 } } })
-                
+
             //    .Where(" Uid >=498 and Uvarchar = 'asdf' or  Uid >=498 or ( Uid BETWEEN '1' and '4' and Uid >=498 ) ");
             //successCount++;
             //_outputHelper.WriteLine(delete.ToSql());
