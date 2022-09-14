@@ -2013,7 +2013,7 @@ namespace HiSql
             {
                 if (filterDefinition.FilterType == FilterType.BRACKET_LEFT)
                 {
-                    sb_where.Append("(");
+                    sb_where.Append(sb_where.Length > 1 ? " and (" : "(");
                 }
                 else if (filterDefinition.FilterType == FilterType.BRACKET_RIGHT)
                 {

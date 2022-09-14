@@ -108,7 +108,7 @@ namespace HiSql.Unit.Test
             int successCount = 0;
             int successActCount = 0;
 
-            var query = sqlClient.HiSql(@$"select * from Hi_FieldModel  where (tabname =  'Hi_FieldModel' or  tabname = 'Hi_TestQuery') and FieldType in (11,41,21) ");
+            var query = sqlClient.HiSql(@$"select * from Hi_FieldModel  where (tabname =  'Hi_FieldModel' or  tabname = 'Hi_TestQuery') and (tabname =  'Hi_FieldModel' or  tabname = 'Hi_TestQuery') and FieldType in (11,41,21) ");
             successCount++;
             _outputHelper.WriteLine(query.ToSql());
             successActCount += query.ToTable().Rows.Count == 29 ? 1 : 0;
@@ -119,7 +119,7 @@ namespace HiSql.Unit.Test
             successCount++;
             successActCount += query.ToTable().Rows.Count == 29 ? 1 : 0;
 
-            query = sqlClient.Query("Hi_FieldModel").Field("*").Where(@$"(tabname =  'Hi_FieldModel' or  tabname = 'Hi_TestQuery') and FieldType in (11,41,21) ");
+            query = sqlClient.Query("Hi_FieldModel").Field("*").Where(@$"(tabname =  'Hi_FieldModel' or  tabname = 'Hi_TestQuery') and (tabname =  'Hi_FieldModel' or  tabname = 'Hi_TestQuery') and FieldType in (11,41,21) ");
             _outputHelper.WriteLine(query.ToSql());
             successCount++;
             successActCount += query.ToTable().Rows.Count == 29 ? 1 : 0;
