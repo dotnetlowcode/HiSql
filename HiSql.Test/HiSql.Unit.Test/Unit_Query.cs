@@ -100,7 +100,7 @@ namespace HiSql.Unit.Test
 
              queryWhere(sqlClient);
             queryCase(sqlClient);
-            //queryGroupBy(sqlClient);    //有问题
+            queryGroupBy(sqlClient);    //有问题
         }
 
         void queryWhere(HiSqlClient sqlClient)
