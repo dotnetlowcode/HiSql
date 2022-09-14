@@ -944,13 +944,13 @@ namespace HiSql
             switch (rank)
             {
                 case DbRank.DENSERANK:
-                    _list_rank.Add($"dense_rank() over( order by {dbFunction.GetDbFunctionName()}({field}) {sortType.ToString()}) as {asname}");
+                    _list_rank.Add($"dense_rank() over( order by {dbFunction.GetDbFunctionName()}({field}) {sortType.ToString()}) as {dbConfig.Field_Pre}{asname}{dbConfig.Field_After}");
                     break;
                 case DbRank.RANK:
-                    _list_rank.Add($"rank() over( order by {dbFunction.GetDbFunctionName()}({field}) {sortType.ToString()}) as {asname}");
+                    _list_rank.Add($"rank() over( order by {dbFunction.GetDbFunctionName()}({field}) {sortType.ToString()}) as {dbConfig.Field_Pre}{asname}{dbConfig.Field_After}");
                     break;
                 case DbRank.ROWNUMBER:
-                    _list_rank.Add($"row_number() over( order by {dbFunction.GetDbFunctionName()}({field}) {sortType.ToString()}) as {asname}");
+                    _list_rank.Add($"row_number() over( order by {dbFunction.GetDbFunctionName()}({field}) {sortType.ToString()}) as {dbConfig.Field_Pre}{asname}{dbConfig.Field_After}");
                     break;
                 default:
                     break;
@@ -993,13 +993,13 @@ namespace HiSql
             switch (rank)
             {
                 case DbRank.DENSERANK:
-                    _list_rank.Add($"dense_rank() over( order by {string.Join(",", _lstorderby.ToArray()) }) as {asname}");
+                    _list_rank.Add($"dense_rank() over( order by {string.Join(",", _lstorderby.ToArray()) }) as {dbConfig.Field_Pre}{asname}{dbConfig.Field_After}");
                     break;
                 case DbRank.RANK:
-                    _list_rank.Add($"rank() over( order by {string.Join(",", _lstorderby.ToArray())}) as {asname}");
+                    _list_rank.Add($"rank() over( order by {string.Join(",", _lstorderby.ToArray())}) as {dbConfig.Field_Pre}{asname}{dbConfig.Field_After}");
                     break;
                 case DbRank.ROWNUMBER:
-                    _list_rank.Add($"row_number() over( order by {string.Join(",", _lstorderby.ToArray())}) as {asname}");
+                    _list_rank.Add($"row_number() over( order by {string.Join(",", _lstorderby.ToArray())}) as {dbConfig.Field_Pre}{asname}{dbConfig.Field_After}");
                     break;
                 default:
                     break;

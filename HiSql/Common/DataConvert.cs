@@ -1558,12 +1558,12 @@ namespace HiSql
         }
         static public HashSet<string> DataTableFieldToHashSet(DataTable dt, string field)
         {
-            HashSet<string> hash = new HashSet<string>();
+            HashSet<string> hash = new HashSet<string>(System.StringComparer.Create(System.Globalization.CultureInfo.CurrentCulture, true));
             if (dt != null && dt.Columns.Contains(field) && dt.Rows.Count > 0)
             {
                 foreach (DataRow drow in dt.Rows)
                 {
-                    hash.Add(drow[field].ToString().ToLower());
+                    hash.Add(drow[field].ToString());
                 }
             }
             return hash;

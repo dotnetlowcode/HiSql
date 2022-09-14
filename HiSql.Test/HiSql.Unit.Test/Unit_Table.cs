@@ -90,6 +90,7 @@ namespace HiSql.Unit.Test
             ////动态创建表
             createDemoDynTable(sqlClient, "H_dyntab1");
 
+            TabInfo tabinfo2 = sqlClient.DbFirst.GetTabStruct(Constants.HiSysTable["Hi_FieldModel"]);
             reCol(sqlClient, "H_dyntab1");
 
             moditable(sqlClient, "H_dyntab1");

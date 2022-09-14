@@ -437,7 +437,7 @@ namespace HiSql
                     var arrcol = hiColumns.Where(h => !string.IsNullOrEmpty(h.Regex) || h.IsRefTab).ToList();
                     foreach (HiColumn hi in arrcol)
                     {
-                        dic_hash_reg.Add(hi.FieldName, new HashSet<string>());
+                        dic_hash_reg.Add(hi.FieldName, new HashSet<string>(System.StringComparer.Create(System.Globalization.CultureInfo.CurrentCulture, true)));
                     }
                     int _rowidx = 0;
                     string _value;
