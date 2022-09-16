@@ -2203,7 +2203,7 @@ namespace HiSql
                                 case DbFunction.AVG:
                                     if (hiColumn.FieldType.IsIn<HiType>(HiType.BIGINT, HiType.DECIMAL, HiType.INT, HiType.SMALLINT))
                                     {
-                                        sb_field.Append($"avg({dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, fieldDefinition)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}) as {fieldDefinition.AsFieldName}");
+                                        sb_field.Append($"avg({dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, fieldDefinition)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}) as {dbConfig.Field_Pre}{fieldDefinition.AsFieldName}{dbConfig.Field_After}");
                                         sb_field_result.Append($"{dbConfig.Field_Pre}{fieldDefinition.AsFieldName}{dbConfig.Field_After}");
                                         lstcol.Add(new HiColumn { FieldName = fieldDefinition.AsFieldName, DBDefault = HiTypeDBDefault.EMPTY, FieldType = hiColumn.FieldType, FieldDec = hiColumn.FieldDec, FieldLen = hiColumn.FieldLen, FieldDesc = $"avg_{fieldDefinition.AsFieldName}" });
                                     }
@@ -2211,14 +2211,14 @@ namespace HiSql
                                         throw new Exception($"表[{fieldDefinition.AsTabName}]字段[{hiColumn.FieldName}]不属于数值型无法使用AVG函数");
                                     break;
                                 case DbFunction.COUNT:
-                                    sb_field.Append($"count(*) as {fieldDefinition.AsFieldName}");
+                                    sb_field.Append($"count(*) as {dbConfig.Field_Pre}{fieldDefinition.AsFieldName}{dbConfig.Field_After}");
                                     sb_field_result.Append($"{dbConfig.Field_Pre}{fieldDefinition.AsFieldName}{dbConfig.Field_After}");
                                     lstcol.Add(new HiColumn { FieldName = fieldDefinition.AsFieldName, DBDefault = HiTypeDBDefault.EMPTY, FieldType = HiType.INT, FieldDesc = $"count_{fieldDefinition.AsFieldName}" });
                                     break;
                                 case DbFunction.SUM:
                                     if (hiColumn.FieldType.IsIn<HiType>(HiType.BIGINT, HiType.DECIMAL, HiType.INT, HiType.SMALLINT))
                                     {
-                                        sb_field.Append($"sum({dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, fieldDefinition)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}) as {fieldDefinition.AsFieldName}");
+                                        sb_field.Append($"sum({dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, fieldDefinition)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}) as {dbConfig.Field_Pre}{fieldDefinition.AsFieldName}{dbConfig.Field_After}");
                                         sb_field_result.Append($"{dbConfig.Field_Pre}{fieldDefinition.AsFieldName}{dbConfig.Field_After}");
                                         lstcol.Add(new HiColumn { FieldName = fieldDefinition.AsFieldName, DBDefault = HiTypeDBDefault.EMPTY, FieldType = hiColumn.FieldType, FieldDec = hiColumn.FieldDec, FieldLen = hiColumn.FieldLen, FieldDesc = $"sum_{fieldDefinition.AsFieldName}" });
                                     }
@@ -2229,7 +2229,7 @@ namespace HiSql
                                     if (hiColumn.FieldType.IsIn<HiType>(HiType.BIGINT, HiType.DECIMAL, HiType.INT, HiType.SMALLINT, HiType.NVARCHAR, HiType.VARCHAR, HiType.NCHAR, HiType.CHAR, HiType.DATE,
                                         HiType.DATETIME))
                                     {
-                                        sb_field.Append($"max({dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, fieldDefinition)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}) as {fieldDefinition.AsFieldName}");
+                                        sb_field.Append($"max({dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, fieldDefinition)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}) as {dbConfig.Field_Pre}{fieldDefinition.AsFieldName}{dbConfig.Field_After}");
                                         sb_field_result.Append($"{dbConfig.Field_Pre}{fieldDefinition.AsFieldName}{dbConfig.Field_After}");
                                         lstcol.Add(new HiColumn { FieldName = fieldDefinition.AsFieldName, DBDefault = HiTypeDBDefault.EMPTY, FieldType = hiColumn.FieldType, FieldDec = hiColumn.FieldDec, FieldLen = hiColumn.FieldLen, FieldDesc = $"max_{fieldDefinition.AsFieldName}" });
                                     }
@@ -2240,7 +2240,7 @@ namespace HiSql
                                     if (hiColumn.FieldType.IsIn<HiType>(HiType.BIGINT, HiType.DECIMAL, HiType.INT, HiType.SMALLINT, HiType.NVARCHAR, HiType.VARCHAR, HiType.NCHAR, HiType.CHAR, HiType.DATE,
                                         HiType.DATETIME))
                                     {
-                                        sb_field.Append($"min({dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, fieldDefinition)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}) as {fieldDefinition.AsFieldName}");
+                                        sb_field.Append($"min({dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, fieldDefinition)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}) as {dbConfig.Field_Pre}{fieldDefinition.AsFieldName}{dbConfig.Field_After}");
                                         sb_field_result.Append($"{dbConfig.Field_Pre}{fieldDefinition.AsFieldName}{dbConfig.Field_After}");
                                         lstcol.Add(new HiColumn { FieldName = fieldDefinition.AsFieldName, DBDefault = HiTypeDBDefault.EMPTY, FieldType = hiColumn.FieldType, FieldDec = hiColumn.FieldDec, FieldLen = hiColumn.FieldLen, FieldDesc = $"min_{fieldDefinition.AsFieldName}" });
                                     }
@@ -2253,7 +2253,7 @@ namespace HiSql
                         {
                             if (fieldDefinition.DbFun == DbFunction.COUNT)
                             {
-                                sb_field.Append($"count(*) as {fieldDefinition.AsFieldName}");
+                                sb_field.Append($"count(*) as {dbConfig.Field_Pre}{fieldDefinition.AsFieldName}{dbConfig.Field_After}");
                                 sb_field_result.Append($"{dbConfig.Field_Pre}{fieldDefinition.AsFieldName}{dbConfig.Field_After}");
                                 lstcol.Add(new HiColumn { FieldName = fieldDefinition.AsFieldName, DBDefault = HiTypeDBDefault.EMPTY, FieldType = HiType.INT, FieldDesc = $"count_{fieldDefinition.AsFieldName}" });
                             }
@@ -2348,7 +2348,6 @@ namespace HiSql
 
             return new Tuple<string, string, List<HiColumn>>(sb_field.ToString(), sb_field_result.ToString(), lstcol);
         }
-
         /// <summary>
         /// 字段检测合法性
         /// </summary>
