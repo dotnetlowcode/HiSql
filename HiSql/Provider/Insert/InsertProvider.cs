@@ -883,7 +883,7 @@ namespace HiSql
                 foreach (HiColumn hi in arrcol)
                 {
                     //if(!string.IsNullOrEmpty(hi.Regex))
-                    dic_hash_reg.Add(hi.FieldName, new HashSet<string>());
+                    dic_hash_reg.Add(hi.FieldName, new HashSet<string>(System.StringComparer.Create(System.Globalization.CultureInfo.CurrentCulture, true)));
                 }
 
                 foreach (HiColumn hi in arrcol_snro)
