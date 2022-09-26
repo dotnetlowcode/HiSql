@@ -101,6 +101,42 @@ namespace HiSql.Unit.Test
              queryWhere(sqlClient);
             queryCase(sqlClient);
             queryGroupBy(sqlClient);    //有问题
+
+
+            //query to list decimal 测试
+            querydecimal(sqlClient);
+            querylike(sqlClient);
+
+        }
+
+        class _Test_Decimal
+        { 
+            public string Uvarchar
+            { get; set; }
+            public decimal Udecimal
+            { get; set; }
+        }
+
+        void querydecimal(HiSqlClient sqlClient)
+        {
+            //class testClass{ }
+            List< _Test_Decimal> list= sqlClient.HiSql("select Uvarchar,Udecimal from Hi_TestQuery").Take(10).Skip(1).ToList<_Test_Decimal>();
+
+        }
+
+        void querylike(HiSqlClient sqlClient)
+        {
+            string sql = "";
+            sql=sqlClient.HiSql("select * from Hi_FieldModel where TabName like 'Hi_%'").ToSql();
+            _outputHelper.WriteLine(sql);
+            DataTable dt= sqlClient.HiSql("select * from Hi_FieldModel where TabName like 'Hi_%'").ToTable();
+            Assert.True(dt.Rows.Count > 0);
+
+            sql=sqlClient.HiSql("select * from Hi_FieldModel where TabName not like 'abc_%'").ToSql();
+            _outputHelper.WriteLine(sql);
+            dt = sqlClient.HiSql("select * from Hi_FieldModel where TabName not like 'abc_%'").ToTable();
+            Assert.True(dt.Rows.Count > 0);
+
         }
 
         void queryWhere(HiSqlClient sqlClient)
