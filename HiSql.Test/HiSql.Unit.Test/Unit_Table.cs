@@ -77,91 +77,214 @@ namespace HiSql.Unit.Test
 
         void tableGroups(HiSqlClient sqlClient)
         {
-
-            TabInfo tabinfo = sqlClient.DbFirst.GetTabStruct(Constants.HiSysTable["Hi_FieldModel"]);
+            createTempTable(sqlClient, "Hi_Test_createTempTable");
+            //dropTableAndTruncate(sqlClient, "Hi_Test_dropTableAndTruncate");
 
             ////表重命名
-            reTabName(sqlClient);
+            //reTabName(sqlClient, "Hi_Test_reTabName");
 
+            //reCol(sqlClient, "Hi_Test_dyntab1reCol", true);
+            //reCol(sqlClient, "Hi_Test_dyntab1reCol3", false);
 
-            ////索引创建 删除修改
-            indexDemo(sqlClient);
+            // moditable(sqlClient, "Hi_Test_dyntab1moditable");
 
-            ////动态创建表
-            createDemoDynTable(sqlClient, "H_dyntab1");
+            //moditableCreatePrimaryKey(sqlClient, "Hi_TestCreatePrimaryKey");
 
-            TabInfo tabinfo2 = sqlClient.DbFirst.GetTabStruct(Constants.HiSysTable["Hi_FieldModel"]);
-            reCol(sqlClient, "H_dyntab1");
+            //////索引创建 删除修改
+            //indexDemo(sqlClient, "Hi_Test_indexDemo");
 
-            moditable(sqlClient, "H_dyntab1");
+        }
+        void moditableCreatePrimaryKey(HiSqlClient sqlClient, string tabname)
+        {
+            //无主键表创建主键
+            if (sqlClient.DbFirst.CheckTabExists(tabname))
+            {
+                sqlClient.DbFirst.DropTable(tabname);
+            }
+            bool iscreate = sqlClient.DbFirst.CreateTable(Test.TestTable.DynTable.BuildTabInfo(tabname, true, false));
+            TestTable.DynTable.BuildTabDataList(tabname, 50);
+            TabInfo tabinfo = DataConvert.CloneTabInfo(sqlClient.DbFirst.GetTabStruct(tabname));
 
+            //无主键表新增主键
+            HiColumn col = tabinfo.GetColumns.Where(c => c.FieldName.Equals("Uid", StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+            col.IsPrimary = true;
+            col.IsBllKey = true;
+            var rtn = sqlClient.DbFirst.ModiTable(tabinfo, OpLevel.Execute);
 
+            tabinfo = DataConvert.CloneTabInfo(sqlClient.DbFirst.GetTabStruct(tabname));
+
+            if (rtn.Item1 && tabinfo.PrimaryKey.Count == 0)
+            {
+                _outputHelper.WriteLine($"无主键表创建主键-表修改结果：{rtn.Item2}");
+                _outputHelper.WriteLine($"无主键表创建主键-表修改sql：{rtn.Item3}");
+            }
+            else
+            {
+                _outputHelper.WriteLine($"无主键表创建主键-表修改结果：{rtn.Item2}");
+                _outputHelper.WriteLine($"无主键表创建主键-表修改sql：{rtn.Item3}");
+            }
+
+            //删除主键
+
+            tabinfo = DataConvert.CloneTabInfo(sqlClient.DbFirst.GetTabStruct(tabname));
+            col = tabinfo.GetColumns.Where(c => c.FieldName.Equals("Uid", StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+            col.IsPrimary = false;
+            col.IsBllKey = false;
+            rtn = sqlClient.DbFirst.ModiTable(tabinfo, OpLevel.Execute);
+
+            tabinfo = DataConvert.CloneTabInfo(sqlClient.DbFirst.GetTabStruct(tabname));
+
+            if (rtn.Item1  && tabinfo.PrimaryKey.Count == 0)
+            {
+                _outputHelper.WriteLine($"主键表删除主键-表修改结果：{rtn.Item2}");
+                _outputHelper.WriteLine($"主键表删除主键-表修改sql：{rtn.Item3}");
+            }
+            else
+            {
+                _outputHelper.WriteLine($"主键表删除主键-表修改结果：{rtn.Item2}");
+                _outputHelper.WriteLine($"主键表删除主键-表修改sql：{rtn.Item3}");
+            }
 
 
         }
 
+        /// <summary>
+        /// 字段类型修改
+        /// </summary>
+        /// <param name="sqlClient"></param>
+        /// <param name="tabname"></param>
         void moditable(HiSqlClient sqlClient, string tabname)
         {
-            TabInfo tabinfo = sqlClient.DbFirst.GetTabStruct(tabname);
+            //创建表
+            if (sqlClient.DbFirst.CheckTabExists(tabname))
+            {
+                sqlClient.DbFirst.DropTable(tabname);
+            }
+            bool iscreate = sqlClient.DbFirst.CreateTable(Test.TestTable.DynTable.BuildTabInfo(tabname, true));
+            TestTable.DynTable.BuildTabDataList(tabname, 50);
 
+            TabInfo tabinfo = sqlClient.DbFirst.GetTabStruct(tabname);
 
             TabInfo newtabinfo = tabinfo.CloneCopy();
 
             HiColumn col = newtabinfo.GetColumns.Where(c => c.FieldName.Equals("Unchar", StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+           
+            col.FieldType = HiType.NVARCHAR;
+            col.FieldLen = 300;
+            col.SortNum = 2;
+            col.Regex = "\\s*";
+            col.IsNull = !col.IsNull;
+            col.IsSearch = !col.IsSearch;
+            
+            var rtn =sqlClient.DbFirst.ModiTable(newtabinfo,OpLevel.Execute);
+            var tabinfoNew = sqlClient.DbFirst.GetTabStruct(tabname);
 
-            col.SortNum =2;
-
-            var rtn=sqlClient.DbFirst.ModiTable(newtabinfo,OpLevel.Execute);
-            if (rtn.Item1)
+            HiColumn newcol = tabinfo.GetColumns.Where(c => c.FieldName.Equals("Unchar", StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+            if (rtn.Item1
+                && newcol.SortNum == col.SortNum
+                    && newcol.FieldLen == col.FieldLen
+                    && newcol.FieldType == col.FieldType
+                      && newcol.Regex == col.Regex
+                       && newcol.IsSearch == col.IsSearch
+                        && newcol.IsNull == col.IsNull
+                )
             {
                 _outputHelper.WriteLine($"表修改结果：{rtn.Item2}");
                 _outputHelper.WriteLine($"表修改sql：{rtn.Item3}");
 
-
-
-                tabinfo = sqlClient.DbFirst.GetTabStruct(tabname);
-                HiColumn newcol = tabinfo.GetColumns.Where(c => c.FieldName.Equals("Unchar", StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-                if (newcol.SortNum == col.SortNum)
-                {
-                    Assert.True(rtn.Item1);
-                    _outputHelper.WriteLine($"修改排序字段成功");
-                }
-                else
-                {
-                    _outputHelper.WriteLine($"修改排序字段失败");
-
-                    Assert.True(rtn.Item1);
-                }
-                
+                Assert.True(true);
             }
             else
             {
+                Assert.True(false);
                 _outputHelper.WriteLine($"表修改结果：{rtn.Item2}");
                 _outputHelper.WriteLine($"表修改sql：{rtn.Item3}");
-
-               
             }
-                
 
+            //删除字段
+            tabinfo = DataConvert.CloneTabInfo(sqlClient.DbFirst.GetTabStruct(tabname));
+            tabinfo.Columns.RemoveAll(c=> c.FieldName.Equals("Unchar", StringComparison.OrdinalIgnoreCase) || c.FieldName.Equals("Uint", StringComparison.OrdinalIgnoreCase));
+            rtn = sqlClient.DbFirst.ModiTable(tabinfo, OpLevel.Execute);
 
+            tabinfoNew = sqlClient.DbFirst.GetTabStruct(tabname);
 
+            Assert.True(rtn.Item1 && tabinfo.Columns.Count == tabinfoNew.Columns.Count );
+            if (rtn.Item1  && tabinfo.Columns.Count == tabinfoNew.Columns.Count)
+            {
+                _outputHelper.WriteLine($"表修改-删除字段-结果：{rtn.Item2}");
+                _outputHelper.WriteLine($"表修改-删除字段-sql：{rtn.Item3}");
+            }
+            else
+            {
+                _outputHelper.WriteLine($"表修改-删除字段-结果：{rtn.Item2}");
+                _outputHelper.WriteLine($"表修改-删除字段-sql：{rtn.Item3}");
+            }
 
+            //修改表的扩展字段信息
+            tabinfo = DataConvert.CloneTabInfo(sqlClient.DbFirst.GetTabStruct(tabname));
+            tabinfo.TabModel.TabReName = tabinfo.TabModel.TabReName + "1";
+            tabinfo.TabModel.DbName = tabinfo.TabModel.DbName + "1";
+            tabinfo.TabModel.DbServer = tabinfo.TabModel.DbServer + "1";
+            tabinfo.TabModel.TabDescript = tabinfo.TabModel.TabDescript + "1";
+            tabinfo.TabModel.TabCacheType =  TabCacheType.ALL;
+            tabinfo.TabModel.IsLog = !tabinfo.TabModel.IsLog;
+            rtn = sqlClient.DbFirst.ModiTable(tabinfo, OpLevel.Execute);
 
+            tabinfoNew = sqlClient.DbFirst.GetTabStruct(tabname);
+            Assert.True(rtn.Item1 &&
+                tabinfoNew.TabModel.TabReName == tabinfo.TabModel.TabReName &&
+                tabinfoNew.TabModel.DbName == tabinfo.TabModel.DbName &&
+                tabinfoNew.TabModel.DbServer == tabinfo.TabModel.DbServer &&
+                tabinfoNew.TabModel.TabDescript == tabinfo.TabModel.TabDescript &&
+                tabinfoNew.TabModel.TabCacheType == tabinfo.TabModel.TabCacheType &&
+                 tabinfoNew.TabModel.IsLog == tabinfo.TabModel.IsLog
+                );
 
+            //修改表的列的扩展信息
+            tabinfo = DataConvert.CloneTabInfo(sqlClient.DbFirst.GetTabStruct(tabname));
+            tabinfo.TabModel.TabReName = tabinfo.TabModel.TabReName + "1";
+            tabinfo.TabModel.DbName = tabinfo.TabModel.DbName + "1";
+            tabinfo.TabModel.DbServer = tabinfo.TabModel.DbServer + "1";
+            tabinfo.TabModel.TabDescript = tabinfo.TabModel.TabDescript + "1";
+            tabinfo.TabModel.TabCacheType = TabCacheType.ALL;
+            tabinfo.TabModel.IsLog = !tabinfo.TabModel.IsLog;
+            rtn = sqlClient.DbFirst.ModiTable(tabinfo, OpLevel.Execute);
 
+            tabinfoNew = sqlClient.DbFirst.GetTabStruct(tabname);
+            Assert.True(rtn.Item1 &&
+                tabinfoNew.TabModel.TabReName == tabinfo.TabModel.TabReName &&
+                tabinfoNew.TabModel.DbName == tabinfo.TabModel.DbName &&
+                tabinfoNew.TabModel.DbServer == tabinfo.TabModel.DbServer &&
+                tabinfoNew.TabModel.TabDescript == tabinfo.TabModel.TabDescript &&
+                tabinfoNew.TabModel.TabCacheType == tabinfo.TabModel.TabCacheType &&
+                 tabinfoNew.TabModel.IsLog == tabinfo.TabModel.IsLog
+                );
         }
 
-        void reCol(HiSqlClient sqlClient, string tabname)
+        /// <summary>
+        /// 字段重命名  表重命名
+        /// </summary>
+        /// <param name="sqlClient"></param>
+        /// <param name="tabname"></param>
+        void reCol(HiSqlClient sqlClient, string tabname, bool inserData)
         {
+            //创建表
+            if (sqlClient.DbFirst.CheckTabExists(tabname))
+            {
+                sqlClient.DbFirst.DropTable(tabname);
+            }
+            bool iscreate = sqlClient.DbFirst.CreateTable(Test.TestTable.DynTable.BuildTabInfo(tabname, true));
+            if (inserData)
+            {
+                int v = sqlClient.Insert(tabname, TestTable.DynTable.BuildTabDataList(tabname, 50)).ExecCommand();
+            }
+            
+
             string fieldname = "Unchar";
             string newfieldname = "Unchar2";
             _outputHelper.WriteLine($"正在修改表[{tabname}]中的字段 将字段[{fieldname}] 改为[{newfieldname}]");
 
-
             TabInfo tabinfo= sqlClient.DbFirst.GetTabStruct(tabname);
-
-
-            
 
             HiColumn hiColumn=tabinfo.Columns.Where(c=>c.FieldName.Equals(fieldname, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
             hiColumn.FieldDesc = "测试Unchar字段 修改";
@@ -207,25 +330,57 @@ namespace HiSql.Unit.Test
                 Assert.True(false);
             }
 
-
-
-
-
-            
-
-
-
         }
 
 
-        void truncateTable(HiSqlClient sqlClient, string tabname)
+        void dropTableAndTruncate(HiSqlClient sqlClient, string tabname)
         {
-            //清除表中数据
+            //创建表
+            if (sqlClient.DbFirst.CheckTabExists(tabname))
+            {
+                sqlClient.DbFirst.DropTable(tabname);
+            }
+            bool iscreate = sqlClient.DbFirst.CreateTable(Test.TestTable.DynTable.BuildTabInfo(tabname, true));
+
+            int v = sqlClient.Insert(tabname, TestTable.DynTable.BuildTabDataList(tabname, 50)).ExecCommand();
 
             _outputHelper.WriteLine($"正在清除表[{tabname}]中所有数据");
-            sqlClient.DbFirst.Truncate(tabname);
+            var resultTruncate = sqlClient.DbFirst.Truncate(tabname);
+            var dataCount = sqlClient.DbFirst.GetTableDataCount(tabname);
+            Assert.True(resultTruncate && dataCount == 0);
+
+            sqlClient.DbFirst.DropTable(tabname);
+            Assert.True(!sqlClient.DbFirst.CheckTabExists(tabname));
+
         }
-        
+        void createTempTable(HiSqlClient sqlClient, string tabname)
+        {
+            //创建表
+            if (sqlClient.DbFirst.CheckTabExists(tabname))
+            {
+                sqlClient.DbFirst.DropTable(tabname);
+            }
+            bool iscreate = sqlClient.DbFirst.CreateTable(Test.TestTable.DynTable.BuildTabInfo(tabname, true));
+            int v = sqlClient.Insert(tabname, TestTable.DynTable.BuildTabDataList(tabname, 50)).ExecCommand();
+
+            Assert.True(sqlClient.DbFirst.CheckTabExists(tabname));
+            var temptabname = "#" + tabname;
+            sqlClient.Query(tabname).Field("*").Insert(temptabname);
+
+            //tabname = "#" + tabname;
+            //if (sqlClient.DbFirst.CheckTabExists(tabname))
+            //{
+            //    sqlClient.DbFirst.DropTable(tabname);
+            //}
+           
+            //插入临时表后，无法查出
+           var tempData = sqlClient.Query(temptabname).Field("*").ToTable();
+
+
+            //Assert.True(tempData.Rows.Count == 50);
+
+        }
+
 
         void showIndexList(HiSqlClient sqlClient,string tabname)
         {
@@ -236,65 +391,78 @@ namespace HiSql.Unit.Test
             }
         }
 
-        void indexDemo(HiSqlClient sqlClient)
+        void indexDemo(HiSqlClient sqlClient, string tabname)
         {
-            Unit_Insert unit_Insert = new Unit_Insert(_outputHelper);
-
-            //向表H_Test01中插入100条数据 
-
-            unit_Insert.InsertData(sqlClient, 100);
-
+            //创建表
+            if (sqlClient.DbFirst.CheckTabExists(tabname))
+            {
+                sqlClient.DbFirst.DropTable(tabname);
+            }
+            bool iscreate = sqlClient.DbFirst.CreateTable(Test.TestTable.DynTable.BuildTabInfo(tabname, true));
+            int v = sqlClient.Insert(tabname, TestTable.DynTable.BuildTabDataList(tabname, 50)).ExecCommand();
 
             bool _isok = true;
-            string tabname = typeof(H_Test01).Name;
             string keyidxname = $"{tabname}_UName";
 
-            TabInfo tabInfo = sqlClient.Context.DMInitalize.GetTabStruct(typeof(H_Test01).Name);
-            List<HiColumn> hiColumns = tabInfo.Columns.Where(c => c.FieldName.Equals( "UName",StringComparison.OrdinalIgnoreCase)).ToList();
+            TabInfo tabInfo = sqlClient.Context.DMInitalize.GetTabStruct(tabname);
+
+
+            List<HiColumn> hiColumns = tabInfo.Columns.Where(c => c.FieldName.Equals("Uvarchar", StringComparison.OrdinalIgnoreCase) || c.FieldName.Equals("Uint", StringComparison.OrdinalIgnoreCase)).ToList();
             var rtn = sqlClient.DbFirst.CreateIndex($"{tabname}", keyidxname, hiColumns, OpLevel.Execute);
-            if (rtn.Item1)
+
+
+            List<TabIndex> lstindex = sqlClient.DbFirst.GetTabIndexs(tabname);
+
+            if (rtn.Item1 && lstindex.Any(t=> t.IndexName == keyidxname))
             {
                 _outputHelper.WriteLine($"向表[{tabname}]新建索引：[{keyidxname}]成功 {System.Environment.NewLine} {rtn.Item3}");
-                showIndexList(sqlClient,tabname);
+          
             }
             else
             {
                 _outputHelper.WriteLine($"向表[{tabname}]新建索引：[{keyidxname}]失败： {System.Environment.NewLine} {rtn.Item2}{System.Environment.NewLine} {rtn.Item3}");
                 _isok = false;
-                showIndexList(sqlClient, tabname);
             }
 
-
+            showIndexList(sqlClient, tabname);
             rtn = sqlClient.DbFirst.DelIndex(tabname, keyidxname, OpLevel.Execute);
-
-            if (rtn.Item1)
+            lstindex = sqlClient.DbFirst.GetTabIndexs(tabname);
+            if (rtn.Item1 && !lstindex.Any(t => t.IndexName == keyidxname))
             {
-                showIndexList(sqlClient, tabname);
+               
                 _outputHelper.WriteLine($"向表[{tabname}]删除索引：[{keyidxname}]成功 {System.Environment.NewLine} {rtn.Item3}");
             }
             else
             {
                 _outputHelper.WriteLine($"向表[{tabname}]删除索引：[{keyidxname}]失败： {System.Environment.NewLine} {rtn.Item2}{System.Environment.NewLine} {rtn.Item3}");
                 _isok = false;
-                showIndexList(sqlClient, tabname);
+               
             }
+            showIndexList(sqlClient, tabname);
 
             Assert.True(_isok);
         }
 
-        void reTabName(HiSqlClient sqlClient)
+        void reTabName(HiSqlClient sqlClient, string tabname)
         {
             bool _isok = true;
-            string tabname1=typeof(H_Test50C01).Name;
-            string newtabname1 = $"{tabname1}_new";
 
+            string newtabname1 = $"{tabname}_new";
+           
+           //创建表
+            if (sqlClient.DbFirst.CheckTabExists(tabname))
+            {
+                sqlClient.DbFirst.DropTable(tabname);
+            }
+            bool iscreate = sqlClient.DbFirst.CreateTable(Test.TestTable.DynTable.BuildTabInfo(tabname, true));
+            int v = sqlClient.Insert(tabname, TestTable.DynTable.BuildTabDataList(tabname, 50)).ExecCommand();
 
-            TabInfo oldtab = sqlClient.Context.DMInitalize.GetTabStruct(tabname1);
+            TabInfo oldtab = sqlClient.Context.DMInitalize.GetTabStruct(tabname);
 
-            var rtn = sqlClient.DbFirst.ReTable(tabname1, newtabname1, OpLevel.Execute);
+            var rtn = sqlClient.DbFirst.ReTable(tabname, newtabname1, OpLevel.Execute);
             if (rtn.Item1)
             {
-                _outputHelper.WriteLine($"表[{tabname1}]重命名为[{newtabname1}]");
+                _outputHelper.WriteLine($"表[{tabname}]重命名为[{newtabname1}]");
                 TabInfo tabInfo = sqlClient.Context.DMInitalize.GetTabStruct(newtabname1);
 
                 _outputHelper.WriteLine($"重命名Sql语句:{System.Environment.NewLine}");//输出重命名表 生成的SQL
@@ -302,17 +470,17 @@ namespace HiSql.Unit.Test
 
                 if (tabInfo.TabModel.TabName.Equals(newtabname1,StringComparison.OrdinalIgnoreCase))
                 {
-                    _outputHelper.WriteLine($"表[{tabname1}]重命名为[{newtabname1}]  在表结构信息中已经变更");
+                    _outputHelper.WriteLine($"表[{tabname}]重命名为[{newtabname1}]  在表结构信息中已经变更");
                 }
                 else
                 {
-                    _outputHelper.WriteLine($"表[{tabname1}]重命名为[{newtabname1}]  在表结构信息中已经变更失败");
+                    _outputHelper.WriteLine($"表[{tabname}]重命名为[{newtabname1}]  在表结构信息中已经变更失败");
                     _isok = false;
                 }
 
 
-                _outputHelper.WriteLine($"表[{newtabname1}]重命名为[{tabname1}] 将表重新变更回原来的表");
-                rtn = sqlClient.DbFirst.ReTable(newtabname1, tabname1, OpLevel.Execute);
+                _outputHelper.WriteLine($"表[{newtabname1}]重命名为[{tabname}] 将表重新变更回原来的表");
+                rtn = sqlClient.DbFirst.ReTable(newtabname1, tabname, OpLevel.Execute);
 
                 if (rtn.Item1)
                     _outputHelper.WriteLine("表操作还原成功");
@@ -373,9 +541,6 @@ namespace HiSql.Unit.Test
             sqlClient.CurrentConnectionConfig.AppEvents = GetAopEvent();
 
             
-
-            
-
             _outputHelper.WriteLine($"检测表[{tabname1}] 是否在当前库中存在");
             if (sqlClient.DbFirst.CheckTabExists(tabname1))
             {
@@ -398,9 +563,9 @@ namespace HiSql.Unit.Test
 
             TabInfo tabInfo= sqlClient.DbFirst.GetTabStruct(tabname1);
 
-            List<object> lstdata = TestTable.DynTable.BuildTabDataList(tabname1, 5000);
+            List<object> lstdata = TestTable.DynTable.BuildTabDataList(tabname1, 500);
 
-
+            int v = sqlClient.Insert(tabname1, lstdata).ExecCommand();
 
 
         }

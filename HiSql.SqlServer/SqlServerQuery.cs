@@ -334,7 +334,7 @@ namespace HiSql
             sqlServerDM.Context = this.Context;
 
             TabInfo currTabInfo = null;
-
+            string tableName = "";
             //多表子查询的情况下 无当前查询表
             if (!this.IsMultiSubQuery)
             {
@@ -345,6 +345,8 @@ namespace HiSql
                     //this.Context;
                     foreach (TableDefinition table in this.TableList)
                     {
+                        tableName = table.TabName;
+
                         TabInfo tabinfo;
                         Dictionary<string, string> _dic = Tool.RegexGrp(Constants.REG_TABNAME, table.TabName);
                         if (_dic["flag"].ToString() != "")
@@ -369,7 +371,7 @@ namespace HiSql
                 else
                     throw new Exception("没有指定查询的表");
 
-                sb_table.Append($"[{currTabInfo.TabModel.TabName}] as [{this.Table.AsTabName}]");
+                sb_table.Append($"[{(currTabInfo!=null ?currTabInfo.TabModel.TabName: tableName)}] as [{this.Table.AsTabName}]"); //临时表 currTabInfo = null
 
                 if (this.WithLockMode != LockMode.NONE)
                 {

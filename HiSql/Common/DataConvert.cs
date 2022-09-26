@@ -518,10 +518,17 @@ namespace HiSql
                                 else
                                     drow[dc.ColumnName] = 0;
                             }
-                            else if (dc.DataType == Constants.IntType || dc.DataType == Constants.ShortType)
+                            else if (dc.DataType == Constants.IntType )
                             {
                                 if (_value != null)
                                     drow[dc.ColumnName] = Convert.ToInt32(_value);
+                                else
+                                    drow[dc.ColumnName] = 0;
+                            }
+                            else if (dc.DataType == Constants.ShortType)
+                            {
+                                if (_value != null)
+                                    drow[dc.ColumnName] = Convert.ToInt16(_value);
                                 else
                                     drow[dc.ColumnName] = 0;
                             }
@@ -608,10 +615,17 @@ namespace HiSql
                                 else
                                     drow[dc.ColumnName] = 0;
                             }
-                            else if (dc.DataType == Constants.IntType || dc.DataType == Constants.ShortType)
+                            else if (dc.DataType == Constants.IntType)
                             {
                                 if (_value != null)
                                     drow[dc.ColumnName] = Convert.ToInt32(_value);
+                                else
+                                    drow[dc.ColumnName] = 0;
+                            }
+                            else if (dc.DataType == Constants.ShortType)
+                            {
+                                if (_value != null)
+                                    drow[dc.ColumnName] = Convert.ToInt16(_value);
                                 else
                                     drow[dc.ColumnName] = 0;
                             }
@@ -699,10 +713,17 @@ namespace HiSql
                                 else
                                     drow[dc.ColumnName] = 0;
                             }
-                            else if (dc.DataType == Constants.IntType || dc.DataType == Constants.ShortType)
+                            else if (dc.DataType == Constants.IntType )
                             {
                                 if (!string.IsNullOrEmpty(_value))
                                     drow[dc.ColumnName] = Convert.ToInt32(_value);
+                                else
+                                    drow[dc.ColumnName] = 0;
+                            }
+                            else if (dc.DataType == Constants.ShortType)
+                            {
+                                if (!string.IsNullOrEmpty(_value))
+                                    drow[dc.ColumnName] = Convert.ToInt16(_value);
                                 else
                                     drow[dc.ColumnName] = 0;
                             }
@@ -823,10 +844,14 @@ namespace HiSql
                         continue;//自增长字段忽略写入
                     }
 
-                    if (column.FieldType.IsIn<HiType>(HiType.VARCHAR, HiType.TEXT, HiType.NVARCHAR, HiType.NCHAR, HiType.CHAR, HiType.GUID))
+                    if (column.FieldType.IsIn<HiType>(HiType.VARCHAR, HiType.TEXT, HiType.NVARCHAR, HiType.NCHAR, HiType.CHAR))
                     {
                         dc.DataType = typeof(string);
 
+                    }
+                    else if (column.FieldType.IsIn<HiType>(HiType.GUID)) //pengxy guid 指定类型，不使用string
+                    {
+                        dc.DataType = typeof(Guid);
                     }
                     else if (column.FieldType.IsIn<HiType>(HiType.DATE, HiType.DATETIME))
                     {
@@ -836,9 +861,13 @@ namespace HiSql
                     {
                         dc.DataType = typeof(Boolean);
                     }
-                    else if (column.FieldType.IsIn<HiType>(HiType.INT, HiType.SMALLINT))
+                    else if (column.FieldType.IsIn<HiType>(HiType.INT))
                     {
                         dc.DataType = typeof(Int32);
+                    }
+                    else if (column.FieldType.IsIn<HiType>( HiType.SMALLINT))
+                    {
+                        dc.DataType = typeof(Int16);
                     }
                     else if (column.FieldType.IsIn<HiType>(HiType.BIGINT))
                     {

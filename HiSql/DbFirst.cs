@@ -1363,6 +1363,11 @@ namespace HiSql
                 {
                     reBuilderPrimaryKey = true;
                 }
+                else if (fieldChanges.Any(f => f.OldColumn.IsPrimary))
+                {
+                    reBuilderPrimaryKey = true;
+                }
+
             }
             List<HiColumn> lstchg = new List<HiColumn>();
             List<HiColumn> lstdel = new List<HiColumn>();
@@ -1517,7 +1522,7 @@ namespace HiSql
                 if (reBuilderPrimaryKey)
                 {
                     List<TabIndex> lst = idm.GetIndexs(tabInfo.TabModel.TabName);
-                    if (lst.Count > 0)
+                    if (lst.Count > 0 && lst.Any(t => string.Equals(t.IndexType, "Key_Index", StringComparison.OrdinalIgnoreCase)))
                     {
                         string primaryKeyName = lst.FirstOrDefault(t => string.Equals(t.IndexType, "Key_Index", StringComparison.OrdinalIgnoreCase)).IndexName;
                         string delPrimaryKey = idm.DropIndex(tabInfo.TabModel.TabName, primaryKeyName, true);

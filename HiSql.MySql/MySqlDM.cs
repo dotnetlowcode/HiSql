@@ -1280,7 +1280,7 @@ namespace HiSql
                     keys = dbConfig.Table_Key.Replace("[$TabName$]", hiTable.TabName)
                         .Replace("[$Keys$]", keys).Replace("[$ConnectID$]", this.Context.ConnectedId);
                 }
-
+               
                 string _fields_str = BuildFieldStatment(hiTable, lstHiTable);
                 if (hiTable.TableType == TableType.Var)
                 {
@@ -1289,12 +1289,17 @@ namespace HiSql
 
 
                 }
+                if (string.IsNullOrEmpty(keys)) //没有主键的时候，去掉 字段 的 ，
+                {
+                    _fields_str = _fields_str.Substring(0, _fields_str.LastIndexOf(","));
+                }
+
                 _temp_create = _temp_create.Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema)
                     .Replace("[$TabName$]", _create_tabname)
                     .Replace("[$Fields$]", _fields_str)
                     .Replace("[$Keys$]", hiTable.TableType == TableType.Var ? "" : keys)
-                    .Replace("[$Primary$]", hiTable.TableType == TableType.Var ? "" : dbConfig.Table_Key3);
-                if (hiTable.TabName.Substring(0, 1) != "#" && (hiTable.TabName.Substring(0, 1) != "@")
+                    .Replace("[$Primary$]", hiTable.TableType == TableType.Var ? "": dbConfig.Table_Key3);
+                if (hiTable.TabName.Substring(0, 1) != "#" && (hiTable.TabName.Substring(0, 1) != "@")// || string.IsNullOrWhiteSpace(keys)
                     && (!Constants.HiSysTable["Hi_TabModel"].Equals(hiTable.TabName, StringComparison.OrdinalIgnoreCase) && !Constants.HiSysTable["Hi_FieldModel"].Equals(hiTable.TabName, StringComparison.OrdinalIgnoreCase))
                     )
                 {

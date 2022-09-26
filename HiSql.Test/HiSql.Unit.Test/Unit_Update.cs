@@ -87,10 +87,7 @@ namespace HiSql.Unit.Test
             int rltcnt = 0;
             IUpdate Update = null;
 
-
-        
-
-            //按指定 的where更新
+            //按指定的where更新
             Update = sqlClient.Update("Hi_TestUpdate").Set(new { Uvarchar = "新店开业通告 广东广州天河22" }).OnlyWhere(new Filter { { "Uid", OperType.BETWEEN, new RangDefinition() { Low = 1, High = 4 } } });
             successCount++;
             _outputHelper.WriteLine(Update.ToSql());
@@ -139,6 +136,21 @@ namespace HiSql.Unit.Test
             _outputHelper.WriteLine(Update.ToSql());
             rltcnt = Update.ExecCommand();
             successActCount += rltcnt == 1 ? 1 : 0;
+
+
+            Update = sqlClient.Update("Hi_TestUpdate", new List<object> { new { Uid = 6, Uvarchar = "新店开业通德发生的阿的州天河666" }, new { Uid = 7, Uvarchar = "新店开业通德发生的阿的州天河777" } }).Exclude("UID");
+            successCount++;
+            _outputHelper.WriteLine(Update.ToSql());
+            rltcnt = Update.ExecCommand();
+            successActCount += rltcnt > 0 ? 1 : 0;
+
+
+
+            Update = sqlClient.Update("Hi_TestUpdate", new List<Hi_TestUpdate> { new Hi_TestUpdate { Uid = 8, Uvarchar = "新店开业通德发生的阿的州天河88" }, new Hi_TestUpdate { Uid = 9, Uvarchar = "新店开业通德发生的阿的州天河999" } }).Exclude("UID");
+            successCount++;
+            _outputHelper.WriteLine(Update.ToSql());
+            rltcnt = Update.ExecCommand();
+            successActCount += rltcnt > 0 ? 1 : 0;
 
             Assert.Equal(successActCount, successCount);
             /*

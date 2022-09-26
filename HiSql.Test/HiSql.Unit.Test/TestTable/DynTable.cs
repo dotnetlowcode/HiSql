@@ -33,13 +33,13 @@ namespace HiSql.Unit.Test.TestTable
 
         }
 
-        public static TabInfo BuildTabInfo(string tabname,bool standardfeild)
+        public static TabInfo BuildTabInfo(string tabname,bool standardfeild, bool hadPrimaryKey = true)
         { 
             TabInfo tabinfo = new TabInfo();
             tabinfo.TabModel = new HiTable {DbServer="",DbName="",TabName=tabname.ToSqlInject(),TabDescript=$"{tabname}自定义表", TabStoreType = TabStoreType .Column, TabStatus = TabStatus .Use};
 
 
-            tabinfo.Columns.Add(new HiColumn { DbServer=tabinfo.TabModel.DbServer,DbName=tabinfo.TabModel.DbName,FieldName="Uid",FieldType=HiType.BIGINT , IsPrimary = true, IsBllKey = true, SortNum = 1, IsSys = false, DBDefault = HiTypeDBDefault.EMPTY});
+            tabinfo.Columns.Add(new HiColumn { DbServer=tabinfo.TabModel.DbServer,DbName=tabinfo.TabModel.DbName,FieldName="Uid",FieldType=HiType.BIGINT , IsPrimary = hadPrimaryKey, IsBllKey = hadPrimaryKey, SortNum = 1, IsSys = false, DBDefault = HiTypeDBDefault.EMPTY});
 
 
             tabinfo.Columns.Add(new HiColumn { DbServer = tabinfo.TabModel.DbServer, DbName = tabinfo.TabModel.DbName, FieldName = "Uvarchar", FieldType = HiType.VARCHAR,FieldLen=50,  FieldDesc="测试varchar字段", SortNum = 2,  DBDefault = HiTypeDBDefault.EMPTY });
@@ -95,6 +95,52 @@ namespace HiSql.Unit.Test.TestTable
             return list;
 
         }
+
+
+        public static List<DynTable> BuildTabDataEntityList(string tabname, int count)
+        {
+
+            List<DynTable> list = new List<DynTable>();
+
+            for (int i = 0; i < count; i++)
+            {
+                list.Add(new DynTable
+                {
+                    Uid = i,
+                    Uvarchar = $"testlen_{i}",
+                    Unvarchar = "新店开业通告 广东广州天河城购物广场店新店开业通告 广东广州天河城购物广场店新店开业通告 广东广州天",
+                    Uchar = "魏凤和回应佩洛台：中国军队敌人sssdfadfadsfasdfasdf",
+                    Unchar = "新店开业通告 广东广州天河城购物广场店新店开业通告 广东广州天河城购物广场店新店开业通告 广东广州a",
+                    Utext = "魏凤和说，当今世界进入新的动荡变革期，携手构建人类命运共同体才是正确抉择魏凤和说，当今世界进入新的动荡变革期，携手构建人类命运共同体才是正确抉择",
+                    Uguid = Guid.NewGuid(),
+                    Ubigint = 4112,
+                    Uint = 142,
+                    Udecimal = (Decimal)123.32,
+                    Ubool = true,
+                    Udate = DateTime.Now,
+                    Udatetime = DateTime.Now
+                });
+            }
+
+            return list;
+
+        }
+
+
+        public int Uid { get; set; }
+
+        public string Uvarchar { get; set; }
+        public string Unvarchar { get; set; }
+        public string Uchar { get; set; }
+        public string Unchar { get; set; }
+        public string Utext { get; set; }
+        public Guid Uguid { get; set; }
+        public long Ubigint { get; set; }
+        public int Uint { get; set; }
+        public Decimal Udecimal { get; set; }
+        public bool Ubool { get; set; }
+        public DateTime Udate { get; set; }
+        public DateTime Udatetime { get; set; }
 
     }
 }

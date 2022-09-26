@@ -1546,7 +1546,7 @@ namespace HiSql
                     .Replace("[$TabName$]", _create_tabname)
                     .Replace("[$Fields$]", _fields_str)
                     .Replace("[$Keys$]", hiTable.TableType == TableType.Var ? "" : "")
-                    .Replace("[$Primary$]", hiTable.TableType == TableType.Var ? "" : _table_keys);
+                    .Replace("[$Primary$]", hiTable.TableType == TableType.Var || string.IsNullOrWhiteSpace(keys) ? "" : _table_keys);
                 if (hiTable.TabName.Substring(0, 1) != "#" && (hiTable.TabName.Substring(0, 1) != "@")
                     && (!Constants.HiSysTable["Hi_TabModel"].Equals(hiTable.TabName, StringComparison.OrdinalIgnoreCase) && !Constants.HiSysTable["Hi_FieldModel"].Equals(hiTable.TabName, StringComparison.OrdinalIgnoreCase))
                     )

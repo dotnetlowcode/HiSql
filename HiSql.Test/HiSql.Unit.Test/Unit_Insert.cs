@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -19,7 +20,8 @@ namespace HiSql.Unit.Test
         }
         #region 10列5条数据插入
         [Fact(DisplayName = "SqlServer表创建10列-5-1W条")]
-        [Trait("TableInsert10col", "init")]
+        [Trait("Insert", "init")]
+
         public void TableInsert10_5SqlServer()
         {
             HiSqlClient sqlClient = TestClientInit.GetSqlServerClient();
@@ -27,7 +29,7 @@ namespace HiSql.Unit.Test
 
         }
         [Fact(DisplayName = "MySql表创建10列-5-1W条")]
-        [Trait("TableInsert10col", "init")]
+        [Trait("Insert", "init")]
         public void TableInsert10_5MySql()
         {
             HiSqlClient sqlClient = TestClientInit.GetMySqlClient();
@@ -35,7 +37,7 @@ namespace HiSql.Unit.Test
 
         }
         [Fact(DisplayName = "Oracle表创建10列-5-1W条")]
-        [Trait("TableInsert10col", "init")]
+        [Trait("Insert", "init")]
         public void TableInsert10_5Oracle()
         {
             HiSqlClient sqlClient = TestClientInit.GetOracleClient();
@@ -44,7 +46,7 @@ namespace HiSql.Unit.Test
 
         }
         [Fact(DisplayName = "PostgreSql表创建10列-5-1W条")]
-        [Trait("TableInsert10col", "init")]
+        [Trait("Insert", "init")]
         public void TableInsert10_5PostgreSql()
         {
             HiSqlClient sqlClient = TestClientInit.GetPostgreSqlClient();
@@ -52,7 +54,7 @@ namespace HiSql.Unit.Test
 
         }
         [Fact(DisplayName = "Hana表创建10列-5-1W条")]
-        [Trait("TableInsert10col", "init")]
+        [Trait("Insert", "init")]
         public void TableCreatHana()
         {
             HiSqlClient sqlClient = TestClientInit.GetHanaClient();
@@ -60,7 +62,7 @@ namespace HiSql.Unit.Test
 
         }
         [Fact(DisplayName = "Sqlite表创建10列-5-1W条")]
-        [Trait("TableInsert10col", "init")]
+        [Trait("Insert", "init")]
         public void TableInsert10_5Sqlite()
         {
             HiSqlClient sqlClient = TestClientInit.GetSqliteClient();
@@ -68,7 +70,7 @@ namespace HiSql.Unit.Test
 
         }
         [Fact(DisplayName = "达梦表创建10列-5-1W条")]
-        [Trait("TableInsert10col", "init")]
+        [Trait("Insert", "init")]
         public void TableDaMeng()
         {
             HiSqlClient sqlClient = TestClientInit.GetDaMengClient();
@@ -95,10 +97,13 @@ namespace HiSql.Unit.Test
         {
             sqlClient.CurrentConnectionConfig.AppEvents = GetAopEvent();
             int count = 5;
+
             _outputHelper.WriteLine($"准备向表中插入[{count}]条数据测试");
             insertData(sqlClient, count);
 
+            bulkcopyInsertData(sqlClient, count, "Hi_Test_bulkcopyInsertData");
 
+            return;
             count = 10;
             _outputHelper.WriteLine($"准备向表中插入[{count}]条数据测试");
             insertData(sqlClient, count);
@@ -129,6 +134,42 @@ namespace HiSql.Unit.Test
             insertData(sqlClient, count);
         }
 
+        void bulkcopyInsertData(HiSqlClient sqlClient, int count, string tabname)
+        {
+
+            //创建表
+            if (sqlClient.DbFirst.CheckTabExists(tabname))
+            {
+                sqlClient.DbFirst.DropTable(tabname);
+            }
+            bool iscreate = sqlClient.DbFirst.CreateTable(Test.TestTable.DynTable.BuildTabInfo(tabname, true));
+
+            TabInfo tabinfo = sqlClient.Context.DMInitalize.GetTabStruct(tabname);
+
+            var lstdata = TestTable.DynTable.BuildTabDataList(tabname, count);
+
+            sqlClient.TrunCate(tabname).ExecCommand();
+
+            DataTable dt = DataConvert.ToTable(lstdata, tabinfo);
+           
+            int _effect = sqlClient.BulkCopyExecCommand(tabname, dt);
+            int datacnt = sqlClient.DbFirst.GetTableDataCount(tabname);
+            Assert.True(_effect == count && datacnt  == count);
+
+
+            var lstdataEntity = TestTable.DynTable.BuildTabDataEntityList(tabname, count);
+
+            sqlClient.TrunCate(tabname).ExecCommand();
+
+            dt = DataConvert.ToTable(lstdataEntity, tabinfo);
+
+            _effect = sqlClient.BulkCopyExecCommand(tabname, dt);
+            datacnt = sqlClient.DbFirst.GetTableDataCount(tabname);
+            Assert.True(_effect == count && datacnt == count);
+
+
+
+        }
 
         void insertNullData(HiSqlClient sqlClient)
         {
