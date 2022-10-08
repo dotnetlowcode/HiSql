@@ -70,7 +70,15 @@ namespace HiSql
                         }
                         else
                         {
-                            pinfo.SetValue(ef, value);
+                            if (dbtype == DBType.Hana)
+                            {
+                                if (value.GetType().FullName.IndexOf("HanaDecimal") >= 0)
+                                {
+                                    pinfo.SetValue(ef, Convert.ToDecimal(value));
+                                }else
+                                    pinfo.SetValue(ef, value);
+                            }else
+                                pinfo.SetValue(ef, value);
                         }
                     }
                     else
