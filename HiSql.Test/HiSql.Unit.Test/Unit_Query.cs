@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
@@ -32,59 +34,59 @@ namespace HiSql.Unit.Test
         }
         [Fact(DisplayName = "SqlServer查询操作")]
         [Trait("Query", "init")]
-        public void QuerySqlServer()
+        public async Task QuerySqlServer()
         {
             HiSqlClient sqlClient = TestClientInit.GetSqlServerClient();
-            QueryGroups(sqlClient);
+            await QueryGroups(sqlClient);
         }
 
         [Fact(DisplayName = "MySql查询操作")]
         [Trait("Query", "init")]
-        public void QueryMySql()
+        public async Task QueryMySql()
         {
             HiSqlClient sqlClient = TestClientInit.GetMySqlClient();
-            QueryGroups(sqlClient);
+            await QueryGroups(sqlClient);
         }
         [Fact(DisplayName = "Oracle查询操作")]
         [Trait("Query", "init")]
-        public void QueryOracle()
+        public async Task QueryOracle()
         {
             HiSqlClient sqlClient = TestClientInit.GetOracleClient();
-            QueryGroups(sqlClient);
+            await QueryGroups(sqlClient);
         }
         [Fact(DisplayName = "PostgreSql查询操作")]
         [Trait("Query", "init")]
-        public void QueryPostgreSql()
+        public async Task QueryPostgreSql()
         {
             HiSqlClient sqlClient = TestClientInit.GetPostgreSqlClient();
-            QueryGroups(sqlClient);
+            await QueryGroups(sqlClient);
 
         }
         [Fact(DisplayName = "Hana查询操作")]
         [Trait("Query", "init")]
-        public void QueryHana()
+        public async Task QueryHana()
         {
             HiSqlClient sqlClient = TestClientInit.GetHanaClient();
-            QueryGroups(sqlClient);
+            await QueryGroups(sqlClient);
         }
         [Fact(DisplayName = "Sqlite查询操作")]
         [Trait("Query", "init")]
-        public void QuerySqlite()
+        public async Task QuerySqlite()
         {
             HiSqlClient sqlClient = TestClientInit.GetSqliteClient();
-            QueryGroups(sqlClient);
+            await QueryGroups(sqlClient);
 
         }
         [Fact(DisplayName = "达梦查询操作")]
         [Trait("Query", "init")]
-        public void QueryDaMeng()
+        public async Task QueryDaMeng()
         {
             HiSqlClient sqlClient = TestClientInit.GetDaMengClient();
-            QueryGroups(sqlClient);
+            await QueryGroups(sqlClient);
         }
 
         #region
-        void QueryGroups(HiSqlClient sqlClient)
+        async Task QueryGroups(HiSqlClient sqlClient)
         {
             //初始化
             initDemoDynTable(sqlClient, "Hi_TestQuery");
@@ -92,13 +94,13 @@ namespace HiSql.Unit.Test
             insertNullData(sqlClient);
 
             queryNullData(sqlClient);
-            query(sqlClient);
+            await query(sqlClient);
 
             queryIn(sqlClient);
 
             queryJoin(sqlClient);
 
-             queryWhere(sqlClient);
+            queryWhere(sqlClient);
             queryCase(sqlClient);
             queryGroupBy(sqlClient);    //有问题
         }
@@ -130,9 +132,9 @@ namespace HiSql.Unit.Test
              .WithRank(DbRank.DENSERANK, DbFunction.NONE, "TabName", "rowidx1", SortType.ASC)
               .WithRank(DbRank.RANK, DbFunction.NONE, "TabName", "rowidx2", SortType.ASC)
               .WithRank(DbRank.ROWNUMBER, DbFunction.NONE, "TabName", "rowidx3", SortType.ASC)
-                //以下实现组合排名
+                 //以下实现组合排名
                  .WithRank(DbRank.DENSERANK, new Ranks { { DbFunction.NONE, "TabName" } }, "rowidx234")
-                  .WithRank(DbRank.RANK, new Ranks { { DbFunction.NONE, "TabName" }}, "rowidx244")
+                  .WithRank(DbRank.RANK, new Ranks { { DbFunction.NONE, "TabName" } }, "rowidx244")
                    .WithRank(DbRank.ROWNUMBER, new Ranks { { DbFunction.NONE, "TabName" } }, "rowidx245")
 
                 .Where(new Filter() {   { "("},{ "tabname", OperType.EQ,"Hi_FieldModel"},{ LogiType.OR},{ "tabname", OperType.EQ,"Hi_TestQuery"} , { ")"}
@@ -157,16 +159,16 @@ namespace HiSql.Unit.Test
 
             IQuery query = null;
             // hisql直接使用 case 
-//            query = sqlClient.HiSql(@$"select CASE WHEN FieldType > 21 THEN '大于21' WHEN FieldType = 21 THEN '等于21' ELSE '小于21' END as CaseValue,* from Hi_FieldModel  where (tabname =  'Hi_FieldModel' or  tabname = 'Hi_TestQuery') and FieldType in (11,41,21)
+            //            query = sqlClient.HiSql(@$"select CASE WHEN FieldType > 21 THEN '大于21' WHEN FieldType = 21 THEN '等于21' ELSE '小于21' END as CaseValue,* from Hi_FieldModel  where (tabname =  'Hi_FieldModel' or  tabname = 'Hi_TestQuery') and FieldType in (11,41,21)
 
-//");     //  where 条件  and CASE WHEN FieldType > 21 THEN '大于21' WHEN FieldType = 21 THEN '等于21' ELSE '小于21' END = '小于21'
-//            successCount++;
-//            _outputHelper.WriteLine(query.ToSql());
-//            successActCount += query.ToTable().Rows.Count == 29 ? 1 : 0;
+            //");     //  where 条件  and CASE WHEN FieldType > 21 THEN '大于21' WHEN FieldType = 21 THEN '等于21' ELSE '小于21' END = '小于21'
+            //            successCount++;
+            //            _outputHelper.WriteLine(query.ToSql());
+            //            successActCount += query.ToTable().Rows.Count == 29 ? 1 : 0;
 
             // CASE WHEN FieldType > 21 THEN '大于21' WHEN FieldType = 21 THEN '等于21' ELSE '小于21' end as Case1 ,
 
-            query = sqlClient.Query("Hi_FieldModel").Field(@"*").WithLock( LockMode.NOLOCK)
+            query = sqlClient.Query("Hi_FieldModel").Field(@"*").WithLock(LockMode.NOLOCK)
               .Case("FieldType")
               .When("FieldType > 21  and FieldType <> 1").Then("'大于21'")
               .When("FieldType = 21").Then("'等于21'")
@@ -205,7 +207,7 @@ namespace HiSql.Unit.Test
                     and FieldType in (11,41,21) AND FieldName IN( SELECT FieldName from Hi_FieldModel WHERE FieldName='CreateTime')");
             successCount++;
             _outputHelper.WriteLine(query.ToSql());
-            successActCount += query.ToTable().Rows.Count == 2?1:0;
+            successActCount += query.ToTable().Rows.Count == 2 ? 1 : 0;
 
             query = sqlClient.HiSql($"select * from Hi_FieldModel  where tabname in ( @TabName)   and FieldType in (@FieldType)  "
             , new { TabName = new List<string> { "Hi_FieldModel", "Hi_TestQuery" }, FieldType = new List<int> { 11, 41, 21 } });
@@ -226,13 +228,13 @@ namespace HiSql.Unit.Test
             successCount++;
             successActCount += query.ToTable().Rows.Count == 2 ? 1 : 0;
 
-            
+
             query = sqlClient.Query("Hi_FieldModel").Field("*").Where(new Filter() { { "tabname", OperType.IN, new List<string> { "Hi_FieldModel", "Hi_TestQuery" } },
             { "FieldType", OperType.IN, new List<int> { 11, 41, 21 } }
             });
             successCount++;
             _outputHelper.WriteLine(query.ToSql());
-            successActCount += query.ToTable().Rows.Count == 29  ? 1 : 0;
+            successActCount += query.ToTable().Rows.Count == 29 ? 1 : 0;
 
 
             query = sqlClient.Query("Hi_FieldModel").Field(@"TabName, FieldName, FieldDesc, IsIdentity, IsPrimary, IsBllKey , FieldType , SortNum, Regex, DBDefault, DefaultValue, FieldLen , FieldDec , SNO, SNO_NUM, IsSys, IsNull, IsRequire, IsIgnore".Split(",")).Where(new Filter() { { "tabname", OperType.IN, new List<string> { "Hi_FieldModel", "Hi_TestQuery" } },
@@ -270,20 +272,20 @@ namespace HiSql.Unit.Test
                 .Group(new GroupBy { { "A.TabName" }, { "A.FieldName" } })
 
         //.Having("count(*)>=0") //此处语法错误
-        .Having(new Having() { { "count(*)", OperType.GE, "0" } } )
+        .Having(new Having() { { "count(*)", OperType.GE, "0" } })
         .Sort("A.TabName asc", "A.FieldName asc");
-      
+
             _outputHelper.WriteLine(query.ToSql()); successCount++;
             successActCount += query.ToTable().Rows.Count == 18 ? 1 : 0;
 
-//            //样例2 有问题
-//            query = sqlClient.HiSql(@"select A.FieldName as FieldName , count(*) as _COUNT, AVG(FieldLen) as _AVG, MIN(FieldLen) as _MIN,MAX(FieldLen) as _MAX,SUM(FieldLen) as _SUM 
-//from Hi_FieldModel as A join Hi_TabModel as b on A.TabName = B.TabName where A.TabName='Hi_TestQuery' group by A.TabName,A.FieldName having count(*)>=0 order by A.TabName asc, A.FieldName asc");
+            //            //样例2 有问题
+            //            query = sqlClient.HiSql(@"select A.FieldName as FieldName , count(*) as _COUNT, AVG(FieldLen) as _AVG, MIN(FieldLen) as _MIN,MAX(FieldLen) as _MAX,SUM(FieldLen) as _SUM 
+            //from Hi_FieldModel as A join Hi_TabModel as b on A.TabName = B.TabName where A.TabName='Hi_TestQuery' group by A.TabName,A.FieldName having count(*)>=0 order by A.TabName asc, A.FieldName asc");
 
-//            //order by  HiSql语法检测错误: 子查询语句[A.TabName = 'Hi_TestQuery' group by A.TabName, A.FieldName having count(*) >= 0 order by A.TabName asc, A.FieldName asc]不允许[order by]排序
+            //            //order by  HiSql语法检测错误: 子查询语句[A.TabName = 'Hi_TestQuery' group by A.TabName, A.FieldName having count(*) >= 0 order by A.TabName asc, A.FieldName asc]不允许[order by]排序
 
-//            _outputHelper.WriteLine(query.ToSql()); successCount++;
-//            successActCount += query.ToTable().Rows.Count == 3 ? 1 : 0;
+            //            _outputHelper.WriteLine(query.ToSql()); successCount++;
+            //            successActCount += query.ToTable().Rows.Count == 3 ? 1 : 0;
 
             Assert.Equal(successActCount, successCount);
         }
@@ -324,7 +326,7 @@ namespace HiSql.Unit.Test
               .Where("A.TabName='Hi_TestQuery'")
               ;
             _outputHelper.WriteLine(query.ToSql()); successCount++;
-            successActCount += query.ToTable().Rows.Count == 18? 1 : 0;
+            successActCount += query.ToTable().Rows.Count == 18 ? 1 : 0;
 
             if (sqlClient.CurrentConnectionConfig.DbType != DBType.Sqlite)
             {
@@ -338,7 +340,7 @@ namespace HiSql.Unit.Test
 
 
             query = sqlClient.Query("Hi_FieldModel").As("A").Field("*")
-           .Join("Hi_TabModel", JoinType.Inner ).As("B").On(@"A.TabName=B.TabName  AND B.TabName = 'Hi_TestQuery'  AND A.FieldName = 'CreateTime' and A.TabName='Hi_TestQuery'")
+           .Join("Hi_TabModel", JoinType.Inner).As("B").On(@"A.TabName=B.TabName  AND B.TabName = 'Hi_TestQuery'  AND A.FieldName = 'CreateTime' and A.TabName='Hi_TestQuery'")
            .Where("A.TabName='Hi_TestQuery'");
             _outputHelper.WriteLine(query.ToSql()); successCount++;
             successActCount += query.ToTable().Rows.Count == 1 ? 1 : 0;
@@ -350,10 +352,10 @@ namespace HiSql.Unit.Test
              */
         }
 
-        void query(HiSqlClient sqlClient)
+        async Task query(HiSqlClient sqlClient)
         {
             DataTable table = sqlClient.Query("Hi_FieldModel").Field("*").Take(10).Skip(1).ToTable();
-            var dataList= sqlClient.Query("Hi_FieldModel").Field("*").Take(10).Skip(1).ToList<Hi_FieldModel>();
+            var dataList = sqlClient.Query("Hi_FieldModel").Field("*").Take(10).Skip(1).ToList<Hi_FieldModel>();
             //测试 table to list
             List<Hi_FieldModel> _FieldModelsB = DataConverter.ToList<Hi_FieldModel>(table, sqlClient.Context.CurrentConnectionConfig.DbType);
             List<Hi_FieldModel> _FieldModelsA = DataConvert.ToEntityList<Hi_FieldModel>(table);
@@ -363,22 +365,17 @@ namespace HiSql.Unit.Test
 
             bool tabletolistIsOk = strA.Equals(strB) && strA.Equals(strC);
 
-           
+
             _outputHelper.WriteLine($"测试 DataTable 转 List<T>  一致性：  {tabletolistIsOk}");
             //测试 datareader to list
             int total = 0;
-             _FieldModelsB = sqlClient.Query("Hi_FieldModel").Field("*").Take(10).Skip(1).ToList<Hi_FieldModel>( ref total);
-             _FieldModelsA = sqlClient.Query("Hi_FieldModel").Field("*").Take(10).Skip(1).ToList<Hi_FieldModel>();
-             bool datareader2listIsOk = JsonConverter.ToJson(_FieldModelsA).Equals(JsonConverter.ToJson(_FieldModelsB));
+            _FieldModelsB = sqlClient.Query("Hi_FieldModel").Field("*").Take(10).Skip(1).ToList<Hi_FieldModel>(ref total);
+            _FieldModelsA = sqlClient.Query("Hi_FieldModel").Field("*").Take(10).Skip(1).ToList<Hi_FieldModel>();
+            bool datareader2listIsOk = JsonConverter.ToJson(_FieldModelsA).Equals(JsonConverter.ToJson(_FieldModelsB));
 
 
             _FieldModelsB = sqlClient.Query("Hi_TestQuery").Field("*").Take(10).Skip(1).ToList<Hi_FieldModel>(ref total);
-            _FieldModelsA = sqlClient.Query("Hi_TestQuery").Field("*").Take(10).Skip(1).ToList<Hi_FieldModel>();
 
-            bool datareader2Hi_TestQueryIsOk = JsonConverter.ToJson(_FieldModelsA).Equals(JsonConverter.ToJson(_FieldModelsB));
-
-
-            _outputHelper.WriteLine($"测试 IDataReader 转 List<T>  一致性：  {datareader2listIsOk && datareader2Hi_TestQueryIsOk}");
 
 
 
@@ -390,8 +387,32 @@ namespace HiSql.Unit.Test
             var listTOtableIsOk = listToTableJson.Equals(listJson);
 
             _outputHelper.WriteLine($"测试 ListToDataTable 再转 List<T>  一致性：  {listTOtableIsOk}");
+            _FieldModelsA = sqlClient.Query("Hi_TestQuery").Field("*").Take(10).Skip(1).ToList<Hi_FieldModel>();
 
-            Assert.True(tabletolistIsOk && datareader2listIsOk&& listTOtableIsOk);
+            bool datareader2Hi_TestQueryIsOk = JsonConverter.ToJson(_FieldModelsA).Equals(JsonConverter.ToJson(_FieldModelsB));
+
+
+            _outputHelper.WriteLine($"测试 IDataReader 转 List<T>  一致性：  {datareader2listIsOk && datareader2Hi_TestQueryIsOk}");
+
+
+            var list = await sqlClient.HiSql("select * from Hi_FieldModel where FieldName=@FieldName and TabName in (@TabName) or FieldName in (@FieldNameList)",
+                new Dictionary<string, object> {
+                    {"FieldName","CreateTime" },
+                    {"TabName",JArray.FromObject(new List<string>
+                    {
+                        "Hi_FieldModel",
+                        "Hi_TabModel"
+                    })},
+                    {"FieldNameList",new List<string>{
+                        "CreateTime",
+                        "IsSearch"
+                    } }
+               }).ToEObjectAsync();
+            _outputHelper.WriteLine(JsonConverter.ToJson(list));
+            _outputHelper.WriteLine($"测试混合参数查询！");
+           
+
+            Assert.True(tabletolistIsOk && datareader2listIsOk && listTOtableIsOk);
         }
         void initDemoDynTable(HiSqlClient sqlClient, string tabname1)
         {

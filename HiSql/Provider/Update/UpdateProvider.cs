@@ -61,12 +61,12 @@ namespace HiSql
             get { return _onlywhere; }
         }
 
-        object _obkey=new object ();
+        object _obkey = new object();
 
         IDbConfig _dbConfig = null;
         public UpdateProvider()
         {
-            
+
         }
         IDbConfig buildConfig(DBType dBType)
         {
@@ -465,15 +465,15 @@ namespace HiSql
                                         #region 将值转成string 及特殊处理
                                         if (hiColumn.FieldType.IsIn<HiType>(HiType.DATE, HiType.DATETIME))
                                         {
-                                            
-                                            if (_o[hiColumn.FieldName] !=null)
+
+                                            if (_o[hiColumn.FieldName] != null)
                                             {
-                                                DateTime dtime = string.IsNullOrEmpty( _o[hiColumn.FieldName].ToString())?DateTime.MinValue:Convert.ToDateTime(_o[hiColumn.FieldName].ToString());
+                                                DateTime dtime = string.IsNullOrEmpty(_o[hiColumn.FieldName].ToString()) ? DateTime.MinValue : Convert.ToDateTime(_o[hiColumn.FieldName].ToString());
                                                 _value = dtime.ToString("yyyy-MM-dd HH:mm:ss.fff");
                                             }
                                             else
                                             {
-                                                _value= DateTime.MinValue.ToString("yyyy-MM-dd HH:mm:ss.fff");
+                                                _value = DateTime.MinValue.ToString("yyyy-MM-dd HH:mm:ss.fff");
                                             }
                                         }
                                         else if (hiColumn.FieldType.IsIn<HiType>(HiType.BOOL))
@@ -485,10 +485,11 @@ namespace HiSql
                                             else
                                                 _value = "0";
                                         }
-                                        else if(hiColumn.FieldType.IsNumberField())
+                                        else if (hiColumn.FieldType.IsNumberField())
                                         {
-                                            _value = _o[hiColumn.FieldName]==null?"0":_o[hiColumn.FieldName].ToString();
-                                        }else
+                                            _value = _o[hiColumn.FieldName] == null ? "0" : _o[hiColumn.FieldName].ToString();
+                                        }
+                                        else
                                             _value = _o[hiColumn.FieldName] == null ? "" : _o[hiColumn.FieldName].ToString();
                                         #endregion
 
@@ -546,8 +547,8 @@ namespace HiSql
                                     {
                                         if (_values.ContainsKey(_column.FieldName))
                                             _values.Remove(_column.FieldName);
-                                        
-                                        if(Context.CurrentConnectionConfig.DbType== DBType.Oracle)
+
+                                        if (Context.CurrentConnectionConfig.DbType == DBType.Oracle)
                                             _values.Add(_column.FieldName, $"timestamp'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
                                         else
                                             _values.Add(_column.FieldName, $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
@@ -683,7 +684,7 @@ namespace HiSql
                         {
                             if (!_dic_proinfo.ContainsKey(pinfo.Name.ToLower()))
                             {
-                                _dic_proinfo.Add(pinfo.Name.ToLower(),pinfo);
+                                _dic_proinfo.Add(pinfo.Name.ToLower(), pinfo);
                             }
                         }
 
@@ -709,7 +710,7 @@ namespace HiSql
                                     throw new Exception($"行[{_rowidx}] 缺少字段[{hiColumn.FieldName}] 为必填字段");
                                 }
 
-                                
+
 
 
                                 if (hiColumn.IsIdentity && _dic.ContainsKey(hiColumn.FieldName))
@@ -751,20 +752,20 @@ namespace HiSql
                                         if (objprop.PropertyType.Name.Contains("Bool"))
                                         {
                                             bool _boolval = (bool)objprop.GetValue(objdata);
-                                            _dic.Add(hiColumn.FieldName, _boolval?"1":"0");
+                                            _dic.Add(hiColumn.FieldName, _boolval ? "1" : "0");
                                         }
                                         else
                                         {
                                             _dic.Add(hiColumn.FieldName, ((int)objprop.GetValue(objdata)).ToString());
                                         }
-                                        
+
                                     }
                                     else
                                     {
-                                        if (hiColumn.IsPrimary && hiColumn.FieldType.IsIn<HiType>(HiType.VARCHAR,HiType.NVARCHAR,HiType.CHAR,HiType.NCHAR,HiType.GUID))
+                                        if (hiColumn.IsPrimary && hiColumn.FieldType.IsIn<HiType>(HiType.VARCHAR, HiType.NVARCHAR, HiType.CHAR, HiType.NCHAR, HiType.GUID))
                                         {
                                             string _val = objprop.GetValue(objdata).ToString();
-                                            if(string.IsNullOrEmpty(_val))
+                                            if (string.IsNullOrEmpty(_val))
                                                 _dic.Add(hiColumn.FieldName, _dbConfig.Key_Char_Default);
                                             else
                                                 _dic.Add(hiColumn.FieldName, _val);
@@ -838,7 +839,7 @@ namespace HiSql
                             if (_values.Count > 0)
                             {
                                 var _column = hiColumns.Where(h => h.FieldName.ToLower() == "moditime").FirstOrDefault();
-                                if (_column!=null)
+                                if (_column != null)
                                 {
                                     if (_values.ContainsKey(_column.FieldName))
                                         _values.Remove(_column.FieldName);
@@ -847,7 +848,7 @@ namespace HiSql
                                     else
                                         _values.Add(_column.FieldName, $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
                                 }
-                                _column= hiColumns.Where(h => h.FieldName.ToLower() == "modiname").FirstOrDefault();
+                                _column = hiColumns.Where(h => h.FieldName.ToLower() == "modiname").FirstOrDefault();
                                 if (_column != null)
                                 {
                                     if (_values.ContainsKey(_column.FieldName))
@@ -1025,7 +1026,7 @@ namespace HiSql
                     //中文按两个字符计算
 
                     //_value = "test";
-                    if (_value.LengthZH() > hiColumn.FieldLen && hiColumn.FieldLen>0)
+                    if (_value.LengthZH() > hiColumn.FieldLen && hiColumn.FieldLen > 0)
                     {
                         throw new Exception($"字段[{hiColumn.FieldName}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
                     }
@@ -1158,7 +1159,7 @@ namespace HiSql
                                     continue;
                             }
 
-                            if (_value.Length > hiColumn.FieldLen &&   hiColumn.FieldLen > 0)
+                            if (_value.Length > hiColumn.FieldLen && hiColumn.FieldLen > 0)
                             {
                                 throw new Exception($"字段[{objprop.Name}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
                             }
@@ -1324,7 +1325,7 @@ namespace HiSql
                             }
 
                             //_value = "test";
-                            if (_value.LengthZH() > hiColumn.FieldLen && hiColumn.FieldLen>0)
+                            if (_value.LengthZH() > hiColumn.FieldLen && hiColumn.FieldLen > 0)
                             {
                                 throw new Exception($"字段[{hiColumn.FieldName}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
                             }

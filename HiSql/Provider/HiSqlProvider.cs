@@ -8,6 +8,7 @@ using System.Data;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
+using Newtonsoft.Json.Linq;
 
 namespace HiSql
 {
@@ -27,7 +28,7 @@ namespace HiSql
 
         private string _connectedid = string.Empty;
 
-        private IDM _idm ;
+        private IDM _idm;
 
         /// <summary>
         /// 数据连接ID
@@ -54,8 +55,9 @@ namespace HiSql
         /// </summary>
         public ConnectionConfig SlaveConnectionConfig
         {
-            get {
-                if (_slaveConnectionConfig == null && CurrentConnectionConfig.SlaveConnectionConfigs!=null)
+            get
+            {
+                if (_slaveConnectionConfig == null && CurrentConnectionConfig.SlaveConnectionConfigs != null)
                 {
                     _slaveConnectionConfig = _currentConnectionConfig.CloneProperoty();
 
@@ -81,7 +83,8 @@ namespace HiSql
 
         public IDMInitalize DMInitalize
         {
-            get {
+            get
+            {
                 if (_idm == null)
                 {
                     _idm = Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
@@ -138,7 +141,8 @@ namespace HiSql
 
         public virtual IDataBase DBO
         {
-            get {
+            get
+            {
                 if (this.ContextDBO == null)
                 {
                     //实现数据库连接
@@ -160,11 +164,13 @@ namespace HiSql
 
         public HiSqlProvider Context
         {
-            get {
+            get
+            {
                 _Context = this;
                 return _Context;
             }
-            set {
+            set
+            {
                 _Context = value;
             }
         }
@@ -221,7 +227,7 @@ namespace HiSql
         /// <param name="rename">表别名</param>
         /// <param name="dbMasterSlave">主从策略</param>
         /// <returns></returns>
-        public IQuery Query(string tabname, string rename,DbMasterSlave dbMasterSlave= DbMasterSlave.Default)
+        public IQuery Query(string tabname, string rename, DbMasterSlave dbMasterSlave = DbMasterSlave.Default)
         {
             IQuery result = null;
             //默认主从规则
@@ -247,13 +253,13 @@ namespace HiSql
             //默认主从规则
 
             bool _isslave = ConnManager.ChooseSlaveForTable(this.Context.SlaveConnectionConfig, tabname, dbMasterSlave);
-            if(_isslave)
+            if (_isslave)
                 result = Instance.GetQuery(this.Context.SlaveConnectionConfig);
             else
                 result = Instance.GetQuery(this.Context.CurrentConnectionConfig);
 
 
-            
+
             result.Context = this.Context;
             result.Query(tabname);
             return result;
@@ -283,7 +289,7 @@ namespace HiSql
 
 
             result.Context = this.Context;
-            result.HiSql(hisql,result);
+            result.HiSql(hisql, result);
             return result;
         }
 
@@ -430,7 +436,7 @@ namespace HiSql
             Type type = objparm.GetType();
             if (!Tool.RegexMatch("[\'\\\"]+", sql))
             {
-               
+
                 Dictionary<string, object> dicparam = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
                 #region 参数解析
@@ -468,10 +474,40 @@ namespace HiSql
                     Dictionary<string, object> _dic = objparm as Dictionary<string, object>;
                     foreach (string key in _dic.Keys)
                     {
-                        if (dicparam.ContainsKey(key))
-                            dicparam[key] = _dic[key];
+                        var pValue = _dic[key];
+                        object pResultValue = "";
+                        if (pValue is JArray)
+                        {
+                            var vList = (JArray)pValue;
+                            if (vList.Count > 0)
+                            {
+                                if (vList[0].Type == JTokenType.Integer)
+                                {
+                                    pResultValue = vList.Values<int>().ToList();
+                                }
+                                else
+                                {
+                                    pResultValue = vList.Values<string>().ToList();
+                                }
+                            }
+                            else if (pValue is string[])
+                            {
+                                pResultValue = (pValue as string[]).ToList();
+                            }
+                            else if (pValue is decimal[])
+                            {
+                                pResultValue = (pValue as decimal[]).ToList();
+                            }
+                            else if (pValue is int[])
+                            {
+                                pResultValue = (pValue as int[]).ToList();
+                            }
+                        }
                         else
-                            dicparam.Add(key, _dic[key]);
+                        {
+                            pResultValue = pValue;
+                        }
+                        dicparam[key] = pResultValue;
                     }
                 }
                 else if (type == typeof(List<HiParameter>))
@@ -530,7 +566,7 @@ namespace HiSql
                             {
                                 string n = _dic["pname"];
                                 Type _type = dicparam[n].GetType();
-                                Regex regex = new Regex(@$"@{n}\b",RegexOptions.IgnoreCase);
+                                Regex regex = new Regex(@$"@{n}\b", RegexOptions.IgnoreCase);
 
                                 if (type.IsIn<Type>(Constants.ShortType, Constants.LongType, Constants.DecType, Constants.IntType, Constants.FloatType, Constants.DobType))
                                 {
@@ -538,7 +574,7 @@ namespace HiSql
                                 }
                                 else if (_type == Constants.BoolType)
                                 {
-                                    
+
                                     if (dicparam[n].ToString().ToLower().Trim() == "true")
                                         sql = regex.Replace(sql, "1");
                                     else
@@ -677,7 +713,7 @@ namespace HiSql
                                                 var list = dicparam[n] as List<string>;
                                                 _insql = AdoExtensions.ToSqlIn<string>(list.ToArray(), true);
                                             }
-                                            
+
                                             else if (_type == _typ_int)
                                             {
                                                 var list = dicparam[n] as List<int>;
@@ -698,7 +734,7 @@ namespace HiSql
                                                 var list = dicparam[n] as List<long>;
                                                 _insql = AdoExtensions.ToSqlIn<long>(list.ToArray(), false);
                                             }
-                                            
+
                                             else
                                             {
                                                 throw new HiSqlException($"类型[{_type.FullName}]不在允许的in集合内,仅允许string[],List<string>,List<int>,List<long>,List<decimal> 类型");
@@ -757,7 +793,7 @@ namespace HiSql
             return result;
         }
 
- 
+
 
 
         #region 数据插入
@@ -836,8 +872,8 @@ namespace HiSql
                 }
                 return this.Context.DBO.ExecBulkCopyCommand(sourcetable, tabInfo, columnMap);
             }
-            
-           
+
+
 
         }
         /// <summary>
@@ -853,9 +889,9 @@ namespace HiSql
             {
                 columnMap.Add(dc.ColumnName, dc.ColumnName);
             }
-            return  this.Context.DBO.ExecBulkCopyCommand(sourcetable, tabInfo, columnMap);
+            return this.Context.DBO.ExecBulkCopyCommand(sourcetable, tabInfo, columnMap);
         }
-        public  Task<int> BulkCopyExecCommandAsyc(TabInfo tabInfo, DataTable sourcetable)
+        public Task<int> BulkCopyExecCommandAsyc(TabInfo tabInfo, DataTable sourcetable)
         {
             Dictionary<string, string> columnMap = new Dictionary<string, string>();
             foreach (DataColumn dc in sourcetable.Columns)
@@ -870,7 +906,7 @@ namespace HiSql
             if (Context.CurrentConnectionConfig.DbType == DBType.MySql)
             {
                 DataTable sourcetable = DataConvert.BuildDataTable(tabInfo);
-                
+
                 foreach (DataColumn dc in sourcetable.Columns)
                 {
                     columnMap.Add(dc.ColumnName, dc.ColumnName);
@@ -887,7 +923,7 @@ namespace HiSql
                 }
                 return this.Context.DBO.ExecBulkCopyCommandAsync(sourcetable, tabInfo, columnMap);
             }
-            
+
         }
 
 
@@ -899,7 +935,8 @@ namespace HiSql
             result.Modi(tabname, lstobj);
             return result;
         }
-        public IInsert Modi<T>(string tabname, T objdata) {
+        public IInsert Modi<T>(string tabname, T objdata)
+        {
             IInsert result = Instance.GetInsert(this.Context.CurrentConnectionConfig);
             result.Context = this.Context;
             result.Modi<T>(tabname, objdata);
@@ -991,17 +1028,17 @@ namespace HiSql
         {
             IDelete result = Instance.GetDelete(this.Context.CurrentConnectionConfig);
             result.Context = this.Context;
-            result.Delete (tabname);
+            result.Delete(tabname);
             return result;
         }
         public IDelete Delete(string tabname, object objdata)
         {
             IDelete result = Instance.GetDelete(this.Context.CurrentConnectionConfig);
             result.Context = this.Context;
-            result.Delete(tabname,objdata);
+            result.Delete(tabname, objdata);
             return result;
         }
-        public IDelete Delete(string tabname, List<object> objlst) 
+        public IDelete Delete(string tabname, List<object> objlst)
         {
             IDelete result = Instance.GetDelete(this.Context.CurrentConnectionConfig);
             result.Context = this.Context;
@@ -1028,7 +1065,7 @@ namespace HiSql
         {
             IDelete result = Instance.GetDelete(this.Context.CurrentConnectionConfig);
             result.Context = this.Context;
-            result.Delete<T>( objlst);
+            result.Delete<T>(objlst);
             return result;
         }
 
@@ -1109,7 +1146,7 @@ namespace HiSql
             this.Context.BeginTran(iso);
         }
 
-       
+
 
 
 
