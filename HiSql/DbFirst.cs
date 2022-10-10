@@ -1601,7 +1601,7 @@ namespace HiSql
             }
             else
             {
-                _isok = false;
+                _isok = true;
                 _msg = "表结构无变更";
             }
 
