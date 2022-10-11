@@ -634,6 +634,8 @@ namespace HiSql
     /// <typeparam name="Entity"></typeparam>
     public class DataTableEntityBuilder<Entity>
     {
+        private static IDictionary<Type, Type> types = new Dictionary<Type, Type>();
+
         #region DataRow
         private static readonly MethodInfo setRowValueByIndexMethod = typeof(DataRow).GetMethod("set_Item", new Type[] { typeof(string), typeof(object) });
         private static readonly MethodInfo getValueByIndexMethod = typeof(DataRow).GetMethod("get_Item", new Type[] { typeof(int) });
@@ -678,7 +680,27 @@ namespace HiSql
 
         #endregion
 
-        private DataTableEntityBuilder() { }
+        private DataTableEntityBuilder() {
+            if (types.Count == 0)
+            {
+                lock (types)
+                {
+                    if (types.Count == 0)
+                    {
+                        types.Add(typeof(bool), typeof(Nullable<bool>));
+                        types.Add(typeof(byte), typeof(Nullable<byte>));
+                        types.Add(typeof(DateTime), typeof(Nullable<DateTime>));
+                        types.Add(typeof(decimal), typeof(Nullable<decimal>));
+                        types.Add(typeof(double), typeof(Nullable<double>));
+                        types.Add(typeof(float), typeof(Nullable<float>));
+                        types.Add(typeof(Guid), typeof(Nullable<Guid>));
+                        types.Add(typeof(Int16), typeof(Nullable<Int16>));
+                        types.Add(typeof(Int32), typeof(Nullable<Int32>));
+                        types.Add(typeof(Int64), typeof(Nullable<Int64>));
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// 如果DataRow中的列与实体中的不一致，会报错
@@ -755,13 +777,15 @@ namespace HiSql
 
                 var nullUnderlyingType = Nullable.GetUnderlyingType(property.PropertyType);
                 var unboxType = nullUnderlyingType?.IsEnum == true ? nullUnderlyingType : property.PropertyType;
-
+                bool isNullable = false;
+                if (unboxType.Name.ToLower().Contains("nullable"))
+                    isNullable = true;
                 if (property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
                 {
                     unboxType = property.PropertyType.GetGenericArguments()[0];
                 }
 
-
+                Type _type = column.DataType;
                 if (dbtype == DBType.Sqlite || dbtype == DBType.Oracle || dbtype == DBType.MySql)
                 {
                    
@@ -774,7 +798,14 @@ namespace HiSql
                
                 else
                 {
-                    generator.Emit(OpCodes.Unbox_Any, unboxType); //拆箱
+                    if (isNullable)
+                    {
+                        generator.Emit(OpCodes.Unbox_Any, types[_type]);
+                    }
+                    else
+                    {
+                        generator.Emit(OpCodes.Unbox_Any, _type);
+                    }
                 }
 
                 generator.Emit(OpCodes.Callvirt, property.GetSetMethod());
@@ -1254,6 +1285,7 @@ namespace HiSql
                        .Where(p => p.GetIndexParameters().Length > 0 && p.GetIndexParameters()[0].ParameterType == typeof(int))
                        .Select(p => p.GetGetMethod()).First();
 
+      
         /// <summary>
         /// DataReader转Entity
         /// </summary>
@@ -1311,13 +1343,16 @@ namespace HiSql
                 var nullUnderlyingType = Nullable.GetUnderlyingType(property.PropertyType);
                 var unboxType = nullUnderlyingType?.IsEnum == true ? nullUnderlyingType : property.PropertyType;
 
+                bool isNullable = false;
+                if (unboxType.Name.ToLower().Contains("nullable"))
+                    isNullable = true;
                 if (property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
                 {
                     unboxType = property.PropertyType.GetGenericArguments()[0];
                 }
 
-
-                if (dbtype == DBType.Sqlite || dbtype == DBType.Oracle || dbtype == DBType.MySql)
+                Type _type = reader.GetFieldType(i);
+                if (dbtype == DBType.Sqlite || dbtype == DBType.Oracle || dbtype == DBType.MySql )
                 {
 
                     if (unboxType.IsValueType)
@@ -1328,7 +1363,15 @@ namespace HiSql
                 }
                 else
                 {
-                    generator.Emit(OpCodes.Unbox_Any, unboxType);
+                    if (isNullable)
+                    {
+                        generator.Emit(OpCodes.Unbox_Any, types[_type]);
+                    }
+                    else
+                    {
+                        generator.Emit(OpCodes.Unbox_Any, _type);
+                    }
+                    
                 }
                 generator.Emit(OpCodes.Callvirt, property.GetSetMethod());
                 generator.MarkLabel(endIfDBNull);

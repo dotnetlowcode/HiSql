@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using HiSql.SqlServerUnitTest;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -63,10 +64,47 @@ namespace HiSql.UnitTest
             //Query_Demo19(sqlClient);
             // Query_Demo20(sqlClient);
             //Query_Demo21();
-            //Query_DemoEmit(sqlClient);
+           //Query_DemoEmit(sqlClient);
 
             Query_Null(sqlClient);
+            //Query_MyFlowDto(sqlClient);
             var s = Console.ReadLine();
+        }
+
+        static void Query_MyFlowDto(HiSqlClient sqlClient)
+        {
+            #region  ======================测试 普通反射 和 emit转换结果是否一致====================
+            {
+                DataTable dt3 = sqlClient.Query("Wf_Instance").Field("*").ToTable();
+                Console.WriteLine($"======================测试 普通反射 和 emit转换结果是否一致====================");
+
+
+                var modelListDataConverter = DataConverter.ToList<MyFlowDto>(dt3, sqlClient.Context.CurrentConnectionConfig.DbType);
+                var modelListDataConvert = DataConvert.ToEntityList<MyFlowDto>(dt3);
+
+                Console.WriteLine($"测试 DataTable 转 List<T>  一致性：  {JsonConverter.ToJson(modelListDataConverter).Equals(JsonConverter.ToJson(modelListDataConvert))}");
+
+                List<MyFlowDto> _FieldModelsA = new List<MyFlowDto>();
+                List<MyFlowDto> _FieldModelsB = new List<MyFlowDto>();
+
+                using (IDataReader dr = sqlClient.Context.DBO.GetDataReader("select * from Wf_Instance", null))
+                {
+                    _FieldModelsB = DataConverter.ToList<MyFlowDto>(dr, sqlClient.Context.CurrentConnectionConfig.DbType).ToList();
+                }
+                using (IDataReader dr = sqlClient.Context.DBO.GetDataReader("select * from Wf_Instance", null))
+                {
+                    _FieldModelsA = DataConvert.ToList<MyFlowDto>(dr, sqlClient.Context.CurrentConnectionConfig.DbType);
+                }
+                Console.WriteLine($"测试 IDataReader 转 List<T>  一致性：  {JsonConverter.ToJson(_FieldModelsA).Equals(JsonConverter.ToJson(_FieldModelsB))}");
+
+            }
+
+            #endregion
+            //转到动态类
+            List<MyFlowDto> lstdyn = sqlClient.HiSql($@"select WFNum,  FlowName, WFTitle, WFState, CreateClient, CreateSystem ,
+        CreateUserID  from Wf_Instance where CreateUserID = 'U000101420' order by  CreateTime DESC").ToList<MyFlowDto>();
+            
+
         }
 
         static void Query_Null(HiSqlClient sqlClient)
