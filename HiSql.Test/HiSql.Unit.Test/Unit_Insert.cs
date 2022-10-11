@@ -97,13 +97,13 @@ namespace HiSql.Unit.Test
         {
             sqlClient.CurrentConnectionConfig.AppEvents = GetAopEvent();
             int count = 5;
-
-            _outputHelper.WriteLine($"准备向表中插入[{count}]条数据测试");
-            insertData(sqlClient, count);
-
             bulkcopyInsertData(sqlClient, count, "Hi_Test_bulkcopyInsertData");
 
             return;
+            _outputHelper.WriteLine($"准备向表中插入[{count}]条数据测试");
+            insertData(sqlClient, count);
+
+           
             count = 10;
             _outputHelper.WriteLine($"准备向表中插入[{count}]条数据测试");
             insertData(sqlClient, count);
@@ -258,9 +258,15 @@ namespace HiSql.Unit.Test
         void insertData(HiSqlClient sqlClient,int count)
         {
             string tabname1 =typeof(H_Test01).Name;
-        
+
+            if (sqlClient.DbFirst.CheckTabExists(tabname1))
+            {
+                sqlClient.DbFirst.DropTable(tabname1);
+               
+            }
+            sqlClient.DbFirst.CreateTable(typeof(H_Test01));
             _outputHelper.WriteLine($"清除表[{tabname1}]中数据");
-            sqlClient.DbFirst.Truncate(tabname1);
+            //sqlClient.DbFirst.Truncate(tabname1);
 
             List<object > lstdata = buildData10Col(count);
 

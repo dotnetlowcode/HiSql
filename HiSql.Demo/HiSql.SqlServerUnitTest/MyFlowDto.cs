@@ -1,11 +1,166 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace HiSql.SqlServerUnitTest
 {
+
+	public class BaseEntity
+	{
+	}
+
+	///<summary>
+	///Wf_Instance
+	///</summary>
+	[Table("Wf_Instance")]
+	public partial class Wf_Instance : BaseEntity
+	{
+		public Wf_Instance() { }
+
+
+		/// <summary>
+		/// 工作流流水号
+		/// </summary>
+		[Key]
+		public string WFNum { get; set; }
+
+
+		/// <summary>
+		/// 流程ID
+		/// </summary>
+		public Guid FlowID { get; set; }
+
+
+		/// <summary>
+		/// 流程名称
+		/// </summary>
+		public string FlowName { get; set; }
+
+
+		/// <summary>
+		/// 工作流标题
+		/// </summary>
+		public string WFTitle { get; set; }
+
+
+		/// <summary>
+		/// 流程状态
+		/// </summary>
+		public int? WFState { get; set; }
+
+
+		/// <summary>
+		/// 发起客户端
+		/// </summary>
+		public string CreateClient { get; set; }
+
+
+		/// <summary>
+		/// 发起系统
+		/// </summary>
+		public string CreateSystem { get; set; }
+
+
+		/// <summary>
+		/// 完成时间
+		/// </summary>
+		public DateTime? CompleteTime { get; set; }
+
+
+		/// <summary>
+		/// 流程发起者ID
+		/// </summary>
+		public string CreateUserID { get; set; }
+
+
+		/// <summary>
+		/// 流程发起者ID
+		/// </summary>
+		public string CreateUserName { get; set; }
+
+
+		/// <summary>
+		/// 发起人部门ID
+		/// </summary>
+		public string CreateUserDepID { get; set; }
+
+
+		/// <summary>
+		/// 发起人部门名称
+		/// </summary>
+		public string CreateUserDepName { get; set; }
+
+
+		/// <summary>
+		/// 发起人区域ID
+		/// </summary>
+		public string CreateUserOrgID { get; set; }
+
+
+		/// <summary>
+		/// 发起人区域名称
+		/// </summary>
+		public string CreateUserOrgName { get; set; }
+
+
+		/// <summary>
+		/// 发起人公司编号
+		/// </summary>
+		public string CreateUserTenantId { get; set; }
+
+
+		/// <summary>
+		/// 发起人公司名称
+		/// </summary>
+		public string CreateUserTenantName { get; set; }
+
+
+		/// <summary>
+		/// 流程紧急程序(0普通1重要2紧急)
+		/// </summary>
+		public int? Urgent { get; set; }
+
+
+		/// <summary>
+		/// CreateName
+		/// </summary>
+		public string CreateName { get; set; }
+
+
+		/// <summary>
+		/// CreateTime
+		/// </summary>
+		public DateTime? CreateTime { get; set; }
+
+
+		/// <summary>
+		/// ModiName
+		/// </summary>
+		public string ModiName { get; set; }
+
+
+		/// <summary>
+		/// ModiTime
+		/// </summary>
+		public DateTime? ModiTime { get; set; }
+
+
+		/// <summary>
+		/// DataState
+		/// </summary>
+		public int? DataState { get; set; }
+
+
+		/// <summary>
+		/// TenantId
+		/// </summary>
+		public string TenantId { get; set; }
+
+	}
 	public class MyFlowDto2
 	{
 		

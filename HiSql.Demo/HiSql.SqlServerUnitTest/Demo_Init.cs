@@ -20,6 +20,7 @@ namespace HiSql.UnitTest
                          DbServer = "local-HoneBI",
                          //ConnectionString = "server=(local);uid=sa;pwd=Hone@123;database=Hone;Encrypt=True; TrustServerCertificate=True;",//; MultipleActiveResultSets = true;
                          //User = "tansar",//可以指定登陆用户的帐号
+                         //ConnectionString = "server=121.201.110.194,43109; uid=HoneDev;pwd=Dev@Hone; database=Hone_Flow_Dev;Encrypt=True; TrustServerCertificate=True;",//; MultipleActiveResultSets = true;
                          ConnectionString = "server=(local);uid=sa;pwd=Hone@123;database=Hone;Encrypt=True; TrustServerCertificate=True;",//; MultipleActiveResultSets = true;
                          SlaveConnectionConfigs = new List<SlaveConnectionConfig> {
                              { new SlaveConnectionConfig{ ConnectionString=" server=(local);uid=sa;pwd=Hone@123;database=Hone;Encrypt=True; TrustServerCertificate=True;" , Weight=3} },

@@ -75,25 +75,27 @@ namespace HiSql.UnitTest
         {
             #region  ======================测试 普通反射 和 emit转换结果是否一致====================
             {
-                DataTable dt3 = sqlClient.Query("Wf_Instance").Field("*").ToTable();
-                Console.WriteLine($"======================测试 普通反射 和 emit转换结果是否一致====================");
+                DataTable dt3 = sqlClient.Query("wf_instance").Field("*").ToTable();
+                Console.WriteLine($"======================测试 普通反射 和 emit转换结果是否一致===================wf_instance=");
 
 
-                var modelListDataConverter = DataConverter.ToList<MyFlowDto>(dt3, sqlClient.Context.CurrentConnectionConfig.DbType);
-                var modelListDataConvert = DataConvert.ToEntityList<MyFlowDto>(dt3);
+                var modelListDataConverter = DataConverter.ToList<Wf_Instance>(dt3, sqlClient.Context.CurrentConnectionConfig.DbType);
+                var modelListDataConvert = DataConvert.ToEntityList<Wf_Instance>(dt3);
 
                 Console.WriteLine($"测试 DataTable 转 List<T>  一致性：  {JsonConverter.ToJson(modelListDataConverter).Equals(JsonConverter.ToJson(modelListDataConvert))}");
 
-                List<MyFlowDto> _FieldModelsA = new List<MyFlowDto>();
-                List<MyFlowDto> _FieldModelsB = new List<MyFlowDto>();
+                List<Wf_Instance> _FieldModelsA = new List<Wf_Instance>();
+                List<Wf_Instance> _FieldModelsB = new List<Wf_Instance>();
 
-                using (IDataReader dr = sqlClient.Context.DBO.GetDataReader("select * from Wf_Instance", null))
+                var aa = sqlClient.HiSql("select * from wf_instance where WFNum = '2210110002' AND DataState != -1").ToList<Wf_Instance>();
+
+                using (IDataReader dr = sqlClient.Context.DBO.GetDataReader("select * from wf_instance where WFNum = '2210110002' AND DataState != -1", null))
                 {
-                    _FieldModelsB = DataConverter.ToList<MyFlowDto>(dr, sqlClient.Context.CurrentConnectionConfig.DbType).ToList();
+                    _FieldModelsB = DataConverter.ToList<Wf_Instance>(dr, sqlClient.Context.CurrentConnectionConfig.DbType).ToList();
                 }
-                using (IDataReader dr = sqlClient.Context.DBO.GetDataReader("select * from Wf_Instance", null))
+                using (IDataReader dr = sqlClient.Context.DBO.GetDataReader("select * from wf_instance where WFNum = '2210110002' AND DataState != -1", null))
                 {
-                    _FieldModelsA = DataConvert.ToList<MyFlowDto>(dr, sqlClient.Context.CurrentConnectionConfig.DbType);
+                    _FieldModelsA = DataConvert.ToList<Wf_Instance>(dr, sqlClient.Context.CurrentConnectionConfig.DbType);
                 }
                 Console.WriteLine($"测试 IDataReader 转 List<T>  一致性：  {JsonConverter.ToJson(_FieldModelsA).Equals(JsonConverter.ToJson(_FieldModelsB))}");
 
@@ -101,8 +103,8 @@ namespace HiSql.UnitTest
 
             #endregion
             //转到动态类
-            List<MyFlowDto> lstdyn = sqlClient.HiSql($@"select WFNum,  FlowName, WFTitle, WFState, CreateClient, CreateSystem ,
-        CreateUserID  from Wf_Instance where CreateUserID = 'U000101420' order by  CreateTime DESC").ToList<MyFlowDto>();
+            List<Wf_Instance> lstdyn = sqlClient.HiSql($@"select WFNum,  FlowName, WFTitle, WFState, CreateClient, CreateSystem ,
+        CreateUserID  from Wf_Instance where CreateUserID = 'U000101420' order by  CreateTime DESC").ToList<Wf_Instance>();
             
 
         }

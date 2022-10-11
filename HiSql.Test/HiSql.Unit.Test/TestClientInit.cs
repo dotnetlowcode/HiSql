@@ -25,7 +25,7 @@ namespace HiSql.Unit.Test
                  {
                      DbType = DBType.SqlServer,
                      DbServer = "local-HiSql",
-                     ConnectionString = @"server=172.16.80.253;uid=sa;pwd=Hone@123;database=Hone;Encrypt=True; TrustServerCertificate=True;",//; MultipleActiveResultSets = true;
+                     ConnectionString = @"server=(local);uid=sa;pwd=Hone@123;database=Hone;Encrypt=True; TrustServerCertificate=True;",//; MultipleActiveResultSets = true;
                                                                                                                                        //User="tansar",//可以指定登陆用户的帐号
 
                      SlaveConnectionConfigs = new List<SlaveConnectionConfig> {

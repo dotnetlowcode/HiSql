@@ -403,7 +403,8 @@ namespace HiSql
 
         private static IEnumerable<T> ToIEnumerable<T>(IDataReader dataReader, DBType dbType, bool closeDataReader = true)
         {
-            string cacheKey = GetDataReaderCacheInfo(dataReader, null);
+            var type = typeof(T);
+            string cacheKey = GetDataReaderCacheInfo(dataReader, type);
             DataReaderToEntityHandlerInfo cacheHandlerInfo = null;
             if (DataConverterCache<object>.DataReaderToEntityHandler.ContainsKey(cacheKey))
             {
@@ -411,7 +412,6 @@ namespace HiSql
             }
             else
             {
-                var type = typeof(T);
                 cacheHandlerInfo = new DataReaderToEntityHandlerInfo() { EntityType = type };
                 cacheHandlerInfo.PropertyInfo = cacheHandlerInfo.EntityType
             .GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
