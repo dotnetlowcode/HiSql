@@ -132,6 +132,9 @@ namespace HiSql.Unit.Test
             count = 10000;
             _outputHelper.WriteLine($"准备向表中插入[{count}]条数据测试");
             insertData(sqlClient, count);
+
+
+            insertNullData(sqlClient);
         }
 
         void bulkcopyInsertData(HiSqlClient sqlClient, int count, string tabname)
@@ -201,7 +204,7 @@ namespace HiSql.Unit.Test
                     },
                     new Dictionary<string, object>
                     {
-                        { "SID",2},
+                        { "SID",3},
                         { "gname","tgm"},
                         { "birth",DateTime.Now}
                     },
@@ -213,6 +216,34 @@ namespace HiSql.Unit.Test
                    
                     }
                 }).ExecCommand();
+
+
+                sqlClient.Insert(tabname, new List<Dictionary<string, object>> {
+                    new Dictionary<string, object>
+                    {
+                        { "SID",5},
+                        { "uname","tansar"}
+                    },
+                    new Dictionary<string, object>
+                    {
+                        { "SID",6},
+                        { "uname","tansar"},
+                        { "birth",DateTime.Now}
+                    },
+                    new Dictionary<string, object>
+                    {
+                        { "SID",7},
+                        { "gname","tgm"},
+                        { "birth",DateTime.Now}
+                    },
+                    new Dictionary<string, object>
+                    {
+                        { "SID",8},
+                         { "uname","tansar"},
+                        { "gname","tgm"}
+
+                    }
+                }).ExecCommandAsync();
 
 
             }
