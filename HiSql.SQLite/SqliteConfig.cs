@@ -536,7 +536,7 @@ PRAGMA [main].legacy_alter_table = 'off';"; }
                 //样例：[udescript] [text] NULL,
                 { "text",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} text [$IsNull$] COLLATE NOCASE [$Default$] [$EXTEND$]{_temp_field_split}"},
 
-                { "int",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} int [$IsIdentity$] [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}"},
+                { "int",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} integer [$IsIdentity$] [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}"},
                 { "bigint",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} bigint [$IsIdentity$] [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}" },
                 { "smallint",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} smallint  [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}"},
                 { "decimal",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} decimal([$FieldLen$],[$FieldDec$])  [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}"},

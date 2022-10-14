@@ -1105,6 +1105,10 @@ namespace HiSql
                 {
                     _tempfield = dbConfig.Table_Key2;
                     _tempfield = _tempfield.Replace("[$FieldName$]", $"{dbConfig.Field_Pre}{cols[i].FieldName}{dbConfig.Field_After}");
+
+                    if (cols[i].IsPrimary && cols[i].IsIdentity)
+                        _tempfield += " AUTOINCREMENT";//sqlite 只要主键才允许自增长
+
                     if (i != cols.Count - 1)
                         _tempfield += dbConfig.Field_Split;
 
@@ -1279,7 +1283,7 @@ namespace HiSql
                         case "int":
                         case "bigint":
                             _str_temp_field = _str_temp_field.Replace("[$FieldName$]", hiColumn.FieldName)
-                                .Replace("[$IsIdentity$]", hiColumn.IsIdentity ? "IDENTITY(1,1)" : "")
+                                .Replace("[$IsIdentity$]", hiColumn.IsIdentity ? "" : "") //IDENTITY(1,1)
                                 .Replace("[$IsNull$]", hiColumn.IsPrimary ? "NOT NULL" : hiColumn.IsIdentity ? "NOT NULL" : hiColumn.IsNull == true ? "NULL" : "NOT NULL")
                                 .Replace("[$Default$]", hiColumn.IsPrimary || hiColumn.IsIdentity ? "" : GetDbDefault(hiColumn))
                                 .Replace("[$EXTEND$]", hiTable.TableType == TableType.Var && hiColumn.IsPrimary ? "primary key" : "")
@@ -1373,6 +1377,8 @@ namespace HiSql
                 var dict = Tool.RegexGrp(@"^(?<FieldType>[\w\s]+)[\s]*\([\s]*(?<Lens>\d+)[\s]*,?[\s]*(?<PointDec>\d*)\)", item["type"].ToString());
 
                 string type = item["type"].ToString();
+                if (type.Equals("integer", StringComparison.OrdinalIgnoreCase))
+                    type = "int";
                 int lens = 0;
                 int pointDec = 0;
 
@@ -1482,6 +1488,38 @@ namespace HiSql
             //     && table.Rows.Count >
 
             DataTable dt = ConvertTableDefinitionFromPRAGMA(Context.DBO.GetDataTable(dbConfig.Get_Table_Schema.Replace("[$TabName$]", tabname)), tabname, true);
+
+            //add by tansar 识别sqlite自增长标识
+            DataTable dt_sql = Context.DBO.GetDataTable($"select * from sqlite_master where name='{tabname}' order by name");
+            if (dt_sql.Rows.Count > 0)
+            {
+                string _tab_sql = dt_sql.Rows[0]["sql"].ToString();
+
+                List<Dictionary<string,string>> lstdic= Tool.RegexGrps(@"(?<field>[^,\(]*AUTOINCREMENT)", _tab_sql);
+                if (lstdic.Count > 0)
+                {
+                    //说明是有主键
+                    foreach (Dictionary<string, string> dic in lstdic)
+                    {
+                        if (dic.ContainsKey("field"))
+                        {
+
+                            Dictionary<string, string> _dic = Tool.RegexGrp(@"\[?(?<fieldname>[\w]+)\]?\s*", dic["field"]);
+                            if (_dic.ContainsKey("fieldname"))
+                            {
+                                DataRow drow = dt.AsEnumerable().Where(t => t.Field<string>("FieldName").ToString().Equals(_dic["fieldname"].ToString(),StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                                if(drow!=null)
+                                    drow["IsIdentity"] = true;
+                            }
+
+
+                        }
+                    }
+
+                }
+
+            }
+
 
 
             if (dt.Rows.Count == 0)

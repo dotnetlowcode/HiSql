@@ -27,12 +27,20 @@ namespace HiSql.Unit.Test
             var rtnexe = Lock.LockOnExecute(_key, () => {
 
                 System.Threading.Thread.Sleep(1000);
+
+                var  rtnlck = Lock.CheckLock(_key);
+                if(rtnlck.Item1)
+                    _outputHelper.WriteLine($"key:{_key} 已经被锁定中。。。。");
             }, new LckInfo { UName = "hone", Ip = Tool.Net.GetLocalIPAddress() });
 
             var rtnlck = Lock.CheckLock(_key);
             if (rtnlck.Item1)
             {
+
+
                 _outputHelper.WriteLine($"key:{_key} 已经被锁定");
+
+
 
                 //Assert.True(false);
             }
