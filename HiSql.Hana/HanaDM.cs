@@ -34,7 +34,15 @@ namespace HiSql
             });
             return version;
         }
-       
+        public DateTime CurrentDBTime()
+        {
+            var table = Context.DBO.GetDataTable("select current_date , current_time from dummy;");
+            var obj = table.Rows[0][0].ToString().Substring(0,10)+" "+ table.Rows[0][1];
+            DateTime now = DateTime.Now;
+            DateTime.TryParse(obj?.ToString(), out now);
+            return now;
+        }
+
         HanaConfig dbConfig = new HanaConfig(true);
         public HanaDM()
         {

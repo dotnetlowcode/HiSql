@@ -1659,7 +1659,7 @@ namespace HiSql
             return l;
         }
 
-        public static TabInfo CloneTabInfo(TabInfo tabInfo)
+        public static TabInfo CloneTabInfo(this TabInfo tabInfo)
         {
             TabInfo l = new TabInfo() { 
                Columns = CloneHiColumnList(tabInfo.Columns),
@@ -1667,10 +1667,9 @@ namespace HiSql
                EntityName = tabInfo.EntityName
                , TabModel = tabInfo.TabModel
             };
-            
             return l;
         }
-        public static List<HiColumn> CloneHiColumnList(List<HiColumn> HiColumns)
+        public static List<HiColumn> CloneHiColumnList(this List<HiColumn> HiColumns)
         {
             List<HiColumn> l = new List<HiColumn>();
             foreach (var item in HiColumns)
@@ -1679,7 +1678,7 @@ namespace HiSql
             }
             return l;
         }
-        public static HiColumn CloneHiColumn(HiColumn hiColumn)
+        public static HiColumn CloneHiColumn(this HiColumn hiColumn)
         {
             HiColumn l = new HiColumn()
             {

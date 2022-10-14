@@ -459,16 +459,14 @@ namespace HiSql
             string _msg = "";
             if (GetCache<LckInfo>(key) != null)
             {
-                _islock = true;
+                //MCaceh 检查锁只有是 缓存对象在，且 HashTable有值才是锁定状态  pengxy on 2022 10 14 
                 string _lockinfo = HGet(_lockhashname, key);
                 if (!string.IsNullOrEmpty(_lockinfo))
                 {
+                    _islock = true;
                     LckInfo lckInfo = JsonConvert.DeserializeObject<LckInfo>(_lockinfo);
                     _msg = $"key:[{_key}]已经被[{lckInfo.UName}]在[{lckInfo.EventName}]于[{lckInfo.LockTime.ToString("yyyy-MM-dd HH:mm:ss")}]锁定!";
-
                 }
-                else
-                    _msg = $"key:[{_key}]被锁定";
             }
             else
             {
@@ -651,6 +649,7 @@ namespace HiSql
                 }
             }
 
+            var rtnlcks = Lock.CheckLock(key);
             return new Tuple<bool, string>(flag, msg);
         }
 

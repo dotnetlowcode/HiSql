@@ -292,6 +292,8 @@ namespace HiSql
                             isok = _sqlClient.Context.DMInitalize.BuildTabCreate(tabInfo) > 0;
                         }, new LckInfo { UName = _sqlClient.CurrentConnectionConfig.User,Ip=Tool.Net.GetLocalIPAddress() });
 
+                        var rtnlcks = Lock.CheckLock(_key);
+
                         return isok;
                     }
 

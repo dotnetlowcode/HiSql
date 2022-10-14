@@ -39,7 +39,18 @@ namespace HiSql
             });
             return version;
         }
-        
+        public DateTime CurrentDBTime()
+        {
+            var table = Context.DBO.GetDataTable("select to_char(localtimestamp,'yyyy-mm-dd hh24:mi:ss') as \"curr\", dbtimezone from dual");
+            var obj = table.Rows[0][0];
+            var dbtimezone = table.Rows[0][1];
+            DateTime now = DateTime.Now;
+            if (DateTime.TryParse(obj?.ToString(), out now)  && dbtimezone.Equals("+00:00"))
+            {
+                now = now.AddHours(8);
+            }
+            return now;
+        }
         public TabInfo BuildTab(Type type)
         {
             TabInfo tabInfo = new TabInfo();

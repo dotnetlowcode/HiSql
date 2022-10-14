@@ -48,7 +48,13 @@ namespace HiSql
             });
             return version;
         }
-        
+        public DateTime CurrentDBTime()
+        {
+            var obj = Context.DBO.GetDataTable("select sysdate").Rows[0][0];
+            DateTime now = DateTime.Now;
+            DateTime.TryParse(obj?.ToString(), out now);
+            return now;
+        }
         #region IDMInitalize接口实现
         public TabInfo BuildTab(Type type)
         {
@@ -3405,6 +3411,8 @@ namespace HiSql
         {
             throw new NotImplementedException();
         }
+
+      
         #endregion
     }
 }

@@ -81,6 +81,11 @@ namespace HiSql
         /// <returns></returns>
         DBVersion DBVersion();
 
+        /// <summary>
+        /// 获取数据库当前时间
+        /// </summary>
+        /// <returns></returns>
+        DateTime CurrentDBTime();
 
         /// <summary>
         /// 创建视图
