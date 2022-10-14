@@ -97,9 +97,9 @@ namespace HiSql.Unit.Test
         {
             sqlClient.CurrentConnectionConfig.AppEvents = GetAopEvent();
             int count = 5;
-            bulkcopyInsertData(sqlClient, count, "Hi_Test_bulkcopyInsertData");
+            //bulkcopyInsertData(sqlClient, count, "Hi_Test_bulkcopyInsertData");
 
-            return;
+            //return;
             _outputHelper.WriteLine($"准备向表中插入[{count}]条数据测试");
             insertData(sqlClient, count);
 
@@ -135,8 +135,23 @@ namespace HiSql.Unit.Test
 
 
             insertNullData(sqlClient);
+
+            insertAutoIncreate(sqlClient);
         }
 
+        void insertAutoIncreate(HiSqlClient sqlClient)
+        {
+            if (!sqlClient.DbFirst.CheckTabExists(nameof(WeatherForecast)))
+                sqlClient.DbFirst.CreateTable(typeof(WeatherForecast));
+
+            List<object> lstobj = new List<object>();
+            for (int i = 0; i < 100; i++)
+            {
+                lstobj.Add(new { Summary=$"test{i}" , Date=DateTime.Now });
+            }
+            sqlClient.Insert(nameof(WeatherForecast), lstobj).ExecCommand();
+
+        }
         void bulkcopyInsertData(HiSqlClient sqlClient, int count, string tabname)
         {
 
