@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
@@ -96,6 +97,10 @@ namespace HiSql.Unit.Test
         void insertGroups(HiSqlClient sqlClient)
         {
             sqlClient.CurrentConnectionConfig.AppEvents = GetAopEvent();
+
+            insertDefault(sqlClient);
+            insertAutoIncreate(sqlClient);
+
             int count = 5;
             //bulkcopyInsertData(sqlClient, count, "Hi_Test_bulkcopyInsertData");
 
@@ -136,13 +141,29 @@ namespace HiSql.Unit.Test
 
             insertNullData(sqlClient);
 
-            insertAutoIncreate(sqlClient);
+            
+        }
+
+        void insertDefault(HiSqlClient sqlClient)
+        {
+            //将createtime ModiTime的默认值去掉测试 插入值
+            if (sqlClient.DbFirst.CheckTabExists("Hi_Test2022"))
+            {
+                sqlClient.DbFirst.Truncate("Hi_Test2022");
+                sqlClient.Insert("Hi_Test2022", new { SID = 1, SNAME = "tansar", SDESC = "测试" }).ExecCommand();
+            }
         }
 
         void insertAutoIncreate(HiSqlClient sqlClient)
         {
-            if (!sqlClient.DbFirst.CheckTabExists(nameof(WeatherForecast)))
-                sqlClient.DbFirst.CreateTable(typeof(WeatherForecast));
+
+
+            //var _sql = sqlClient.HiSql("select * from WeatherForecast2").ToSql();
+
+            if (sqlClient.DbFirst.CheckTabExists(nameof(WeatherForecast)))
+                sqlClient.DbFirst.DropTable(nameof(WeatherForecast));
+
+            sqlClient.DbFirst.CreateTable(typeof(WeatherForecast));
 
             List<object> lstobj = new List<object>();
             for (int i = 0; i < 100; i++)
