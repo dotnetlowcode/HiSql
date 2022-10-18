@@ -887,9 +887,13 @@ namespace HiSql
             Dictionary<string, string> columnMap = new Dictionary<string, string>();
             foreach (DataColumn dc in sourcetable.Columns)
             {
-                columnMap.Add(dc.ColumnName, dc.ColumnName);
+                if (tabInfo.Columns.Any(t => t.FieldName.Equals(dc.ColumnName, StringComparison.OrdinalIgnoreCase)))
+                {
+                    columnMap.Add(dc.ColumnName, dc.ColumnName);
+                }
             }
             return this.Context.DBO.ExecBulkCopyCommand(sourcetable, tabInfo, columnMap);
+            
         }
         public Task<int> BulkCopyExecCommandAsyc(TabInfo tabInfo, DataTable sourcetable)
         {

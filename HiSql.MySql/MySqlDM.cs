@@ -31,7 +31,12 @@ namespace HiSql
                 {
                     _version.VersionDesc = tablerows[0][0]?.ToString();
 
-                    _version.Version = new Version(tablerows[0][0]?.ToString());
+                    var ver = tablerows[0][0]?.ToString();
+                    if (ver.IndexOf("-") >= 0)
+                    {
+                        ver = ver.Substring(0, ver.IndexOf("-"));
+                    }
+                    _version.Version = new Version(ver);
                 }
                 return _version;
             });
