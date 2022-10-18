@@ -152,6 +152,9 @@ namespace HiSql.Unit.Test
                 sqlClient.DbFirst.Truncate("Hi_Test2022");
                 sqlClient.Insert("Hi_Test2022", new { SID = 1, SNAME = "tansar", SDESC = "测试" }).ExecCommand();
             }
+
+            sqlClient.BeginTran();
+
         }
 
         void insertAutoIncreate(HiSqlClient sqlClient)

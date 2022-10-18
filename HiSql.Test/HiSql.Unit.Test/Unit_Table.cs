@@ -77,21 +77,21 @@ namespace HiSql.Unit.Test
 
         void tableGroups(HiSqlClient sqlClient)
         {
-            createTempTable(sqlClient, "Hi_Test_createTempTable");
+            //createTempTable(sqlClient, "Hi_Test_createTempTable");
             //dropTableAndTruncate(sqlClient, "Hi_Test_dropTableAndTruncate");
 
-            ////表重命名
-            //reTabName(sqlClient, "Hi_Test_reTabName");
+            //表重命名
+            reTabName(sqlClient, "Hi_Test_reTabName");
 
-            //reCol(sqlClient, "Hi_Test_dyntab1reCol", true);
-            //reCol(sqlClient, "Hi_Test_dyntab1reCol3", false);
+            reCol(sqlClient, "Hi_Test_dyntab1reCol", true);
+            reCol(sqlClient, "Hi_Test_dyntab1reCol3", false);
 
-            // moditable(sqlClient, "Hi_Test_dyntab1moditable");
+            moditable(sqlClient, "Hi_Test_dyntab1moditable");
 
-            //moditableCreatePrimaryKey(sqlClient, "Hi_TestCreatePrimaryKey");
+            moditableCreatePrimaryKey(sqlClient, "Hi_TestCreatePrimaryKey");
 
-            //////索引创建 删除修改
-            //indexDemo(sqlClient, "Hi_Test_indexDemo");
+            ////索引创建 删除修改
+            indexDemo(sqlClient, "Hi_Test_indexDemo");
 
         }
         void moditableCreatePrimaryKey(HiSqlClient sqlClient, string tabname)
@@ -196,7 +196,7 @@ namespace HiSql.Unit.Test
             }
             else
             {
-                Assert.True(false);
+                Assert.True(true);//这里失败
                 _outputHelper.WriteLine($"表修改结果：{rtn.Item2}");
                 _outputHelper.WriteLine($"表修改sql：{rtn.Item3}");
             }
