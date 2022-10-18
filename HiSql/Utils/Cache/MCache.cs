@@ -839,7 +839,7 @@ namespace HiSql
                 {
                     if (System.Threading.Monitor.IsEntered(cacheObj))
                         System.Threading.Monitor.Exit(cacheObj);
-                    //RemoveCache(newkey);  //不能移除缓存，否则多线程下锁对象时候，缓存可能被移除了
+                    //RemoveCache(newkey);  //不能移除缓存，否则多线程下，无法获得锁对象，另外的线程就没法锁定同一个对象，通过移除  Hashtable 实现所现场锁。
                     HDel(_lockhashname, newkey);
                 }
             }

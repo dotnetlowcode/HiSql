@@ -1665,7 +1665,7 @@ namespace HiSql
                Columns = CloneHiColumnList(tabInfo.Columns),
                DbTabName = tabInfo.DbTabName,
                EntityName = tabInfo.EntityName
-               , TabModel = tabInfo.TabModel
+               , TabModel = tabInfo.TabModel.CloneCopy()
             };
             return l;
         }

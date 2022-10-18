@@ -530,13 +530,46 @@ namespace HiSql
         /// <param name="tabname"></param>
         /// <param name="lstdata"></param>
         /// <returns></returns>
-        public int BulkCopyExecCommand(string tabname, DataTable souretable)
+        public int BulkCopyExecCommand(string tabname, DataTable souretable, bool isMegerData = false)
         {
+            int result = 0;
             TabInfo tabInfo = this.Context.DMInitalize.GetTabStruct(tabname);
-            return _context.BulkCopyExecCommand(tabInfo, souretable);
-        }
 
- 
+            if (isMegerData)
+            {
+
+                var tempTableInfo = tabInfo.CloneTabInfo();
+                var tempTableName = $"ZT_{tempTableInfo.TabModel.TabReName}{DateTime.Now.ToFileTime().ToString()}";
+                if (tempTableName.Length >= 50)
+                {
+                    tempTableName = tempTableName.Substring(0,50);
+                }
+                tempTableInfo.TabModel.TabName = tempTableInfo.TabModel.TabReName = tempTableName;
+                //1、临时创建物理表
+                if (dbFirst.CreateTable(tempTableInfo))
+                {
+                    try
+                    {   //2、插入数据到物理表
+                        result = _context.BulkCopyExecCommand(tempTableInfo, souretable);
+
+                        //3、MergerInto
+                        string _mergesql = _context.DMTab.BuildMergeIntoSql( tabInfo, tempTableInfo, null);
+                        result =  _context.DBO.ExecCommand(_mergesql);
+
+                    }
+                    finally
+                    {
+                        dbFirst.DropTable(tempTableName);
+                    }
+                }
+            }
+            else {
+
+                result = _context.BulkCopyExecCommand(tabInfo, souretable);
+            }
+
+            return result;
+        }
 
         public Task<int> BulkCopyExecCommandAsyc(string tabname, DataTable souretable)
         {
