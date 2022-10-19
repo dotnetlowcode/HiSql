@@ -152,6 +152,10 @@ namespace HiSql
                 Tuple<bool, List<Hi_Version>> verinfo = checkVersion();
                 upgradeVersions(_isinstall,verinfo.Item1, verinfo.Item2);
 
+                //add by tgm date:2022.10.19 升级系统表结构
+                verinfo = checkVersion();
+                upgradeVersions1054(_isinstall, verinfo.Item1, verinfo.Item2);
+
 
             }
             else
@@ -234,6 +238,46 @@ namespace HiSql
                 {
                     List<Hi_UpgradeInfo> upgradeInfos = lstupgradeinfo.Where(u => u.MinVersion <= _curver && _curver < u.MaxVersion).ToList();
                     if (upgradeInfos.Count>0)
+                    {
+                        foreach (Hi_UpgradeInfo upgradeInfo in upgradeInfos)
+                            upgradeVersion(_curver, upgradeInfo);
+
+                        
+                    }
+                    saveCurrVersion();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 2022.10.19 hisql 1.0.5.4 升级表结结构
+        /// </summary>
+        /// <param name="isinstall"></param>
+        /// <param name="hasversion"></param>
+        /// <param name="versions"></param>
+        private void upgradeVersions1054(bool isinstall, bool hasversion, List<Hi_Version> versions)
+        {
+            string jssonver = HiSql.Properties.Resources.UpgradeVersion1054.ToString();
+            List<Hi_UpgradeInfo> lstupgradeinfo = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Hi_UpgradeInfo>>(jssonver);
+            if (lstupgradeinfo.Count > 0)
+            {
+                //当前版本号
+                Version _curver = Constants.HiSqlVersion;
+                if (!hasversion)
+                {
+                    if (!isinstall)
+                    {
+                        //需要一个版本一个版本的升级
+                        foreach (Hi_UpgradeInfo upgradeInfo in lstupgradeinfo)
+                        {
+                            upgradeVersion(_curver, upgradeInfo);
+                        }
+                    }
+                }
+                else
+                {
+                    List<Hi_UpgradeInfo> upgradeInfos = lstupgradeinfo.Where(u => u.MinVersion <= _curver && _curver < u.MaxVersion).ToList();
+                    if (upgradeInfos.Count > 0)
                     {
                         foreach (Hi_UpgradeInfo upgradeInfo in upgradeInfos)
                             upgradeVersion(_curver, upgradeInfo);

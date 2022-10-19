@@ -31,14 +31,14 @@ namespace HiSql
         /// 表名
         /// </summary>
         /// 
-        [HiColumn( FieldDesc ="表名", FieldLen = 50, IsPrimary =true, IsBllKey =true,IsNull =false, DBDefault = HiTypeDBDefault.EMPTY, SortNum = 5, IsSys = true)]
+        [HiColumn( FieldDesc ="表名", FieldLen = 200, IsPrimary =true, IsBllKey =true,IsNull =false, DBDefault = HiTypeDBDefault.EMPTY, SortNum = 5, IsSys = true)]
         public string TabName { get; set; }
 
         /// <summary>
         /// 字段名
         /// </summary>
         /// 
-        [HiColumn(  FieldDesc = "字段名",FieldLen =50, IsPrimary = true, IsNull = false, IsBllKey =true,DBDefault =HiTypeDBDefault.EMPTY, SortNum = 10, IsSys = true)]
+        [HiColumn(  FieldDesc = "字段名",FieldLen =200, IsPrimary = true, IsNull = false, IsBllKey =true,DBDefault =HiTypeDBDefault.EMPTY, SortNum = 10, IsSys = true)]
         public string FieldName { get; set; }
 
 
@@ -46,7 +46,7 @@ namespace HiSql
         /// <summary>
         /// 字段描述
         /// </summary>
-        [HiColumn(  FieldDesc = "字段名描述", FieldLen = 100, DBDefault = HiTypeDBDefault.EMPTY, SortNum = 15, IsSys = true)]
+        [HiColumn(  FieldDesc = "字段名描述", FieldLen = 200, DBDefault = HiTypeDBDefault.EMPTY, SortNum = 15, IsSys = true)]
         public string FieldDesc { get; set; }
 
 
@@ -213,7 +213,7 @@ namespace HiSql
         /// <summary>
         /// 引用表名
         /// </summary>
-        [HiColumn(FieldDesc = "引用表名", FieldLen=50, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY, SortNum = 125)]
+        [HiColumn(FieldDesc = "引用表名", FieldLen=200, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY, SortNum = 125)]
         public string RefTab
         {
             get; set;
@@ -222,7 +222,7 @@ namespace HiSql
         /// <summary>
         /// 引用的字段
         /// </summary>
-        [HiColumn(FieldDesc = "引用的字段", FieldLen = 50, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY, SortNum = 130)]
+        [HiColumn(FieldDesc = "引用的字段", FieldLen = 200, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY, SortNum = 130)]
         public string RefField
         {
             get; set;
@@ -231,7 +231,7 @@ namespace HiSql
         /// <summary>
         /// 引用字段清单
         /// </summary>
-        [HiColumn(FieldDesc = "引用字段清单", FieldLen = 500, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY, SortNum = 135)]
+        [HiColumn(FieldDesc = "引用字段清单", FieldLen = 1000, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY, SortNum = 135)]
         public string RefFields
         {
             get; set;
@@ -239,7 +239,7 @@ namespace HiSql
         /// <summary>
         /// 引用字段清单描述
         /// </summary>
-        [HiColumn(FieldDesc = "引用字段清单描述", FieldLen = 500, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY, SortNum = 140)]
+        [HiColumn(FieldDesc = "引用字段清单描述", FieldLen = 1000, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY, SortNum = 140)]
         public string RefFieldDesc
         {
             get; set;
@@ -247,7 +247,7 @@ namespace HiSql
         /// <summary>
         /// 引用条件
         /// </summary>
-        [HiColumn(FieldDesc = "引用条件", FieldLen = 500, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY, SortNum = 145)]
+        [HiColumn(FieldDesc = "引用条件", FieldLen = 1000, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY, SortNum = 145)]
         public string RefWhere
         {
             get; set;

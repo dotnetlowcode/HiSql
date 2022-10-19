@@ -129,6 +129,8 @@ namespace HiSql.UnitTest
             //    });
 
 
+            #region 1.0.0.1-1.0.4.7 升级 
+
             lstupgradeinfo.Add(
                 new Hi_UpgradeInfo
                 {
@@ -210,12 +212,107 @@ namespace HiSql.UnitTest
                     }
                 });
 
-
             string json = Newtonsoft.Json.JsonConvert.SerializeObject(lstupgradeinfo);
             if (json != null)
             {
-                List<Hi_UpgradeInfo> upgradeInfo2 =Newtonsoft.Json.JsonConvert.DeserializeObject<List<Hi_UpgradeInfo>>(json);
+                List<Hi_UpgradeInfo> upgradeInfo2 = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Hi_UpgradeInfo>>(json);
             }
+
+            #endregion
+
+
+            #region TabName,FieldName 字度长度升级
+            lstupgradeinfo = new List<Hi_UpgradeInfo>();
+            lstupgradeinfo.Add(
+                new Hi_UpgradeInfo
+                {
+                    MinVersion = new Version("1.0.4.7"),
+                    MaxVersion = new Version("1.0.5.5"),
+                    UpgradTabs = new List<Hi_UpgradeTab>
+                    {
+                        new Hi_UpgradeTab{
+                            TabName="Hi_TabModel",
+                            Columns=new List<Hi_UpgradeCol>{
+                                new Hi_UpgradeCol {
+                                    TabFieldAction = TabFieldAction.MODI ,
+                                    ColumnInfo=new HiColumn {TabName="Hi_TabModel", FieldName="TabName", FieldType=HiType.NVARCHAR, FieldDesc = "表名",  IsPrimary = true, IsBllKey = true,IsNull =false, FieldLen = 200, SortNum = 5, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY }
+                                },
+                                new Hi_UpgradeCol {
+                                    TabFieldAction = TabFieldAction.MODI ,
+                                    ColumnInfo=new HiColumn {TabName="Hi_TabModel", FieldName="TabReName", FieldType=HiType.NVARCHAR, FieldDesc = "表的别名",   FieldLen = 200, SortNum = 6, DBDefault = HiTypeDBDefault.EMPTY }
+                                },
+                                new Hi_UpgradeCol {
+                                    TabFieldAction = TabFieldAction.MODI ,
+                                    ColumnInfo=new HiColumn {TabName="Hi_TabModel", FieldName="TabDescript", FieldType=HiType.NVARCHAR,FieldDesc = "表描述", FieldLen = 200, SortNum = 7, DBDefault = HiTypeDBDefault.EMPTY }
+                                },
+                                new Hi_UpgradeCol {
+                                    TabFieldAction = TabFieldAction.MODI ,
+                                    ColumnInfo=new HiColumn {TabName="Hi_TabModel", FieldName="LogTable", FieldType=HiType.NVARCHAR, FieldDesc = "日志表名", IsNull = true, FieldLen = 200, SortNum = 45, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY }
+                                }
+                            }
+                        }
+                    }
+                });
+
+            lstupgradeinfo.Add(
+                new Hi_UpgradeInfo
+                {
+                    MinVersion = new Version("1.0.4.7"),
+                    MaxVersion = new Version("1.0.5.5"),
+                    UpgradTabs = new List<Hi_UpgradeTab>
+                    {
+                        new Hi_UpgradeTab{
+                            TabName="Hi_FieldModel",
+                            Columns=new List<Hi_UpgradeCol>{
+                                new Hi_UpgradeCol {
+                                    TabFieldAction = TabFieldAction.MODI ,
+                                    ColumnInfo=new HiColumn {TabName="Hi_FieldModel", FieldName="TabName", FieldType=HiType.NVARCHAR,  FieldDesc = "表名",FieldLen =200,  IsPrimary =true, IsBllKey =true,IsNull =false, DBDefault = HiTypeDBDefault.EMPTY, SortNum = 5, IsSys = true }
+                                },
+                                new Hi_UpgradeCol {
+                                    TabFieldAction = TabFieldAction.MODI ,
+                                    ColumnInfo=new HiColumn {TabName="Hi_FieldModel", FieldName="FieldName", FieldType=HiType.NVARCHAR, FieldDesc = "字段名",  FieldLen =200, IsPrimary = true, IsNull = false, IsBllKey =true,DBDefault =HiTypeDBDefault.EMPTY, SortNum = 10, IsSys = true }
+                                },
+                                new Hi_UpgradeCol {
+                                    TabFieldAction = TabFieldAction.MODI ,
+                                    ColumnInfo=new HiColumn {TabName="Hi_FieldModel", FieldName="FieldDesc", FieldType=HiType.NVARCHAR,FieldDesc = "字段名描述", FieldLen = 200, DBDefault = HiTypeDBDefault.EMPTY, SortNum = 15, IsSys = true}
+                                },
+                                new Hi_UpgradeCol {
+                                    TabFieldAction = TabFieldAction.MODI ,
+                                    ColumnInfo=new HiColumn {TabName="Hi_FieldModel", FieldName="RefTab", FieldType=HiType.NVARCHAR,FieldDesc = "引用的字段",FieldLen=200, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY, SortNum = 125}
+                                },
+                                new Hi_UpgradeCol {
+                                    TabFieldAction = TabFieldAction.MODI ,
+                                    ColumnInfo=new HiColumn {TabName="Hi_FieldModel", FieldName="RefField", FieldType=HiType.NVARCHAR,FieldDesc = "引用的字段",FieldLen = 200, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY, SortNum = 130}
+                                }
+                                ,
+                                new Hi_UpgradeCol {
+                                    TabFieldAction = TabFieldAction.MODI ,
+                                    ColumnInfo=new HiColumn {TabName="Hi_FieldModel", FieldName="RefFields", FieldType=HiType.NVARCHAR,FieldDesc = "引用的字段",FieldLen = 1000, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY, SortNum = 135}
+                                }
+                                ,
+                                new Hi_UpgradeCol {
+                                    TabFieldAction = TabFieldAction.MODI ,
+                                    ColumnInfo=new HiColumn {TabName="Hi_FieldModel", FieldName="RefFieldDesc", FieldType=HiType.NVARCHAR,FieldDesc = "引用字段清单描述",FieldLen = 1000, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY, SortNum = 140}
+                                }
+                                ,
+                                new Hi_UpgradeCol {
+                                    TabFieldAction = TabFieldAction.MODI ,
+                                    ColumnInfo=new HiColumn {TabName="Hi_FieldModel", FieldName="RefWhere", FieldType=HiType.NVARCHAR,FieldDesc = "引用条件",FieldLen = 1000, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY, SortNum = 145}
+                                }
+                            }
+                        }
+                    }
+                });
+
+            json = Newtonsoft.Json.JsonConvert.SerializeObject(lstupgradeinfo);
+            if (json != null)
+            {
+                List<Hi_UpgradeInfo> upgradeInfo2 = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Hi_UpgradeInfo>>(json);
+            }
+
+            #endregion
+
+
         }
     }
 }
