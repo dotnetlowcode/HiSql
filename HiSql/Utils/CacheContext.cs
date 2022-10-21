@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Windows.Forms;
+
 namespace HiSql
 {
     public static class CacheContext
@@ -12,13 +14,17 @@ namespace HiSql
 
 
         static ICache _cache = null;
-
         static ICache _localcache = null;
+
+        static object _obj_local = new object();
+        static object _obj_mcache = new object();
+
+
 
         /// <summary>
         /// 提供外部访问缓存
         /// </summary>
-        internal static ICache Cache
+        public static ICache Cache
         {
             get => MCache;
         }
@@ -38,7 +44,7 @@ namespace HiSql
             get {
                 if (_localcache == null)
                 {
-                    lock (ContextList)
+                    lock (_obj_local)
                     {
                         _localcache= new MCache(HiSql.Constants.NameSpace);
                     }
@@ -47,6 +53,10 @@ namespace HiSql
             }
         }
 
+
+
+
+
         internal static ICache MCache
         {
             get
@@ -54,7 +64,7 @@ namespace HiSql
 
                 if (_cache == null)
                 {
-                    lock (ContextList)
+                    lock (_obj_mcache)
                     {
                         if (_cache == null)
                         {
