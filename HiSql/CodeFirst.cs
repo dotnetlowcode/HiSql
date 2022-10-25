@@ -47,7 +47,7 @@ namespace HiSql
         /// 初次使用HiSql时请执行该方法
         /// 执行一次后不需要再执行
         /// </summary>
-        public async Task InstallHisql()
+        public void InstallHisql()
         {
             if (_sqlClient != null)
             {

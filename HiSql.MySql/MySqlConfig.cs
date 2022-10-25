@@ -730,7 +730,7 @@ UNION ALL
 
            //表索引
             _temp_get_tabindex = @"SELECT distinct TABLE_NAME as TableName , INDEX_NAME as IndexName,  case when INDEX_NAME='PRIMARY' then 'Key_Index' ELSE 'Index' end as IndexType
-                                    , case when is_visible = 'YES' then '' ELSE 'Y' end as Disabled
+                                    ,'' as Disabled
                                     FROM INFORMATION_SCHEMA.STATISTICS
                                     WHERE TABLE_NAME = '[$TabName$]'; ";
             //表索引明细
@@ -738,7 +738,7 @@ UNION ALL
                                         , SEQ_IN_INDEX AS ColumnIdx, SEQ_IN_INDEX AS ColumnID, COLUMN_NAME as ColumnName, 'asc' as Sort, case when INDEX_NAME='PRIMARY' then 'Y' ELSE 'N' end as  IsPrimary 
                                         , case when NON_UNIQUE ='1' then '' ELSE 'Y' end as IsUnique
                                          , '' AS Ignore_dup_key
-                                        , case when is_visible = 'YES' then '' ELSE 'Y' end as Disabled 
+                                        , '' as Disabled 
                                         , '' AS Fill_factor
                                         , '' AS Padded ,'' as IsIncludedColumn
                                         FROM INFORMATION_SCHEMA.STATISTICS

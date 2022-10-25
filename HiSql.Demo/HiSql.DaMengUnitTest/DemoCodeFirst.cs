@@ -21,7 +21,7 @@ namespace HiSql.DaMengUnitTest
         static void CodeFirst_Demo(HiSqlClient sqlClient)
         {
 
-           var task =  sqlClient.CodeFirst.InstallHisql();
+           sqlClient.CodeFirst.InstallHisql();
            // return;
            // task.Wait();
 

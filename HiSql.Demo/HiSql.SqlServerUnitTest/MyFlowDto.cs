@@ -9,7 +9,96 @@ using System.Threading.Tasks;
 namespace HiSql.SqlServerUnitTest
 {
 
-	public class BaseEntity
+    /// <summary>
+    /// 流程管理列表DTO
+    /// </summary>
+    public class FlowManagerDto
+    {
+        /// <summary>
+        /// 工作流流水号
+        /// </summary>
+        public string WFNum { get; set; }
+        /// <summary>
+        /// 工作流标题
+        /// </summary>
+        public string WFTitle { get; set; }
+        /// <summary>
+        /// 流程名称
+        /// </summary>
+        public string FlowName { get; set; }
+        /// <summary>
+        /// 流程ID
+        /// </summary>
+        public Guid FlowID { get; set; }
+        /// <summary>
+        /// 流程类型ID
+        /// </summary>
+        public Guid GroupID { get; set; }
+        /// <summary>
+        /// 流程类型
+        /// </summary>
+        public string GroupName { get; set; }
+        /// <summary>
+        /// 流程状态
+        /// </summary>
+        public int? WFState { get; set; }
+        /// <summary>
+        /// 流程状态描述
+        /// </summary>
+        public string WFStateText { get; set; }
+
+        /// <summary>
+        /// 发起客户端
+        /// </summary>
+        public string CreateClient { get; set; }
+        /// <summary>
+        /// 发起系统
+        /// </summary>
+        public string CreateSystem { get; set; }
+        /// <summary>
+        /// 流程发起者ID
+        /// </summary>
+        public string CreateUserID { get; set; }
+        /// <summary>
+        /// CreateName
+        /// </summary>
+        public string CreateUserName { get; set; }
+        /// <summary>
+        /// 流程完成时间
+        /// </summary>
+        public DateTime? CompleteTime { get; set; }
+        /// <summary>
+        /// 流程申请时间
+        /// </summary>
+        public DateTime? CreateTime { get; set; }
+        /// <summary>
+        /// 流程当前节点ID
+        /// </summary>
+        public Guid NodeId { get; set; }
+        /// <summary>
+        /// 当前步骤名
+        /// </summary>
+        public string NodeName { get; set; }
+        /// <summary>
+        /// 当前节点处理人
+        /// </summary>
+        public string ReceiveNameS { get; set; }
+        /// <summary>
+        /// 当前节点状态
+        /// </summary>
+        public int? NodeState { get; set; }
+        /// <summary>
+        /// 当前节点状态描述
+        /// </summary>
+        public string NodeStateText { get; set; }
+        /// <summary>
+        /// 当前节点接收申请时间
+        /// </summary>
+        public DateTime? NodeCreateTime { get; set; }
+
+    }
+
+    public class BaseEntity
 	{
 	}
 

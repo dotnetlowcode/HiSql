@@ -90,7 +90,7 @@ namespace HiSql.Unit.Test
         /// </summary>
         void checkSystemTable(HiSqlClient sqlClient)
         {
-            sqlClient.CurrentConnectionConfig.AppEvents = GetAopEvent();
+            sqlClient.CurrentConnectionConfig.AppEvents = GetAopEvent();             
             sqlClient.CodeFirst.InstallHisql();
             bool _has_tab = sqlClient.DbFirst.CheckTabExists(Constants.HiSysTable["Hi_TabModel"]);
             bool _has_field = sqlClient.DbFirst.CheckTabExists(Constants.HiSysTable["Hi_FieldModel"]);

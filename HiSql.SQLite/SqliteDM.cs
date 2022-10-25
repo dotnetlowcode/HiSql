@@ -614,6 +614,8 @@ namespace HiSql
         {
             StringBuilder sb = new StringBuilder();
 
+            sb.AppendLine(DeleteTabStruct(hiTable));
+
             string _dbname = string.IsNullOrEmpty(hiTable.DbName) ? dbConfig.Key_Char_Default : hiTable.DbName.ToSqlInject();
             string _dbserver = string.IsNullOrEmpty(hiTable.DbServer) ? dbConfig.Key_Char_Default : hiTable.DbServer.ToSqlInject();
             sb.AppendLine($"insert into {dbConfig.Table_Pre}{Constants.HiSysTable["Hi_TabModel"]}{dbConfig.Table_After} (")

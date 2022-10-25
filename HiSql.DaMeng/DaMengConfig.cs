@@ -766,7 +766,7 @@ UNION ALL
                 .AppendLine("	    else 0")
                 .AppendLine("	end as \"UseBytes\",")
 
-                .AppendLine("	0 AS \"IsIdentity\",")
+                .AppendLine("	case when a.COL_NAME is null then FALSE ELSE TRUE END AS \"IsIdentity\",")
                 .AppendLine("	case ")
                 .AppendLine("	    when (select count(col.column_name)")
                 .AppendLine("		    from ALL_constraints con,  ALL_cons_columns col")
@@ -806,10 +806,10 @@ UNION ALL
                 .AppendLine("	END AS \"IsNull\",")
                 .AppendLine("	t1.DATA_DEFAULT AS \"DbDefault\",")
                 .AppendLine("	T2.COMMENTS as \"FieldDesc\"")
-                .AppendLine("	FROM ALL_TAB_COLS T1, ALL_COL_COMMENTS T2")
-                .AppendLine("	WHERE T1.TABLE_NAME = T2.TABLE_NAME")
-                .AppendLine("	    AND T1.COLUMN_NAME = T2.COLUMN_NAME")
-                .AppendLine("	    AND lower(T1.TABLE_NAME) =lower('[$TabName$]') AND T1.OWNER ='[$Schema$]' and T2.SCHEMA_NAME ='[$Schema$]' ")
+                .AppendLine($@"	FROM ALL_TAB_COLS T1 join ALL_COL_COMMENTS T2 on T1.TABLE_NAME = T2.TABLE_NAME and T1.COLUMN_NAME = T2.COLUMN_NAME
+                left join (select a.name COL_NAME from  SYS.SYSCOLUMNS a,all_tables b,sys.sysobjects c where a.INFO2 & 0x01 = 0x01 
+                            and a.id=c.id and c.name= b.table_name AND b.OWNER ='[$Schema$]' and lower(b.table_name) =lower('[$TabName$]')) a on a.COL_NAME = T1.COLUMN_NAME")
+                .AppendLine("	WHERE lower(T1.TABLE_NAME) =lower('[$TabName$]') AND T1.OWNER ='[$Schema$]' and T2.SCHEMA_NAME ='[$Schema$]' ")
                 .ToString();
 
 
@@ -817,7 +817,7 @@ UNION ALL
             //批量MERGE更新模版
             _temp_merge_into = new StringBuilder()
                 .AppendLine($"MERGE INTO {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after}    a")
-                .AppendLine("USING [$Source$]   b")
+                .AppendLine($"USING {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$Source$]{_temp_table_after}   b")
                 .AppendLine("on ( [$OnFilter$] )")
                 .AppendLine("WHEN MATCHED THEN")
                 .AppendLine("   update set [$Update$]")
