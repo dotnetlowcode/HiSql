@@ -1143,7 +1143,7 @@ namespace HiSql
 
                 if (!hiColumn.FieldDesc.IsNullOrEmpty())
                 {
-                    _changesql.AppendLine($"    execute immediate '{dbConfig.Field_Comment.Replace("[$TabName$]", $"{dbConfig.Table_Pre}{hiTable.TabName}{dbConfig.Table_After}").Replace("[$Schema$]", _schema).Replace("[$FieldName$]", $"{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}").Replace("[$FieldDesc$]", hiColumn.FieldDesc).ToString().Replace("'", "''")}';");
+                    _changesql.AppendLine($"    execute immediate '{dbConfig.Field_Comment.Replace("[$TabName$]", $"{hiTable.TabName}").Replace("[$Schema$]", _schema).Replace("[$FieldName$]", $"{hiColumn.FieldName}").Replace("[$FieldDesc$]", hiColumn.FieldDesc).ToString().Replace("'", "''")}';");
                 }
             }
 
@@ -1322,7 +1322,7 @@ namespace HiSql
                 string _temp = sequence_temp;
                 _temp = _temp.Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema)
                     .Replace("[$TabName$]", tabname)
-                    .Replace("[$ConnectID$]", Context.CurrentConnectionConfig.ConfigId.Replace("-", "").Substring(8))
+                    .Replace("[$ConnectID$]", GetKeyID())
                     .Replace("[$FieldName$]", hiColumn.FieldName);
                 sb.AppendLine(
                     _temp
@@ -1330,7 +1330,17 @@ namespace HiSql
             }
             return sb.ToString();
         }
-
+        private string GetKeyID()
+        {
+            if (DBVersion().Version < new Version("19.0"))
+            {
+                return DateTime.Now.ToString("f");
+            }
+            else
+            {
+                return DateTime.Now.ToString("yyMMddHHmmssfff");
+            }
+        }
         public int BuildTabCreate(TabInfo tabInfo)
         {
             string _sql = BuildTabCreateSql(tabInfo.TabModel, tabInfo.GetColumns);

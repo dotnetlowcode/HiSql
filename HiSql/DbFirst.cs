@@ -292,6 +292,8 @@ namespace HiSql
                             isok = _sqlClient.Context.DMInitalize.BuildTabCreate(tabInfo) > 0;
                         }, new LckInfo { UName = _sqlClient.CurrentConnectionConfig.User,Ip=Tool.Net.GetLocalIPAddress() });
 
+
+                        
                         var rtnlcks = Lock.CheckLock(_key);
 
                         return isok;
@@ -1543,7 +1545,6 @@ namespace HiSql
 
             }
 
-
             if (changes.Count() > 0 || reBuilderPrimaryKey)
             {
                 int resultCnt = 0;
@@ -1591,11 +1592,12 @@ namespace HiSql
                             _isok = true;
                             _msg = $"保存表[{tabInfo.TabModel.TabName}]的结构成功";
                         }
-                        catch (Exception E)
+                        catch (Exception e)
                         {
                             _sqlClient.RollBackTran();
                             _isok = false;
-                            _msg = E.Message.ToString();
+                            _msg = e.Message.ToString();
+                            throw e;
                         }
                     }
                     else
@@ -1695,7 +1697,8 @@ namespace HiSql
                     {
                         _sqlClient.RollBackTran();
                         _isok = false;
-                        _msg = E.Message.ToString();
+                        _msg = E.Message.ToString()+ " SQL:"+  _sql;
+                        throw new Exception(E.Message.ToString() + " SQL:" + _sql, E);
                     }
                 }
                 else

@@ -538,11 +538,17 @@ namespace HiSql
 
 
             _temp_sequence = new StringBuilder()
-                .AppendLine($"select count(*) into v_secout from user_sequences where SEQUENCE_NAME = upper('[$TabName$]_[$FieldName$]_SEQ'); ")
+                .AppendLine($"select count(*) into v_secout from user_sequences where SEQUENCE_NAME = '[$TabName$]_[$FieldName$]_SEQ'; ")
                 .AppendLine($"IF v_secout > 0 then")
                 .AppendLine($"   execute immediate 'drop sequence [$TabName$]_[$FieldName$]_SEQ';")
                 .AppendLine($"end if;")
                 .AppendLine($"execute immediate 'create sequence [$TabName$]_[$FieldName$]_SEQ increment by 1 start with 1 minvalue 1 maxvalue 999999999999999';")
+                 .AppendLine($@"execute immediate 'CREATE TRIGGER TRIGGER_[$TabName$]_[$FieldName$]_SEQ 
+                        BEFORE INSERT ON [$Schema$].{_temp_table_pre}[$TabName$]{_temp_table_after} FOR EACH ROW
+                        when (NEW.{_temp_table_pre}[$FieldName$]{_temp_table_after} IS NULL)
+                        BEGIN
+                            SELECT [$TabName$]_[$FieldName$]_SEQ.NEXTVAL INTO :NEW.{_temp_table_pre}[$FieldName$]{_temp_table_after} FROM DUAL;
+                        END;';")
                 .ToString();
 
             _temp_sequence_temp = new StringBuilder()
@@ -551,6 +557,13 @@ namespace HiSql
                 .AppendLine($"   execute immediate 'drop sequence [$TabName$]_[$FieldName$]_SEQ';")
                 .AppendLine($"end if;")
                 .AppendLine($"execute immediate 'create sequence [$TabName$]_[$FieldName$]_SEQ increment by 1 start with 1 minvalue 1 maxvalue 999999999999999';")
+                 .AppendLine($@"execute immediate 'CREATE TRIGGER TRIGGER_[$TabName$]_[$FieldName$]_SEQ 
+                        BEFORE INSERT ON [$Schema$].{_temp_table_pre}[$TabName$]{_temp_table_after} FOR EACH ROW
+                        when (NEW.{_temp_table_pre}[$FieldName$]{_temp_table_after} IS NULL)
+                        BEGIN
+                            SELECT [$TabName$]_[$FieldName$]_SEQ.NEXTVAL INTO :NEW.{_temp_table_pre}[$FieldName$]{_temp_table_after} FROM DUAL;
+                        END;';")
+
                 .ToString();
 
 
@@ -822,7 +835,7 @@ UNION ALL
             //批量MERGE更新模版
             _temp_merge_into = new StringBuilder()
                 .AppendLine($"MERGE INTO {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after}    a")
-                .AppendLine("USING [$Source$]   b")
+                .AppendLine($"USING {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$Source$]{_temp_table_after}   b")
                 .AppendLine("on ( [$OnFilter$] )")
                 .AppendLine("WHEN MATCHED THEN")
                 .AppendLine("   update set [$Update$]")

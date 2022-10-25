@@ -96,15 +96,15 @@ namespace HiSql
 
 
 
-        string _temp_addcolumn = "alter table [$TabName$] add ([$TempColumn$]) ";//ALTER TABLE t ADD (c NVARCHAR(10) DEFAULT 'NCHAR');
+        string _temp_addcolumn = "alter table [$Schema$].[$TabName$] add ([$TempColumn$]) ";//ALTER TABLE t ADD (c NVARCHAR(10) DEFAULT 'NCHAR');
 
         string _temp_delcolumn = "";
 
-        string _temp_modicolumn = "alter table [$TabName$] alter ([$TempColumn$]);";
+        string _temp_modicolumn = $"alter table [$Schema$].[$TabName$] alter ([$TempColumn$]);";
 
-        string _temp_recolumn = "RENAME COLUMN [$TabName$].[$FieldName$] TO [$ReFieldName$];";
+        string _temp_recolumn = "RENAME COLUMN [$Schema$].[$TabName$].[$FieldName$] TO [$ReFieldName$];";
 
-        string _temp_retable = "RENAME TABLE [$TabName$] to [$ReTabName$]";
+        string _temp_retable = "RENAME TABLE [$Schema$].[$TabName$] to [$ReTabName$]";
 
         string _temp_setdefalut = "";
 
@@ -687,7 +687,7 @@ UNION ALL
 
             //此处一定要记得要结合IDataReader 的GetSchemaTable 数据才能找到该表的主键信息
             _temp_get_table_schema = new StringBuilder()
-                .AppendLine("SELECT b.\"OBJECT_TYPE\" AS \"TabType\", a.\"TABLE_NAME\" AS \"TabName\" ,a.\"POSITION\" as \"FieldNo\",A.\"COLUMN_NAME\" AS \"FieldName\",FALSE AS  \"IsIdentity\",FALSE AS \"IsPrimary\",")
+                .AppendLine("SELECT b.\"OBJECT_TYPE\" AS \"TabType\", a.\"TABLE_NAME\" AS \"TabName\" ,a.\"POSITION\" as \"FieldNo\",A.\"COLUMN_NAME\" AS \"FieldName\",case when a.\"GENERATION_TYPE\" like '%IDENTITY%' THEN TRUE ELSE FALSE END AS  \"IsIdentity\", FALSE AS \"IsPrimary\",")
                 .AppendLine("   case ")
                 .AppendLine("       when a.\"DATA_TYPE_NAME\" = 'NVARCHAR' then 'nvarchar'")
                 .AppendLine("       when a.\"DATA_TYPE_NAME\" = 'VARCHAR' then 'varchar'")
@@ -722,7 +722,7 @@ UNION ALL
 
                 .AppendLine(" union all")
 
-                .AppendLine("SELECT b.\"OBJECT_TYPE\" AS \"TabType\", a.\"VIEW_NAME\" AS \"TabName\" ,a.\"POSITION\" as \"FieldNo\",A.\"COLUMN_NAME\" AS \"FieldName\",FALSE AS  \"IsIdentity\",FALSE AS \"IsPrimary\",")
+                .AppendLine("SELECT b.\"OBJECT_TYPE\" AS \"TabType\", a.\"VIEW_NAME\" AS \"TabName\" ,a.\"POSITION\" as \"FieldNo\",A.\"COLUMN_NAME\" AS \"FieldName\",case when a.\"GENERATION_TYPE\" like '%IDENTITY%' THEN TRUE ELSE FALSE END AS  \"IsIdentity\", FALSE AS \"IsPrimary\",")
                 .AppendLine("   case ")
                 .AppendLine("       when a.\"DATA_TYPE_NAME\" = 'NVARCHAR' then 'nvarchar'")
                 .AppendLine("       when a.\"DATA_TYPE_NAME\" = 'VARCHAR' then 'varchar'")
@@ -885,11 +885,11 @@ UNION ALL
 
                              + " from   \"SYS\".\"INDEX_COLUMNS\" WHERE  \"SCHEMA_NAME\" = '[$TabName$]' AND \"TABLE_NAME\" = '[$TabName$]' AND \"INDEX_NAME\"='[$IndexName$]';";
             //创建索引
-            _temp_create_index = $@"CREATE INDEX {_temp_schema_pre}[$IndexName$]{_temp_schema_after} ON {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} ([$Key$]); ";
+            _temp_create_index = $@"CREATE INDEX {_temp_table_pre}[$IndexName$]{_temp_table_after} ON {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} ([$Key$]); ";
 
             //删除索引
             _temp_drop_index = new StringBuilder()
-                .AppendLine($@"DROP INDEX  {_temp_schema_pre}[$IndexName$]{_temp_schema_after}")
+                .AppendLine($@"DROP INDEX  {_temp_table_pre}[$IndexName$]{_temp_table_after}")
                 .ToString();
 
             //删除表中的所有主键

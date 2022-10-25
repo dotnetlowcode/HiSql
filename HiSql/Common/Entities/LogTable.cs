@@ -105,7 +105,7 @@ namespace HiSql
         public bool  IsLogFile { get; set; }
 
 
-        [HiColumn(FieldDesc = "原值", FieldType = HiType.TEXT, SortNum = 5, DBDefault = HiTypeDBDefault.EMPTY)]
+        [HiColumn(FieldDesc = "原值", FieldType = HiType.NVARCHAR, FieldLen = 2000, SortNum = 5, DBDefault = HiTypeDBDefault.EMPTY)]
         public string OldValue { get; set; }
 
         [HiColumn(FieldDesc = "原值json路径", FieldType = HiType.VARCHAR,FieldLen =200, SortNum = 6, DBDefault = HiTypeDBDefault.EMPTY)]
@@ -117,7 +117,7 @@ namespace HiSql
 
 
 
-        [HiColumn(FieldDesc = "新值", FieldType = HiType.TEXT, SortNum = 9, DBDefault = HiTypeDBDefault.EMPTY)]
+        [HiColumn(FieldDesc = "新值", FieldType = HiType.NVARCHAR, FieldLen = 2000, SortNum = 9, DBDefault = HiTypeDBDefault.EMPTY)]
         public string NewValue { get; set; }
 
         [HiColumn(FieldDesc = "新值json路径", FieldType = HiType.VARCHAR, FieldLen = 200, SortNum = 10, DBDefault = HiTypeDBDefault.EMPTY)]

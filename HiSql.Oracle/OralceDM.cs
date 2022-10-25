@@ -1093,7 +1093,7 @@ namespace HiSql
 
                 if (!hiColumn.FieldDesc.IsNullOrEmpty())
                 {
-                    _changesql.AppendLine($"    execute immediate '{dbConfig.Field_Comment.Replace("[$TabName$]", $"{dbConfig.Table_Pre}{hiTable.TabName}{dbConfig.Table_After}").Replace("[$Schema$]", _schema).Replace("[$FieldName$]", $"{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}").Replace("[$FieldDesc$]", hiColumn.FieldDesc).ToString().Replace("'", "''")}';");
+                    _changesql.AppendLine($"    execute immediate '{dbConfig.Field_Comment.Replace("[$TabName$]", $"{hiTable.TabName}").Replace("[$Schema$]", _schema).Replace("[$FieldName$]", $"{hiColumn.FieldName}").Replace("[$FieldDesc$]", hiColumn.FieldDesc).ToString().Replace("'", "''")}';");
                 }
             }
 
@@ -1165,7 +1165,7 @@ namespace HiSql
                         case "int":
                         case "bigint":
                             _str_temp_field = _str_temp_field.Replace("[$FieldName$]", hiColumn.FieldName)
-                                .Replace("[$IsIdentity$]", hiColumn.IsIdentity ? "IDENTITY(1,1)" : "")
+                                .Replace("[$IsIdentity$]", hiColumn.IsIdentity ? "" : "")
                                 .Replace("[$IsNull$]", hiColumn.IsPrimary ? "NOT NULL" : hiColumn.IsIdentity ? "NOT NULL" : hiColumn.IsNull == true ? hiColumn.DBDefault != HiTypeDBDefault.NONE ? "" : "NULL" : "NOT NULL")
                                 .Replace("[$Default$]", hiColumn.IsPrimary || hiColumn.IsIdentity || !hiColumn.IsNull ? "" : GetDbDefault(hiColumn, hiTable.TabName))
                                 .Replace("[$EXTEND$]", hiTable.TableType == TableType.Var && hiColumn.IsPrimary ? "primary key" : "")
@@ -1247,7 +1247,41 @@ namespace HiSql
         /// <returns></returns>
         public DataTable GetTableDefinition(string tabname)
         {
+            
             DataTable dt = Context.DBO.GetDataTable(dbConfig.Get_Table_Schema.Replace("[$TabName$]", tabname));
+
+            string trigerBody = "";
+
+             var dtTrigerBody = Context.DBO.GetDataTable($@"select trigger_body from all_triggers where upper(table_name)=upper('{tabname}') and TRIGGERING_EVENT='INSERT' AND STATUS='ENABLED'".Replace("[$TabName$]", tabname));
+            foreach (DataRow item in dtTrigerBody.Rows)
+            {
+                trigerBody += item[0];
+            }
+
+            List<string> cols = new List<string>();
+            if (!trigerBody.IsNullOrEmpty())
+            {
+                List<Dictionary<string, string>> rsult = Tool.RegexGrps(@"NEXTVAL\s+INTO\s*[\:]+\s*NEW\s*[\.]{1}\s*[\""]?(?<field>[\w]+)[\""]?\s+from", trigerBody);
+                foreach (var dic in rsult)
+                {
+                    if (dic.ContainsKey("field") )
+                    {
+                        cols.Add(dic["field"]);
+                    }
+                }
+            }
+
+            foreach (string col in cols)
+            {
+                DataRow drow = dt.AsEnumerable().Where(c => c.Field<string>("FieldName").Equals(col, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                if (drow != null)
+                {
+                    drow["IsIdentity"] = 1;
+                }
+            }
+           
+            //select trigger_body from all_triggers where table_name='Hi_WeatherForecast' and TRIGGERING_EVENT='INSERT' AND STATUS='ENABLED'
+
             if (dt.Rows.Count == 0) throw new Exception($"表[{tabname}]不存在");
             return dt;
         }

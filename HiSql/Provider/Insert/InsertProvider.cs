@@ -1547,8 +1547,10 @@ namespace HiSql
 
             if (hiColumn.IsPrimary )
             {
-                if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.Oracle, DBType.DaMeng))
+                if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.Oracle, DBType.Hana, DBType.DaMeng))
+                {
                     _value = $"' '";
+                }
                 else
                     _value = "''";
             }
@@ -1576,7 +1578,7 @@ namespace HiSql
                 {
                     if (hiColumn.FieldType.IsIn<HiType>(HiType.VARCHAR, HiType.CHAR, HiType.NCHAR, HiType.NVARCHAR, HiType.GUID, HiType.TEXT))
                     {
-                        if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.Oracle, DBType.DaMeng))
+                        if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.Oracle, DBType.DaMeng, DBType.Hana))
                             _value = $"' '";
                         else
                             _value = "''";
@@ -1588,7 +1590,7 @@ namespace HiSql
                 {
                     if (hiColumn.FieldType.IsIn<HiType>(HiType.VARCHAR, HiType.CHAR, HiType.NCHAR, HiType.NVARCHAR, HiType.GUID, HiType.TEXT))
                     {
-                        if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.Oracle, DBType.DaMeng))
+                        if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.Oracle, DBType.DaMeng, DBType.Hana))
                             _value = $"' '";
                         else
                             _value = "''";
@@ -1677,7 +1679,7 @@ namespace HiSql
                         if (string.IsNullOrEmpty(_value.Trim()) && string.IsNullOrEmpty(hiColumn.SNO) && hiColumn.DBDefault == HiTypeDBDefault.NONE && !hiColumn.IsPrimary)
                             throw new Exception($"字段[{hiColumn.FieldName}] 为必填 无法数据提交");
                     }
-                    if (hiColumn.IsPrimary && string.IsNullOrEmpty(_value) && Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.Oracle, DBType.DaMeng))
+                    if (hiColumn.IsPrimary && string.IsNullOrEmpty(_value) && Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.Oracle, DBType.DaMeng, DBType.Hana))
                         _value = $"' '";
                     else
                         _value = $"'{_value.ToSqlInject()}'";
@@ -1698,7 +1700,7 @@ namespace HiSql
                         if (string.IsNullOrEmpty(_value.Trim()) && string.IsNullOrEmpty(hiColumn.SNO) && hiColumn.DBDefault==HiTypeDBDefault.NONE)
                             throw new Exception($"字段[{hiColumn.FieldName}] 为必填 无法数据提交");
                     }
-                    if (hiColumn.IsPrimary && string.IsNullOrEmpty(_value) && Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.Oracle,DBType.DaMeng))
+                    if (hiColumn.IsPrimary && string.IsNullOrEmpty(_value) && Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.Oracle,DBType.DaMeng, DBType.Hana))
                         _value = $"' '";
                     else
                         _value = $"'{_value.ToSqlInject()}'";

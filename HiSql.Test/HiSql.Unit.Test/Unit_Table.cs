@@ -220,45 +220,45 @@ namespace HiSql.Unit.Test
                 _outputHelper.WriteLine($"表修改-删除字段-sql：{rtn.Item3}");
             }
 
-            //修改表的扩展字段信息
-            tabinfo = DataConvert.CloneTabInfo(sqlClient.DbFirst.GetTabStruct(tabname));
-            tabinfo.TabModel.TabReName = tabinfo.TabModel.TabReName + "1";
-            tabinfo.TabModel.DbName = tabinfo.TabModel.DbName + "1";
-            tabinfo.TabModel.DbServer = tabinfo.TabModel.DbServer + "1";
-            tabinfo.TabModel.TabDescript = tabinfo.TabModel.TabDescript + "1";
-            tabinfo.TabModel.TabCacheType =  TabCacheType.ALL;
-            tabinfo.TabModel.IsLog = !tabinfo.TabModel.IsLog;
-            rtn = sqlClient.DbFirst.ModiTable(tabinfo, OpLevel.Execute);
+            ////修改表的扩展字段信息
+            //tabinfo = DataConvert.CloneTabInfo(sqlClient.DbFirst.GetTabStruct(tabname));
+            //tabinfo.TabModel.TabReName = tabinfo.TabModel.TabReName + "1";
+            //tabinfo.TabModel.DbName = tabinfo.TabModel.DbName + "1";
+            //tabinfo.TabModel.DbServer = tabinfo.TabModel.DbServer + "1";
+            //tabinfo.TabModel.TabDescript = tabinfo.TabModel.TabDescript + "1";
+            //tabinfo.TabModel.TabCacheType =  TabCacheType.ALL;
+            //tabinfo.TabModel.IsLog = !tabinfo.TabModel.IsLog;
+            //rtn = sqlClient.DbFirst.ModiTable(tabinfo, OpLevel.Execute);
 
-            tabinfoNew = sqlClient.DbFirst.GetTabStruct(tabname);
-            Assert.True(rtn.Item1 &&
-                tabinfoNew.TabModel.TabReName == tabinfo.TabModel.TabReName &&
-                tabinfoNew.TabModel.DbName == tabinfo.TabModel.DbName &&
-                tabinfoNew.TabModel.DbServer == tabinfo.TabModel.DbServer &&
-                tabinfoNew.TabModel.TabDescript == tabinfo.TabModel.TabDescript &&
-                tabinfoNew.TabModel.TabCacheType == tabinfo.TabModel.TabCacheType &&
-                 tabinfoNew.TabModel.IsLog == tabinfo.TabModel.IsLog
-                );
+            //tabinfoNew = sqlClient.DbFirst.GetTabStruct(tabname);
+            //Assert.True(rtn.Item1 &&
+            //    tabinfoNew.TabModel.TabReName == tabinfo.TabModel.TabReName &&
+            //    tabinfoNew.TabModel.DbName == tabinfo.TabModel.DbName &&
+            //    tabinfoNew.TabModel.DbServer == tabinfo.TabModel.DbServer &&
+            //    tabinfoNew.TabModel.TabDescript == tabinfo.TabModel.TabDescript &&
+            //    tabinfoNew.TabModel.TabCacheType == tabinfo.TabModel.TabCacheType &&
+            //     tabinfoNew.TabModel.IsLog == tabinfo.TabModel.IsLog
+            //    );
 
-            //修改表的列的扩展信息
-            tabinfo = DataConvert.CloneTabInfo(sqlClient.DbFirst.GetTabStruct(tabname));
-            tabinfo.TabModel.TabReName = tabinfo.TabModel.TabReName + "1";
-            tabinfo.TabModel.DbName = tabinfo.TabModel.DbName + "1";
-            tabinfo.TabModel.DbServer = tabinfo.TabModel.DbServer + "1";
-            tabinfo.TabModel.TabDescript = tabinfo.TabModel.TabDescript + "1";
-            tabinfo.TabModel.TabCacheType = TabCacheType.ALL;
-            tabinfo.TabModel.IsLog = !tabinfo.TabModel.IsLog;
-            rtn = sqlClient.DbFirst.ModiTable(tabinfo, OpLevel.Execute);
+            ////修改表的列的扩展信息
+            //tabinfo = DataConvert.CloneTabInfo(sqlClient.DbFirst.GetTabStruct(tabname));
+            //tabinfo.TabModel.TabReName = tabinfo.TabModel.TabReName + "1";
+            //tabinfo.TabModel.DbName = tabinfo.TabModel.DbName + "1";
+            //tabinfo.TabModel.DbServer = tabinfo.TabModel.DbServer + "1";
+            //tabinfo.TabModel.TabDescript = tabinfo.TabModel.TabDescript + "1";
+            //tabinfo.TabModel.TabCacheType = TabCacheType.ALL;
+            //tabinfo.TabModel.IsLog = !tabinfo.TabModel.IsLog;
+            //rtn = sqlClient.DbFirst.ModiTable(tabinfo, OpLevel.Execute);
 
-            tabinfoNew = sqlClient.DbFirst.GetTabStruct(tabname);
-            Assert.True(rtn.Item1 &&
-                tabinfoNew.TabModel.TabReName == tabinfo.TabModel.TabReName &&
-                tabinfoNew.TabModel.DbName == tabinfo.TabModel.DbName &&
-                tabinfoNew.TabModel.DbServer == tabinfo.TabModel.DbServer &&
-                tabinfoNew.TabModel.TabDescript == tabinfo.TabModel.TabDescript &&
-                tabinfoNew.TabModel.TabCacheType == tabinfo.TabModel.TabCacheType &&
-                 tabinfoNew.TabModel.IsLog == tabinfo.TabModel.IsLog
-                );
+            //tabinfoNew = sqlClient.DbFirst.GetTabStruct(tabname);
+            //Assert.True(rtn.Item1 &&
+            //    tabinfoNew.TabModel.TabReName == tabinfo.TabModel.TabReName &&
+            //    tabinfoNew.TabModel.DbName == tabinfo.TabModel.DbName &&
+            //    tabinfoNew.TabModel.DbServer == tabinfo.TabModel.DbServer &&
+            //    tabinfoNew.TabModel.TabDescript == tabinfo.TabModel.TabDescript &&
+            //    tabinfoNew.TabModel.TabCacheType == tabinfo.TabModel.TabCacheType &&
+            //     tabinfoNew.TabModel.IsLog == tabinfo.TabModel.IsLog
+            //    );
         }
 
         /// <summary>
@@ -413,7 +413,7 @@ namespace HiSql.Unit.Test
 
             List<TabIndex> lstindex = sqlClient.DbFirst.GetTabIndexs(tabname);
 
-            if (rtn.Item1 && lstindex.Any(t=> t.IndexName == keyidxname))
+            if (rtn.Item1 && lstindex.Any(t=> t.IndexName.Equals( keyidxname, StringComparison.OrdinalIgnoreCase)))
             {
                 _outputHelper.WriteLine($"向表[{tabname}]新建索引：[{keyidxname}]成功 {System.Environment.NewLine} {rtn.Item3}");
           

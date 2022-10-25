@@ -1098,19 +1098,19 @@ namespace HiSql
 
             else if (tabFieldAction == TabFieldAction.DELETE)
             {
-                _changesql = dbConfig.Del_Column.Replace("[$TabName$]", $"{dbConfig.Table_Pre}{hiTable.TabName}{dbConfig.Table_After}").Replace("[$FieldName$]", $"{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}").Replace("[$Schema$]", string.IsNullOrEmpty(hiTable.Schema) ? this.Context.CurrentConnectionConfig.Schema : hiTable.Schema);
+                _changesql = dbConfig.Del_Column.Replace("[$TabName$]", $"{hiTable.TabName}").Replace("[$FieldName$]", $"{hiColumn.FieldName}").Replace("[$Schema$]", string.IsNullOrEmpty(hiTable.Schema) ? this.Context.CurrentConnectionConfig.Schema : hiTable.Schema);
 
                 return " EXEC  '" + _changesql.Replace("'", "''") + "';";
             }
             else if (tabFieldAction == TabFieldAction.MODI)
             {
 
-                return " EXEC  '" + dbConfig.Modi_Column.Replace("[$TabName$]", $"{dbConfig.Table_Pre}{hiTable.TabName}{dbConfig.Table_After}").Replace("[$TempColumn$]", _fieldsql).Replace("'", "''") + "';";
+                return " EXEC  '" + dbConfig.Modi_Column.Replace("[$TabName$]", $"{dbConfig.Table_Pre}{hiTable.TabName}{dbConfig.Table_After}").Replace("[$Schema$]", string.IsNullOrEmpty(hiTable.Schema) ? this.Context.CurrentConnectionConfig.Schema : hiTable.Schema).Replace("[$TempColumn$]", _fieldsql).Replace("'", "''") + "';";
 
             }
             else if (tabFieldAction == TabFieldAction.RENAME)
             {
-                _changesql = dbConfig.Re_Column.Replace("[$TabName$]", $"{dbConfig.Table_Pre}{hiTable.TabName}{dbConfig.Table_After}").Replace("[$ReFieldName$]", $"{dbConfig.Field_Pre}{hiColumn.ReFieldName}{dbConfig.Field_After}").Replace("[$FieldName$]", $"{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}");
+                _changesql = dbConfig.Re_Column.Replace("[$TabName$]", $"{dbConfig.Table_Pre}{hiTable.TabName}{dbConfig.Table_After}").Replace("[$Schema$]", string.IsNullOrEmpty(hiTable.Schema) ? this.Context.CurrentConnectionConfig.Schema : hiTable.Schema).Replace("[$ReFieldName$]", $"{dbConfig.Field_Pre}{hiColumn.ReFieldName}{dbConfig.Field_After}").Replace("[$FieldName$]", $"{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}");
 
                 hiColumn.FieldName = hiColumn.ReFieldName;
                 var _changesqlUpdate = BuildChangeFieldStatement(hiTable, hiColumn, TabFieldAction.MODI);
@@ -3363,7 +3363,7 @@ namespace HiSql
 
         public string BuildReTableStatement(string tabname, string newtabname)
         {
-            string _sql = dbConfig.Re_Table.Replace("[$TabName$]", $"{dbConfig.Schema_Pre}{this.Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{tabname}{dbConfig.Table_After}").Replace("[$ReTabName$]", $"{dbConfig.Table_Pre}{newtabname}{dbConfig.Table_After}");
+            string _sql = dbConfig.Re_Table.Replace("[$TabName$]", $"{dbConfig.Table_Pre}{tabname}{dbConfig.Table_After}").Replace("[$ReTabName$]", $"{dbConfig.Table_Pre}{newtabname}{dbConfig.Table_After}").Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema);
             return _sql;
         }
         public string BuildSqlCodeBlock(string sbSql)
