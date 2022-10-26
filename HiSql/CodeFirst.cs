@@ -54,111 +54,120 @@ namespace HiSql
                 bool _ischeck = _sqlClient.CurrentConnectionConfig.IsCheckTableRefData;
                 _sqlClient.CurrentConnectionConfig.IsCheckTableRefData = false;
 
-                bool _has_tabmodel = _sqlClient.DbFirst.CheckTabExists(Constants.HiSysTable["Hi_TabModel"]);
-                bool _has_tabfield = _sqlClient.DbFirst.CheckTabExists(Constants.HiSysTable["Hi_FieldModel"]); 
-                bool _has_domain = _sqlClient.DbFirst.CheckTabExists(Constants.HiSysTable["Hi_Domain"]);
-                bool _has_element = _sqlClient.DbFirst.CheckTabExists(Constants.HiSysTable["Hi_DataElement"]);
-
-                bool _isinstall = false;
-
-                //系统表只有要一个表不存在就需要初始化安装
-                if (!_has_tabmodel || !_has_tabfield || !_has_domain || !_has_element)
+                try
                 {
-                    installHisql();
+                    bool _has_tabmodel = _sqlClient.DbFirst.CheckTabExists(Constants.HiSysTable["Hi_TabModel"]);
+                    bool _has_tabfield = _sqlClient.DbFirst.CheckTabExists(Constants.HiSysTable["Hi_FieldModel"]);
+                    bool _has_domain = _sqlClient.DbFirst.CheckTabExists(Constants.HiSysTable["Hi_Domain"]);
+                    bool _has_element = _sqlClient.DbFirst.CheckTabExists(Constants.HiSysTable["Hi_DataElement"]);
 
-                }
-                else
-                {
-                    IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
-                    idm.Context = this._sqlClient.Context;
+                    bool _isinstall = false;
 
-                    IDbConfig dbConfig = Instance.CreateInstance<IDbConfig>($"{Constants.NameSpace}.{_sqlClient.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.Config.ToString()}");
-                    dbConfig.Init();
-                    DataSet ds_tab = idm.GetTabModelInfo(Constants.HiSysTable["Hi_TabModel"]);
-                    DataSet ds_field = idm.GetTabModelInfo(Constants.HiSysTable["Hi_FieldModel"]);
-
-                    //var lstfield= idm.GetIndexs(Constants.HiSysTable["Hi_FieldModel"]);
-                    //string s1= idm.DropIndex(Constants.HiSysTable["Hi_FieldModel"], lstfield[0].IndexName, true);
-                    //var lsttab = idm.GetIndexs(Constants.HiSysTable["Hi_TabModel"]);
-                    //string s2=idm.DropIndex(Constants.HiSysTable["Hi_FieldModel"], lsttab[0].IndexName, true);
-
-                    if (ds_tab.Tables.Count > 0)
+                    //系统表只有要一个表不存在就需要初始化安装
+                    if (!_has_tabmodel || !_has_tabfield || !_has_domain || !_has_element)
                     {
-                        if (!ds_tab.Tables[Constants.HiSysTable["Hi_FieldModel"]].Columns.Contains("DbServer") && !ds_field.Tables[Constants.HiSysTable["Hi_FieldModel"]].Columns.Contains("DbServer"))
+                        installHisql();
+
+                    }
+                    else
+                    {
+                        IDM idm = (IDM)Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{_sqlClient.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
+                        idm.Context = this._sqlClient.Context;
+
+                        IDbConfig dbConfig = Instance.CreateInstance<IDbConfig>($"{Constants.NameSpace}.{_sqlClient.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.Config.ToString()}");
+                        dbConfig.Init();
+                        DataSet ds_tab = idm.GetTabModelInfo(Constants.HiSysTable["Hi_TabModel"]);
+                        DataSet ds_field = idm.GetTabModelInfo(Constants.HiSysTable["Hi_FieldModel"]);
+
+                        //var lstfield= idm.GetIndexs(Constants.HiSysTable["Hi_FieldModel"]);
+                        //string s1= idm.DropIndex(Constants.HiSysTable["Hi_FieldModel"], lstfield[0].IndexName, true);
+                        //var lsttab = idm.GetIndexs(Constants.HiSysTable["Hi_TabModel"]);
+                        //string s2=idm.DropIndex(Constants.HiSysTable["Hi_FieldModel"], lsttab[0].IndexName, true);
+
+                        if (ds_tab.Tables.Count > 0)
                         {
-                            //需要自定义升级
-
-
-                            TabInfo tabInfo = idm.BuildTab(typeof(Hi_TabModel));
-
-                            TabInfo tabInfo_2 = idm.GetTabStruct(Constants.HiSysTable["Hi_TabModel"]);
-
-                            List<HiColumn> columns = new List<HiColumn>();
-
-                            foreach (HiColumn col in tabInfo.GetColumns)
-                            { 
-                                HiColumn _col= tabInfo_2.Columns.Where(c=>c.FieldName.Equals(col.FieldName,StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-                                if(_col != null)
-                                    columns.Add(_col);
-                                else
-                                    columns.Add(col);
-                            }
-                            tabInfo.Columns = columns;
-                            TabInfo tabInfo2=idm.BuildTab(typeof(Hi_FieldModel));
-
-                            TabInfo tabInfo2_2 = idm.GetTabStruct(Constants.HiSysTable["Hi_FieldModel"]);
-
-                            List<HiColumn> columns2 = new List<HiColumn>();
-
-                            foreach (HiColumn col in tabInfo2.GetColumns)
+                            if (!ds_tab.Tables[Constants.HiSysTable["Hi_FieldModel"]].Columns.Contains("DbServer") && !ds_field.Tables[Constants.HiSysTable["Hi_FieldModel"]].Columns.Contains("DbServer"))
                             {
-                                HiColumn _col = tabInfo2_2.Columns.Where(c => c.FieldName.Equals(col.FieldName, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-                                if (_col != null)
-                                    columns2.Add(_col);
-                                else
-                                    columns2.Add(col);
+                                //需要自定义升级
+
+
+                                TabInfo tabInfo = idm.BuildTab(typeof(Hi_TabModel));
+
+                                TabInfo tabInfo_2 = idm.GetTabStruct(Constants.HiSysTable["Hi_TabModel"]);
+
+                                List<HiColumn> columns = new List<HiColumn>();
+
+                                foreach (HiColumn col in tabInfo.GetColumns)
+                                {
+                                    HiColumn _col = tabInfo_2.Columns.Where(c => c.FieldName.Equals(col.FieldName, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                                    if (_col != null)
+                                        columns.Add(_col);
+                                    else
+                                        columns.Add(col);
+                                }
+                                tabInfo.Columns = columns;
+                                TabInfo tabInfo2 = idm.BuildTab(typeof(Hi_FieldModel));
+
+                                TabInfo tabInfo2_2 = idm.GetTabStruct(Constants.HiSysTable["Hi_FieldModel"]);
+
+                                List<HiColumn> columns2 = new List<HiColumn>();
+
+                                foreach (HiColumn col in tabInfo2.GetColumns)
+                                {
+                                    HiColumn _col = tabInfo2_2.Columns.Where(c => c.FieldName.Equals(col.FieldName, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                                    if (_col != null)
+                                        columns2.Add(_col);
+                                    else
+                                        columns2.Add(col);
+                                }
+                                tabInfo2.Columns = columns2;
+
+
+
+                                var tabresult = _sqlClient.DbFirst.ModiTable(tabInfo, OpLevel.Execute, true);
+                                var fieldresult = _sqlClient.DbFirst.ModiTable(tabInfo2, OpLevel.Execute, true);
+
+                                HiSqlCommProvider.RemoveTabInfoCache(tabInfo.TabModel.TabName, _sqlClient.Context.CurrentConnectionConfig.DbType);
+                                HiSqlCommProvider.RemoveTabInfoCache(tabInfo2.TabModel.TabName, _sqlClient.Context.CurrentConnectionConfig.DbType);
+
+                                _sqlClient.Context.DBO.ExecCommand(idm.BuildSqlCodeBlock(dbConfig.Delete_TabStruct.Replace("[$Schema$]", _sqlClient.CurrentConnectionConfig.Schema).Replace("[$TabName$]", Constants.HiSysTable["Hi_TabModel"])));
+                                _sqlClient.Context.DBO.ExecCommand(idm.BuildSqlCodeBlock(dbConfig.Delete_TabStruct.Replace("[$Schema$]", _sqlClient.CurrentConnectionConfig.Schema).Replace("[$TabName$]", Constants.HiSysTable["Hi_FieldModel"])));
+
+                                _sqlClient.Context.DMInitalize.GetTabStruct(Constants.HiSysTable["Hi_TabModel"]);
+                                _sqlClient.Context.DMInitalize.GetTabStruct(Constants.HiSysTable["Hi_FieldModel"]);
                             }
-                            tabInfo2.Columns = columns2;
+                        }
+
+                    }
 
 
+                    //如果启用了编号那么需要安装编号配置表
+                    if (Global.SnroOn)
+                    {
+                        bool _has_snro = _sqlClient.DbFirst.CheckTabExists(Constants.HiSysTable["Hi_Snro"]);
+                        if (!_has_snro)
+                        {
+                            //如果不存在编号表则创建
+                            TabInfo tabinfo_field = _sqlClient.Context.DMInitalize.BuildTab(typeof(Hi_Snro));
 
-                            var tabresult = _sqlClient.DbFirst.ModiTable(tabInfo, OpLevel.Execute,true);
-                            var fieldresult = _sqlClient.DbFirst.ModiTable(tabInfo2, OpLevel.Execute,true);
-
-                            HiSqlCommProvider.RemoveTabInfoCache(tabInfo.TabModel.TabName,_sqlClient.Context.CurrentConnectionConfig.DbType);
-                            HiSqlCommProvider.RemoveTabInfoCache(tabInfo2.TabModel.TabName, _sqlClient.Context.CurrentConnectionConfig.DbType);
-
-                            _sqlClient.Context.DBO.ExecCommand(idm.BuildSqlCodeBlock( dbConfig.Delete_TabStruct.Replace("[$Schema$]", _sqlClient.CurrentConnectionConfig.Schema).Replace("[$TabName$]", Constants.HiSysTable["Hi_TabModel"])));
-                            _sqlClient.Context.DBO.ExecCommand(idm.BuildSqlCodeBlock(dbConfig.Delete_TabStruct.Replace("[$Schema$]", _sqlClient.CurrentConnectionConfig.Schema).Replace("[$TabName$]", Constants.HiSysTable["Hi_FieldModel"])));
-
-                            _sqlClient.Context.DMInitalize.GetTabStruct(Constants.HiSysTable["Hi_TabModel"]);
-                            _sqlClient.Context.DMInitalize.GetTabStruct(Constants.HiSysTable["Hi_FieldModel"]);
+                            _sqlClient.DbFirst.CreateTable(tabinfo_field);
                         }
                     }
-                    
+
+                    Tuple<bool, List<Hi_Version>> verinfo = checkVersion();
+                    upgradeVersions(_isinstall, verinfo.Item1, verinfo.Item2);
+
+                    //add by tgm date:2022.10.19 升级系统表结构
+                    verinfo = checkVersion();
+                    upgradeVersions1054(_isinstall, verinfo.Item1, verinfo.Item2);
+                    _sqlClient.CurrentConnectionConfig.IsCheckTableRefData = _ischeck;
                 }
-               
-
-                //如果启用了编号那么需要安装编号配置表
-                if (Global.SnroOn)
-                { 
-                    bool _has_snro= _sqlClient.DbFirst.CheckTabExists(Constants.HiSysTable["Hi_Snro"]);
-                    if (!_has_snro)
-                    {
-                        //如果不存在编号表则创建
-                        TabInfo tabinfo_field = _sqlClient.Context.DMInitalize.BuildTab(typeof(Hi_Snro));
-
-                        _sqlClient.DbFirst.CreateTable(tabinfo_field);
-                    }
+                catch (Exception ex)
+                {
+                    _sqlClient.CurrentConnectionConfig.IsCheckTableRefData = _ischeck;
+                    throw ex;
                 }
-
-                Tuple<bool, List<Hi_Version>> verinfo = checkVersion();
-                upgradeVersions(_isinstall,verinfo.Item1, verinfo.Item2);
-
-                //add by tgm date:2022.10.19 升级系统表结构
-                verinfo = checkVersion();
-                upgradeVersions1054(_isinstall, verinfo.Item1, verinfo.Item2);
-                _sqlClient.CurrentConnectionConfig.IsCheckTableRefData = _ischeck;
+                
 
             }
             else
