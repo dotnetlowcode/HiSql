@@ -51,6 +51,9 @@ namespace HiSql
         {
             if (_sqlClient != null)
             {
+                bool _ischeck = _sqlClient.CurrentConnectionConfig.IsCheckTableRefData;
+                _sqlClient.CurrentConnectionConfig.IsCheckTableRefData = false;
+
                 bool _has_tabmodel = _sqlClient.DbFirst.CheckTabExists(Constants.HiSysTable["Hi_TabModel"]);
                 bool _has_tabfield = _sqlClient.DbFirst.CheckTabExists(Constants.HiSysTable["Hi_FieldModel"]); 
                 bool _has_domain = _sqlClient.DbFirst.CheckTabExists(Constants.HiSysTable["Hi_Domain"]);
@@ -155,7 +158,7 @@ namespace HiSql
                 //add by tgm date:2022.10.19 升级系统表结构
                 verinfo = checkVersion();
                 upgradeVersions1054(_isinstall, verinfo.Item1, verinfo.Item2);
-
+                _sqlClient.CurrentConnectionConfig.IsCheckTableRefData = _ischeck;
 
             }
             else
