@@ -312,10 +312,10 @@ namespace HiSql
                     else
                         _default = "False";
                 }
-                else if (hiColumn.FieldType.IsIn<HiType>(HiType.GUID))
-                {
-                    _default = "''";
-                }
+                //else if (hiColumn.FieldType.IsIn<HiType>(HiType.GUID))
+                //{
+                //    _default = "''";
+                //}
                 else if (hiColumn.FieldType.IsIn<HiType>(HiType.DATE, HiType.DATETIME))
                 {
                     //_default = "current_timestamp";

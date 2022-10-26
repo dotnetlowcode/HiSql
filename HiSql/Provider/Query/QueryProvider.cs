@@ -1131,7 +1131,11 @@ namespace HiSql
      
             IDataReader dr = await this._context.DBO.GetDataReaderAsync(_sql, null);
             List<ExpandoObject> _result = DataConvert.ToEObject(dr);
-            dr.Close();
+            if (!dr.IsClosed)
+            {
+                dr.Close();
+            }
+            
             return _result;
             
         }
@@ -1139,6 +1143,17 @@ namespace HiSql
 
         public List<ExpandoObject> ToEObject()
         {
+            string _sql = this.ToSql();
+
+            IDataReader dr =  this._context.DBO.GetDataReader(_sql, null);
+            List<ExpandoObject> _result = DataConvert.ToEObject(dr);
+            if (!dr.IsClosed)
+            {
+                dr.Close();
+            }
+
+            return _result;
+
             lock (this._context)
             {
                 return ToEObjectAsync().ConfigureAwait(false).GetAwaiter().GetResult();
@@ -1156,8 +1171,8 @@ namespace HiSql
                 IDataReader dr = this._context.DBO.GetDataReader(_sql, null);
                 try
                 {
-                   //var values = DataConvert.ToList<T>(dr,this._context.CurrentConnectionConfig.DbType);
-                    _result = DataConverter.ToList<T>(dr, this._context.CurrentConnectionConfig.DbType);
+                   // _result = DataConvert.ToList<T>(dr,this._context.CurrentConnectionConfig.DbType);
+                   _result = DataConverter.ToList<T>(dr, this._context.CurrentConnectionConfig.DbType);
                 }
                 catch (Exception ex)
                 {
@@ -1193,7 +1208,7 @@ namespace HiSql
             }
             
                 IDataReader dr = this._context.DBO.GetDataReader(_sql, null);
-               // _result = DataConvert.ToList<T>(dr, this._context.CurrentConnectionConfig.DbType);
+                //_result = DataConvert.ToList<T>(dr, this._context.CurrentConnectionConfig.DbType);
                 _result = DataConverter.ToList<T>(dr, this._context.CurrentConnectionConfig.DbType);
 
 

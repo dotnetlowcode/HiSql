@@ -786,7 +786,7 @@ UNION ALL
                 .AppendLine("	    when T1.DATA_TYPE = 'BIT'  then 'bit'")
                 .AppendLine("	    when T1.DATA_TYPE = 'TIMESTAMP' then 'datetime' ")
                  .AppendLine("	    when T1.DATA_TYPE = 'DATETIME' then 'datetime' ")
-                 .AppendLine("	    when T1.DATA_TYPE = 'DATE' then 'datetime' ")
+                 .AppendLine("	    when T1.DATA_TYPE = 'DATE' then 'date' ")
                 .AppendLine("	    when T1.DATA_TYPE = 'LONG' then 'text' ")
                 .AppendLine("	    when T1.DATA_TYPE = 'NCLOB' then 'text'")
                 .AppendLine("	    when T1.DATA_TYPE = 'CLOB' then 'text' ")

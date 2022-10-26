@@ -786,16 +786,11 @@ namespace HiSql
                 }
 
                 Type _type = column.DataType;
-                if (dbtype == DBType.Sqlite || dbtype == DBType.Oracle || dbtype == DBType.MySql)
+                if ((dbtype == DBType.Sqlite || dbtype == DBType.Oracle || dbtype == DBType.MySql) && unboxType.IsValueType && !isNullable)
                 {
-                   
-                    if (unboxType.IsValueType)
-                    {
-                        var castMethod = typeof(Convert).GetMethod("To" + unboxType.Name, new Type[] { typeof(object) });
-                        generator.Emit(OpCodes.Call, castMethod); //类型转换
-                    }
+                    var castMethod = typeof(Convert).GetMethod("To" + unboxType.Name, new Type[] { typeof(object) });
+                    generator.Emit(OpCodes.Call, castMethod); //类型转换
                 }
-               
                 else
                 {
                     if (isNullable)
@@ -1352,14 +1347,10 @@ namespace HiSql
                 }
 
                 Type _type = reader.GetFieldType(i);
-                if (dbtype == DBType.Sqlite || dbtype == DBType.Oracle || dbtype == DBType.MySql )
+                if ((dbtype == DBType.Sqlite || dbtype == DBType.Oracle || dbtype == DBType.MySql) && unboxType.IsValueType && !isNullable)
                 {
-
-                    if (unboxType.IsValueType)
-                    {
-                        var castMethod = typeof(Convert).GetMethod("To" + unboxType.Name, new Type[] { typeof(object) });
-                        generator.Emit(OpCodes.Call, castMethod); //类型转换
-                    }
+                    var castMethod = typeof(Convert).GetMethod("To" + unboxType.Name, new Type[] { typeof(object) });
+                    generator.Emit(OpCodes.Call, castMethod); //类型转换
                 }
                 else
                 {

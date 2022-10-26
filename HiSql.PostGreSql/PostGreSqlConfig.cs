@@ -572,7 +572,9 @@ namespace HiSql
                 { "date",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} date  [$IsNull$] [$Default$]  [$EXTEND$] " },
 
                 { "binary",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} bytea  [$IsNull$]  [$EXTEND$] "},
-                { "uniqueidentifier",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} varchar(36)   [$IsNull$] [$Default$]  [$EXTEND$] "},
+               // { "uniqueidentifier",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} varchar(36)   [$IsNull$] [$Default$]  [$EXTEND$] "},
+                 { "uniqueidentifier",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} uuid   [$IsNull$] [$Default$]  [$EXTEND$] "},
+
             };
 
             _fieldtempmappingForModiType = new Dictionary<string, string> {
@@ -595,7 +597,8 @@ namespace HiSql
                 { "date",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} TYPE date" },
 
                 { "binary",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} TYPE bytea"},
-                { "uniqueidentifier",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} TYPE varchar(36)"},
+                //{ "uniqueidentifier",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} TYPE varchar(36)"},
+                 { "uniqueidentifier",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} TYPE uuid"},
             };
             //_fieldtempmappingForModiDEFAULT = new Dictionary<string, string> {
             //    //样例：[TabName] [varchar](50) NOT NULL,
@@ -838,6 +841,7 @@ UNION ALL
                 .AppendLine("       WHEN t.typname ='money' then 'decimal'  ")
                 .AppendLine("       WHEN t.typname ='timestamp' then 'datetime'  ")
                 .AppendLine("       WHEN t.typname ='date' then 'date'  ")
+                .AppendLine("       WHEN t.typname ='uuid' then 'uniqueidentifier'  ")
                 .AppendLine("       WHEN t.typname ='bool' then 'bit'  ")
                 .AppendLine("       WHEN t.typname ='bpchar' then 'nchar'  ")
                 .AppendLine("       WHEN t.typname ='text' then 'text'  ")

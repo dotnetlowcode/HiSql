@@ -304,16 +304,21 @@ namespace HiSql
         {
             List<ExpandoObject> result = new List<ExpandoObject>();
             List<string> fieldNameList = new List<string>();
+            //int colsCount = dataReader.FieldCount;
+            //fieldNameList = Enumerable.Range(0, colsCount).Select(i => dataReader.GetName(i)).ToList();
+
             for (int i = 0; i < dataReader.FieldCount; i++)
             {
                 fieldNameList.Add(dataReader.GetName(i));
             }
-            while (dataReader.Read())
+            while (!dataReader.IsClosed && dataReader.Read())
             {
 
                 TDynamic _dyn = new TDynamic();
                 foreach (string n in fieldNameList)
                 {
+                    // _dyn[n] = dataReader[n];
+
                     //针对于hana 的decimal特殊处理
                     if (dataReader[n].GetType().FullName.IndexOf("HanaDecimal") >= 0)
                     {
