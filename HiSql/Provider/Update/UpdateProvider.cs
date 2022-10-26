@@ -885,7 +885,7 @@ namespace HiSql
 
 
                     //表关联配置校验
-                    if (arrcol_tab.Count > 0)
+                    if (arrcol_tab.Count > 0 && Context.CurrentConnectionConfig.IsCheckTableRefData)
                     {
                         HiSqlClient _sqlClient = Context.CloneClient();
                         int _total = 0;
