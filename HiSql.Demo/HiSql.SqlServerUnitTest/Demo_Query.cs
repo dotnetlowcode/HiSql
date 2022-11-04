@@ -64,10 +64,11 @@ namespace HiSql.UnitTest
             //Query_Demo19(sqlClient);
             // Query_Demo20(sqlClient);
             //Query_Demo21();
-           //Query_DemoEmit(sqlClient);
+            //Query_DemoEmit(sqlClient);
 
             //Query_Null(sqlClient);
-            Query_MyFlowDto(sqlClient);
+            Query_Null2(sqlClient);
+            //Query_MyFlowDto(sqlClient);
             var s = Console.ReadLine();
         }
 
@@ -114,6 +115,13 @@ namespace HiSql.UnitTest
 
 
         }
+
+        static void Query_Null2(HiSqlClient sqlClient)
+        {
+            List<ExpandoObject> lstdyn = sqlClient.HiSql("select * from H_tst11").ToEObject();
+            string strjson=lstdyn.ToJson();
+        }
+
 
         static void Query_Null(HiSqlClient sqlClient)
         {
