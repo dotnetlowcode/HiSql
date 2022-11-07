@@ -88,7 +88,7 @@ namespace HiSql.Unit.Test
             IUpdate Update = null;
 
             //按指定的where更新
-            Update = sqlClient.Update("Hi_TestUpdate").Set(new { Uvarchar = "新店开业通告 广东广州天河22" }).OnlyWhere(new Filter { { "Uid", OperType.BETWEEN, new RangDefinition() { Low = 1, High = 4 } } });
+            Update = sqlClient.Update("Hi_TestUpdate").Set(new { Uvarchar = "新店开业通告 广东广州天河22", Unvarchar = "❤开业通告 广东广州天河城购物广场店新店开业通告 广东广州天河城购物广场店新店开业通告 广东广州天" }).OnlyWhere(new Filter { { "Uid", OperType.BETWEEN, new RangDefinition() { Low = 1, High = 4 } } });
             successCount++;
             _outputHelper.WriteLine(Update.ToSql());
             rltcnt = Update.ExecCommand();
