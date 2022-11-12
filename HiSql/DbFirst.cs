@@ -56,7 +56,7 @@ namespace HiSql
             string _msg = "";
             string _sql = "";
 
-            if (tabInfo.Columns.Any(c => c.FieldName.ToLower() == hiColumn.FieldName.ToLower()))
+            if (tabInfo.Columns.Any(c => c.FieldName.Equals(hiColumn.FieldName,StringComparison.OrdinalIgnoreCase)))
             {
                 _msg = $"向表[{tabInfo.TabModel.TabName}]添加新字段[{hiColumn.FieldName}]失败 原因:该字段[{hiColumn.FieldName}]已经存在于表[{tabInfo.TabModel.TabName}]中";
             }
