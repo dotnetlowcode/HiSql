@@ -91,7 +91,9 @@ namespace HiSql.Unit.Test
             //初始化
             initDemoDynTable(sqlClient, "Hi_TestQuery");
             query(sqlClient);
-          
+
+            //queryTempTable(sqlClient);
+
             insertNullData(sqlClient);
 
             queryNullData(sqlClient);
@@ -126,6 +128,22 @@ namespace HiSql.Unit.Test
             List< _Test_Decimal> list= sqlClient.HiSql("select Uvarchar,Udecimal from Hi_TestQuery").Take(10).Skip(1).ToList<_Test_Decimal>();
 
         }
+
+
+        /// <summary>
+        /// 查询临时表测试样例
+        /// </summary>
+        /// <param name="sqlClient"></param>
+        void queryTempTable(HiSqlClient sqlClient)
+        {
+            sqlClient.HiSql("select * from Hi_FieldModel").Insert("#tmp_hi_2022");
+
+            //var lstcol= sqlClient.HiSql("select * from Hi_FieldModel").ToColumns().CloneCopy();
+    
+
+            DataTable dt = sqlClient.HiSql("select * from #tmp_hi_2022").ToTable();
+        }
+
 
         void querylike(HiSqlClient sqlClient)
         {
