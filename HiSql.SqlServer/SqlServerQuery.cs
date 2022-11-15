@@ -155,7 +155,8 @@ namespace HiSql
                         
                         if (string.IsNullOrEmpty(sb_sort.ToString()))
                             throw new Exception($"有分页查询时必须指定排序条件");
-                        sb.AppendLine($"select  {sb_field_result.ToString()} {insertintosql} from ( ");
+                        //sb.AppendLine($"select  {sb_field_result.ToString()} {insertintosql} from ( ");
+                        sb.AppendLine($"select top {this.PageSize}  {sb_field_result.ToString()} {insertintosql} from ( "); //2022.11.15 优化sqlserver 分页模式
                         sb.AppendLine($"select ROW_NUMBER() OVER(Order by {sb_sort.ToString()}) AS _hi_rownum_, {sb_field.ToString()} from {sb_table.ToString()}");
                         if (!string.IsNullOrEmpty(sb_join.ToString()))
                             sb.AppendLine($" {sb_join.ToString()}");
@@ -170,7 +171,10 @@ namespace HiSql
 
 
                         sb.AppendLine(") as hi_sql ");
-                        sb.Append($"where hi_sql._hi_rownum_ BETWEEN ({this.CurrentPage }-1)*{this.PageSize}+1 and {this.CurrentPage}*{this.PageSize}");
+                        //sb.Append($"where hi_sql._hi_rownum_ BETWEEN ({this.CurrentPage }-1)*{this.PageSize}+1 and {this.CurrentPage}*{this.PageSize}");
+
+                        int _curpageposition = ((this.CurrentPage - 1) * this.PageSize) + 1;
+                        sb.Append($"where hi_sql._hi_rownum_ >= {_curpageposition} ");
                         //if (!string.IsNullOrEmpty(sb_sort.ToString()))
                         sb.AppendLine($" order by  _hi_rownum_ asc");
                     }
