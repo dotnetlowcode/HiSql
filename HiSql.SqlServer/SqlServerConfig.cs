@@ -527,7 +527,7 @@ namespace HiSql
                 { HiType.DATETIME,"datetime" },
                 { HiType.DATE,"date" },
 
-                { HiType.BINARY,"image" },
+                { HiType.BINARY,"byte" },
                 { HiType.GUID,"uniqueidentifier" },
             };
 
@@ -550,7 +550,7 @@ namespace HiSql
                 { "datetime",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} {_temp_field_pre}datetime{_temp_field_after}   [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}"},
                 { "date",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} {_temp_field_pre}date{_temp_field_after}   [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}" },
 
-                { "image",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} {_temp_field_pre}binary{_temp_field_after}   [$IsNull$] [$EXTEND$]{_temp_field_split}"},
+                { "byte",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} {_temp_field_pre}binary{_temp_field_after}   [$IsNull$] [$EXTEND$]{_temp_field_split}"},
                 { "uniqueidentifier",$"{_temp_field_pre}[$FieldName$]{_temp_field_after} {_temp_field_pre}uniqueidentifier{_temp_field_after}   [$IsNull$] [$Default$] [$EXTEND$]{_temp_field_split}"},
             };
 
@@ -756,7 +756,7 @@ UNION ALL
                 .AppendLine("		) > 0 then '1' else '0' end")
                 .AppendLine("	) as IsPrimary,")
                 //.AppendLine("	b.name FieldType,")
-                .AppendLine("(case when b.name='tinyint' or b.name='smallint' then 'smallint' else b.name end)   FieldType,")
+                .AppendLine("(case when b.name='tinyint' or b.name='smallint' then 'smallint' when b.name='timestamp' or b.name='byte' or b.name='image'  then 'byte'  else b.name end)   FieldType,")
                 .AppendLine("	a.length UseBytes,")
                 .AppendLine("	(case when b.name = 'datetime' or b.name='int' or  b.name = 'bigint' or b.name='tinyint' or b.name='smallint' then 0 else COLUMNPROPERTY(a.id,a.name,'PRECISION') end) as Lens,")
                 .AppendLine("	(case when b.name =  'datetime' then 0 else isnull(COLUMNPROPERTY(a.id,a.name,'Scale'),0) end) as PointDec,")

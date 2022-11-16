@@ -118,7 +118,7 @@ namespace HiSql
                         }
 
                         _sb_n.AppendLine(n);
-                        
+
                         if (this.Context.CurrentConnectionConfig.DbType == DBType.Hana)
                         {
                             _sb_n.AppendLine("end;");
@@ -193,7 +193,7 @@ namespace HiSql
                         {
                             //hana 的全局临时表 与标准表的命名规则是一样的
                             //mysql没有全局临时表的概念
-                            _insertTabName = $"tmp_g_{tabinfo.TabModel.TabName}{Thread.CurrentThread.ManagedThreadId.ToString() }{tabinfo.TabModel.TabName.GetHashCode().ToString().Substring(1,3)}";
+                            _insertTabName = $"tmp_g_{tabinfo.TabModel.TabName}{Thread.CurrentThread.ManagedThreadId.ToString()}{tabinfo.TabModel.TabName.GetHashCode().ToString().Substring(1, 3)}";
                             _cacheinsertTabName = $"##{tabinfo.TabModel.TabName}";
                             tabinfo2.TabModel.TabName = $"##{tabinfo.TabModel.TabName}";
                             //tabinfo2.TabModel.TabName = _insertTabName;
@@ -201,7 +201,7 @@ namespace HiSql
                         }
                         else if (Context.CurrentConnectionConfig.DbType == DBType.Oracle || Context.CurrentConnectionConfig.DbType == DBType.DaMeng)
                         {
-                            _insertTabName = $"tmp_l_{tabinfo.TabModel.TabName}{Thread.CurrentThread.ManagedThreadId.ToString() }{tabinfo.TabModel.TabName.GetHashCode().ToString().Substring(1, 3)}";
+                            _insertTabName = $"tmp_l_{tabinfo.TabModel.TabName}{Thread.CurrentThread.ManagedThreadId.ToString()}{tabinfo.TabModel.TabName.GetHashCode().ToString().Substring(1, 3)}";
                             _cacheinsertTabName = $"#{tabinfo.TabModel.TabName}";
                             tabinfo2.TabModel.TabName = $"#{tabinfo.TabModel.TabName}";
                             //tabinfo2.TabModel.TabName = _insertTabName;
@@ -263,7 +263,7 @@ namespace HiSql
                 bool _isdic = type == typeof(Dictionary<string, string>) || type == typeof(Dictionary<string, object>);
                 List<PropertyInfo> attrs = type.GetProperties().Where(p => p.MemberType == MemberTypes.Property && p.CanRead == true).ToList();
 
-                if (this.Data.Count > DbConfig.PackageRecord/10)
+                if (this.Data.Count > DbConfig.PackageRecord / 10)
                 {
                     if (attrs.Count < 10)
                         DbConfig.BlukSize = DbConfig.BlukSize;
@@ -297,9 +297,9 @@ namespace HiSql
                 //    rtnlst.Add(CheckInsertData(_isdic, attrs, tabinfo.GetColumns, obj));
                 //}
 
-                
-               
-                
+
+
+
                 //强制分页分包  如果已经指定了分批次则不需要分包
                 bool _forcepage = false;
                 int _pcount = 0;
@@ -312,13 +312,13 @@ namespace HiSql
                 if (rtnlst.Count > 0)
                 {
 
-                    if (rtnlst[0].Count > this.DbConfig.PackageCell || rtnlst.Count> this.DbConfig.PackageRecord)
+                    if (rtnlst[0].Count > this.DbConfig.PackageCell || rtnlst.Count > this.DbConfig.PackageRecord)
                     {
                         _forcepage = true;
                         _cells = rtnlst[0].Count * rtnlst.Count;
 
                         ///计算分批次数
-                        _pcount= _cells <= this.DbConfig.PackageCells ? 1 : _cells % this.DbConfig.PackageCells == 0 ? _cells / this.DbConfig.PackageCells : _cells / this.DbConfig.PackageCells + 1;
+                        _pcount = _cells <= this.DbConfig.PackageCells ? 1 : _cells % this.DbConfig.PackageCells == 0 ? _cells / this.DbConfig.PackageCells : _cells / this.DbConfig.PackageCells + 1;
 
                         if (page > _pcount)
                             _packunit = page / _pcount;
@@ -400,7 +400,7 @@ namespace HiSql
                         sb_sql = new StringBuilder();
 
 
-                        if ((p + 1) % _packunit == 0 )
+                        if ((p + 1) % _packunit == 0)
                         {
                             _currbatchidx++;
                             if (_currbatchidx < _pcount)
@@ -430,8 +430,8 @@ namespace HiSql
                 }
 
                 if (_times == this.Data.Count)
-                { 
-                    
+                {
+
                 }
                 string sql = sb_sql.ToString();
                 //sql=DbConfig.Code_Block.Replace("[$SQL$]", sql);
@@ -461,7 +461,7 @@ namespace HiSql
                     List<string> lstcol = rtnlst[0].Keys.ToList();
 
                     string _mergesql = sqldm.BuildMergeIntoSql(_tabtarget, _tabsource, lstcol);
-                    if (this.Context.CurrentConnectionConfig.DbType == DBType.Hana 
+                    if (this.Context.CurrentConnectionConfig.DbType == DBType.Hana
                         || this.Context.CurrentConnectionConfig.DbType == DBType.Oracle
                         || this.Context.CurrentConnectionConfig.DbType == DBType.DaMeng
                         )
@@ -652,10 +652,10 @@ namespace HiSql
                 throw new Exception($"未指定插入的数据集");
 
 
-            Type typ=lstdata[0].GetType();
+            Type typ = lstdata[0].GetType();
 
 
-            Type typ_dicobj=typeof(Dictionary<string, object>);
+            Type typ_dicobj = typeof(Dictionary<string, object>);
 
             Type typ_dicstr = typeof(Dictionary<string, string>);
 
@@ -676,7 +676,7 @@ namespace HiSql
                 {
                     _list_data.Add((object)obj);
                 }
-                    
+
             }
             checkData();
             _queue.Add("insert");
@@ -848,7 +848,7 @@ namespace HiSql
                 Type _typ_dic = typeof(Dictionary<string, string>);
                 Type _typ_dic_obj = typeof(Dictionary<string, object>);
 
-                Dictionary<string, PropertyInfo> dicprop= new Dictionary<string, PropertyInfo>(StringComparer.OrdinalIgnoreCase);
+                Dictionary<string, PropertyInfo> dicprop = new Dictionary<string, PropertyInfo>(StringComparer.OrdinalIgnoreCase);
 
 
                 bool _isdic = type == _typ_dic || type == _typ_dic_obj;
@@ -856,10 +856,10 @@ namespace HiSql
 
                 foreach (PropertyInfo pt in attrs)
                 {
-                    if(!dicprop.ContainsKey(pt.Name))
+                    if (!dicprop.ContainsKey(pt.Name))
                         dicprop.Add(pt.Name, pt);
                     else
-                        dicprop[pt.Name]= pt;
+                        dicprop[pt.Name] = pt;
 
                 }
 
@@ -876,7 +876,7 @@ namespace HiSql
                 var arrcol_reg = hiColumns.Where(h => !string.IsNullOrEmpty(h.Regex)).ToList();
                 var arrcol_tab = hiColumns.Where(h => h.IsRefTab).ToList();
 
-                var arrcol_snro=hiColumns.Where(h=>!string.IsNullOrEmpty(h.SNO)).ToList();
+                var arrcol_snro = hiColumns.Where(h => !string.IsNullOrEmpty(h.SNO)).ToList();
 
 
                 var arrcol = hiColumns.Where(h => !string.IsNullOrEmpty(h.Regex) || h.IsRefTab).ToList();
@@ -938,8 +938,8 @@ namespace HiSql
                                 if (_o.ContainsKey(hiColumn.FieldName))
                                 {
                                     if (_issnro)
-                                    { 
-                                        if(string.IsNullOrEmpty(_o[hiColumn.FieldName].ToString()))
+                                    {
+                                        if (string.IsNullOrEmpty(_o[hiColumn.FieldName].ToString()))
                                             dic_snro_num[hiColumn.FieldName] = dic_snro_num[hiColumn.FieldName] + 1;
                                     }
 
@@ -963,7 +963,7 @@ namespace HiSql
                                     }
                                     else if (hiColumn.FieldType.IsIn<HiType>(HiType.BOOL))
                                     {
-                                        if ((bool)_o[hiColumn.FieldName] == true)
+                                        if (_o[hiColumn.FieldName] != null && (bool)_o[hiColumn.FieldName] == true)
                                         {
                                             _value = "1";
                                         }
@@ -1006,8 +1006,8 @@ namespace HiSql
                                     }
                                     else
                                     {
-                                        _value = null;
-                                        _rowdic.Add(hiColumn.FieldName, _value);
+                                        var rtn = defaultValue(hiColumn, _rowidx);
+                                        _rowdic.Add(hiColumn.FieldName, rtn.Item2);
                                     }
                                 }
                                 else
@@ -1031,7 +1031,8 @@ namespace HiSql
                                     }
                                     else
                                     {
-
+                                        //_value = null;
+                                        //_rowdic.Add(hiColumn.FieldName, _value);
                                         var rtn = defaultValue(hiColumn, _rowidx);
                                         _rowdic.Add(hiColumn.FieldName, rtn.Item2);
 
@@ -1113,8 +1114,10 @@ namespace HiSql
                                     }
                                     else
                                     {
-                                        _value = null;
-                                        _rowdic.Add(hiColumn.FieldName, _value);
+                                        //_value = null;
+                                        //_rowdic.Add(hiColumn.FieldName, _value);
+                                        var rtn = defaultValue(hiColumn, _rowidx);
+                                        _rowdic.Add(hiColumn.FieldName, rtn.Item2);
                                     }
                                 }
                                 else
@@ -1170,8 +1173,8 @@ namespace HiSql
                             if (!string.IsNullOrEmpty(hiColumn.SNO))
                                 _issnro = true;
                             PropertyInfo objprop = null;
-                            if(dicprop.ContainsKey(hiColumn.FieldName))
-                                objprop=dicprop[hiColumn.FieldName];
+                            if (dicprop.ContainsKey(hiColumn.FieldName))
+                                objprop = dicprop[hiColumn.FieldName];
                             #region  判断必填 及自增长
                             if (hiColumn.IsRequire && !hiColumn.IsIdentity && objprop == null)
                             {
@@ -1192,7 +1195,7 @@ namespace HiSql
                             }
                             #endregion
 
-                            if (objprop != null )
+                            if (objprop != null)
                             {
                                 object objvalue = objprop.GetValue(objdata);
                                 if (objvalue != null)
@@ -1231,7 +1234,7 @@ namespace HiSql
                                             {
                                                 bool _boolvalue = (bool)objvalue;
 
-                                                _dic.Add(hiColumn.FieldName, _boolvalue?"1":"0");
+                                                _dic.Add(hiColumn.FieldName, _boolvalue ? "1" : "0");
                                             }
                                             else
                                             {
@@ -1248,7 +1251,7 @@ namespace HiSql
 
 
                                     #region 是否需要正则校验
-                                    if (arrcol.Count>0 && arrcol.Any(h => h.FieldName == hiColumn.FieldName))
+                                    if (arrcol.Count > 0 && arrcol.Any(h => h.FieldName == hiColumn.FieldName))
                                     {
                                         dic_hash_reg[hiColumn.FieldName].Add(_dic[hiColumn.FieldName].ToLower());
                                     }
@@ -1314,7 +1317,7 @@ namespace HiSql
                                 else
                                 {
 
-                                   var rtn=  defaultValue(hiColumn, _rowidx);
+                                    var rtn = defaultValue(hiColumn, _rowidx);
                                     _rowdic.Add(hiColumn.FieldName, rtn.Item2);
 
                                 }
@@ -1429,7 +1432,7 @@ namespace HiSql
 
 
                 #region 编号填充
-                rtnlst=fillSnro(rtnlst,dic_snro,dic_snro_num);
+                rtnlst = fillSnro(rtnlst, dic_snro, dic_snro_num);
                 #endregion
 
             }
@@ -1457,7 +1460,7 @@ namespace HiSql
                 foreach (string key in dic_snro_num.Keys)
                 {
                     if (dic_snro_num[key] > 0)
-                        dicnum.Add(key,dic_snro_num[key]);
+                        dicnum.Add(key, dic_snro_num[key]);
                 }
                 foreach (string key in dicnum.Keys)
                 {
@@ -1517,13 +1520,13 @@ namespace HiSql
                                 dic_listnum[key].RemoveAt(0);
                                 if (dic_snro[key].FieldType.IsNumberField())
                                 {
-                                    dic.Add(key,v);
+                                    dic.Add(key, v);
                                 }
                                 else
                                 {
                                     dic.Add(key, $"'{v}'");
                                 }
-                            }else
+                            } else
                                 throw new Exception($"字段[{key}]生成编号不足");
                         }
                     }
@@ -1545,7 +1548,7 @@ namespace HiSql
             bool _isok = true;
             Tuple<bool, string> rtn = new Tuple<bool, string>(_isok, _value);
 
-            if (hiColumn.IsPrimary )
+            if (hiColumn.IsPrimary)
             {
                 if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.Oracle, DBType.Hana, DBType.DaMeng))
                 {
@@ -1557,7 +1560,7 @@ namespace HiSql
 
             if (hiColumn.DBDefault == HiTypeDBDefault.NONE) // || hiColumn.DBDefault==HiTypeDBDefault.EMPTY
             {
-                if (hiColumn.IsPrimary)
+                if (hiColumn.IsPrimary || !hiColumn.IsNull)
                 {
                     if (hiColumn.FieldType.IsIn<HiType>(HiType.VARCHAR, HiType.CHAR, HiType.NCHAR, HiType.NVARCHAR, HiType.GUID, HiType.TEXT))
                     {
