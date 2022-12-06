@@ -368,7 +368,7 @@ namespace HiSql
                 TabInfo tabinfo_field = _sqlClient.Context.DMInitalize.BuildTab(typeof(Hi_Version));
                 _sqlClient.DbFirst.CreateTable(tabinfo_field);
                 lstver=saveCurrVersion();
-                rtn= new Tuple<bool, List<Hi_Version>>(false, lstver);
+                rtn= new Tuple<bool, List<Hi_Version>>(true, lstver);
             }
             else
             {
