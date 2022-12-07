@@ -41,6 +41,20 @@
 传统ORM框架最大的弊端就是完全要依赖于实体用lambda表达式写查询语句，但最大的问题就是如果业务场景需要动态拼接条件时只能又切换到原生数据库的sql语句进行完成，如果自行拼接开发人员还要解决防注入的问题,hisql 刚才完美的解决这些问题,Hisql底层已经对sql注入进行了处理，开发人员只要关注于业务开发
 
 
+### 2022.11.12 更新
+
+1. 增加将查询结果直接插入到表中如下
+
+```c#
+//目标表可以是一个不存在的表 也可以是一个存在的表
+sqlClient.HiSql("select * from Hi_FieldModel").Insert("tmp_hi_2022");
+```
+
+2. 也支持插入临时表 (除HANA,ORACLE,达梦)之外都支持
+```c#
+sqlClient.HiSql("select * from Hi_FieldModel").Insert("#tmp_hi_2022");
+```
+
 
 ### 2022.9.13 更新
 1. `HiSql`语句新增`is null` 和 `is not null` 查询语法

@@ -891,7 +891,7 @@ where    table_type in ('BASE TABLE','VIEW') and  table_schema = '[$Schema$]' [$
 
             _temp_delete = $"delete from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after};";
 
-            _temp_delete_where = $"delete from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} where [$Where$];";
+            _temp_delete_where = $"delete from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} as {_temp_table_pre}[$LowTabName$]{_temp_table_after} where [$Where$];";
 
             //删除不会留下任何痕迹
             _temp_truncate = $"TRUNCATE TABLE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after};";

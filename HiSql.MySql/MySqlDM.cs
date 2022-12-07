@@ -859,6 +859,7 @@ namespace HiSql
                 _temp_delete = _temp_delete
                     .Replace("[$Schema$]", _schema)
                     .Replace("[$TabName$]", table.TabName)
+                    .Replace("[$LowTabName$]",table.TabName.ToLower())
                     .Replace("[$Where$]", sb_field.ToString());
                 ;
             }

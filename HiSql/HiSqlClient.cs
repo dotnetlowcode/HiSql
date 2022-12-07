@@ -50,14 +50,14 @@ namespace HiSql
         private HiSqlProvider _context = null;
         public HiSqlClient(ConnectionConfig config)
         {
-            initContext(config);
+            
 
             //如果有需要也可以克隆一个连接
             //this.CloneClient();
             codeFirst.SqlClient = this;
             dbFirst.SqlClient = this;
 
-
+            initContext(config);
         }
 
         
@@ -126,6 +126,10 @@ namespace HiSql
 
 
             _context = new HiSqlProvider(config);
+
+            //add byt date:2022.11.12
+            _context.DbFirst = dbFirst;
+            _context.CodeFirst = codeFirst;
 
             _salveConnectionConfig = _context.SlaveConnectionConfig;
         }

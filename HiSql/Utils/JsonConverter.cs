@@ -23,7 +23,7 @@ namespace HiSql
             settings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             settings.Formatting = Formatting.Indented;
             settings.Converters.Add(timeConverter);
-            return ReplaceDatetimeString(JsonConvert.SerializeObject(obj, settings)).Replace("\r\n", "");
+            return ReplaceDatetimeString(JsonConvert.SerializeObject(obj, settings));
         }
         public static string ToJson(this object obj, string datetimeformats)
         {

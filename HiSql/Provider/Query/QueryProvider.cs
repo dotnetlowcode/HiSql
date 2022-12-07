@@ -917,8 +917,49 @@ namespace HiSql
         /// <param name="tabname"></param>
         /// <returns>返回插入的表名称</returns>
         /// <exception cref="Exception"></exception>
-        public virtual string Insert(string tabname)
+        public virtual string Insert(string tabname,bool isclear=false)
         {
+            HiTable hiTable = new HiTable() { TabName = tabname };
+            if (Context.CurrentConnectionConfig.DbType.IsIn(DBType.Oracle, DBType.Hana, DBType.DaMeng))
+            {
+                if (hiTable.TableType.IsIn(TableType.Local, TableType.Global, TableType.Var))
+                    throw new Exception($"HiSql不支持当前数据库类型[{Context.CurrentConnectionConfig.DbType.ToString()}] 将查询结果插入到临时表中");
+            }
+
+
+            if (hiTable.TableType.IsIn(TableType.Local, TableType.Global, TableType.Var))
+            {
+                TabInfo newtabinfo = this.Context.MCache.GetCache<TabInfo>(tabname);
+                if (newtabinfo != null)
+                {
+                    this.Context.MCache.RemoveCache(tabname);
+                }
+                
+                newtabinfo = this.Context.MCache.GetOrCreate<TabInfo>(tabname, () => {
+                    var lstcol = this.ToColumns().CloneCopy();
+                    TabInfo tabinfo = new TabInfo();
+                    tabinfo.TabModel = new HiTable() { TabName = tabname };
+                    int idx = 1;
+                    foreach (var col in lstcol)
+                    {
+                        col.SortNum = idx;
+                        col.IsPrimary = false;
+                        col.IsIdentity = false;
+                        col.TabName = tabname;
+                        idx++;
+                    }
+                    tabinfo.Columns = lstcol;
+                    return tabinfo;
+                });
+            }
+            
+            
+            
+            
+
+            
+
+
             if (!_queue.HasQueue("field"))
             {
                 throw new Exception($"Insert操作必须基于查询结果");

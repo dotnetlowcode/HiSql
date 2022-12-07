@@ -31,11 +31,30 @@ namespace HiSql
             string sql_where = string.Empty;
             if (this.Table != null)
             {
-                //sqldm = Instance.CreateInstance<SqlServerDM>($"{Constants.NameSpace}.{this.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
-                tabinfo = Context.DMInitalize.GetTabStruct(this.Table.TabName);
-                //sqldm.Context = this.Context;
-                //tabinfo = sqldm.GetTabStruct(this.Table.TabName);
-                dictabinfo.Add(this.Table.TabName, tabinfo);
+                HiTable hiTable = new HiTable() { TabName = this.Table.TabName };
+                if (hiTable.TableType.IsIn(TableType.Local, TableType.Global, TableType.Var))
+                {
+                    if (Context.CurrentConnectionConfig.DbType.IsIn(DBType.Oracle, DBType.Hana, DBType.DaMeng))
+                    {
+                        if (hiTable.TableType.IsIn(TableType.Local, TableType.Global, TableType.Var))
+                            throw new Exception($"HiSql不支持当前数据库类型[{Context.CurrentConnectionConfig.DbType.ToString()}] 将查询结果插入到临时表中");
+                        else
+                        {
+                            tabinfo = this.Context.MCache.GetCache<TabInfo>(this.Table.TabName);
+                            dictabinfo.Add(this.Table.TabName, tabinfo);
+                        }
+                    }
+                    else
+                    {
+                        tabinfo = this.Context.MCache.GetCache<TabInfo>(this.Table.TabName);
+                        dictabinfo.Add(this.Table.TabName, tabinfo);
+                    }
+                }
+                else
+                {
+                    tabinfo = Context.DMInitalize.GetTabStruct(this.Table.TabName);
+                    dictabinfo.Add(this.Table.TabName, tabinfo);
+                }
             }
             else
                 throw new Exception("未指定要更新的表");

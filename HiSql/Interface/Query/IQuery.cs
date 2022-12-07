@@ -124,8 +124,13 @@ namespace HiSql
 
 
 
-
-        string Insert(string tabname);
+        /// <summary>
+        /// 将查询结果插入到指定的表中
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <param name="isclear">默认不清除表中的数据</param>
+        /// <returns></returns>
+        string Insert(string tabname,bool isclear=false);
 
 
 

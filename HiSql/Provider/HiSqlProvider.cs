@@ -175,9 +175,9 @@ namespace HiSql
             }
         }
 
-        public ICodeFirst CodeFirst => throw new NotImplementedException();
+        public ICodeFirst CodeFirst { get; set; }
 
-        public IDbFirst DbFirst => throw new NotImplementedException();
+        public IDbFirst DbFirst { get; set; }
 
 
         /// <summary>

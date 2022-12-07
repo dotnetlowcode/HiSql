@@ -32,6 +32,12 @@ namespace HiSql
         private bool _ignorecase=true;
 
         private bool _uppercase = false;
+
+        /// <summary>
+        /// 表引表检测是否开启
+        /// </summary>
+        private bool _tabrefcheck = true;
+
         /// <summary>
         /// 是否自主指定大小写
         /// </summary>
@@ -80,6 +86,11 @@ namespace HiSql
         /// 连接字符串
         /// </summary>
         public string ConnectionString { get; set; }
+
+        /// <summary>
+        /// 是否启用表引用检测
+        /// </summary>
+        public bool IsCheckTableRefData { get => _tabrefcheck; set => _tabrefcheck = value; }
 
         //数据忽略大小写
         //public bool IgnoreCase { 

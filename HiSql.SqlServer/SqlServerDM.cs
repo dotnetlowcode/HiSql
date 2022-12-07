@@ -1055,6 +1055,11 @@ namespace HiSql
             {
                 var columninfo = tabinfo.Columns.Where(c => c.FieldName.ToLower() == n.ToLower()).FirstOrDefault();
                 string _str = dic_value[n];
+
+                if (columninfo != null)
+                    if (columninfo.FieldType == HiType.NVARCHAR)
+                        _str = $"N{_str}";
+
                 //只有是字段类型为数字的才支持
                 if (columninfo != null && columninfo.FieldType.IsIn<HiType>(HiType.INT, HiType.BIGINT, HiType.DECIMAL, HiType.SMALLINT))
                 {
