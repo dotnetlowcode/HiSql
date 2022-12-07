@@ -1682,7 +1682,7 @@ namespace HiSql
                     if (hiColumn.IsPrimary && string.IsNullOrEmpty(_value) && Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.Oracle, DBType.DaMeng, DBType.Hana))
                         _value = $"' '";
                     else
-                        _value = $"'{_value.ToSqlInject()}'";
+                        _value = $"N'{_value.ToSqlInject()}'";
                     rtn = new Tuple<bool, string>(true, _value);
 
                 }

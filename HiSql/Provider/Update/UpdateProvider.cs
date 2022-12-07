@@ -1017,7 +1017,7 @@ namespace HiSql
                             throw new Exception($"字段[{hiColumn.FieldName}] 为必填 无法数据提交");
                     }
 
-                    _value = $"'{_value.ToSqlInject()}'";
+                    _value = $"N'{_value.ToSqlInject()}'";
                     rtn = new Tuple<bool, string>(true, _value);
 
                 }

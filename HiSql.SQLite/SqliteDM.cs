@@ -614,7 +614,6 @@ namespace HiSql
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendLine(DeleteTabStruct(hiTable));
 
             string _dbname = string.IsNullOrEmpty(hiTable.DbName) ? dbConfig.Key_Char_Default : hiTable.DbName.ToSqlInject();
             string _dbserver = string.IsNullOrEmpty(hiTable.DbServer) ? dbConfig.Key_Char_Default : hiTable.DbServer.ToSqlInject();
@@ -810,7 +809,7 @@ namespace HiSql
         {
             throw new NotSupportedException("该方法仅支持PostGreSql数据库");
         }
-        public string BuildMergeIntoSql(TabInfo targetinfo, TabInfo sourceinfo, List<string> dataColLst = null)
+        public string BuildMergeIntoSql(TabInfo targetinfo, TabInfo sourceinfo, List<string> dataColLst = null, List<string> keyColList = null)
         {
 
             string _merge_temp = dbConfig.Table_MergeInto;

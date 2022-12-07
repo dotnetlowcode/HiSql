@@ -189,7 +189,7 @@ namespace HiSql
         /// <param name="sourceinfo"></param>
         /// <param name="dataColLst">当存在数据时指定更新的字段</param>
         /// <returns></returns>
-        string BuildMergeIntoSql(TabInfo targetinfo, TabInfo sourceinfo,List<string> dataColLst=null);
+        string BuildMergeIntoSql(TabInfo targetinfo, TabInfo sourceinfo,List<string> dataColLst=null, List<string> keyColList = null);
         
         //仅限于PostGreSql 其它库不支持
         string BuildMergeIntoSqlSequence(TabInfo targetinfo,List<string> dataColLst= null);

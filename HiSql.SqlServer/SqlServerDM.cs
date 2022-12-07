@@ -817,7 +817,7 @@ namespace HiSql
         {
             throw new NotSupportedException("该方法仅支持PostGreSql数据库");
         }
-        public string BuildMergeIntoSql(TabInfo targetinfo, TabInfo sourceinfo, List<string> dataColLst = null)
+        public string BuildMergeIntoSql(TabInfo targetinfo, TabInfo sourceinfo, List<string> dataColLst = null, List<string> keyColList = null)
         {
 
             string _merge_temp = dbConfig.Table_MergeInto;
@@ -831,9 +831,19 @@ namespace HiSql
             string _updatestr = string.Empty;
             string _fieldstr = string.Empty;
             string _valuestr = string.Empty;
-            foreach (HiColumn hiColumn in bllkeys)
+            if (keyColList == null)
             {
-                _filer.Add($"a.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}=b.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}");
+                foreach (HiColumn hiColumn in bllkeys)
+                {
+                    _filer.Add($"a.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}=b.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}");
+                }
+            }
+            else
+            {
+                foreach (HiColumn hiColumn in targetinfo.Columns.Where(t=> keyColList.Any(a=>a.Equals(t.FieldName, StringComparison.OrdinalIgnoreCase ))))
+                {
+                    _filer.Add($"a.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}=b.{dbConfig.Field_Pre}{hiColumn.FieldName}{dbConfig.Field_After}");
+                }
             }
 
             if (_filer.Count == 0)

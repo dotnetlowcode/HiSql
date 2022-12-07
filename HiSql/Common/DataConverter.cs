@@ -788,8 +788,15 @@ namespace HiSql
                 Type _type = column.DataType;
                 if ((dbtype == DBType.Sqlite || dbtype == DBType.Oracle || dbtype == DBType.MySql) && unboxType.IsValueType && !isNullable)
                 {
-                    var castMethod = typeof(Convert).GetMethod("To" + unboxType.Name, new Type[] { typeof(object) });
-                    generator.Emit(OpCodes.Call, castMethod); //类型转换
+                    if (unboxType.IsEnum)
+                    {
+                        generator.Emit(OpCodes.Unbox_Any, _type);
+                    }
+                    else
+                    {
+                        var castMethod = typeof(Convert).GetMethod("To" + unboxType.Name, new Type[] { typeof(object) });
+                        generator.Emit(OpCodes.Call, castMethod); //类型转换
+                    }
                 }
                 else
                 {

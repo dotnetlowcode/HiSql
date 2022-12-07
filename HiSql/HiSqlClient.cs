@@ -527,19 +527,22 @@ namespace HiSql
         /// <summary>
         /// 批量写入
         /// </summary>
-        /// <param name="tabname"></param>
-        /// <param name="lstdata"></param>
+        /// <param name="tabname">要写入的表名</param>
+        /// <param name="souretable">数据源表</param>
+        /// <param name="isMegerData">是否采用MegerInto方式</param>
+        /// <param name="keyColList">MegerInto条件列</param>
         /// <returns></returns>
-        public int BulkCopyExecCommand(string tabname, DataTable souretable, bool isMegerData = false)
+        public int BulkCopyExecCommand(string tabname, DataTable souretable, bool isMegerData = false, List<string> megerFilterColList = null)
         {
             int result = 0;
             TabInfo tabInfo = this.Context.DMInitalize.GetTabStruct(tabname);
 
             if (isMegerData)
             {
+                //kai
 
                 var tempTableInfo = tabInfo.CloneTabInfo();
-                var tempTableName = $"ZT_{tempTableInfo.TabModel.TabReName}{DateTime.Now.ToFileTime().ToString()}";
+                var tempTableName = $"ZT_{tempTableInfo.TabModel.TabReName}_{DateTime.Now.ToString("yyMMddHHmmssfff")}";
                 if (tempTableName.Length >= 50)
                 {
                     tempTableName = tempTableName.Substring(0,50);
@@ -552,8 +555,10 @@ namespace HiSql
                     {   //2、插入数据到物理表
                         result = _context.BulkCopyExecCommand(tempTableInfo, souretable);
 
+                        tabInfo.Columns = tabInfo.Columns.Where(dc => souretable.Columns.Contains(dc.FieldName)).ToList();
+
                         //3、MergerInto
-                        string _mergesql = _context.DMTab.BuildMergeIntoSql( tabInfo, tempTableInfo, null);
+                        string _mergesql = _context.DMTab.BuildMergeIntoSql( tabInfo, tempTableInfo, null, megerFilterColList);
                         result =  _context.DBO.ExecCommand(_mergesql);
 
                     }

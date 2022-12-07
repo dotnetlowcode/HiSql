@@ -844,7 +844,7 @@ namespace HiSql
                 ;
         }
 
-        public string BuildMergeIntoSql(TabInfo targetinfo, TabInfo sourceinfo, List<string> dataColLst = null)
+        public string BuildMergeIntoSql(TabInfo targetinfo, TabInfo sourceinfo, List<string> dataColLst = null, List<string> keyColList = null)
         {
 
             string _merge_temp = dbConfig.Table_MergeInto;
