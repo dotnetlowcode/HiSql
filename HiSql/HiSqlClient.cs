@@ -543,9 +543,11 @@ namespace HiSql
 
             if (isMegerData)
             {
+
+                var newtabInfo = tabInfo.CloneTabInfo();
                 //kai
 
-                var tempTableInfo = tabInfo.CloneTabInfo();
+                var tempTableInfo = newtabInfo.CloneTabInfo();
                 var tempTableName = $"ZT_{tempTableInfo.TabModel.TabReName}_{DateTime.Now.ToString("yyMMddHHmmssfff")}";
                 if (tempTableName.Length >= 50)
                 {
@@ -559,10 +561,10 @@ namespace HiSql
                     {   //2、插入数据到物理表
                         result = _context.BulkCopyExecCommand(tempTableInfo, souretable);
 
-                        tabInfo.Columns = tabInfo.Columns.Where(dc => souretable.Columns.Contains(dc.FieldName)).ToList();
+                        newtabInfo.Columns = newtabInfo.Columns.Where(dc => souretable.Columns.Contains(dc.FieldName)).ToList();
 
                         //3、MergerInto
-                        string _mergesql = _context.DMTab.BuildMergeIntoSql( tabInfo, tempTableInfo, null, megerFilterColList);
+                        string _mergesql = _context.DMTab.BuildMergeIntoSql(newtabInfo, tempTableInfo, null, megerFilterColList);
                         result =  _context.DBO.ExecCommand(_mergesql);
 
                     }

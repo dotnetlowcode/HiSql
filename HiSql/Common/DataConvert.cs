@@ -1670,6 +1670,7 @@ namespace HiSql
                Columns = CloneHiColumnList(tabInfo.Columns),
                DbTabName = tabInfo.DbTabName,
                EntityName = tabInfo.EntityName
+               
                , TabModel = tabInfo.TabModel.CloneCopy()
             };
             return l;
@@ -1687,7 +1688,7 @@ namespace HiSql
         {
             HiColumn l = new HiColumn()
             {
-                DbName=hiColumn.DbName,
+                DbName = hiColumn.DbName,
                 TabName = hiColumn.TabName,
                 DBDefault = hiColumn.DBDefault,
                 IsPrimary = hiColumn.IsPrimary,
@@ -1702,17 +1703,19 @@ namespace HiSql
                 IsIgnore = hiColumn.IsIgnore,
                 IsNull = hiColumn.IsNull,
                 IsObsolete = hiColumn.IsObsolete,
-                
+
                 IsRefTab = hiColumn.IsRefTab,
-                IsRequire = hiColumn.IsRequire, 
-                IsSearch   = hiColumn.IsSearch, 
+                IsRequire = hiColumn.IsRequire,
+                IsSearch = hiColumn.IsSearch,
                 IsShow = hiColumn.IsShow,
-                IsSys = hiColumn.IsSys, 
+                IsSys = hiColumn.IsSys,
                 RefField = hiColumn.RefField,
                 RefFieldDesc = hiColumn.RefFieldDesc,
                 RefFields = hiColumn.RefFields,
-                ReFieldName = hiColumn.ReFieldName,RefTab = hiColumn.RefTab,RefWhere = hiColumn.RefWhere,Regex = hiColumn.Regex,
-                SNO = hiColumn.SNO,SNO_NUM = hiColumn.SNO_NUM,SortNum = hiColumn.SortNum,SrchMode = hiColumn.SrchMode
+                ReFieldName = hiColumn.ReFieldName, RefTab = hiColumn.RefTab, RefWhere = hiColumn.RefWhere, Regex = hiColumn.Regex,
+                SNO = hiColumn.SNO, SNO_NUM = hiColumn.SNO_NUM, SortNum = hiColumn.SortNum, SrchMode = hiColumn.SrchMode
+                , DbServer = hiColumn.DbServer
+                
             };
 
             return l;
