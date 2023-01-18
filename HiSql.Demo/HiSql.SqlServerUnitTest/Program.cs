@@ -6,6 +6,8 @@ using System.Data;
 using System.Diagnostics;
 using System.Dynamic;
 using System.Linq;
+using System.Reflection;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -66,12 +68,12 @@ namespace HiSql.UnitTest
 
             // Console.WriteLine($"数据库连接id"+sqlcient.Context.ConnectedId);
 
-            //Demo_Update.Init(sqlcient);
-            Demo_Query.Init(sqlcient);
+            // Demo_Update.Init(sqlcient);
+            //Demo_Query.Init(sqlcient);
 
             //Demo_Delete.Init(sqlcient);
             //Demo_Insert.Init(sqlcient);
-           //DemoCodeFirst.Init(sqlcient);
+            //DemoCodeFirst.Init(sqlcient);
             //Demo_Snro.Init(sqlcient);
             //Demo_DbCode.Init(sqlcient);
             //Demo_Cache.Init(sqlcient);
@@ -80,7 +82,10 @@ namespace HiSql.UnitTest
             //RedisTest();
             //ThreadTest();
             //SnowId();
-
+            // MultiCacheTest3();
+            MultiCacheTest4();
+            // MultiCacheTest();
+            //MultiCacheTest2();
             Console.ReadLine();
         }
         static Object _lockerNextId = new Object();
@@ -236,7 +241,6 @@ namespace HiSql.UnitTest
 
 
         }
-
         static void ThreadTest()
         {
             HiSql.Global.RedisOn = true;//开启redis缓存
@@ -244,13 +248,13 @@ namespace HiSql.UnitTest
 
             int _count = 0;
 
-            Parallel.For(1, 50, (index,y) => {
+            Parallel.For(1, 50, (index, y) => {
                 Thread.Sleep(index * 20);
 
-               var rtn= HiSql.Lock.LockOnExecute("stock", () => { 
-                
-                
-                
+                var rtn = HiSql.Lock.LockOnExecute("stock", () => {
+
+
+
                 }, new LckInfo
                 {
                     UName = "tanar",
@@ -259,8 +263,126 @@ namespace HiSql.UnitTest
 
                 });
                 Console.WriteLine(rtn.Item2);
-                
+
             });
+        }
+        static void MultiCacheTest3()
+        {
+            HiSql.Global.RedisOn = true;//开启redis缓存
+
+            HiSql.Global.RedisOptions = new RedisOptions { EnableMultiCache = true, Host = "192.168.10.130", PassWord = "pwd123", Port = 6683, CacheRegion = "TST", Database = 0 };
+            Console.WriteLine("开始：");
+            var a = Console.ReadLine();
+            while (a != "1")
+            {
+                var aStr = HiSql.CacheContext.Cache.GetCache("test");
+                Console.WriteLine("结果："+aStr);
+                a = Console.ReadLine();
+            }
+
+            Console.WriteLine("结束....");
+            Console.ReadLine();
+
+        }
+        static void MultiCacheTest4()
+        {
+            HiSql.Global.RedisOn = false;//开启redis缓存
+
+            HiSql.Global.RedisOptions = new RedisOptions { EnableMultiCache = false, Host = "192.168.10.130", PassWord = "pwd123", Port = 6683, CacheRegion = "TST", Database = 0 };
+            Console.WriteLine("开始："+default(string));
+            var a = Console.ReadLine();
+            while (a != "1")
+            {
+                if (a == "2")
+                {
+                    var aStr = HiSql.CacheContext.Cache.GetOrCreate("test", () =>
+                    {
+                        return DateTime.Now.ToString("mmssfff");
+                    }, 15);
+                    Console.WriteLine("结果：" + aStr);
+                }else if (a == "3")
+                {
+                    HiSql.CacheContext.Cache.RemoveCache("test");
+                    var aStr = HiSql.CacheContext.Cache.GetOrCreate("test", () =>
+                    {
+                        return null;
+                        return DateTime.Now.ToString("mmssfff");
+                    }, 15);
+                    Console.WriteLine("结果：" + aStr);
+                }
+                else if (a == "4")
+                {
+                    var aStr = HiSql.CacheContext.Cache.GetCache("test");
+                    
+                    Console.WriteLine("结果：" + aStr);
+                }
+
+                a = Console.ReadLine();
+            }
+
+            Console.WriteLine("结束....");
+            Console.ReadLine();
+
+        }
+
+        static void MultiCacheTest2()
+        {
+            HiSql.Global.RedisOn = true;//开启redis缓存
+
+            HiSql.Global.RedisOptions = new RedisOptions { EnableMultiCache = true, Host = "192.168.10.130", PassWord = "pwd123", Port = 6683, CacheRegion = "TST", Database = 0 };
+
+            HiSql.CacheContext.Cache.RemoveCache("test");
+            var aa = HiSql.CacheContext.Cache.GetOrCreate("test", () =>
+            {
+                return DateTime.Now.ToString("mmssfff");
+            });
+        }
+
+        static string lastStr = "1111111111111111111";
+            static void MultiCacheTest()
+        {
+            HiSql.Global.RedisOn = true;//开启redis缓存
+            
+            HiSql.Global.RedisOptions = new RedisOptions { EnableMultiCache = true, Host = "192.168.10.130", PassWord = "pwd123", Port = 6683, CacheRegion = "TST", Database = 0 };
+
+            int _count = 0;
+
+
+           HiSql.CacheContext.Cache.GetOrCreate("test", () =>
+            {
+                //return null;
+                return DateTime.Now.ToString("mmssfff");
+            }, 5);
+
+            Console.WriteLine("完成 ..  ");
+            Console.ReadLine();
+            return;
+            StringBuilder stringBuilder = new StringBuilder();
+            while (true)
+            {
+               var aa =  HiSql.CacheContext.Cache.GetOrCreate("test", () =>
+                {
+                    //return null;
+                    return DateTime.Now.ToString("mmssfff");
+                }, 5000);
+                if (!lastStr.Equals(aa) && !lastStr.Equals("1111111111111111111"))
+                {
+                    stringBuilder.AppendLine(DateTime.Now.ToString("mmssfff") + ":" + aa);
+
+                    Console.WriteLine("停止 ..  ");
+
+                    break;
+                }
+                stringBuilder.AppendLine( DateTime.Now.ToString("mmssfff")+ ":" +aa);
+                Thread.Sleep(1);
+                lastStr = aa;
+            }
+
+            Console.WriteLine("汇总 ..  ");
+            Console.WriteLine(stringBuilder.ToString());
+
+            Console.ReadLine();
+           
         }
 
 

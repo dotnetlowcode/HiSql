@@ -41,7 +41,11 @@ namespace HiSql.UnitTest
             //string sql2 = sqlClient.Update("HTest01").Set(new { UName = "TEST" }).Where("SID=123456").ToSql();
             //string sql = sqlClient.Update("HTest01").Set(new { UName = "TEST" }).Where(new Filter { { "SID", OperType.EQ, 123456 } }).ToSql();
 
-            string sql3=sqlClient.Update("HTest01", new { SID = 123456, Salary = "`Salary`+1" }).Exclude("SID").Where("SID = 1234856").ToSql();
+            sqlClient.CurrentConnectionConfig.User = "@阿荣。🌸 ";
+            string sql3=sqlClient.Update("HTest01", new { SID = 123456, Salary = "`Salary`+1" , CreateName ="asdfasdf"}).Exclude("SID").Where("SID = 123456").ToSql();
+
+            sqlClient.Update("HTest01", new { SID = 123456, Salary = "`Salary`+1", CreateName = "@阿荣。🌸 " }).Exclude("SID").Where("SID = 123456").ExecCommand();
+
         }
         static void Update_Demo4(HiSqlClient sqlClient)
         {
