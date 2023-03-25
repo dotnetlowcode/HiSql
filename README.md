@@ -40,6 +40,105 @@
 
 传统ORM框架最大的弊端就是完全要依赖于实体用lambda表达式写查询语句，但最大的问题就是如果业务场景需要动态拼接条件时只能又切换到原生数据库的sql语句进行完成，如果自行拼接开发人员还要解决防注入的问题,hisql 刚才完美的解决这些问题,Hisql底层已经对sql注入进行了处理，开发人员只要关注于业务开发
 
+### 2023.03.25 更新
+1.hisql框架全面支持NET7.0
+
+2.修改bool类型默认为false
+
+3.对HiSql.Excel 更新可导出excel并带图片
+
+图片是一个Url地址可下载下来并插入到excel中以下是demo代码
+
+
+
+```c#
+/// <summary>
+/// 数据保存到Excel
+/// </summary>
+/// <param name="tableInfo"></param>
+/// <param name="dt"></param>
+/// <param name="savePath"></param>
+/// <returns></returns>
+static async Task SavePageExcel(TabInfo tableInfo, DataTable dt, string savePath, bool isNullTemplate, List<ColumnSetting> columnSettings = null)
+{
+    Extension.Excel excel = new Extension.Excel(new Extension.ExcelOptions()
+    {
+        TempType = Extension.TempType.HEADER
+    });
+    excel.Add(new Extension.ExcelHeader(1).Add("表名").Add(tableInfo.TabModel.TabName));//标识表名
+                                                                                        //中文头
+    Extension.ExcelHeader cnHeader = new Extension.ExcelHeader(2);
+    //英文头
+    Extension.ExcelHeader enHeader = new Extension.ExcelHeader(3);
+
+    var excludeFields = new List<string>() {//模板忽略字段
+        "CreateTime",
+        "CreateName",
+        "ModiTime",
+        "ModiName"
+    };
+    foreach (DataColumn dataColumn in dt.Columns)
+    {
+        if (isNullTemplate && excludeFields.Contains(dataColumn.ColumnName))
+        {
+            continue;
+        }
+        HiColumn hiColumn = tableInfo.Columns.Where(c => c.FieldName.Equals(dataColumn.ColumnName)).FirstOrDefault();
+        if (hiColumn != null)
+        {
+            //自增主键不能填也不能改
+            var tipStr = hiColumn.IsIdentity ? "[不可修改]" : "";
+            var cnName = (string.IsNullOrEmpty(hiColumn.FieldDesc) ? dataColumn.ColumnName : hiColumn.FieldDesc) + tipStr;
+            cnHeader.Add(cnName);
+        }
+        else
+        {
+            cnHeader.Add(dataColumn.ColumnName);
+        }
+        enHeader.Add(dataColumn.ColumnName);
+    }
+    excel.Add(cnHeader);//字段中文描述
+    excel.Add(enHeader);//字段名
+    if (isNullTemplate)
+    {
+        dt.Clear();
+    }
+
+    var columnSettingMap = columnSettings?.ToDictionary(r => r.FieldName, r => r);
+    //生成excel  columnSettingMap == null ? null :
+
+    excel.WriteExcel(dt, savePath, cellRenderFun: (sheet, row, cell) =>
+    {
+        if (columnSettingMap == null)
+        {
+            return;
+        }
+        var columnIndex = cell.ColumnIndex;
+        var headName = dt.Columns[columnIndex].ColumnName;
+        var cSetting = columnSettingMap[headName];
+        row.Height = cSetting.RowHeight;
+        //如果是图片
+        if (cSetting.RenderType == "1")
+        {
+            var imgPath = cell.StringCellValue;
+            if (imgPath.IndexOf("//") == 0)
+            {
+                imgPath = "https:" + imgPath;
+            }
+            var imgData = WebHelper.GetImageDataByUrl(imgPath);
+            var imgId = sheet.Workbook.AddPicture(imgData, PictureType.JPEG);
+            var patriarch = sheet.CreateDrawingPatriarch();
+            int rowIndex = cell.RowIndex;
+            var h = row.Height;
+            IClientAnchor anchor = patriarch.CreateAnchor(0, 0, 0, h, columnIndex, rowIndex, columnIndex + 1, rowIndex + 1);
+            patriarch.CreatePicture(anchor, imgId);
+        }
+    });
+}
+
+```
+
+
 
 ### 2022.11.12 更新
 
