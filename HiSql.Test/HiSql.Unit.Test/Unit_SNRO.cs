@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Azure;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -84,9 +85,37 @@ namespace HiSql.Unit.Test
             List<string> lstsn= HiSql.SnroNumber.NewNumber("SALENO", 1, 100);
 
             Assert.Equal(100, lstsn.Count);
-            
 
-            
+            snroTest(sqlClient);
+
+
+
+
+        }
+
+
+
+        void snroTest(HiSqlClient sqlClient)
+        {
+            string tabname1 = typeof(H_Test_snro).Name;
+
+            _outputHelper.WriteLine($"检测表[{tabname1}] 是否在当前库中存在");
+            if (sqlClient.DbFirst.CheckTabExists(tabname1))
+            {
+                _outputHelper.WriteLine($"表[{tabname1}] 存在正在执行删除并清除表结构信息");
+                sqlClient.DbFirst.DropTable(tabname1);
+                _outputHelper.WriteLine($"表[{tabname1}] 已经删除");
+            }
+            else
+            { 
+                _outputHelper.WriteLine($"检测表[{tabname1}] 是否在当前库中不存在");
+                
+            }
+
+            sqlClient.DbFirst.CreateTable(sqlClient.Context.DMInitalize.BuildTab(typeof(H_Test_snro)));
+
+            sqlClient.Insert(tabname1, new { UName ="tgm", Age =11, Salary =333, Descript ="test"}).ExecCommand();
+
 
 
         }

@@ -315,16 +315,18 @@ namespace HiSql
             CheckRedis();
             key = GetRegionKey(key);
             string obj = string.Empty;
+            
             if (this._options.EnableMultiCache)
             {
                 obj = _MemoryCache.GetCache(key);
                 if (obj.IsNullOrEmpty())
                 {
-                    var val = _cache.StringGet(key);
-                    if (val.HasValue)
+                    
+                    var val = _cache.StringGetWithExpiry(key);
+                    if (val.Value.HasValue)
                     {
-                        obj = val.ToString();
-                        _MemoryCache.SetCache(key, obj);
+                        obj = val.Value.ToString();
+                        _MemoryCache.SetCache(key, obj,  DateTime.Now.Add(val.Expiry.HasValue? val.Expiry.Value:TimeSpan.FromSeconds(10)));
                     }
 
                     else
@@ -345,6 +347,7 @@ namespace HiSql
 
         public override T GetCache<T>(string key) where T : class
         {
+           
             CheckRedis();
             key = GetRegionKey(key);
 
@@ -355,11 +358,12 @@ namespace HiSql
                 var obj = _MemoryCache.GetCache(key);
                 if (obj.IsNullOrEmpty())
                 {
-                    var cachevalue = _cache.StringGet(key);
-                    if (!cachevalue.IsNull)
+                    var cachevalue = _cache.StringGetWithExpiry(key);
+                    if (!cachevalue.Value.IsNull)
                     {
-                        value = JsonConvert.DeserializeObject<T>(cachevalue);
-                        _MemoryCache.SetCache(key, value);
+                        value = JsonConvert.DeserializeObject<T>(cachevalue.Value);
+
+                        _MemoryCache.SetCache(key, value, DateTime.Now.Add(cachevalue.Expiry.HasValue ? cachevalue.Expiry.Value : TimeSpan.FromSeconds(10)));
                     }
                 }
                 else
@@ -407,6 +411,10 @@ namespace HiSql
             if (!Exists(key))
             {
                 T _val = value.Invoke();
+                if (_val == null)
+                {
+                    throw new Exception("不能将Null存入缓存");
+                }
                 string _value = JsonConvert.SerializeObject(_val);
 
                 _cache.StringSet(key, _value, second > 0 ? TimeSpan.FromSeconds(second) : null, When.NotExists, CommandFlags.None);
@@ -430,7 +438,32 @@ namespace HiSql
             }
             else
             {
-                return GetCache<T>(key);
+                var obj= GetCache<T>(key);
+                if (obj == default(T))
+                {
+                    T _val = value.Invoke();
+                    string _value = JsonConvert.SerializeObject(_val);
+
+                    _cache.StringSet(key, _value, second > 0 ? TimeSpan.FromSeconds(second) : null, When.NotExists, CommandFlags.None);
+
+                    if (this._options.EnableMultiCache)
+                    {
+                        //本地存储，并发布消息
+                        if (second > 0)
+                        {
+                            _MemoryCache.SetCache(key, _value, DateTime.Now.Add(TimeSpan.FromSeconds(second)));
+                        }
+                        else
+                        {
+                            _MemoryCache.SetCache(key, _value);
+                        }
+
+                        this.PublishMessage(_cache_notity_channel_remove, GetRegionKeyForNotityKey(key));
+
+                    }
+                    obj = _val;
+                }
+                return obj;
             }
 
         }
@@ -463,6 +496,7 @@ namespace HiSql
             _cache.KeyDelete(fullKey);
             if (this._options.EnableMultiCache)
             {
+                _MemoryCache.RemoveCache(key);
                 this.PublishMessage(_cache_notity_channel_remove, GetRegionKeyForNotityKey(fullKey));
             }
         }
@@ -484,6 +518,10 @@ namespace HiSql
 
         public override void SetCache(string key, object value, int second)
         {
+            if (value == null)
+            {
+                throw new Exception("不能将Null存入缓存");
+            }
             CheckRedis();
             var fullKey = GetRegionKey(key);
 

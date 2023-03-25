@@ -850,7 +850,6 @@ namespace HiSql
 
                 Dictionary<string, PropertyInfo> dicprop = new Dictionary<string, PropertyInfo>(StringComparer.OrdinalIgnoreCase);
 
-
                 bool _isdic = type == _typ_dic || type == _typ_dic_obj;
                 List<PropertyInfo> attrs = type.GetProperties().Where(p => p.MemberType == MemberTypes.Property && p.CanRead == true).ToList();
 
@@ -890,6 +889,7 @@ namespace HiSql
                 {
                     dic_snro.Add(hi.FieldName, hi);
                     dic_snro_num.Add(hi.FieldName, 0);
+
                 }
 
                 int _rowidx = 0;
@@ -1620,11 +1620,11 @@ namespace HiSql
                     {
                         if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.PostGreSql, DBType.Hana, DBType.MySql))
                         {
-                            _value = "True";
+                            _value = "False";
                         }
                         else
                         {
-                            _value = "1";
+                            _value = "0";
                         }
                     }
                     else

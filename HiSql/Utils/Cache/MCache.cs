@@ -113,10 +113,13 @@ namespace HiSql
         /// <exception cref="ArgumentNullException"></exception>
         public override void SetCache(string key, object value, DateTimeOffset expirationTime)
         {
+            
             key = GetRegionKey(key);
 
             if (value == null)
-                throw new ArgumentNullException(nameof(value));
+            {
+                throw new Exception("不能将Null存入缓存");
+            }
 
             object v = null;
             if (this._cache.TryGetValue(key, out v))
@@ -197,6 +200,11 @@ namespace HiSql
             return this._cache.GetOrCreate<T>(key, (entry) =>
             {
                 var objs = value.Invoke();
+                if (objs == null)
+                {
+                    throw new Exception("不能将Null存入缓存");
+                }
+
                 entry.SetValue(objs);
                 entry.AbsoluteExpiration = time;
                 return objs;
