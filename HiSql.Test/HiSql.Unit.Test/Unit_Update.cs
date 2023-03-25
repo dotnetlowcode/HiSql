@@ -78,8 +78,17 @@ namespace HiSql.Unit.Test
             //初始化
             initDemoDynTable(sqlClient, "Hi_TestUpdate");
             UpdateWhere(sqlClient);
-        }
 
+            Update_Demo5(sqlClient);
+
+
+        }
+        static void Update_Demo5(HiSqlClient sqlClient)
+        {
+            sqlClient.CurrentConnectionConfig.User = "@阿荣。🌸 ";
+            sqlClient.Update("HTest01", new { SID = 123456, Salary = "`Salary`+1" }).Exclude("SID").Where("SID = 123456").ExecCommand();
+
+        }
         void UpdateWhere(HiSqlClient sqlClient)
         {
             int successCount = 0;
