@@ -3,7 +3,6 @@ using NPOI.SS.UserModel;
 using NPOI.XSSF.Streaming;
 using NPOI.XSSF.UserModel;
 
-using NPOI.OOXML.XWPF;
 using System;
 using System.Data;
 using System.IO;
@@ -85,14 +84,12 @@ namespace HiSql.Extension
         }
 
 
-        public void WriteExcel(DataTable dt, string filepath, string sheetname = "")
+        public void WriteExcel(DataTable dt, string filepath, string sheetname = "", Action<ISheet, IRow, ICell> cellRenderFun = null)
         {
-
-
             bool _iscreate = createExcelFile((int)_options.TempType, filepath);
             if (_iscreate)
             {
-                PageWriteExcel(filepath, dt, sheetname);
+                PageWriteExcel(filepath, dt, sheetname, cellRenderFun);
             }
         }
 
@@ -265,7 +262,7 @@ namespace HiSql.Extension
              });
         }
 
-        private void PageWriteExcel(string newfile, DataTable dtable, string sheetname = "")
+        private void PageWriteExcel(string newfile, DataTable dtable, string sheetname = "", Action<ISheet, IRow, ICell> cellRenderFun = null)
         {
 
             var count = dtable.Rows.Count;
@@ -315,7 +312,6 @@ namespace HiSql.Extension
                         _dcell = excelRow.GetCell(cell.ColIdx - 1);
                         if (_dcell == null)
                             _dcell = excelRow.CreateCell(cell.ColIdx - 1);
-
                         ICellStyle cellStyle = _dcell.CellStyle;
 
                         if (cellStyle.FillBackgroundColorColor == null)
@@ -328,6 +324,7 @@ namespace HiSql.Extension
 
 
                     }
+
                     //excelRow.RowStyle = rowStyle;
 
                 }
@@ -396,7 +393,7 @@ namespace HiSql.Extension
             //    }
             //}
 
-            pageWriteExcel(dtable, _actidx, beginRow, newfile);
+            pageWriteExcel(dtable, _actidx, beginRow, newfile, cellRenderFun);
 
 
             //fs.Flush();
@@ -420,7 +417,7 @@ namespace HiSql.Extension
         /// <param name="headerMap"></param>
         /// <param name="headerRowNumber"></param>
         /// <returns></returns>
-        public async Task<bool> DataTableToExcel(Func<Task<Tuple<DataTable, int>>> getData, string sheetName, string excelpath, Dictionary<string, string> headerMap, int headerRowNumber)
+        public async Task<bool> DataTableToExcel(Func<Task<Tuple<DataTable, int>>> getData, string sheetName, string excelpath, Dictionary<string, string> headerMap, int headerRowNumber, Action<IRow, ICell, string> cellRenderFun)
         {
             var fs = new FileStream(excelpath, FileMode.Open, FileAccess.Read, FileShare.Read);
             var workbook = new XSSFWorkbook(fs);//将文件读到内存，在内存中操作excel
@@ -429,7 +426,7 @@ namespace HiSql.Extension
             fs.Close();
             try
             {
-                await WriteSheetData(workbook, xssfsheet, getData, headerMap, headerRowNumber);
+                await WriteSheetData(workbook, xssfsheet, getData, headerMap, headerRowNumber, cellRenderFun);
             }
             catch (Exception ex)
             {
@@ -452,7 +449,7 @@ namespace HiSql.Extension
         }
 
 
-        public async Task WriteSheetData(XSSFWorkbook workbook, ISheet xssfsheet, Func<Task<Tuple<DataTable, int>>> getData, Dictionary<string, string> headerMap, int headerRowNumber)
+        public async Task WriteSheetData(XSSFWorkbook workbook, ISheet xssfsheet, Func<Task<Tuple<DataTable, int>>> getData, Dictionary<string, string> headerMap, int headerRowNumber, Action<IRow, ICell, string> cellRenderFun)
         {
             var headerRow = workbook.GetSheet(xssfsheet.SheetName).GetRow(headerRowNumber); //xssfsheet.GetRow(headerRowNumber);
             if (headerRow == null)
@@ -499,6 +496,7 @@ namespace HiSql.Extension
                         var dtColumn = dt.Columns[dtKey];
                         ICell _dcell = excelRow.CreateCell(j);
                         var _value = dtCell.ToString().Trim();
+                        cellRenderFun(excelRow, _dcell, dtKey);
                         if (dtColumn.DataType == typedec || dtColumn.DataType == typeint || dtColumn.DataType == typeint64 || dtColumn.DataType == typefloat)
                         {
                             if (_value.Length <= 10)
@@ -539,7 +537,7 @@ namespace HiSql.Extension
         /// <param name="excelpath"></param>
         /// <returns></returns>
         //private bool pageWriteExcel(DataTable dt,int sheetidx,int currrowidx, int pagesize, int pageidx,string excelpath)
-        private bool pageWriteExcel(DataTable dt, int sheetidx, int currrowidx, string excelpath)
+        private bool pageWriteExcel(DataTable dt, int sheetidx, int currrowidx, string excelpath, Action<ISheet, IRow, ICell> cellRenderFun)
         {
             FileStream file = new FileStream(excelpath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
@@ -547,7 +545,9 @@ namespace HiSql.Extension
             XSSFWorkbook workbook = new XSSFWorkbook(file);//将文件读到内存，在内存中操作excel
 
             SXSSFWorkbook xssfworkbook = new SXSSFWorkbook(workbook, 1000);
+            var w = xssfworkbook.GetSheetAt(sheetidx);
             SXSSFSheet xssfsheet = xssfworkbook.GetSheetAt(sheetidx) as SXSSFSheet;
+            // 
             file.Close();
 
             int beginRow = currrowidx;
@@ -571,6 +571,7 @@ namespace HiSql.Extension
                     {
                         ICell _dcell = excelRow.CreateCell(j);
                         var _value = dt.Rows[i][j].ToString().Trim();
+
                         if (dt.Columns[j].DataType == typedec || dt.Columns[j].DataType == typeint || dt.Columns[j].DataType == typeint64 || dt.Columns[j].DataType == typefloat)
                         {
                             if (_value.Length <= 10)
@@ -597,7 +598,7 @@ namespace HiSql.Extension
                         }
                         else
                             _dcell.SetCellValue(_value);
-
+                        cellRenderFun(xssfsheet, excelRow, _dcell);
 
 
 
