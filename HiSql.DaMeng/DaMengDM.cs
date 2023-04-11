@@ -1343,6 +1343,19 @@ namespace HiSql
         }
         public int BuildTabCreate(TabInfo tabInfo)
         {
+            if (tabInfo.Columns.Count > 0)
+            {
+                //如果从sqlserver转过来的类型可能会出现varchar(max) 种转到目标库时将要转成为text
+                var cols = tabInfo.Columns.Where(c => c.FieldLen >= int.MaxValue || c.FieldLen==-1).ToList();
+                foreach (var col in cols)
+                {
+                    if (col.FieldType.IsCharField())
+                    {
+                        col.FieldLen = 0;
+                        col.FieldType = HiType.TEXT;
+                    }
+                }
+            }
             string _sql = BuildTabCreateSql(tabInfo.TabModel, tabInfo.GetColumns);
             string v = this.Context.DBO.ExecCommand(_sql).ToString();
             int _effect = Convert.ToInt32(v);

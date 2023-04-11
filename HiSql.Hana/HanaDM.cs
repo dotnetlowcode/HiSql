@@ -419,6 +419,9 @@ namespace HiSql
                                 tabInfo.TabModel.TabDescript = _tabinfo.TabModel.TabDescript;
                                 tabInfo.TabModel.IsEdit = false;
                             }
+
+                            
+
                             string _sql = BuildSqlCodeBlock( this.BuildTabStructSql(tabInfo.TabModel, tabInfo.Columns).ToString());
                             //HiSqlClient _cloneClient = this.Context.CloneClient();
                             int cnt = this.Context.DBO.ExecCommand(_sql);
@@ -1293,6 +1296,21 @@ namespace HiSql
         public int BuildTabCreate(TabInfo tabInfo)
         {
             StringBuilder sb_sql = new StringBuilder();
+
+            if (tabInfo.Columns.Count > 0)
+            { 
+                //如果从sqlserver转过来的类型可能会出现varchar(max) 种转到目标库时将要转成为text
+                var cols=tabInfo.Columns.Where(c=>c.FieldLen>=int.MaxValue || c.FieldLen==-1).ToList();
+                foreach (var col in cols)
+                {
+                    if (col.FieldType.IsCharField())
+                    {
+                        col.FieldLen = 0;
+                        col.FieldType = HiType.TEXT;
+                    }
+                }
+            }
+
             string _sql = BuildTabCreateSql(tabInfo.TabModel, tabInfo.GetColumns);
             sb_sql.AppendLine("do begin");
             sb_sql.AppendLine(_sql);

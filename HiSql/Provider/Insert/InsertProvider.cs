@@ -198,6 +198,16 @@ namespace HiSql
                             tabinfo2.TabModel.TabName = $"##{tabinfo.TabModel.TabName}";
                             //tabinfo2.TabModel.TabName = _insertTabName;
                             tabinfo2.TabModel.TabReName = _insertTabName;
+
+
+                            var colstext = tabinfo2.Columns.Where(c => c.FieldType == HiType.TEXT).FirstOrDefault();
+                            if (colstext != null)
+                            {
+                                throw new Exception($"表[{this.Table.TabName}]不支持[Modi]操作,因为该表的字段[{colstext.FieldName}]类型为[{colstext.FieldType.ToString()}] 当前数据库类型为[{Context.CurrentConnectionConfig.DbType.ToString()}]是不支持临时表字段中包括[{colstext.FieldType.ToString()}]类型字段,请用Insert或Update方式替代");
+                            }
+
+
+
                         }
                         else if (Context.CurrentConnectionConfig.DbType == DBType.Oracle || Context.CurrentConnectionConfig.DbType == DBType.DaMeng)
                         {

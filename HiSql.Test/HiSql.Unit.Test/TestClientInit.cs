@@ -340,6 +340,7 @@ namespace HiSql.Unit.Test
         public static HiSqlClient GetHanaClient()
         {
 
+            
             string dbstr = "DRIVER=HDBODBC;UID=BIUSER;PWD=Hone@2022;SERVERNODE =192.168.10.243:31013;DATABASENAME =QAS";
             HiSqlClient sqlclient = new HiSqlClient(
                      new ConnectionConfig()
@@ -347,7 +348,7 @@ namespace HiSql.Unit.Test
                          DbType = DBType.Hana,
                          DbServer = "local-HoneBI",
                          ConnectionString = dbstr,//; MultipleActiveResultSets = true;
-                         Schema = "BIUSER",
+                         Schema = "HONEBI",
                          IsEncrypt = true,
                          IsAutoClose = false,
                          SqlExecTimeOut = 60000,

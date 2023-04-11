@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
 using System.Data;
+using System.Net.Http.Headers;
+using System.Threading;
 
 namespace HiSql
 {
@@ -41,69 +43,92 @@ namespace HiSql
         public static TabInfo InitTabMaping(string keyname, Func<TabInfo> GetInfo)
         {
             string _keyname = keyname;
+            int _waitseconds = 20;//等待时间单位秒
             //string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", keyname.ToLower());
-            //TabInfo tableInfo = null; 
-            //bool locked = false;
-            //var lckinfo = new LckInfo() { UName = "hisql", EventName = "InitTabMaping" };
-            //try
-            //{
-            //    tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
-
-            //    if (tableInfo == null)
-            //    {
-            //        //var lockResult2 = CacheContext.MCache.LockOn(_keyname, lckinfo, 60, 60);
-            //        var lockResult = CacheContext.MCache.LockOn(_keyname, lckinfo, 60, 60);
-            //        if (lockResult.Item1) //加锁成功
-            //        {
-            //            locked = true;
-            //             tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
-            //            if (tableInfo == null)
-            //            {
-            //                tableInfo = GetInfo();
-            //                CacheContext.MCache.SetCache(_keyname, tableInfo);
-            //            }
-            //            CacheContext.MCache.UnLock(lckinfo, _keyname); 
-            //            locked = false;
-            //        }
-            //        else
-            //        {
-            //            tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
-            //            if (tableInfo == null)
-            //            {
-            //                throw new Exception("InitTabMaping获取表结构信息因为未获取到独占锁，无法创建并获取表信息");
-            //            }
-            //        }
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
-            //}
-            //finally {
-            //    if (locked) { CacheContext.MCache.UnLock(lckinfo, _keyname); }
-
-            //}
-            //if (tableInfo != null)
-            //{
-            //    return tableInfo;
-            //}
-            //else
-            //{
-            //    throw new Exception("InitTabMaping获取表结构信息因为未获取到独占锁，无法创建并获取表信息");
-            //}
-            return CacheContext.MCache.GetOrCreate<TabInfo>(_keyname, () =>
+            TabInfo tableInfo = null;
+            bool locked = false;
+            var lckinfo = new LckInfo() { UName = "hisql", EventName = "InitTabMaping" };
+            try
             {
-                try
-                {
-                    return GetInfo();
-                }
-                catch (Exception)
-                {
+                tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
 
-                    throw;
+                if (tableInfo == null)
+                {
+                    //var lockResult2 = CacheContext.MCache.LockOn(_keyname, lckinfo, 60, 60);
+
+                    
+                    var lockResult2 = CacheContext.MCache.LockOnExecute(keyname, () => {
+                        tableInfo = GetInfo();
+                        CacheContext.MCache.SetCache(_keyname, tableInfo);
+                    }, lckinfo);
+                    if (!lockResult2.Item1 )
+                    {
+                        Thread.Sleep(_waitseconds * 1000);
+                        tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
+                        if (tableInfo == null)
+                        {
+                            throw new Exception($"在等待获取表结构信息时超时[{_waitseconds * 1000}]秒");
+                        }
+                    }
+                    else
+                        throw new Exception("InitTabMaping获取表结构信息因为未获取到独占锁，无法创建并获取表信息");
+                    
+
+                    //var lockResult = CacheContext.MCache.LockOn(_keyname, lckinfo, 60, 60);
+                    //if (lockResult.Item1) //加锁成功
+                    //{
+                    //    locked = true;
+                    //    tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
+                    //    if (tableInfo == null)
+                    //    {
+                    //        tableInfo = GetInfo();
+                    //        CacheContext.MCache.SetCache(_keyname, tableInfo);
+                    //    }
+                    //    CacheContext.MCache.UnLock(lckinfo, _keyname);
+                    //    locked = false;
+                    //}
+                    //else
+                    //{
+                    //    tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
+                    //    if (tableInfo == null)
+                    //    {
+                    //        throw new Exception("InitTabMaping获取表结构信息因为未获取到独占锁，无法创建并获取表信息");
+                    //    }
+                    //}
                 }
-               
-            });
+            }
+            catch (Exception ex)
+            {
+                tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
+            }
+            finally
+            {
+                if (locked) { CacheContext.MCache.UnLock(lckinfo, _keyname); }
+
+            }
+            if (tableInfo != null)
+            {
+                return tableInfo;
+            }
+            else
+            {
+                throw new Exception("InitTabMaping获取表结构信息因为未获取到独占锁，无法创建并获取表信息");
+            }
+
+            //以下这种方式可能导至两个请求同时执行
+            //return CacheContext.MCache.GetOrCreate<TabInfo>(_keyname, () =>
+            //{
+            //    try
+            //    {
+            //        return GetInfo();
+            //    }
+            //    catch (Exception)
+            //    {
+
+            //        throw;
+            //    }
+
+            //});
         }
 
         /// <summary>
