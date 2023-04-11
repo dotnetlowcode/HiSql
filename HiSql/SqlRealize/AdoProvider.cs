@@ -229,11 +229,11 @@ namespace HiSql
             {
                 this.Transaction.Commit();//提交事务
                 this.Transaction = null;
-
-                if (this.Context.CurrentConnectionConfig.IsAutoClose)
-                {
-                    this.Close();
-                }
+                //2023.4.11 事务提交则关闭连接
+                //if (this.Context.CurrentConnectionConfig.IsAutoClose)
+                //{
+                this.Close();
+                //}
             }
         }
         public virtual void RollBackTran()
@@ -242,10 +242,11 @@ namespace HiSql
             {
                 this.Transaction.Rollback();
                 this.Transaction = null;
-                if (this.Context.CurrentConnectionConfig.IsAutoClose)
-                {
+                //2023.4.11 事务回滚则关闭连接
+                //if (this.Context.CurrentConnectionConfig.IsAutoClose)
+                //{
                     this.Close();
-                }
+                //}
             }
         }
 
@@ -260,7 +261,7 @@ namespace HiSql
                 this.Transaction = null;
             }
 
-            if (this.Connection != null && this.Connection.State == ConnectionState.Open)
+            if (this.Connection.State == ConnectionState.Open)
             {
                 this.Connection.Close();
             }

@@ -26,6 +26,8 @@ namespace HiSql
         //分批次执行
         bool _batch_exec = false;
 
+        bool _is_autoclose=false;
+
         /// <summary>
         /// 是否分批次执行SQL
         /// </summary>
@@ -90,6 +92,17 @@ namespace HiSql
                     i = await this.Context.DBO.ExecCommandAsync(_Sql.ToString());
                     //sw.Stop();
                     //Console.WriteLine($"sql单次执行耗时："+sw.Elapsed);
+
+                    if (_queue.HasQueue("modi"))
+                    {
+                        this.Context.CurrentConnectionConfig.IsAutoClose = _is_autoclose;
+                        if (_is_autoclose)
+                        {
+                            //还原最初的是否自动关闭状态
+                            this.Context.DBO.Close();
+                        }
+
+                    }
                     _Sql = new StringBuilder();
                     return i;
                 }
@@ -703,6 +716,8 @@ namespace HiSql
             {
                 if (!_queue.HasQueue("modi"))
                 {
+                    _is_autoclose = this.Context.CurrentConnectionConfig.IsAutoClose;
+                    this.Context.CurrentConnectionConfig.IsAutoClose = false;//使用modi方法不能关闭链接执行结束才能关闭
                     //写入到临时表中
                     Insert(tabname, objdata);
 
@@ -727,10 +742,13 @@ namespace HiSql
         public IInsert Modi(string tabname, List<object> lstdata)
         {
             _mergeinto = true;
+
             if (!_queue.HasQueue("insert"))
             {
                 if (!_queue.HasQueue("modi"))
                 {
+                    _is_autoclose = this.Context.CurrentConnectionConfig.IsAutoClose;
+                    this.Context.CurrentConnectionConfig.IsAutoClose = false;//使用modi方法不能关闭链接执行结束才能关闭
                     //写入到临时表中
                     Insert(tabname, lstdata);
 
@@ -754,6 +772,8 @@ namespace HiSql
             {
                 if (!_queue.HasQueue("modi"))
                 {
+                    _is_autoclose = this.Context.CurrentConnectionConfig.IsAutoClose;
+                    this.Context.CurrentConnectionConfig.IsAutoClose = false;//使用modi方法不能关闭链接执行结束才能关闭
                     //写入到临时表中
                     Insert<T>(tabname, objdata);
 
@@ -776,6 +796,8 @@ namespace HiSql
             {
                 if (!_queue.HasQueue("modi"))
                 {
+                    _is_autoclose = this.Context.CurrentConnectionConfig.IsAutoClose;
+                    this.Context.CurrentConnectionConfig.IsAutoClose = false;//使用modi方法不能关闭链接执行结束才能关闭
                     //写入到临时表中
                     Insert<T>(objdata);
 
@@ -798,6 +820,8 @@ namespace HiSql
             {
                 if (!_queue.HasQueue("modi"))
                 {
+                    _is_autoclose = this.Context.CurrentConnectionConfig.IsAutoClose;
+                    this.Context.CurrentConnectionConfig.IsAutoClose = false;//使用modi方法不能关闭链接执行结束才能关闭
                     //写入到临时表中
                     Insert<T>(lstdata);
 
@@ -820,6 +844,8 @@ namespace HiSql
             {
                 if (!_queue.HasQueue("modi"))
                 {
+                    _is_autoclose = this.Context.CurrentConnectionConfig.IsAutoClose;
+                    this.Context.CurrentConnectionConfig.IsAutoClose = false;//使用modi方法不能关闭链接执行结束才能关闭
                     //写入到临时表中
                     Insert<T>(tabname, lstdata);
 
