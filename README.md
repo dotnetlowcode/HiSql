@@ -40,10 +40,42 @@
 
 传统ORM框架最大的弊端就是完全要依赖于实体用lambda表达式写查询语句，但最大的问题就是如果业务场景需要动态拼接条件时只能又切换到原生数据库的sql语句进行完成，如果自行拼接开发人员还要解决防注入的问题,hisql 刚才完美的解决这些问题,Hisql底层已经对sql注入进行了处理，开发人员只要关注于业务开发
 
-### 2023.04.11
+
+
+
+### 2023.04.11 更新
 1. 修复第一次获取表信息在多线程下会报表错的总是
 2. sqlserver的表结构信息字段为varchar|nvarchar|(max) 转到HANA及其它库抛出异常的问题
 3. 针对于HANA库中表中的字段类型包括[TEXT]类型使用[sqlClient.Modi] 方法抛出错误提示（HANA中的临时表不支持text类型） 
+
+事务优化
+如果业务中需要使用多表且多动作更新请参数以下定法
+为了防止死锁请参照 `业务锁` 的处理方式
+
+```c#
+void transDemo(HiSqlClient sqlClient)
+{
+    int count = 10;
+    string tabname = typeof(H_Test02).Name;
+    List<object> lstdata = buildData10Col(count);
+
+    sqlClient.Delete(tabname).ExecCommand();
+
+    using (var sqlClt = sqlClient.CreateUnitOfWork())
+    { 
+        sqlClt.Insert(tabname, lstdata).ExecCommand();
+
+        sqlClt.Modi(tabname, lstdata).ExecCommand();
+        sqlClt.CommitTran();
+        //sqlClt.RollBackTran();
+    }
+
+
+}
+
+
+```
+
 
 
 ### 2023.03.25 更新
