@@ -1095,7 +1095,8 @@ namespace HiSql
             string _changesql = string.Empty;
             if (tabFieldAction == TabFieldAction.ADD)
             {
-                _changesql = dbConfig.Add_Column.Replace("[$TabName$]", $"{dbConfig.Table_Pre}{hiTable.TabName}{dbConfig.Table_After}").Replace("[$TempColumn$]", _fieldsql);
+                
+                _changesql = dbConfig.Add_Column.Replace("[$TabName$]", $"{dbConfig.Table_Pre}{hiTable.TabName}{dbConfig.Table_After}").Replace("[$TempColumn$]", _fieldsql).Replace("[$Schema$]", string.IsNullOrEmpty(hiTable.Schema) ? this.Context.CurrentConnectionConfig.Schema : hiTable.Schema);
                 return " EXEC  '" + _changesql.Replace("'", "''") + "';";
             }
 
