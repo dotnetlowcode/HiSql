@@ -184,7 +184,7 @@ namespace HiSql.HanaUnitTest
                          DbType = DBType.Hana,
                          DbServer = "local-HoneBI",                         
                          ConnectionString = dbStr,//; MultipleActiveResultSets = true;
-                         Schema = "HONEBI",
+                         Schema = "SAPHANADB",
                          IsEncrypt = true,
                          IsAutoClose = false,
                          SqlExecTimeOut = 60000,
