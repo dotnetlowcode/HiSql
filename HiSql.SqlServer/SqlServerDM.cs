@@ -3412,7 +3412,7 @@ namespace HiSql
             string keys = BuildKey(hiColumns);
             if (!string.IsNullOrEmpty(keys))
             {
-                keys = dbConfig.Table_Key.Replace("[$TabName$]", tabname)
+                keys = dbConfig.Table_Key.Replace("[$PKName$]", DateTime.Now.ToString("yyMMddHH")) //生成索ID号全局唯一
                     .Replace("[$Keys$]", keys).Replace("[$ConnectID$]", this.Context.ConnectedId.Replace("-", "_"));
             }
 
