@@ -90,19 +90,6 @@ namespace HiSql.Unit.Test
             int count = 10;
 
 
-
-
-            //TabInfo tabinfo = sqlClient.DbFirst.GetTabStruct("SPS_PURCHASEDETAIL");
-
-            var sql = sqlClient.HiSql("select * from SPS_PURCHASEDETAIL ").Skip(1).Take(100).ToSql();
-
-
-
-            var _sql = sqlClient.HiSql("select * from H_Test02 where Descript  like '%usr'").ToSql();
-
-
-
-
             string tabname=typeof(H_Test02).Name;
             List<object> lstdata = buildData10Col(count);
 
@@ -124,10 +111,33 @@ namespace HiSql.Unit.Test
 
             }
 
-            
 
-            
+            transDemo(sqlClient);
+
+
         }
+
+        void transDemo(HiSqlClient sqlClient)
+        {
+            int count = 10;
+            string tabname = typeof(H_Test02).Name;
+            List<object> lstdata = buildData10Col(count);
+
+            sqlClient.Delete(tabname).ExecCommand();
+
+            sqlClient.CurrentConnectionConfig.IsAutoClose = false;
+            using (var sqlClt = sqlClient.CreateUnitOfWork())
+            { 
+                sqlClt.Insert(tabname, lstdata).ExecCommand();
+
+                sqlClt.Modi(tabname, lstdata).ExecCommand();
+                sqlClt.CommitTran();
+                //sqlClt.RollBackTran();
+            }
+
+
+        }
+        
 
         List<object> buildData10Col(int count)
         {

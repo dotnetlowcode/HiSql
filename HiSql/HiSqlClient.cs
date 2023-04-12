@@ -43,6 +43,7 @@ namespace HiSql
 
         private IDbFirst dbFirst = new DbFirst();
 
+        private bool _is_autoclose=false;
         //ICache _mcache = new MCache(null);
         /// <summary>
         /// 连接管道
@@ -208,8 +209,10 @@ namespace HiSql
         public HiSqlClient CreateUnitOfWork()
         {
             var client=this.Context.CloneClient();
+            _is_autoclose = client.CurrentConnectionConfig.IsAutoClose;
             //连接不能自动关闭 因为自动关闭时事务会自动提交
             client.CurrentConnectionConfig.IsAutoClose = false;
+            
             client.BeginTran();
             return client;
 

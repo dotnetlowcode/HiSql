@@ -55,19 +55,25 @@ namespace HiSql
                 if (tableInfo == null)
                 {
                     //var lockResult2 = CacheContext.MCache.LockOn(_keyname, lckinfo, 60, 60);
-
-                    
                     var lockResult2 = CacheContext.MCache.LockOnExecute(keyname, () => {
                         tableInfo = GetInfo();
                         CacheContext.MCache.SetCache(_keyname, tableInfo);
                     }, lckinfo);
                     if (!lockResult2.Item1 )
                     {
-                        Thread.Sleep(_waitseconds * 1000);
-                        tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
-                        if (tableInfo == null)
+                        bool _getinfo = false;
+                        int _maxtimes = _waitseconds * 1000;
+                        int _currtimes = 0;
+                        while (_currtimes < _maxtimes && !_getinfo)
                         {
-                            throw new Exception($"在等待获取表结构信息时超时[{_waitseconds * 1000}]秒");
+                            _currtimes = _currtimes + (1 * 1000);
+                            Thread.Sleep(1*1000);//隔1000毫秒取一次缓存
+                            tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
+                            if (tableInfo != null)
+                            {
+                                _getinfo = true;
+                                //获取到退出等待
+                            }
                         }
                     }
                     else
