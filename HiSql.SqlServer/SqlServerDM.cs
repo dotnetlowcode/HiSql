@@ -1603,7 +1603,7 @@ namespace HiSql
                 string keys = BuildKey(lstHiTable);
                 if (!string.IsNullOrEmpty(keys))
                 {
-                    keys = dbConfig.Table_Key.Replace("[$TabName$]", hiTable.TabName)
+                    keys = dbConfig.Table_Key.Replace("[$PKName$]", DateTime.Now.ToString("yyMMddHH"))
                         .Replace("[$Keys$]", keys).Replace("[$ConnectID$]", this.Context.ConnectedId.Replace("-", "_"));
                 }
 
@@ -3412,7 +3412,7 @@ namespace HiSql
             string keys = BuildKey(hiColumns);
             if (!string.IsNullOrEmpty(keys))
             {
-                keys = dbConfig.Table_Key.Replace("[$TabName$]", tabname)
+                keys = dbConfig.Table_Key.Replace("[$PKName$]", DateTime.Now.ToString("yyMMddHH"))
                     .Replace("[$Keys$]", keys).Replace("[$ConnectID$]", this.Context.ConnectedId.Replace("-", "_"));
             }
 

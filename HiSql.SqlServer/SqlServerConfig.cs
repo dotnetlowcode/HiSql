@@ -662,7 +662,7 @@ namespace HiSql
 
             //表创建时的KEY模版
             _temp_tabel_key = new StringBuilder()
-                .AppendLine($"CONSTRAINT {_temp_table_pre}PK_[$TabName$]_[$ConnectID$]{_temp_table_after} PRIMARY KEY CLUSTERED")
+                .AppendLine($"CONSTRAINT {_temp_table_pre}PK_[$PKName$]_[$ConnectID$]{_temp_table_after} PRIMARY KEY CLUSTERED")
                 .AppendLine("(")
                 .AppendLine("[$Keys$]")
                 .AppendLine(")WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]")
