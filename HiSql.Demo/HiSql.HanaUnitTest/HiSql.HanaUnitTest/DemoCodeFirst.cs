@@ -11,11 +11,23 @@ namespace HiSql.HanaUnitTest
     {
         public static void Init(HiSqlClient sqlClient)
         {
-            CodeFirst_Demo(sqlClient);
+            //CodeFirst_Demo(sqlClient);
             //CodeFirst_DbDefault(sqlClient);
+            ModiTableDemo(sqlClient);
             string s = Console.ReadLine();
         }
 
+
+        static void ModiTableDemo(HiSqlClient sqlClient)
+        {
+            TabInfo tabInfo = sqlClient.DbFirst.GetTabStruct("H_Test02");
+
+            var jsons= tabInfo.Columns.ToJson();
+
+            Tuple<bool, string, string> rtn= sqlClient.DbFirst.ModiTable(tabInfo, OpLevel.Check);
+
+
+        }
 
         static void CodeFirst_DbDefault(HiSqlClient sqlClient)
         {

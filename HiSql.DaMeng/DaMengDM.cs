@@ -3343,7 +3343,7 @@ namespace HiSql
             string keys = BuildKey(hiColumns);
             if (!string.IsNullOrEmpty(keys))
             {
-                keys = dbConfig.Table_Key.Replace("[$TabName$]", tabname).Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema)
+                keys = dbConfig.Table_Key.Replace("[$PKName$]", DateTime.Now.ToString("yyMMddHH")).Replace("[$TabName$]", tabname).Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema)
                     .Replace("[$Keys$]", keys).Replace("[$ConnectID$]", this.Context.ConnectedId.Replace("-", "_"));
             }
             return "execute immediate  '" + keys + "';";
