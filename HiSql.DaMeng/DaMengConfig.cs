@@ -693,7 +693,7 @@ namespace HiSql
 
             //表创建时的KEY模版
             _temp_tabel_key = new StringBuilder()
-                .Append($"alter table {_temp_table_pre}[$TabName$]{_temp_table_after}  add constraint {_temp_table_pre}PK_[$PKName$]_[$ConnectID$]{_temp_table_after} primary key ([$Keys$])")
+                .Append($"alter table {_temp_table_pre}[$TabName$]{_temp_table_after}  add constraint {_temp_table_pre}PK_[$TabName$]_[$ConnectID$]{_temp_table_after} primary key ([$Keys$])")
                 .ToString();
             _temp_table_key2 = "[$FieldName$] ";//定义主键的排序方式
 
