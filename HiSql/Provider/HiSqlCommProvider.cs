@@ -310,6 +310,7 @@ namespace HiSql
                     hiColumn.RefField = column.RefField;
                     hiColumn.RefFields = column.RefFields;
                     hiColumn.RefFieldDesc = column.RefFieldDesc;
+                    hiColumn.RefWhere=column.RefWhere;
 
 
                     hiColumn.IsRequire = column.IsRequire;
