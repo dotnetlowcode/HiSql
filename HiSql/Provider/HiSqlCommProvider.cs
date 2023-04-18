@@ -54,11 +54,12 @@ namespace HiSql
 
                 if (tableInfo == null)
                 {
+
                     //var lockResult2 = CacheContext.MCache.LockOn(_keyname, lckinfo, 60, 60);
                     var lockResult2 = CacheContext.MCache.LockOnExecute(keyname, () => {
                         tableInfo = GetInfo();
                         CacheContext.MCache.SetCache(_keyname, tableInfo);
-                    }, lckinfo);
+                    }, lckinfo,30,0);
                     if (!lockResult2.Item1 )
                     {
                         bool _getinfo = false;

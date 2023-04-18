@@ -69,7 +69,7 @@ namespace HiSql.UnitTest
             // Console.WriteLine($"数据库连接id"+sqlcient.Context.ConnectedId);
 
             // Demo_Update.Init(sqlcient);
-            //Demo_Query.Init(sqlcient);
+            Demo_Query.Init(sqlcient);
 
             //Demo_Delete.Init(sqlcient);
             //Demo_Insert.Init(sqlcient);
@@ -83,7 +83,7 @@ namespace HiSql.UnitTest
             //ThreadTest();
             //SnowId();
             // MultiCacheTest3();
-            MultiCacheTest4();
+            //MultiCacheTest4();
             // MultiCacheTest();
             //MultiCacheTest2();
             Console.ReadLine();

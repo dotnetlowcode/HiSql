@@ -64,14 +64,21 @@ namespace HiSql.UnitTest
             //Query_Demo19(sqlClient);
             // Query_Demo20(sqlClient);
             //Query_Demo21();
+            //Query_Demo22(sqlClient);
             //Query_DemoEmit(sqlClient);
 
             //Query_Null(sqlClient);
-            Query_Null2(sqlClient);
+            //Query_Null2(sqlClient);
             //Query_MyFlowDto(sqlClient);
             var s = Console.ReadLine();
         }
 
+
+        static void Query_Demo22(HiSqlClient sqlClient)
+        {
+            var _paramsql = sqlClient.HiSql(@"select * from Hi_FieldModel where tabname in (@TabName)  and fieldname=@fieldname and tabname in (select tabname from hi_tabmodel where tabname in (@TabName) )", new { TabName = new List<string> { "Hi_TestQuery", "Hi_FieldModel" }, FieldName = "DbServer" }).ToSql();
+            Console.WriteLine(_paramsql);
+        }
         static void Query_MyFlowDto(HiSqlClient sqlClient)
         {
             #region  ======================测试 普通反射 和 emit转换结果是否一致====================

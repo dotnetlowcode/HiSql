@@ -165,6 +165,9 @@ namespace HiSql.Unit.Test
             int successCount = 0;
             int successActCount = 0;
 
+
+            var _paramsql= sqlClient.HiSql(@"select * from Hi_FieldModel where tabname in @TabName and fieldname=@fieldname", new { TabName = new List<string> { "Hi_TestQuery", "Hi_FieldModel" },FieldName="DbServer" }).ToSql();
+
             var query = sqlClient.HiSql(@$"select * from Hi_FieldModel  where (tabname =  'Hi_FieldModel' or  tabname = 'Hi_TestQuery') and (tabname =  'Hi_FieldModel' or  tabname = 'Hi_TestQuery') and FieldType in (11,41,21,12) ");
             successCount++;
             _outputHelper.WriteLine(query.ToSql());
