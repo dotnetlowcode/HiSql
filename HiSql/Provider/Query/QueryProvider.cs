@@ -1148,6 +1148,7 @@ namespace HiSql
         public  Task<List<ExpandoObject>> ToEObjectAsync(ref int total)
         {
             string _sql = this.ToSql();
+            Console.WriteLine(_sql);
             total = 0;
            
             lock (this._context)

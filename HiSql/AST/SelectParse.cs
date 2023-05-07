@@ -565,7 +565,7 @@ namespace HiSql.AST
                     var rtn = Tool.RegexGrpOrReplace(Constants.REG_SELECT_ORDER_FIELD, sql);
                     if (rtn.Item1)
                     {
-                        if (rtn.Item2["field"].ToString().Trim().ToLower() == "desc")
+                        if (rtn.Item2["sort"].ToString().Trim().ToLower() == "desc")
                         {
                             sorts.Add(rtn.Item2["field"].ToString(), SortType.DESC);
                         }
