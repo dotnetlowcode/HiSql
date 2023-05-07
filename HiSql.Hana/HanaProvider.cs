@@ -70,7 +70,7 @@ namespace HiSql
                         }
                     }
 
-                    sqlBulkCopy.BatchSize = _batchsize;
+                    sqlBulkCopy.BatchSize = sourceTable.Rows.Count;
                     sqlBulkCopy.WriteToServer(sourceTable);
 
 

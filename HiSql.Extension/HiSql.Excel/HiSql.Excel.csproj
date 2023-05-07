@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <TargetFrameworks>net461;net5.0;netcoreapp3.1;net6.0;net7.0</TargetFrameworks>
+	  <TargetFrameworks>net461;net5.0;netcoreapp3.1;net6.0</TargetFrameworks>
 	  <Version>1.0.0.7</Version>
 	  <Authors>tansar</Authors>
 	  <Company>Hone</Company>
@@ -16,7 +16,9 @@
 		<Reference Include="Microsoft.CSharp" />
 	</ItemGroup>
 	<ItemGroup>
+	  <PackageReference Include="ExcelDataReader" Version="3.6.0" />
 	  <PackageReference Include="NPOI" Version="2.6.0" />
+	  <PackageReference Include="System.Text.Encoding.CodePages" Version="7.0.0" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Compile Update="Properties\Resources.Designer.cs">

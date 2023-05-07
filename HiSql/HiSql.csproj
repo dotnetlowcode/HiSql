@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net461;net5.0;netcoreapp3.1;net6.0;net7.0</TargetFrameworks>
+		<TargetFrameworks>net461;net5.0;netcoreapp3.1;net6.0</TargetFrameworks>
 		<LangVersion>9.0</LangVersion>
 		<Version>1.0.5.8</Version>
 		<Authors>tansar</Authors>

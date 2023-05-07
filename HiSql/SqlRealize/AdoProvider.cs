@@ -439,10 +439,8 @@ namespace HiSql
                 if (IsSqlLog)
                 {
                     //执行前日志
-
                     if (OnLogSqlExecuting != null)
                     {
-
                         Task.Run(() =>
                         {
                             OnLogSqlExecuting(sql, parameters);
