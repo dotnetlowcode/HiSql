@@ -555,6 +555,7 @@ namespace HiSql
                     //表示参数为@name 格式
                     #region 解析@name 参数格式
 
+                    
                     if (!Tool.RegexMatch(Constants.REG_HISQL_PARAM2, sql))
                     {
 
@@ -595,9 +596,14 @@ namespace HiSql
                                     var _dic_p1 = Tool.RegexGrps($@"{Constants.KeyParameterPre}(?<pname>\w+)\b", sql);
                                     var _dic_p2 = Tool.RegexGrps(Constants.REG_HISQL_IN_PARAM2, sql);
                                     string _insql = "";
-                                    if (_dic_p1.Count > 0 && _dic_p1.Count == _dic_p2.Count)
+                                    if (_dic_p2!=null && _dic_p2.Count>0)
                                     {
                                         //foreach(var _o in )
+
+                                        if (_dic_p2.Any(_pdic => _pdic["param"].Equals(_dic["0"])))
+                                        {
+                                            var _suc = "匹配";
+                                        }
 
                                         var _typ_string = typeof(List<string>);
                                         var _typ_int = typeof(List<int>);
@@ -637,7 +643,8 @@ namespace HiSql
                                     }
                                     else
                                     {
-                                        throw new HiSqlException($"参数 {n} 是集合 只能放在in ({n})中");
+                                        if (sql.Contains(_dic["0"]))
+                                            throw new HiSqlException($"参数 {n} 是集合 只能放在in ({_dic["0"]})中");
                                     }
                                 }
                                 else if (type.IsIn<Type>(Constants.ObjType))

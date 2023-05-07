@@ -7,7 +7,6 @@ using System.Reflection;
 using System.Data;
 using System.Net.Http.Headers;
 using System.Threading;
-using System.Diagnostics;
 
 namespace HiSql
 {
@@ -48,7 +47,6 @@ namespace HiSql
             //string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", keyname.ToLower());
             TabInfo tableInfo = null;
             bool locked = false;
-            var id = Guid.NewGuid();
             var lckinfo = new LckInfo() { UName = "hisql", EventName = "InitTabMaping" };
             try
             {
@@ -56,19 +54,13 @@ namespace HiSql
 
                 if (tableInfo == null)
                 {
-                    Stopwatch sw = new Stopwatch();
-                    sw.Start();
 
-                    Console.WriteLine(id + "获取锁Key:" + keyname + DateTime.Now.ToString("HH:mm:ss.fff"));
                     //var lockResult2 = CacheContext.MCache.LockOn(_keyname, lckinfo, 60, 60);
-                    var lockResult2 = CacheContext.MCache.LockOnExecute(keyname, () =>
-                    {
-                        Console.WriteLine(id + "成功获取锁Key: " + keyname + sw.Elapsed);
+                    var lockResult2 = CacheContext.MCache.LockOnExecute(keyname, () => {
                         tableInfo = GetInfo();
                         CacheContext.MCache.SetCache(_keyname, tableInfo);
-                        Console.WriteLine($"{id} success  key {keyname + sw.Elapsed}");
                     }, lckinfo,30,0);
-                    if (!lockResult2.Item1)
+                    if (!lockResult2.Item1 )
                     {
                         bool _getinfo = false;
                         int _maxtimes = _waitseconds * 1000;
@@ -76,21 +68,18 @@ namespace HiSql
                         while (_currtimes < _maxtimes && !_getinfo)
                         {
                             _currtimes = _currtimes + (1 * 1000);
-                            Thread.Sleep(1 * 1000);//隔1000毫秒取一次缓存
+                            Thread.Sleep(1*1000);//隔1000毫秒取一次缓存
                             tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
                             if (tableInfo != null)
                             {
                                 _getinfo = true;
-                                Console.WriteLine($"{id}  {_keyname} waiting {_currtimes / 1000} success...");
                                 //获取到退出等待
                             }
-                            else
-                                Console.WriteLine($"{id}  {_keyname} waiting {_currtimes / 1000} faild...");
                         }
                     }
                     else
-                        throw new Exception($"InitTabMaping获取表结构信息因为未获取到独占锁，无法创建并获取表信息A {id}");
-
+                        throw new Exception("InitTabMaping获取表结构信息因为未获取到独占锁，无法创建并获取表信息");
+                    
 
                     //var lockResult = CacheContext.MCache.LockOn(_keyname, lckinfo, 60, 60);
                     //if (lockResult.Item1) //加锁成功
@@ -107,22 +96,10 @@ namespace HiSql
                     //}
                     //else
                     //{
-                    //    bool _getinfo = false;
-                    //    int _maxtimes = _waitseconds * 1000;
-                    //    int _currtimes = 0;
-                    //    while (_currtimes < _maxtimes && !_getinfo)
+                    //    tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
+                    //    if (tableInfo == null)
                     //    {
-                    //        _currtimes = _currtimes + (1 * 1000);
-                    //        Thread.Sleep(1 * 1000);//隔1000毫秒取一次缓存
-                    //        tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
-                    //        if (tableInfo != null)
-                    //        {
-                    //            _getinfo = true;
-                    //            Console.WriteLine($"{id}  {_keyname} waiting {_currtimes / 1000} success...");
-                    //            //获取到退出等待
-                    //        }
-                    //        else
-                    //            Console.WriteLine($"{id}  {_keyname} waiting {_currtimes / 1000} faild...");
+                    //        throw new Exception("InitTabMaping获取表结构信息因为未获取到独占锁，无法创建并获取表信息");
                     //    }
                     //}
                 }
@@ -142,7 +119,7 @@ namespace HiSql
             }
             else
             {
-                throw new Exception($"InitTabMaping获取表结构信息因为未获取到独占锁，无法创建并获取表信息B {id}");
+                throw new Exception("InitTabMaping获取表结构信息因为未获取到独占锁，无法创建并获取表信息");
             }
 
             //以下这种方式可能导至两个请求同时执行

@@ -42,6 +42,15 @@
 
 
 
+### 2023.4.18 参数化优化
+可以看以下demo
+
+```c#
+var _paramsql = sqlClient.HiSql(@"select * from Hi_FieldModel where tabname in (@TabName)  and fieldname=@fieldname and tabname in (select tabname from hi_tabmodel where tabname in (@TabName) )", new { TabName = new List<string> { "Hi_TestQuery", "Hi_FieldModel" }, FieldName = "DbServer" }).ToSql();
+            Console.WriteLine(_paramsql);
+```
+
+
 
 ### 2023.04.11 更新
 1. 修复第一次获取表信息在多线程下会报表错的总是
