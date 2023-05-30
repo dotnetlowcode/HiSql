@@ -76,11 +76,11 @@ namespace HiSql
                 {
                     //throw new Exception($"已经指定了按指定数据集合删除就不能再指定Where条件删除");
                     _hisqlwhere = true;
-                    sql_where =Context.DMTab.BuilderWhereSql(new List<TableDefinition> { this.Table }, dictabinfo, null, this.Filters.WhereParse.Result, false);
+                    sql_where =Context.DMTab.BuilderWhereSql(new List<TableDefinition> { this.Table }, dictabinfo, null, this.Filters.WhereParse.Result, false,false);
                 }
                 else if (this.Wheres.Count > 0)
                 {
-                    sql_where= Context.DMTab.BuilderWhereSql(new List<TableDefinition> { this.Table }, dictabinfo, null, this.Wheres, false);
+                    sql_where= Context.DMTab.BuilderWhereSql(new List<TableDefinition> { this.Table }, dictabinfo, null, this.Wheres, false,false);
                 }
 
                 Tuple<List<Dictionary<string, string>>, List<Dictionary<string, string>>> rtn_check = this.CheckAllData(this.Table, tabinfo, _field, this.Data, this.Wheres.Count >0|| _hisqlwhere, _isonly);
