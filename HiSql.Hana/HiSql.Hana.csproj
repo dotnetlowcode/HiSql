@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <TargetFrameworks>net461;net5.0;netcoreapp3.1;net6.0</TargetFrameworks>
+	  <TargetFrameworks>net5.0;netcoreapp3.1;net6.0</TargetFrameworks>
     <Authors>tansar</Authors>
     <Version>1.0.5.8</Version>
     <Company>dotnetlowcode</Company>
@@ -45,11 +45,6 @@
 			<HintPath>..\HanaDLL\Sap.Data.Hana.Core.v2.1.dll</HintPath>
 		</Reference>
 	</ItemGroup>
-	<ItemGroup Condition="'$(TargetFramework)' == 'net461'">
-		<Reference Include="Sap.Data.Hana.Core.v2.1">
-			<HintPath>..\HanaDLL\Sap.Data.Hana.v4.5.dll</HintPath>
-		</Reference>
-	</ItemGroup>
 
 	<!--<ItemGroup Condition="'$(TargetFramework)' == 'net461'">
 		<HintPath>..\HanaDLL\Sap.Data.Hana.Core.v2.1.dll</HintPath>
@@ -79,5 +74,4 @@
       <PackagePath></PackagePath>
     </None>
   </ItemGroup>
-
 </Project>
