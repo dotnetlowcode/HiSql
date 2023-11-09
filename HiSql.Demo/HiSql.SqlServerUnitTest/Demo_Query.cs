@@ -70,9 +70,16 @@ namespace HiSql.UnitTest
             //Query_Null(sqlClient);
             //Query_Null2(sqlClient);
             //Query_MyFlowDto(sqlClient);
+            //Query_Demo23(sqlClient);
             var s = Console.ReadLine();
         }
 
+
+        static void Query_Demo23(HiSqlClient sqlClient)
+        {
+
+           string _sql= sqlClient.HiSql("select * from Hi_FieldModel order by TabName asc fieldname asc").Take(10).Skip(2).ToSql();
+        }
 
         static void Query_Demo22(HiSqlClient sqlClient)
         {
@@ -757,6 +764,10 @@ Order By a.fieldNamE
             //    .Where("a.tabname = 'Hi_FieldModel' and ((a.FieldType = 11)) and a.tabname in ('h_test','hi_fieldmodel')  and a.tabname in (select a.tabname from hi_fieldmodel as a inner join Hi_TabModel as  b on a.tabname =b.tabname " +
             //    " inner join Hi_TabModel as c on a.tabname=c.tabname where a.tabname='h_test' ) and a.FieldType in (11,41,21)  ")
             //    .Group(new GroupBy { { "A.FieldNamE" } }).ToSql();
+
+            var _sqlin = sqlClient.HiSql("select a.tabname from Hi_TabModel as a where a.tabname in (select b.tabname from Hi_FieldModel as b where b.tabname = `a.tabname`)").ToSql();
+            
+
 
             var cols2 = sqlClient.Query("Hi_FieldModel", "A").Field("A.FieldName as Fname")
                 .Join("Hi_TabModel").As("B").On(new Filter { { "A.TabName", OperType.EQ, "Hi_FieldModel" } })

@@ -2769,11 +2769,21 @@ namespace HiSql
 
                     if (!string.IsNullOrEmpty(dic["flag"].ToString()))
                         nvalue = dic["flag"].ToString();
-                    if (!string.IsNullOrEmpty(dic["tab"].ToString()))
-                        nvalue = nvalue + $"{dbConfig.Table_Pre}{Tool.GetDbTabName(_hiColumn, _field)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(_hiColumn, _field)}{dbConfig.Field_After}";
+                    //add by tgm date:2023.3.6.12 当为模版语法时可忽略检测表及字段
+                    if (_hiColumn != null)
+                    {
+                        if (!string.IsNullOrEmpty(dic["tab"].ToString()))
+                            nvalue = nvalue + $"{dbConfig.Table_Pre}{Tool.GetDbTabName(_hiColumn, _field)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(_hiColumn, _field)}{dbConfig.Field_After}";
+                        else
+                            nvalue = nvalue + $"{dbConfig.Field_Pre}{Tool.GetDbFieldName(_hiColumn, _field)}{dbConfig.Field_After}";
+                    }
                     else
-                        nvalue = nvalue + $"{dbConfig.Field_Pre}{Tool.GetDbFieldName(_hiColumn, _field)}{dbConfig.Field_After}";
-
+                    {
+                        if (!string.IsNullOrEmpty(dic["tab"].ToString()))
+                            nvalue = nvalue + $"{dbConfig.Table_Pre}{_field.AsTabName}{dbConfig.Table_After}.{dbConfig.Field_Pre}{_field.AsFieldName}{dbConfig.Field_After}";
+                        else
+                            nvalue = nvalue + $"{dbConfig.Field_Pre}{_field.AsFieldName}{dbConfig.Field_After}";
+                    }
 
                     value = nvalue;
                 }

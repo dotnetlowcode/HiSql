@@ -37,7 +37,7 @@ namespace HiSql.Excel.Test
         static void ReadExcelName()
         {
             HiSql.Extension.Excel excel = new HiSql.Extension.Excel(new Extension.ExcelOptions() { TempType = Extension.TempType.HEADER });
-            List<string> names = excel.GetExcelSheetNames(@"D:\data\GD_UniqueCodeInfo1.xlsx");
+            List<string> names = excel.GetExcelSheetNames(@"D:\data\GD_UniqueCodeInfo1.xlsx").Result;
             foreach (string name in names)
             {
                 Console.WriteLine($"excel sheetName:{name}");
@@ -48,20 +48,20 @@ namespace HiSql.Excel.Test
         {
             HiSql.Extension.Excel excel = new HiSql.Extension.Excel(new Extension.ExcelOptions() { TempType = Extension.TempType.HEADER });
 
-            DataTable dt = excel.ExcelToDataTable(@"D:\data\GD_UniqueCodeInfo1.xlsx", true);
+            DataTable dt = excel.ExcelToDataTable(@"D:\data\GD_UniqueCodeInfo1.xlsx", true).Result;
         }
         static void ReadExcel_2()
         {
             HiSql.Extension.Excel excel = new HiSql.Extension.Excel(new Extension.ExcelOptions() { TempType = Extension.TempType.STANDARD, DataBeginRow = 2, HeaderRow = 1 });
 
-            DataTable dt = excel.ExcelToDataTable(@"D:\data\GD_UniqueCodeInfo2.xlsx", true);
+            DataTable dt = excel.ExcelToDataTable(@"D:\data\GD_UniqueCodeInfo2.xlsx", true).Result;
         }
 
         static void ReadExcel_3()
         {
             HiSql.Extension.Excel excel = new HiSql.Extension.Excel(new Extension.ExcelOptions() { TempType = Extension.TempType.STANDARD, DataBeginRow = 2, HeaderRow = 1 });
 
-            DataTable dt = excel.ExcelToDataTable(@"D:\data\GD_UniqueCodeInfo3.xlsx", true);
+            DataTable dt = excel.ExcelToDataTable(@"D:\data\GD_UniqueCodeInfo3.xlsx", true).Result;
         }
 
         static void BuildExceBigData()
@@ -197,7 +197,7 @@ namespace HiSql.Excel.Test
             HiSqlClient sqlClient = Demo_Init.GetSqlClient();
             HiSql.Extension.Excel excel = new HiSql.Extension.Excel(new Extension.ExcelOptions() { TempType = Extension.TempType.STANDARD, EndRow = -1 });
             //DataTable dt = excel.ExcelToDataTable(@"C:\Users\admin\Downloads\2088531658652104-20220505-086373743-账务组合查询.xls\20220505.xlsx", true);
-            DataTable dt = excel.ExcelToDataTable(@"C:\Users\admin\Downloads\2088531658652104-20220509-086513029-账务组合查询.xls\20220511.xlsx", true);
+            DataTable dt = excel.ExcelToDataTable(@"C:\Users\admin\Downloads\2088531658652104-20220509-086513029-账务组合查询.xls\20220511.xlsx", true).Result;
 
             List<dynamic> list = new List<dynamic>();
 

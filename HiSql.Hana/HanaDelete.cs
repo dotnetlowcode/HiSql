@@ -83,7 +83,7 @@ namespace HiSql
                 }
                 else if (this.Wheres.Count > 0)
                 {
-                    sql_where = Context.DMTab.BuilderWhereSql(new List<TableDefinition> { this.Table }, dictabinfo, null, this.Wheres, false);
+                    sql_where = Context.DMTab.BuilderWhereSql(new List<TableDefinition> { this.Table }, dictabinfo, null, this.Wheres, false,false);
                 }
                 else
                 {

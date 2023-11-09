@@ -41,6 +41,16 @@
 传统ORM框架最大的弊端就是完全要依赖于实体用lambda表达式写查询语句，但最大的问题就是如果业务场景需要动态拼接条件时只能又切换到原生数据库的sql语句进行完成，如果自行拼接开发人员还要解决防注入的问题,hisql 刚才完美的解决这些问题,Hisql底层已经对sql注入进行了处理，开发人员只要关注于业务开发
 
 
+### 2023.6.12 hisql语法优化
+
+以下语句的的子语句的条件可以引用上层语句的字段
+```c#
+var _sql = sqlClient.HiSql("select a.tabname from Hi_TabModel as a where a.tabname in (select b.tabname from Hi_FieldModel as b where b.tabname = `a.tabname`)").ToSql();
+```
+
+### 2023.5.30 修复update 的bug
+1. 1.0.5.9 发布
+2. 修复在特定场景定update语句生成的Bug
 
 ### 2023.4.18 参数化优化
 可以看以下demo

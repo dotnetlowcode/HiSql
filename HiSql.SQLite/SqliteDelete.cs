@@ -70,7 +70,7 @@ namespace HiSql
                     //sql_where=Context.DMTab.BuilderWhereSql(new List<TableDefinition> { this.Table }, dictabinfo, null, this.Filters.WhereParse.Result, false);
                 }else  if (this.Wheres.Count > 0)
                 {
-                    sql_where = Context.DMTab.BuilderWhereSql(new List<TableDefinition> { this.Table }, dictabinfo, null, this.Wheres, false);
+                    sql_where = Context.DMTab.BuilderWhereSql(new List<TableDefinition> { this.Table }, dictabinfo, null, this.Wheres, false, false);
                 }
                 else
                 {
@@ -88,11 +88,11 @@ namespace HiSql
             {
                 if (this.Filters != null && this.Filters.IsHiSqlWhere && !string.IsNullOrEmpty(this.Filters.HiSqlWhere.Trim()))
                 {
-                    sql_where = Context.DMTab.BuilderWhereSql(new List<TableDefinition> { this.Table }, dictabinfo, null, this.Filters.WhereParse.Result, false);
+                    sql_where = Context.DMTab.BuilderWhereSql(new List<TableDefinition> { this.Table }, dictabinfo, null, this.Filters.WhereParse.Result, false,false);
                 }
                 else if(this.Wheres.Count > 0)
                 {
-                    sql_where = Context.DMTab.BuilderWhereSql(new List<TableDefinition> { this.Table }, dictabinfo, null, this.Wheres, false);
+                    sql_where = Context.DMTab.BuilderWhereSql(new List<TableDefinition> { this.Table }, dictabinfo, null, this.Wheres, false,false);
                 }
                 sb.AppendLine(Context.DMTab.BuildDeleteSql(this.Table, new Dictionary<string, string>(), sql_where.ToString(), this.IsTruncate,this.IsDrop));
             }
