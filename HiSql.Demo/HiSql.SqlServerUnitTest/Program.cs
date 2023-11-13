@@ -65,10 +65,10 @@ namespace HiSql.UnitTest
 
             //StockThread();
             HiSqlClient sqlcient = Demo_Init.GetSqlClient();
-
+            //TestLike();
             // Console.WriteLine($"数据库连接id"+sqlcient.Context.ConnectedId);
 
-            Demo_Update.Init(sqlcient);
+            //Demo_Update.Init(sqlcient);
             //Demo_Query.Init(sqlcient);
 
             //Demo_Delete.Init(sqlcient);
@@ -91,6 +91,24 @@ namespace HiSql.UnitTest
         static Object _lockerNextId = new Object();
 
 
+
+        static void TestLike()
+        {
+            var likestr = "20";
+            HiSqlClient sqlcient = Demo_Init.GetSqlClient();
+
+            var sql= sqlcient.HiSql("select * from Hi_FieldModel where SNO_NUM like '%"+"tes"+"'")
+            
+                .ToSql();
+
+            
+            //var lstdic= Tool.RegexGrps(@"[\%]+", likestr);
+            //if (lstdic.Count > 0)
+            //{ 
+                
+            //}
+
+        }
 
         static void RedisTest()
         {

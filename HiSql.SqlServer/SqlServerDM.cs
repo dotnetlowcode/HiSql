@@ -3026,12 +3026,14 @@ namespace HiSql
         string getSingleValue(bool issubquery, HiColumn hiColumn, object value)
         {
             string _value = string.Empty;
+            int _likesymbol = 0;
             if (!issubquery)
             {
                 if (hiColumn.FieldType.IsIn<HiType>(HiType.NCHAR, HiType.NVARCHAR, HiType.GUID))
                 {
                     _value = value.ToString();
-                    if (_value.Length <= hiColumn.FieldLen || hiColumn.FieldLen < 0)
+                    _likesymbol = Tool.RegexGrps(Constants.REG_ISLIKEQUERY, _value).Count;
+                    if (_value.Length <= hiColumn.FieldLen+_likesymbol || hiColumn.FieldLen < 0)
                     {
                         if (hiColumn.IsPrimary && string.IsNullOrEmpty(_value))
                         {
@@ -3046,7 +3048,8 @@ namespace HiSql
                 else if (hiColumn.FieldType.IsIn<HiType>(HiType.VARCHAR, HiType.CHAR))
                 {
                     _value = value.ToString();
-                    if (_value.LengthZH() <= hiColumn.FieldLen || hiColumn.FieldLen < 0)
+                    _likesymbol = Tool.RegexGrps(Constants.REG_ISLIKEQUERY, _value).Count;
+                    if (_value.LengthZH() <= hiColumn.FieldLen + _likesymbol || hiColumn.FieldLen < 0)
                     {
                         if (hiColumn.IsPrimary && string.IsNullOrEmpty(_value))
                         {
@@ -3180,20 +3183,20 @@ namespace HiSql
             string _value = string.Empty;
             //是否是模板字段
             bool _istempfield = false;
-
+            int _likesymbol = 0;
             if (!issubquery)
             {
                 _value = value.ToString();
                 List<Dictionary<string, string>> _lstdic = Tool.RegexGrps(Constants.REG_TEMPLATE_FIELDS, _value);
                 if (_lstdic.Count > 0) _istempfield = true;
-
+                _likesymbol = Tool.RegexGrps(Constants.REG_ISLIKEQUERY, _value).Count;
                 if (hiColumn.FieldType.IsIn<HiType>(HiType.NCHAR, HiType.NVARCHAR, HiType.GUID))
                 {
                     _value = value.ToString();
                     if (!_istempfield)
                     {
                         //非模板字段
-                        if (_value.Length <= hiColumn.FieldLen || hiColumn.FieldLen < 0)
+                        if (_value.Length <= hiColumn.FieldLen+ _likesymbol || hiColumn.FieldLen < 0)
                         {
                             if (hiColumn.IsPrimary && string.IsNullOrEmpty(_value))
                             {
@@ -3216,7 +3219,7 @@ namespace HiSql
                     _value = value.ToString();
                     if (!_istempfield)
                     {
-                        if (_value.LengthZH() <= hiColumn.FieldLen || hiColumn.FieldLen < 0)
+                        if (_value.LengthZH() <= hiColumn.FieldLen + _likesymbol || hiColumn.FieldLen < 0)
                         {
                             if (hiColumn.IsPrimary && string.IsNullOrEmpty(_value))
                             {
@@ -3295,7 +3298,7 @@ namespace HiSql
         string getLikeValue(bool issubquery, HiColumn hiColumn, FilterDefinition filterDefinition, object value)
         {
             string _value = string.Empty;
-            int _likesymbol = "%%".Length;
+            int _likesymbol = 0;
             //没有子查询
             if (!issubquery)
             {
@@ -3304,6 +3307,7 @@ namespace HiSql
                     _value = value.ToString();
                     if (!Tool.RegexMatch(Constants.REG_ISLIKEQUERY, _value))
                         throw new Exception($"当前使用了模糊查询但值[{_value}]未指定[%]符号 ");
+                    _likesymbol = Tool.RegexGrps(Constants.REG_ISLIKEQUERY, _value).Count;
                     if (_value.Length <= hiColumn.FieldLen + _likesymbol || hiColumn.FieldLen < 0)
                         _value = $"'{_value.ToSqlInject()}'";
                     else
@@ -3314,6 +3318,7 @@ namespace HiSql
                     _value = value.ToString();
                     if (!Tool.RegexMatch(Constants.REG_ISLIKEQUERY, _value))
                         throw new Exception($"当前使用了模糊查询但值[{_value}]未指定[%]符号 ");
+                    _likesymbol = Tool.RegexGrps(Constants.REG_ISLIKEQUERY, _value).Count;
                     if (_value.LengthZH() <= hiColumn.FieldLen + _likesymbol || hiColumn.FieldLen < 0)
                         _value = $"'{_value.ToSqlInject()}'";
                     else
