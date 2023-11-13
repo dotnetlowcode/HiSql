@@ -648,8 +648,8 @@ namespace HiSql.Extension
 
 
 
-            int pageSize = 1000;
-            int pageCount = dtable.Rows.Count > pageSize ? dtable.Rows.Count % pageSize == 0 ? dtable.Rows.Count / pageSize : dtable.Rows.Count / pageSize + 1 : 1;
+            //int pageSize = 1000;
+            //int pageCount = dtable.Rows.Count > pageSize ? dtable.Rows.Count % pageSize == 0 ? dtable.Rows.Count / pageSize : dtable.Rows.Count / pageSize + 1 : 1;
 
 
             ////写数据
@@ -850,15 +850,17 @@ namespace HiSql.Extension
                             if (_value.Length <= 10)
                             {
                                 _dcell.SetCellType(NPOI.SS.UserModel.CellType.Numeric);
-                                if (_value.IndexOf(".") > 0)
+                                if (_value == "")
+                                {
+                                    _dcell.SetCellValue(_value);
+                                }
+                                else  if (_value.IndexOf(".") > 0)
                                     _dcell.SetCellValue(Convert.ToDouble(_value));
                                 else
                                     _dcell.SetCellValue(Convert.ToInt64(_value));
                             }
                             else
                                 _dcell.SetCellValue(_value);
-
-
                         }
                         else if (dt.Columns[j].DataType == typedatetime)
                         {
