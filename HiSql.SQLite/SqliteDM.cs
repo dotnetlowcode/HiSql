@@ -3460,6 +3460,7 @@ namespace HiSql
         string getLikeValue(bool issubquery, HiColumn hiColumn, FilterDefinition filterDefinition, object value)
         {
             string _value = string.Empty;
+            int _likesymbol = "%%".Length;
             //没有子查询
             if (!issubquery)
             {
@@ -3468,7 +3469,7 @@ namespace HiSql
                     _value = value.ToString();
                     if (!Tool.RegexMatch(Constants.REG_ISLIKEQUERY, _value))
                         throw new Exception($"当前使用了模糊查询但值[{_value}]未指定[%]符号 ");
-                    if (_value.Length <= hiColumn.FieldLen || hiColumn.FieldLen < 0)
+                    if (_value.Length <= hiColumn.FieldLen+ _likesymbol || hiColumn.FieldLen < 0)
                         _value = $"'{_value.ToSqlInject()}'";
                     else
                         throw new Exception($"过滤条件字段[{filterDefinition.Field.AsFieldName}]指定的值超过了限定长度[{hiColumn.FieldLen}]");
@@ -3478,7 +3479,7 @@ namespace HiSql
                     _value = value.ToString();
                     if (!Tool.RegexMatch(Constants.REG_ISLIKEQUERY, _value))
                         throw new Exception($"当前使用了模糊查询但值[{_value}]未指定[%]符号 ");
-                    if (_value.LengthZH() <= hiColumn.FieldLen || hiColumn.FieldLen < 0)
+                    if (_value.LengthZH() <= hiColumn.FieldLen+ _likesymbol || hiColumn.FieldLen < 0)
                         _value = $"'{_value.ToSqlInject()}'";
                     else
                         throw new Exception($"过滤条件字段[{filterDefinition.Field.AsFieldName}]指定的值超过了限定长度[{hiColumn.FieldLen}]");

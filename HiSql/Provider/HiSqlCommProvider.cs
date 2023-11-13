@@ -60,7 +60,7 @@ namespace HiSql
                         tableInfo = GetInfo();
                         CacheContext.MCache.SetCache(_keyname, tableInfo);
                     }, lckinfo,30,0);
-                    if (!lockResult2.Item1 )
+                    if (!lockResult2.Item1)
                     {
                         bool _getinfo = false;
                         int _maxtimes = _waitseconds * 1000;
@@ -77,8 +77,9 @@ namespace HiSql
                             }
                         }
                     }
-                    else
-                        throw new Exception("InitTabMaping获取表结构信息因为未获取到独占锁，无法创建并获取表信息");
+                    //2023.8.16 注释以下代码
+                    //else
+                    //    throw new Exception("InitTabMaping获取表结构信息因为未获取到独占锁，无法创建并获取表信息");
                     
 
                     //var lockResult = CacheContext.MCache.LockOn(_keyname, lckinfo, 60, 60);
@@ -119,7 +120,7 @@ namespace HiSql
             }
             else
             {
-                throw new Exception("InitTabMaping获取表结构信息因为未获取到独占锁，无法创建并获取表信息");
+                throw new Exception($"InitTabMaping获取表结构信息因为未获取到独占锁，无法创建并获取表信息或表不存在");
             }
 
             //以下这种方式可能导至两个请求同时执行
