@@ -323,7 +323,7 @@ namespace HiSql
                     hiColumn.SNO = column.SNO;
                     hiColumn.SNO_NUM = column.SNO_NUM;
 
-
+                    hiColumn.FieldDesc = column.FieldDesc;
                     hiColumn.SortNum = column.SortNum;
 
                     //如果有扩展信息需要在此处赋值
