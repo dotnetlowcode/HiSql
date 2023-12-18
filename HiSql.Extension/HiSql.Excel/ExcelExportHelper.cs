@@ -1,4 +1,5 @@
-﻿using NPOI.SS.UserModel;
+﻿using NPOI.HSSF.UserModel;
+using NPOI.SS.UserModel;
 using NPOI.XSSF.Streaming;
 using NPOI.XSSF.UserModel;
 using System;
@@ -36,13 +37,19 @@ namespace HiSql.GUI.Helper
         /// </summary>
         List<HeaderInfo> headers = new List<HeaderInfo>();
 
-      
 
-        public ExcelExportHelper(string fileSavePath,string tableName, List<HeaderInfo>  headers)
+        /// <summary>
+        /// Excel单个sheet最大行数
+        /// </summary>
+        int maxSheetRow = 100000;
+
+
+
+        public ExcelExportHelper(string fileSavePath, string tableName, List<HeaderInfo> headers)
         {
             this.TableName = tableName;
             this.headers = headers;
-            this.filePath= fileSavePath;
+            this.filePath = fileSavePath;
             byte[] xlsbyte = HiSql.Excel.Properties.Resources.Excel_Template_Standard;
             var dirPath = Path.GetDirectoryName(fileSavePath);
             if (!Directory.Exists(dirPath))
@@ -50,26 +57,27 @@ namespace HiSql.GUI.Helper
                 Directory.CreateDirectory(dirPath);
             }
             //复制模板excel到新路径
-            FileStream  fs = new FileStream(fileSavePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None);
+            FileStream fs = new FileStream(fileSavePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None);
             fs.Write(xlsbyte, 0, xlsbyte.Length);
             fs.Close();
+
+            FileStream file = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            XSSFWorkbook _workbook = new XSSFWorkbook(file);
+            workbook = new SXSSFWorkbook(_workbook, 1000);
+            file.Close();
         }
 
-
+       readonly  SXSSFWorkbook workbook;
 
         private SXSSFSheet currentOperateSheet;
 
         public SXSSFSheet SetCurrentOperateSheet(string sheetName)
         {
-            if( currentOperateSheet?.SheetName == sheetName)
+            if (currentOperateSheet?.SheetName == sheetName)
             {
                 return currentOperateSheet;
             }
-            FileStream file = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            XSSFWorkbook _workbook = new XSSFWorkbook(file);
-            var workbook = new SXSSFWorkbook(_workbook, 1000);
             var sheetIndex = workbook.GetSheetIndex(sheetName);
-            file.Close();
             if (sheetIndex == -1)
             {
                 workbook.CreateSheet(sheetName);
@@ -81,6 +89,10 @@ namespace HiSql.GUI.Helper
                 currentOperateSheet = workbook.GetSheet(sheetName) as SXSSFSheet;
             }
             currentOperateSheet.ForceFormulaRecalculation = true;
+            if (workbook.GetSheetIndex("Sheet1")>-1)
+            {
+                workbook.RemoveSheetAt(workbook.GetSheetIndex("Sheet1"));
+            }
             return currentOperateSheet;
         }
 
@@ -90,7 +102,7 @@ namespace HiSql.GUI.Helper
             SXSSFSheet sheet = currentOperateSheet;
             //初始表头
             var excelRow = sheet.CreateRow(0);
-            var tableNameTitleCell=   excelRow.CreateCell(0);
+            var tableNameTitleCell = excelRow.CreateCell(0);
             tableNameTitleCell.SetCellValue("表名");
             var tableNameValueCell = excelRow.CreateCell(1);
             tableNameValueCell.SetCellValue(this.TableName);
@@ -99,10 +111,10 @@ namespace HiSql.GUI.Helper
             for (int i = 0; i < headers.Count; i++)
             {
                 var headerObj = headers[i];
-               var cnCellObj=  cnTitleRow.CreateCell(i);
-               var enCellObj = enTitleRow.CreateCell(i);
-               cnCellObj.SetCellValue(headerObj.Description);
-               enCellObj.SetCellValue(headerObj.Title);
+                var cnCellObj = cnTitleRow.CreateCell(i);
+                var enCellObj = enTitleRow.CreateCell(i);
+                cnCellObj.SetCellValue(headerObj.Description);
+                enCellObj.SetCellValue(headerObj.Title);
             }
         }
 
@@ -119,10 +131,12 @@ namespace HiSql.GUI.Helper
             {
                 rowHandlerFun();
                 SXSSFSheet sheet = this.currentOperateSheet;
-                var workbook = sheet.Workbook;
-                XSSFDataFormat format = (XSSFDataFormat)workbook.CreateDataFormat();
-                XSSFCellStyle xSSFCellStyle1 = (XSSFCellStyle)workbook.CreateCellStyle();
-                var excelRow = sheet.CreateRow(sheet.LastRowNum+1);
+                //var workbook = sheet.Workbook;
+                //XSSFDataFormat format = (XSSFDataFormat)workbook.CreateDataFormat();
+                //XSSFCellStyle xSSFCellStyle1 = (XSSFCellStyle)workbook.CreateCellStyle();
+                //设置单元格边框样式为细线条
+                //xSSFCellStyle1.BorderBottom = BorderStyle.Thin;
+                var excelRow = sheet.CreateRow(sheet.LastRowNum + 1);
                 for (int j = 0; j < dt.Columns.Count; j++)
                 {
                     ICell _dcell = excelRow.CreateCell(j);
@@ -149,32 +163,38 @@ namespace HiSql.GUI.Helper
                         if (!string.IsNullOrEmpty(_value))
                             _dcell.SetCellValue(Convert.ToDateTime(_value));
 
-                        xSSFCellStyle1.DataFormat = format.GetFormat("yyyy-MM-dd");
-                        _dcell.CellStyle = xSSFCellStyle1;
+                        //xSSFCellStyle1.DataFormat = format.GetFormat("yyyy-MM-dd");
+                        //_dcell.CellStyle = xSSFCellStyle1;
 
                     }
                     else
                         _dcell.SetCellValue(_value);
-                    await cellHandlerFun(sheet,excelRow, _dcell);
+                    await cellHandlerFun(sheet, excelRow, _dcell);
                 }
             }
         }
 
-     
 
-        public  void SaveSheetToFile()
+        /// <summary>
+        /// 保存excel
+        /// 注意：不管这个excel多少数据，这个保存只要最后保存一次就可以了，中间不要做保存操作
+        /// </summary>
+        public void SaveSheetToFile()
         {
-            if(currentOperateSheet == null)
+            if (currentOperateSheet == null)
             {
                 return;
             }
             using (FileStream fs = File.OpenWrite(filePath))
             {
+                 Console.WriteLine("开始保持数据!");
                 var workbook = this.currentOperateSheet.Workbook as SXSSFWorkbook;
+                this.currentOperateSheet.ForceFormulaRecalculation = true;
                 workbook.Write(fs);
                 workbook.Dispose();
                 workbook.Close();
                 fs.Close();
+                Console.WriteLine("保存数据成功!");
                 currentOperateSheet = null;//重置sheet
             }
         }
