@@ -554,14 +554,21 @@ namespace HiSql
                             }
                             else if (dc.DataType == Constants.DateType || dc.DataType == Constants.DateTimeOffsetType)
                             {
-                                if (_value != null && (_typ == Constants.DateType || _typ == Constants.DateType))
+                                if (_value != null && DateTime.TryParse(_value.ToString(), out DateTime tryValue))
+                                {
+                                    drow[dc.ColumnName] = tryValue;
+                                }
+                                else if (_value != null && (_typ == Constants.DateType || _typ == Constants.DateType))
                                     drow[dc.ColumnName] = _value;
                                 else
                                     drow[dc.ColumnName] = DateTime.MinValue;
                             }
                             else if (dc.DataType == Constants.BoolType)
                             {
-                                if (_value != null)
+                                if (_value != null && bool.TryParse(_value.ToString(), out bool tryValue))
+                                {
+                                    drow[dc.ColumnName] = tryValue;
+                                }else  if (_value != null)
                                 {
                                     if (_value.GetType() == Constants.BoolType)
                                         drow[dc.ColumnName] = _value;
