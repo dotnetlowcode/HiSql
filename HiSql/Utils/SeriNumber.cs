@@ -324,7 +324,7 @@ namespace HiSql
                         }
                         else
                         {
-                            if (snro.CurrNum == snro.StartNum)
+                            if (snro.CurrNum == snro.EndNum)
                             {
                                 rtntuple = new Tuple<bool, string, List<string>>(false, "当前编号已经到顶无法再进行编号", dic_list);
                                 return rtntuple;

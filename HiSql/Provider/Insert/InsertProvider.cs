@@ -1720,6 +1720,8 @@ namespace HiSql
                     }
                     if (hiColumn.IsPrimary && string.IsNullOrEmpty(_value) && Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.Oracle, DBType.DaMeng, DBType.Hana))
                         _value = $"' '";
+                    else if ( Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.Sqlite))
+                        _value = $"'{_value.ToSqlInject()}'";
                     else
                         _value = $"N'{_value.ToSqlInject()}'";
                     rtn = new Tuple<bool, string>(true, _value);
@@ -1741,6 +1743,7 @@ namespace HiSql
                     }
                     if (hiColumn.IsPrimary && string.IsNullOrEmpty(_value) && Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.Oracle,DBType.DaMeng, DBType.Hana))
                         _value = $"' '";
+                    
                     else
                         _value = $"'{_value.ToSqlInject()}'";
                     rtn = new Tuple<bool, string>(true, _value);
