@@ -12,6 +12,7 @@ using System.Collections;
 using System.Threading.Tasks;
 using ExcelDataReader;
 using System.Text;
+using System.ComponentModel.DataAnnotations;
 
 namespace HiSql.Extension
 {
@@ -416,7 +417,6 @@ namespace HiSql.Extension
                 {
                     reader.Read();//跳到表头行
                 }
-               
                 int rowCount = 0;
                 while (reader.Read())
                 {
