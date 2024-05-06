@@ -873,7 +873,8 @@ namespace HiSql.Extension
                         }
                         else
                             _dcell.SetCellValue(_value);
-                        cellRenderFun(xssfsheet, excelRow, _dcell);
+                        if (cellRenderFun != null)
+                            cellRenderFun(xssfsheet, excelRow, _dcell);
 
 
 
