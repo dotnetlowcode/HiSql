@@ -45,7 +45,8 @@ namespace HiSql.Extension
             {
                 var imageBytes = await WebHelper.GetImageDataByUrl(url, client);
                 var savePath = tempPath + "/" + Guid.NewGuid().ToString() + ".png";
-                await File.WriteAllBytesAsync(savePath, imageBytes);
+                File.WriteAllBytes(savePath, imageBytes);
+                //await File.WriteAllBytesAsync(savePath, imageBytes);
                 _images.Add(url, savePath);
                 return imageBytes;
             }

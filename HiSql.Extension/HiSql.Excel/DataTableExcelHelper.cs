@@ -26,48 +26,50 @@ namespace HiSql.Excel
         )
         {
             var excelObj = new ExcelExportHelperV2(savePath, tableTitle, headers, sheetName);
-            using var imageGetHelper = new ExcelImageGetHelper();
-            await excelObj.WriteDataTable(
-                table,
-                () => { },
-                async (sheet, row, cell, headerInfo) =>
-                {
-                    var columnIndex = cell.ColumnIndex;
-                    if (headerInfo.ValueType == ExcelValueType.Image)
+            using (var imageGetHelper = new ExcelImageGetHelper())
+            {
+                await excelObj.WriteDataTable(
+                    table,
+                    () => { },
+                    async (sheet, row, cell, headerInfo) =>
                     {
-                        row.Height = 2000;
-                        var imgPath = cell.StringCellValue;
-                        if (imgPath.StartsWith("//"))
+                        var columnIndex = cell.ColumnIndex;
+                        if (headerInfo.ValueType == ExcelValueType.Image)
                         {
-                            imgPath = "https:" + imgPath;
+                            row.Height = 2000;
+                            var imgPath = cell.StringCellValue;
+                            if (imgPath.StartsWith("//"))
+                            {
+                                imgPath = "https:" + imgPath;
+                            }
+                            imgPath = imgPath.Replace("w_80,h_80", "w_500,h_500"); //替换为大图
+                            var imgId = await imageGetHelper.getImageId(sheet.Workbook, imgPath);
+                            if (imgId == -1)
+                            {
+                                //图片不存在
+                                return;
+                            }
+                            var patriarch = sheet.CreateDrawingPatriarch();
+                            int rowIndex = cell.RowIndex;
+                            var h = row.Height;
+                            sheet.SetColumnWidth(columnIndex, Convert.ToInt32(row.Height * 2.4));
+                            var anchor = patriarch.CreateAnchor(
+                                1,
+                                1,
+                                1,
+                                h - 2,
+                                columnIndex,
+                                rowIndex,
+                                columnIndex + 1,
+                                rowIndex + 1
+                            );
+                            patriarch.CreatePicture(anchor, imgId);
                         }
-                        imgPath = imgPath.Replace("w_80,h_80", "w_500,h_500"); //替换为大图
-                        var imgId = await imageGetHelper.getImageId(sheet.Workbook, imgPath);
-                        if (imgId == -1)
-                        {
-                            //图片不存在
-                            return;
-                        }
-                        var patriarch = sheet.CreateDrawingPatriarch();
-                        int rowIndex = cell.RowIndex;
-                        var h = row.Height;
-                        sheet.SetColumnWidth(columnIndex, Convert.ToInt32(row.Height * 2.4));
-                        var anchor = patriarch.CreateAnchor(
-                            1,
-                            1,
-                            1,
-                            h - 2,
-                            columnIndex,
-                            rowIndex,
-                            columnIndex + 1,
-                            rowIndex + 1
-                        );
-                        patriarch.CreatePicture(anchor, imgId);
                     }
-                }
-            );
+                );
 
-            excelObj.SaveSheetToFile();
+                excelObj.SaveSheetToFile();
+            }
         }
     }
 }

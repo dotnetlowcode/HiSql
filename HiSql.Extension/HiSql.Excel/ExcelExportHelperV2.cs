@@ -157,7 +157,7 @@ namespace HiSql.Extension
         /// </summary>
         public void SaveSheetToFile()
         {
-            FileStream? file = null;
+            FileStream file = null;
             try
             {
                 Console.WriteLine("开始保存excel文件");
