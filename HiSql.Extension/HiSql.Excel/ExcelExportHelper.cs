@@ -1,27 +1,30 @@
-﻿using NPOI.HSSF.UserModel;
-using NPOI.SS.UserModel;
-using NPOI.XSSF.Streaming;
-using NPOI.XSSF.UserModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Threading.Tasks;
+using NPOI.HSSF.UserModel;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.Streaming;
+using NPOI.XSSF.UserModel;
 
-namespace HiSql.GUI.Helper
+namespace HiSql.Extension
 {
     public class HeaderInfo
     {
-        public string Title { get; set; }
+        /// <summary>
+        /// 列名
+        /// </summary>
+        public string Title { get; set; } = string.Empty;
 
-        public string Description { get; set; }
+        /// <summary>
+        /// 列描述
+        /// </summary>
+        public string Description { get; set; } = string.Empty;
     }
-
-
 
     public class ExcelExportHelper
     {
-
         /// <summary>
         /// 文件路径
         /// </summary>
@@ -37,13 +40,10 @@ namespace HiSql.GUI.Helper
         /// </summary>
         List<HeaderInfo> headers = new List<HeaderInfo>();
 
-
         /// <summary>
         /// Excel单个sheet最大行数
         /// </summary>
         int maxSheetRow = 100000;
-
-
 
         public ExcelExportHelper(string fileSavePath, string tableName, List<HeaderInfo> headers)
         {
@@ -57,17 +57,27 @@ namespace HiSql.GUI.Helper
                 Directory.CreateDirectory(dirPath);
             }
             //复制模板excel到新路径
-            FileStream fs = new FileStream(fileSavePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None);
+            FileStream fs = new FileStream(
+                fileSavePath,
+                FileMode.OpenOrCreate,
+                FileAccess.Write,
+                FileShare.None
+            );
             fs.Write(xlsbyte, 0, xlsbyte.Length);
             fs.Close();
 
-            FileStream file = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            FileStream file = new FileStream(
+                filePath,
+                FileMode.Open,
+                FileAccess.Read,
+                FileShare.ReadWrite
+            );
             XSSFWorkbook _workbook = new XSSFWorkbook(file);
             workbook = new SXSSFWorkbook(_workbook, 1000);
             file.Close();
         }
 
-       readonly  SXSSFWorkbook workbook;
+        readonly SXSSFWorkbook workbook;
 
         private SXSSFSheet currentOperateSheet;
 
@@ -89,13 +99,12 @@ namespace HiSql.GUI.Helper
                 currentOperateSheet = workbook.GetSheet(sheetName) as SXSSFSheet;
             }
             currentOperateSheet.ForceFormulaRecalculation = true;
-            if (workbook.GetSheetIndex("Sheet1")>-1)
+            if (workbook.GetSheetIndex("Sheet1") > -1)
             {
                 workbook.RemoveSheetAt(workbook.GetSheetIndex("Sheet1"));
             }
             return currentOperateSheet;
         }
-
 
         private void InitHeader()
         {
@@ -118,10 +127,12 @@ namespace HiSql.GUI.Helper
             }
         }
 
-
-        public async Task WriteDataTable(DataTable dt, Action rowHandlerFun, Func<SXSSFSheet, IRow, ICell, Task> cellHandlerFun)
+        public async Task WriteDataTable(
+            DataTable dt,
+            Action rowHandlerFun,
+            Func<SXSSFSheet, IRow, ICell, Task> cellHandlerFun
+        )
         {
-
             Type typeint = typeof(int);
             Type typeint64 = typeof(long);
             Type typefloat = typeof(float);
@@ -141,7 +152,12 @@ namespace HiSql.GUI.Helper
                 {
                     ICell _dcell = excelRow.CreateCell(j);
                     var _value = dt.Rows[i][j].ToString().Trim();
-                    if (dt.Columns[j].DataType == typedec || dt.Columns[j].DataType == typeint || dt.Columns[j].DataType == typeint64 || dt.Columns[j].DataType == typefloat)
+                    if (
+                        dt.Columns[j].DataType == typedec
+                        || dt.Columns[j].DataType == typeint
+                        || dt.Columns[j].DataType == typeint64
+                        || dt.Columns[j].DataType == typefloat
+                    )
                     {
                         if (_value.Length <= 10)
                         {
@@ -165,7 +181,6 @@ namespace HiSql.GUI.Helper
 
                         //xSSFCellStyle1.DataFormat = format.GetFormat("yyyy-MM-dd");
                         //_dcell.CellStyle = xSSFCellStyle1;
-
                     }
                     else
                         _dcell.SetCellValue(_value);
@@ -173,7 +188,6 @@ namespace HiSql.GUI.Helper
                 }
             }
         }
-
 
         /// <summary>
         /// 保存excel
@@ -187,7 +201,7 @@ namespace HiSql.GUI.Helper
             }
             using (FileStream fs = File.OpenWrite(filePath))
             {
-                 Console.WriteLine("开始保持数据!");
+                Console.WriteLine("开始保持数据!");
                 var workbook = this.currentOperateSheet.Workbook as SXSSFWorkbook;
                 this.currentOperateSheet.ForceFormulaRecalculation = true;
                 workbook.Write(fs);
@@ -195,7 +209,7 @@ namespace HiSql.GUI.Helper
                 workbook.Close();
                 fs.Close();
                 Console.WriteLine("保存数据成功!");
-                currentOperateSheet = null;//重置sheet
+                currentOperateSheet = null; //重置sheet
             }
         }
     }
