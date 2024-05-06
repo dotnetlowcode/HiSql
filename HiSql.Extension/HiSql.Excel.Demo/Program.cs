@@ -10,10 +10,10 @@ namespace HiSql.Excel.Test
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             Console.WriteLine("Hello World!");
-
+            await HiSqlExcelV2ImageExport();
             //ReadExcelName();
             //BuildExceBigData();
             //BuildExcel_1();
@@ -310,25 +310,32 @@ namespace HiSql.Excel.Test
         static async Task HiSqlExcelV2ImageExport()
         {
             HiSqlClient sqlClient = Demo_Init.GetSqlClient();
-            DataTable dt = sqlClient.HiSql("select * from GD_UniqueCodeInfo").ToTable();
-            var savePath = "";
+            DataTable dt = sqlClient
+                .HiSql("select PName,PlName,PID,PicPath from ThProductSpu")
+                .Skip(1)
+                .Take(10)
+                .ToTable();
+            //通过dt获取表头初始化List<DataTableHeaderInfo> headers
+            var headers = new List<DataTableHeaderInfo>();
+            for (int i = 0; i < dt.Columns.Count; i++)
+            {
+                var headName = dt.Columns[i].ColumnName;
+                var headObj = new DataTableHeaderInfo
+                {
+                    Title = headName,
+                    Description = headName,
+                    ValueType = ExcelValueType.Text,
+                };
+                if (headObj.Title == "PicPath")
+                {
+                    headObj.ValueType = ExcelValueType.Image;
+                }
+                headers.Add(headObj);
+            }
+            var savePath = AppContext.BaseDirectory + "/Export/test.xlsx";
             await DataTableExcelHelper.DataTableToExcel(
                 "测试表",
-                new List<DataTableHeaderInfo>()
-                {
-                    new DataTableHeaderInfo
-                    {
-                        Title = "AAA",
-                        Description = "AAA测试字段",
-                        ValueType = ExcelValueType.Text
-                    },
-                    new DataTableHeaderInfo
-                    {
-                        Title = "BBB",
-                        Description = "BBB测试字段",
-                        ValueType = ExcelValueType.Image //图片类型
-                    }
-                },
+                headers,
                 dt,
                 savePath,
                 sheetName: "sheet1"
