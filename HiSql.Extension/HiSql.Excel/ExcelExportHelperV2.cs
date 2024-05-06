@@ -31,7 +31,7 @@ namespace HiSql.Extension
         /// <summary>
         /// 文件路径
         /// </summary>
-        private string filePath;
+        private readonly string filePath;
 
         /// <summary>
         /// 表名
@@ -41,7 +41,7 @@ namespace HiSql.Extension
         /// <summary>
         /// 表头
         /// </summary>
-        List<DataTableHeaderInfo> headers = new List<DataTableHeaderInfo>();
+        readonly List<DataTableHeaderInfo> headers;
 
         /// <summary>
         /// Excel单个sheet最大行数
@@ -111,6 +111,11 @@ namespace HiSql.Extension
             //居中样式
             xSSFCellStyle1.Alignment = HorizontalAlignment.Center;
             xSSFCellStyle1.VerticalAlignment = VerticalAlignment.Center;
+            xSSFCellStyle1.BorderBottom = BorderStyle.Thin;
+            xSSFCellStyle1.BorderLeft = BorderStyle.Thin;
+            xSSFCellStyle1.BorderRight = BorderStyle.Thin;
+            xSSFCellStyle1.BorderTop = BorderStyle.Thin;
+
             XSSFDataFormat format = (XSSFDataFormat)workbook.CreateDataFormat();
             for (var i = 0; i < dt.Rows.Count; i++)
             {
