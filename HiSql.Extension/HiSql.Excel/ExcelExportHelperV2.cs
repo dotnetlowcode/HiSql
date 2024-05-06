@@ -108,6 +108,9 @@ namespace HiSql.Extension
             Type typeDec = typeof(decimal);
             Type typeDatetime = typeof(DateTime);
             XSSFCellStyle xSSFCellStyle1 = (XSSFCellStyle)workbook.CreateCellStyle();
+            //居中样式
+            xSSFCellStyle1.Alignment = HorizontalAlignment.Center;
+            xSSFCellStyle1.VerticalAlignment = VerticalAlignment.Center;
             XSSFDataFormat format = (XSSFDataFormat)workbook.CreateDataFormat();
             for (var i = 0; i < dt.Rows.Count; i++)
             {
@@ -146,11 +149,11 @@ namespace HiSql.Extension
                         {
                             _dCell.SetCellValue(Convert.ToDateTime(_value));
                             xSSFCellStyle1.DataFormat = format.GetFormat("yyyy-MM-dd");
-                            _dCell.CellStyle = xSSFCellStyle1;
                         }
                     }
                     else
                         _dCell.SetCellValue(_value);
+                    _dCell.CellStyle = xSSFCellStyle1;
                     var headInfo = headerMap[columnObj.ColumnName];
                     await cellHandlerFun(sheet, excelRow, _dCell, headInfo);
                 }

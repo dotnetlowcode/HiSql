@@ -310,11 +310,7 @@ namespace HiSql.Excel.Test
         static async Task HiSqlExcelV2ImageExport()
         {
             HiSqlClient sqlClient = Demo_Init.GetSqlClient();
-            DataTable dt = sqlClient
-                .HiSql("select PName,PlName,PID,PicPath from ThProductSpu")
-                .Skip(1)
-                .Take(10)
-                .ToTable();
+            DataTable dt = sqlClient.HiSql("select * from ThProductSpu").Skip(1).Take(10).ToTable();
             //通过dt获取表头初始化List<DataTableHeaderInfo> headers
             var headers = new List<DataTableHeaderInfo>();
             for (int i = 0; i < dt.Columns.Count; i++)
