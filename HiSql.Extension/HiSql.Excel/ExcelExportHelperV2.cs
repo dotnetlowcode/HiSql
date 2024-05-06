@@ -107,6 +107,8 @@ namespace HiSql.Extension
             Type typeFloat = typeof(float);
             Type typeDec = typeof(decimal);
             Type typeDatetime = typeof(DateTime);
+            XSSFCellStyle xSSFCellStyle1 = (XSSFCellStyle)workbook.CreateCellStyle();
+            XSSFDataFormat format = (XSSFDataFormat)workbook.CreateDataFormat();
             for (var i = 0; i < dt.Rows.Count; i++)
             {
                 rowHandlerFun();
@@ -116,6 +118,10 @@ namespace HiSql.Extension
                     ICell _dCell = excelRow.CreateCell(j);
                     var _value = dt.Rows[i][j].ToString().Trim();
                     var columnObj = dt.Columns[j];
+                    if (columnObj.ColumnName == "CDate")
+                    {
+                        Console.WriteLine("Test");
+                    }
                     if (
                         columnObj.DataType == typeDec
                         || columnObj.DataType == typeInt
@@ -141,7 +147,11 @@ namespace HiSql.Extension
                     else if (columnObj.DataType == typeDatetime)
                     {
                         if (!string.IsNullOrEmpty(_value))
+                        {
                             _dCell.SetCellValue(Convert.ToDateTime(_value));
+                            xSSFCellStyle1.DataFormat = format.GetFormat("yyyy-MM-dd");
+                            _dCell.CellStyle = xSSFCellStyle1;
+                        }
                     }
                     else
                         _dCell.SetCellValue(_value);
