@@ -67,7 +67,6 @@ namespace HiSql.Excel
                         }
                     }
                 );
-
                 excelObj.SaveSheetToFile();
             }
         }
