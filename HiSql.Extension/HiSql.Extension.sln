@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HiSql.Excel.Test", "HiSql.Excel.Demo\HiSql.Excel.Test.csproj", "{CED46DF4-7A43-4C15-915E-995440FE41DA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HiSql.Excel", "HiSql.Excel\HiSql.Excel.csproj", "{048DF59F-C164-4563-8E05-458CAABC3AB3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CED46DF4-7A43-4C15-915E-995440FE41DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CED46DF4-7A43-4C15-915E-995440FE41DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CED46DF4-7A43-4C15-915E-995440FE41DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CED46DF4-7A43-4C15-915E-995440FE41DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{048DF59F-C164-4563-8E05-458CAABC3AB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{048DF59F-C164-4563-8E05-458CAABC3AB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{048DF59F-C164-4563-8E05-458CAABC3AB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{048DF59F-C164-4563-8E05-458CAABC3AB3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {715A6A50-ECCE-495B-B4AF-D063809CEE91}
+	EndGlobalSection
+EndGlobal
