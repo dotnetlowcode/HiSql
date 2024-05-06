@@ -118,10 +118,6 @@ namespace HiSql.Extension
                     ICell _dCell = excelRow.CreateCell(j);
                     var _value = dt.Rows[i][j].ToString().Trim();
                     var columnObj = dt.Columns[j];
-                    if (columnObj.ColumnName == "CDate")
-                    {
-                        Console.WriteLine("Test");
-                    }
                     if (
                         columnObj.DataType == typeDec
                         || columnObj.DataType == typeInt
