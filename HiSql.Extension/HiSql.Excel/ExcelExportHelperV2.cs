@@ -109,19 +109,19 @@ namespace HiSql.Extension
             Type typeDatetime = typeof(DateTime);
             for (var i = 0; i < dt.Rows.Count; i++)
             {
-                XSSFCellStyle xSSFCellStyle1 = (XSSFCellStyle)workbook.CreateCellStyle();
-                //居中样式
-                xSSFCellStyle1.Alignment = HorizontalAlignment.Center;
-                xSSFCellStyle1.VerticalAlignment = VerticalAlignment.Center;
-                xSSFCellStyle1.BorderBottom = BorderStyle.Thin;
-                xSSFCellStyle1.BorderLeft = BorderStyle.Thin;
-                xSSFCellStyle1.BorderRight = BorderStyle.Thin;
-                xSSFCellStyle1.BorderTop = BorderStyle.Thin;
                 rowHandlerFun();
                 var excelRow = sheet.CreateRow(sheet.LastRowNum + 1);
                 for (int j = 0; j < dt.Columns.Count; j++)
                 {
                     ICell _dCell = excelRow.CreateCell(j);
+                    XSSFCellStyle xSSFCellStyle1 = (XSSFCellStyle)workbook.CreateCellStyle();
+                    //居中样式
+                    xSSFCellStyle1.Alignment = HorizontalAlignment.Center;
+                    xSSFCellStyle1.VerticalAlignment = VerticalAlignment.Center;
+                    xSSFCellStyle1.BorderBottom = BorderStyle.Thin;
+                    xSSFCellStyle1.BorderLeft = BorderStyle.Thin;
+                    xSSFCellStyle1.BorderRight = BorderStyle.Thin;
+                    xSSFCellStyle1.BorderTop = BorderStyle.Thin;
                     _dCell.CellStyle = xSSFCellStyle1;
                     var _value = dt.Rows[i][j].ToString().Trim();
                     var columnObj = dt.Columns[j];
