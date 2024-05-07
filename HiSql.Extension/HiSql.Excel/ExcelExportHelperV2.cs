@@ -154,11 +154,12 @@ namespace HiSql.Extension
                         {
                             _dCell.SetCellValue(Convert.ToDateTime(_value));
                             xSSFCellStyle1.DataFormat = format.GetFormat("yyyy-MM-dd");
+                            _dCell.CellStyle = xSSFCellStyle1;
                         }
                     }
                     else
                         _dCell.SetCellValue(_value);
-                    _dCell.CellStyle = xSSFCellStyle1;
+                   
                     var headInfo = headerMap[columnObj.ColumnName];
                     await cellHandlerFun(sheet, excelRow, _dCell, headInfo);
                 }
