@@ -31,7 +31,7 @@ namespace HiSql.Extension
         /// <summary>
         /// 文件路径
         /// </summary>
-        private string filePath;
+        private readonly string filePath;
 
         /// <summary>
         /// 表名
@@ -41,7 +41,7 @@ namespace HiSql.Extension
         /// <summary>
         /// 表头
         /// </summary>
-        List<DataTableHeaderInfo> headers = new List<DataTableHeaderInfo>();
+        readonly List<DataTableHeaderInfo> headers;
 
         /// <summary>
         /// Excel单个sheet最大行数
@@ -107,11 +107,6 @@ namespace HiSql.Extension
             Type typeFloat = typeof(float);
             Type typeDec = typeof(decimal);
             Type typeDatetime = typeof(DateTime);
-            XSSFCellStyle xSSFCellStyle1 = (XSSFCellStyle)workbook.CreateCellStyle();
-            //居中样式
-            xSSFCellStyle1.Alignment = HorizontalAlignment.Center;
-            xSSFCellStyle1.VerticalAlignment = VerticalAlignment.Center;
-            XSSFDataFormat format = (XSSFDataFormat)workbook.CreateDataFormat();
             for (var i = 0; i < dt.Rows.Count; i++)
             {
                 rowHandlerFun();
@@ -119,6 +114,15 @@ namespace HiSql.Extension
                 for (int j = 0; j < dt.Columns.Count; j++)
                 {
                     ICell _dCell = excelRow.CreateCell(j);
+                    XSSFCellStyle xSSFCellStyle1 = (XSSFCellStyle)workbook.CreateCellStyle();
+                    //居中样式
+                    xSSFCellStyle1.Alignment = HorizontalAlignment.Center;
+                    xSSFCellStyle1.VerticalAlignment = VerticalAlignment.Center;
+                    xSSFCellStyle1.BorderBottom = BorderStyle.Thin;
+                    xSSFCellStyle1.BorderLeft = BorderStyle.Thin;
+                    xSSFCellStyle1.BorderRight = BorderStyle.Thin;
+                    xSSFCellStyle1.BorderTop = BorderStyle.Thin;
+                    _dCell.CellStyle = xSSFCellStyle1;
                     var _value = dt.Rows[i][j].ToString().Trim();
                     var columnObj = dt.Columns[j];
                     if (
@@ -148,13 +152,13 @@ namespace HiSql.Extension
                         if (!string.IsNullOrEmpty(_value))
                         {
                             _dCell.SetCellValue(Convert.ToDateTime(_value));
+                            XSSFDataFormat format = (XSSFDataFormat)workbook.CreateDataFormat();
                             xSSFCellStyle1.DataFormat = format.GetFormat("yyyy-MM-dd");
                             _dCell.CellStyle = xSSFCellStyle1;
                         }
                     }
                     else
                         _dCell.SetCellValue(_value);
-                   
                     var headInfo = headerMap[columnObj.ColumnName];
                     await cellHandlerFun(sheet, excelRow, _dCell, headInfo);
                 }
