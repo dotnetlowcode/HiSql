@@ -16,8 +16,7 @@ namespace HiSql.Excel.Test
                     DbType = DBType.SqlServer,
                     DbServer = "local-HoneBI",
                     ConnectionString =
-                       
-                    "server=(local);uid=sa;pwd=Hone@123;database=HiSql;Encrypt=True; TrustServerCertificate=True;", //; MultipleActiveResultSets = true;
+                        "server=(local);uid=sa;pwd=Hone@123;database=HiSql;Encrypt=True; TrustServerCertificate=True;", //; MultipleActiveResultSets = true;
                     User = "tansar", //可以指定登陆用户的帐号
                     SlaveConnectionConfigs = new List<SlaveConnectionConfig>
                     {

@@ -57,7 +57,6 @@ namespace HiSql.Extension
                 Directory.CreateDirectory(dir);
             if (File.Exists(cachePath))
             {
-                Console.WriteLine("读取图片缓存: " + cachePath);
                 return File.ReadAllBytes(cachePath);
             }
             try
