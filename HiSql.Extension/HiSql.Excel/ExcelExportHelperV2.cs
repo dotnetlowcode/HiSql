@@ -96,6 +96,19 @@ namespace HiSql.Extension
             }
         }
 
+        private XSSFCellStyle CreateStyle()
+        {
+            //文本样式
+            XSSFCellStyle textStyle = (XSSFCellStyle)workbook.CreateCellStyle();
+            textStyle.Alignment = HorizontalAlignment.Center;
+            textStyle.VerticalAlignment = VerticalAlignment.Center;
+            textStyle.BorderBottom = BorderStyle.Thin;
+            textStyle.BorderLeft = BorderStyle.Thin;
+            textStyle.BorderRight = BorderStyle.Thin;
+            textStyle.BorderTop = BorderStyle.Thin;
+            return textStyle;
+        }
+
         public async Task WriteDataTable(
             DataTable dt,
             Action rowHandlerFun,
@@ -107,6 +120,12 @@ namespace HiSql.Extension
             Type typeFloat = typeof(float);
             Type typeDec = typeof(decimal);
             Type typeDatetime = typeof(DateTime);
+            //文本样式
+            XSSFCellStyle textStyle = CreateStyle();
+            //日期样式
+            XSSFCellStyle dateStyle = CreateStyle();
+            XSSFDataFormat format = (XSSFDataFormat)workbook.CreateDataFormat();
+            dateStyle.DataFormat = format.GetFormat("yyyy-MM-dd");
             for (var i = 0; i < dt.Rows.Count; i++)
             {
                 rowHandlerFun();
@@ -114,15 +133,7 @@ namespace HiSql.Extension
                 for (int j = 0; j < dt.Columns.Count; j++)
                 {
                     ICell _dCell = excelRow.CreateCell(j);
-                    XSSFCellStyle xSSFCellStyle1 = (XSSFCellStyle)workbook.CreateCellStyle();
-                    //居中样式
-                    xSSFCellStyle1.Alignment = HorizontalAlignment.Center;
-                    xSSFCellStyle1.VerticalAlignment = VerticalAlignment.Center;
-                    xSSFCellStyle1.BorderBottom = BorderStyle.Thin;
-                    xSSFCellStyle1.BorderLeft = BorderStyle.Thin;
-                    xSSFCellStyle1.BorderRight = BorderStyle.Thin;
-                    xSSFCellStyle1.BorderTop = BorderStyle.Thin;
-                    _dCell.CellStyle = xSSFCellStyle1;
+                    _dCell.CellStyle = textStyle;
                     var _value = dt.Rows[i][j].ToString().Trim();
                     var columnObj = dt.Columns[j];
                     if (
@@ -152,9 +163,7 @@ namespace HiSql.Extension
                         if (!string.IsNullOrEmpty(_value))
                         {
                             _dCell.SetCellValue(Convert.ToDateTime(_value));
-                            XSSFDataFormat format = (XSSFDataFormat)workbook.CreateDataFormat();
-                            xSSFCellStyle1.DataFormat = format.GetFormat("yyyy-MM-dd");
-                            _dCell.CellStyle = xSSFCellStyle1;
+                            _dCell.CellStyle = dateStyle;
                         }
                     }
                     else
