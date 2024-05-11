@@ -25,7 +25,8 @@ namespace HiSql.Excel
             string sheetName = "Export"
         )
         {
-            var excelObj = new ExcelExportHelperV2(savePath, tableTitle, headers, sheetName);
+            var excelObj = new ExcelExportHelperV2(savePath);
+            excelObj.InitHeader(tableTitle, headers, sheetName);
             using (var imageGetHelper = new ExcelImageGetHelper())
             {
                 await excelObj.WriteDataTable(
