@@ -329,13 +329,10 @@ namespace HiSql.Excel.Test
                 headers.Add(headObj);
             }
             var savePath = AppContext.BaseDirectory + "/Export/test.xlsx";
-            await DataTableExcelHelper.DataTableToExcel(
-                "测试表",
-                headers,
-                dt,
-                savePath,
-                sheetName: "sheet1"
-            );
+            var excelObj = new ExcelExportHelperV2(savePath);
+            await excelObj.WriteDataTableToSheet("测试表", headers, dt, "sheet1");
+            await excelObj.WriteDataTableToSheet("测试2", headers, dt, "sheet2");
+            excelObj.SaveSheetToFile();
         }
     }
 }
