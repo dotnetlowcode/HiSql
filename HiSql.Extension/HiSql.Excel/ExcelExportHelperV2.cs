@@ -41,42 +41,97 @@ namespace HiSql.Extension
         /// <summary>
         /// 表头
         /// </summary>
-        readonly List<DataTableHeaderInfo> headers;
+        List<DataTableHeaderInfo> headers;
 
         /// <summary>
         /// Excel单个sheet最大行数
         /// </summary>
         int maxSheetRow = 100000;
 
-        readonly IWorkbook workbook;
+        IWorkbook workbook;
 
         private ISheet sheet;
 
-        public ExcelExportHelperV2(
-            string fileSavePath,
-            string tableName,
-            List<DataTableHeaderInfo> headers,
-            string sheetName = "Export"
-        )
+        public ExcelExportHelperV2(string fileSavePath)
         {
-            TableName = tableName;
-            this.headers = headers;
             filePath = fileSavePath;
             var dirPath = Path.GetDirectoryName(fileSavePath) ?? string.Empty;
             if (!Directory.Exists(dirPath))
             {
                 Directory.CreateDirectory(dirPath);
             }
-            workbook = new SXSSFWorkbook(new XSSFWorkbook());
-            sheet = workbook.CreateSheet(sheetName);
-            InitHeader();
+            this.workbook = new SXSSFWorkbook(new XSSFWorkbook());
         }
 
-        readonly Dictionary<string, DataTableHeaderInfo> headerMap =
+        Dictionary<string, DataTableHeaderInfo> headerMap =
             new Dictionary<string, DataTableHeaderInfo>();
 
-        private void InitHeader()
+        public async Task WriteDataTableToSheet(
+            string tableTitle,
+            List<DataTableHeaderInfo> headers,
+            DataTable table,
+            string sheetName = "Export"
+        )
         {
+            InitHeader(tableTitle, headers, sheetName);
+            using (var imageGetHelper = new ExcelImageGetHelper())
+            {
+                await WriteDataTable(
+                    table,
+                    () => { },
+                    async (sheet, row, cell, headerInfo) =>
+                    {
+                        var columnIndex = cell.ColumnIndex;
+                        if (headerInfo.ValueType == ExcelValueType.Image)
+                        {
+                            row.Height = 2000;
+                            var imgPath = cell.StringCellValue;
+                            if (imgPath.StartsWith("//"))
+                            {
+                                imgPath = "https:" + imgPath;
+                            }
+                            imgPath = imgPath.Replace("w_80,h_80", "w_500,h_500"); //替换为大图
+                            var imgId = await imageGetHelper.getImageId(sheet.Workbook, imgPath);
+                            if (imgId == -1)
+                            {
+                                //图片不存在
+                                return;
+                            }
+                            var patriarch = sheet.CreateDrawingPatriarch();
+                            int rowIndex = cell.RowIndex;
+                            var h = row.Height;
+                            sheet.SetColumnWidth(columnIndex, Convert.ToInt32(row.Height * 2.4));
+                            var anchor = patriarch.CreateAnchor(
+                                1,
+                                1,
+                                1,
+                                h - 2,
+                                columnIndex,
+                                rowIndex,
+                                columnIndex + 1,
+                                rowIndex + 1
+                            );
+                            patriarch.CreatePicture(anchor, imgId);
+                        }
+                    }
+                );
+            }
+        }
+
+        public void InitHeader(
+            string tableName,
+            List<DataTableHeaderInfo> headers,
+            string sheetName
+        )
+        {
+            TableName = tableName;
+            this.headers = headers;
+            sheet = workbook.GetSheet(sheetName);
+            if (sheet != null)
+            {
+                return;
+            }
+            sheet = workbook.CreateSheet(sheetName);
             //初始表头
             var excelRow = sheet.CreateRow(0);
             var tableNameTitleCell = excelRow.CreateCell(0);
@@ -85,6 +140,7 @@ namespace HiSql.Extension
             tableNameValueCell.SetCellValue(this.TableName);
             var cnTitleRow = sheet.CreateRow(1);
             var enTitleRow = sheet.CreateRow(2);
+            headerMap.Clear();
             for (int i = 0; i < headers.Count; i++)
             {
                 var headerObj = headers[i];
