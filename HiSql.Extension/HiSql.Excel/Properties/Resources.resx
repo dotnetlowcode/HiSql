@@ -124,4 +124,7 @@
   <data name="Excel_Template_Standard" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Template\Excel_Template_Standard.xlsx;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="Excel_Template_StandardV2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Excel_Template_StandardV2.xlsm;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
 </root>

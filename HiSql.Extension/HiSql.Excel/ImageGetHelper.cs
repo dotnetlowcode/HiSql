@@ -30,6 +30,8 @@ namespace HiSql.Extension
         private void ClearTempFile()
         {
             //删除BasePath下昨天之前创建的所有目录以及目录下的文件
+            if (!Directory.Exists(BasePath))
+                return;
             var dirs = Directory.GetDirectories(BasePath);
             foreach (var dir in dirs)
             {
