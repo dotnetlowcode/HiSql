@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using NPOI.SS.UserModel;
 
@@ -30,6 +31,8 @@ namespace HiSql.Extension
         private void ClearTempFile()
         {
             //删除BasePath下昨天之前创建的所有目录以及目录下的文件
+            if (!Directory.Exists(BasePath))
+                return;
             var dirs = Directory.GetDirectories(BasePath);
             foreach (var dir in dirs)
             {
@@ -43,13 +46,20 @@ namespace HiSql.Extension
             }
         }
 
+        /// <summary>
+        /// http前缀替换正则
+        /// </summary>
+        private static readonly Regex HttpRegex = new Regex("^http[s]?://", RegexOptions.Compiled);
+
         public async Task<byte[]> GetImageData(string url)
         {
             //生成日期目录名 2022-01-01 生成目录名 22-01-01
             var dateStr = DateTime.Now.ToString("yyyy-MM-dd");
+            //正则替换  "https://" "http://", $"excel_cache_image/{dateStr}/"
             var cachePath =
                 AppContext.BaseDirectory
-                + url.Replace("https://", $"excel_cache_image/{dateStr}/")
+                + HttpRegex
+                    .Replace(url, $"excel_cache_image/{dateStr}/")
                     .Replace("?", "_")
                     .Replace("&", "-");
             var dir = Path.GetDirectoryName(cachePath) ?? string.Empty;

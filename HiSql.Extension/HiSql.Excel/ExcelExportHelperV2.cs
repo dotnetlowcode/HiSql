@@ -52,15 +52,38 @@ namespace HiSql.Extension
 
         private ISheet sheet;
 
-        public ExcelExportHelperV2(string fileSavePath)
+        //定义是否启用宏
+        private bool EnableMacro = false;
+
+
+        /// <summary>
+        /// Excel初始化
+        /// </summary>
+        /// <param name="fileSavePath">保存路径</param>
+        /// <param name="enableMacro">是否启用宏</param>
+        public ExcelExportHelperV2(string fileSavePath, bool enableMacro = false)
         {
-            filePath = fileSavePath;
+            byte[] xlsbyte;
+            if (enableMacro)
+            {
+                this.EnableMacro = true;
+                fileSavePath = fileSavePath.Replace(".xlsx", ".xlsm");
+                xlsbyte= HiSql.Excel.Properties.Resources.Excel_Template_StandardV2;
+            }
+            else
+            {
+                xlsbyte = HiSql.Excel.Properties.Resources.Excel_Template_Standard;
+            }
             var dirPath = Path.GetDirectoryName(fileSavePath) ?? string.Empty;
             if (!Directory.Exists(dirPath))
             {
                 Directory.CreateDirectory(dirPath);
             }
-            this.workbook = new SXSSFWorkbook(new XSSFWorkbook());
+            File.WriteAllBytes(fileSavePath, xlsbyte);
+            filePath = fileSavePath;
+            FileStream file = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            //将文件读到内存，在内存中操作excel
+            this.workbook = new SXSSFWorkbook(new XSSFWorkbook(file));
         }
 
         Dictionary<string, DataTableHeaderInfo> headerMap =
@@ -127,11 +150,10 @@ namespace HiSql.Extension
             TableName = tableName;
             this.headers = headers;
             sheet = workbook.GetSheet(sheetName);
-            if (sheet != null)
+            if (sheet == null)
             {
-                return;
+                sheet = workbook.CreateSheet(sheetName);
             }
-            sheet = workbook.CreateSheet(sheetName);
             //初始表头
             var excelRow = sheet.CreateRow(0);
             var tableNameTitleCell = excelRow.CreateCell(0);
