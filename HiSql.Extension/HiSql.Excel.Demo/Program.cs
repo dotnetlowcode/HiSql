@@ -328,8 +328,7 @@ namespace HiSql.Excel.Test
                 headers.Add(headObj);
             }
             var savePath = AppContext.BaseDirectory + "/Export/test.xlsx";
-
-            var excelObj = new ExcelExportHelperV2(savePath);
+            var excelObj = new ExcelExportHelperV2(savePath, true);
 
             await excelObj.WriteDataTableToSheet("测试表", headers, dt, "sheet1");
 
