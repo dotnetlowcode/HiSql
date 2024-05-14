@@ -55,7 +55,6 @@ namespace HiSql.Extension
         //定义是否启用宏
         private bool EnableMacro = false;
 
-
         /// <summary>
         /// Excel初始化
         /// </summary>
@@ -68,7 +67,7 @@ namespace HiSql.Extension
             {
                 this.EnableMacro = true;
                 fileSavePath = fileSavePath.Replace(".xlsx", ".xlsm");
-                xlsbyte= HiSql.Excel.Properties.Resources.Excel_Template_StandardV2;
+                xlsbyte = HiSql.Excel.Properties.Resources.Excel_Template_StandardV2;
             }
             else
             {
@@ -81,7 +80,12 @@ namespace HiSql.Extension
             }
             File.WriteAllBytes(fileSavePath, xlsbyte);
             filePath = fileSavePath;
-            FileStream file = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            FileStream file = new FileStream(
+                filePath,
+                FileMode.Open,
+                FileAccess.Read,
+                FileShare.ReadWrite
+            );
             //将文件读到内存，在内存中操作excel
             this.workbook = new SXSSFWorkbook(new XSSFWorkbook(file));
         }
@@ -93,15 +97,32 @@ namespace HiSql.Extension
             string tableTitle,
             List<DataTableHeaderInfo> headers,
             DataTable table,
+            //定义导出进度action
+            Action<int> progressAction = null,
             string sheetName = "Export"
         )
         {
             InitHeader(tableTitle, headers, sheetName);
             using (var imageGetHelper = new ExcelImageGetHelper())
             {
+                var max = table.Rows.Count;
+                var index = 0;
+                //进度百分比0-100
+                var progress = 0;
                 await WriteDataTable(
                     table,
-                    () => { },
+                    () =>
+                    {
+                        if (progressAction != null)
+                        {
+                            index++;
+                            var tempValue = index * 100 / max;
+                            if (tempValue > progress)
+                            {
+                                progressAction(tempValue);
+                            }
+                        }
+                    },
                     async (sheet, row, cell, headerInfo) =>
                     {
                         var columnIndex = cell.ColumnIndex;
@@ -184,6 +205,8 @@ namespace HiSql.Extension
             textStyle.BorderLeft = BorderStyle.Thin;
             textStyle.BorderRight = BorderStyle.Thin;
             textStyle.BorderTop = BorderStyle.Thin;
+            //自动换行
+            textStyle.WrapText = true;
             return textStyle;
         }
 
