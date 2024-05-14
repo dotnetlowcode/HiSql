@@ -213,7 +213,7 @@ namespace HiSql.Extension
             textStyle.BorderRight = BorderStyle.Thin;
             textStyle.BorderTop = BorderStyle.Thin;
             //自动换行
-            textStyle.WrapText = true;
+            //textStyle.WrapText = true;
             return textStyle;
         }
 
