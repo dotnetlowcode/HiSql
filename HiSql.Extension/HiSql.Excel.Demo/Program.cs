@@ -339,7 +339,7 @@ namespace HiSql.Excel.Test
                 {
                     Console.WriteLine("进度:" + progress + "%");
                 },
-                "sheet1"
+                "测试A"
             );
 
             await excelObj.WriteDataTableToSheet(
@@ -350,7 +350,7 @@ namespace HiSql.Excel.Test
                 {
                     Console.WriteLine("进度:" + progress + "%");
                 },
-                "sheet2"
+                "测试B"
             );
 
             excelObj.SaveSheetToFile();
