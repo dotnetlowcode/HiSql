@@ -166,6 +166,8 @@ namespace HiSql.Extension
             }
         }
 
+        int sheetIndex = 0;
+
         public void InitHeader(
             string tableName,
             List<DataTableHeaderInfo> headers,
@@ -179,6 +181,7 @@ namespace HiSql.Extension
             {
                 sheet = workbook.CreateSheet(sheetName);
             }
+            workbook.SetSheetOrder(sheetName, sheetIndex++);
             //初始表头
             var excelRow = sheet.CreateRow(0);
             var tableNameTitleCell = excelRow.CreateCell(0);

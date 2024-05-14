@@ -10,21 +10,27 @@ namespace HiSql.Excel.Test
     {
         public static HiSqlClient GetSqlClient()
         {
+            //从环境变量读取连接字符串
+            string connectionStr = Environment.GetEnvironmentVariable("TESTSQL_CONNECTIONSTR");
+            if (string.IsNullOrWhiteSpace(connectionStr))
+            {
+                connectionStr =
+                    "server=(local);uid=sa;pwd=Hone@123;database=HiSql;Encrypt=True; TrustServerCertificate=True;";
+            }
             HiSqlClient sqlclient = new HiSqlClient(
                 new ConnectionConfig()
                 {
                     DbType = DBType.SqlServer,
                     DbServer = "local-HoneBI",
-                    ConnectionString =
-                        "server=(local);uid=sa;pwd=Hone@123;database=HiSql;Encrypt=True; TrustServerCertificate=True;", //; MultipleActiveResultSets = true;
-                    User = "tansar", //可以指定登陆用户的帐号
+                    ConnectionString = connectionStr, //; MultipleActiveResultSets = true;
+                    User = "tansar",
+                    //可以指定登陆用户的帐号
                     SlaveConnectionConfigs = new List<SlaveConnectionConfig>
                     {
                         {
                             new SlaveConnectionConfig
                             {
-                                ConnectionString =
-                                    " server=(local);uid=sa;pwd=Hone@123;database=HiSql;Encrypt=True; TrustServerCertificate=True;",
+                                ConnectionString = connectionStr,
                                 Weight = 3
                             }
                         },
