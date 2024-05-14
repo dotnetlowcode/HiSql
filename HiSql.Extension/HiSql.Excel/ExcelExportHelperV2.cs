@@ -43,17 +43,17 @@ namespace HiSql.Extension
         /// </summary>
         List<DataTableHeaderInfo> headers;
 
-        /// <summary>
-        /// Excel单个sheet最大行数
-        /// </summary>
-        int maxSheetRow = 100000;
+        // /// <summary>
+        // /// Excel单个sheet最大行数
+        // /// </summary>
+        //int maxSheetRow = 1000000;
 
         IWorkbook workbook;
 
         private ISheet sheet;
 
-        //定义是否启用宏
-        private bool EnableMacro = false;
+        // //定义是否启用宏
+        // private bool EnableMacro = false;
 
         /// <summary>
         /// Excel初始化
@@ -65,7 +65,7 @@ namespace HiSql.Extension
             byte[] xlsbyte;
             if (enableMacro)
             {
-                this.EnableMacro = true;
+                // this.EnableMacro = true;
                 fileSavePath = fileSavePath.Replace(".xlsx", ".xlsm");
                 xlsbyte = HiSql.Excel.Properties.Resources.Excel_Template_StandardV2;
             }
@@ -166,6 +166,8 @@ namespace HiSql.Extension
             }
         }
 
+        int sheetIndex = 0;
+
         public void InitHeader(
             string tableName,
             List<DataTableHeaderInfo> headers,
@@ -179,6 +181,7 @@ namespace HiSql.Extension
             {
                 sheet = workbook.CreateSheet(sheetName);
             }
+            workbook.SetSheetOrder(sheetName, sheetIndex++);
             //初始表头
             var excelRow = sheet.CreateRow(0);
             var tableNameTitleCell = excelRow.CreateCell(0);
@@ -285,6 +288,8 @@ namespace HiSql.Extension
         /// </summary>
         public void SaveSheetToFile()
         {
+            //设置当前选中的sheet为第1个
+            workbook.SetActiveSheet(0);
             FileStream file = null;
             try
             {
