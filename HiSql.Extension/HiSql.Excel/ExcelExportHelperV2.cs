@@ -159,6 +159,10 @@ namespace HiSql.Extension
                         }
                     }
                 );
+                if (index < max)
+                {
+                    progressAction(100);
+                }
             }
         }
 
