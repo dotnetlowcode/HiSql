@@ -38,10 +38,10 @@ namespace HiSql.Extension
         /// </summary>
         private string TableName { get; set; }
 
-        /// <summary>
-        /// 表头
-        /// </summary>
-        List<DataTableHeaderInfo> headers;
+        // /// <summary>
+        // /// 表头
+        // /// </summary>
+        // List<DataTableHeaderInfo> headers;
 
         // /// <summary>
         // /// Excel单个sheet最大行数
@@ -113,14 +113,15 @@ namespace HiSql.Extension
                     table,
                     () =>
                     {
-                        if (progressAction != null)
+                        if (progressAction == null)
                         {
-                            index++;
-                            var tempValue = index * 100 / max;
-                            if (tempValue > progress)
-                            {
-                                progressAction(tempValue);
-                            }
+                            return;
+                        }
+                        index++;
+                        var tempValue = index * 100 / max;
+                        if (tempValue > progress)
+                        {
+                            progressAction(tempValue);
                         }
                     },
                     async (sheet, row, cell, headerInfo) =>
@@ -175,7 +176,7 @@ namespace HiSql.Extension
         )
         {
             TableName = tableName;
-            this.headers = headers;
+            // this.headers = headers;
             sheet = workbook.GetSheet(sheetName);
             if (sheet == null)
             {
@@ -202,7 +203,7 @@ namespace HiSql.Extension
             }
         }
 
-        private XSSFCellStyle CreateStyle()
+        private XSSFCellStyle CreateStyle(ExcelValueType cellType)
         {
             //文本样式
             XSSFCellStyle textStyle = (XSSFCellStyle)workbook.CreateCellStyle();
@@ -212,6 +213,20 @@ namespace HiSql.Extension
             textStyle.BorderLeft = BorderStyle.Thin;
             textStyle.BorderRight = BorderStyle.Thin;
             textStyle.BorderTop = BorderStyle.Thin;
+            switch (cellType)
+            {
+                case ExcelValueType.DateTime:
+                    textStyle.SetDataFormat(workbook.CreateDataFormat().GetFormat("yyyy-MM-dd"));
+                    break;
+                case ExcelValueType.Number:
+                    //textStyle.SetDataFormat(workbook.CreateDataFormat().GetFormat("0.00"));
+                    //textStyle.SetDataFormat(workbook.CreateDataFormat().GetFormat("0"));
+                    break;
+                default:
+                    //单元格设置为文本类型
+                    textStyle.SetDataFormat(workbook.CreateDataFormat().GetFormat("@"));
+                    break;
+            }
             //自动换行
             //textStyle.WrapText = true;
             return textStyle;
@@ -229,11 +244,14 @@ namespace HiSql.Extension
             Type typeDec = typeof(decimal);
             Type typeDatetime = typeof(DateTime);
             //文本样式
-            XSSFCellStyle textStyle = CreateStyle();
+            XSSFCellStyle textStyle = CreateStyle(ExcelValueType.Text);
+
             //日期样式
-            XSSFCellStyle dateStyle = CreateStyle();
-            XSSFDataFormat format = (XSSFDataFormat)workbook.CreateDataFormat();
-            dateStyle.DataFormat = format.GetFormat("yyyy-MM-dd");
+            XSSFCellStyle dateStyle = CreateStyle(ExcelValueType.DateTime);
+
+            //数值样式
+            XSSFCellStyle numberStyle = CreateStyle(ExcelValueType.Number);
+
             for (var i = 0; i < dt.Rows.Count; i++)
             {
                 rowHandlerFun();
@@ -254,6 +272,7 @@ namespace HiSql.Extension
                         if (_value.Length <= 10)
                         {
                             _dCell.SetCellType(CellType.Numeric);
+                            _dCell.CellStyle = numberStyle;
                             if (_value == "")
                             {
                                 _dCell.SetCellValue(_value);
