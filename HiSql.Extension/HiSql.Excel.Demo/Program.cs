@@ -320,6 +320,7 @@ namespace HiSql.Excel.Test
                     Title = headName,
                     Description = headName,
                     ValueType = ExcelValueType.Text,
+                    Width = 50
                 };
                 if (headObj.Title == "PicPath")
                 {

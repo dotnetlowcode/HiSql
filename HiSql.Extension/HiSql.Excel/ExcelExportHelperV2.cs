@@ -21,6 +21,11 @@ namespace HiSql.Extension
     public class DataTableHeaderInfo : HeaderInfo
     {
         /// <summary>
+        /// 单元格宽度 px
+        /// </summary>
+        public int Width { get; set; } = 0;
+
+        /// <summary>
         /// 列值类型
         /// </summary>
         public ExcelValueType ValueType { get; set; } = ExcelValueType.Text;
@@ -197,6 +202,7 @@ namespace HiSql.Extension
             tableNameTitleCell.SetCellValue("表名");
             var tableNameValueCell = excelRow.CreateCell(1);
             tableNameValueCell.SetCellValue(this.TableName);
+
             var cnTitleRow = sheet.CreateRow(1);
             var enTitleRow = sheet.CreateRow(2);
             headerMap.Clear();
@@ -205,6 +211,11 @@ namespace HiSql.Extension
                 var headerObj = headers[i];
                 headerMap.Add(headerObj.Title, headerObj);
                 var cnCellObj = cnTitleRow.CreateCell(i);
+                if (headerObj.Width > 0)
+                {
+                    //设置单元格宽度
+                    sheet.SetColumnWidth(i, headerObj.Width * 42); //将像素款转成列宽,这个值只是近似
+                }
                 var enCellObj = enTitleRow.CreateCell(i);
                 cnCellObj.SetCellValue(headerObj.Description);
                 enCellObj.SetCellValue(headerObj.Title);
