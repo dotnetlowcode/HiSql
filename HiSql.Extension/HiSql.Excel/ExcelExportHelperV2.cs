@@ -62,32 +62,39 @@ namespace HiSql.Extension
         /// <param name="enableMacro">是否启用宏</param>
         public ExcelExportHelperV2(string fileSavePath, bool enableMacro = false)
         {
-            byte[] xlsbyte;
+            byte[] xlsbyte = null;
             if (enableMacro)
             {
                 // this.EnableMacro = true;
                 fileSavePath = fileSavePath.Replace(".xlsx", ".xlsm");
                 xlsbyte = HiSql.Excel.Properties.Resources.Excel_Template_StandardV2;
             }
-            else
-            {
-                xlsbyte = HiSql.Excel.Properties.Resources.Excel_Template_Standard;
-            }
+            // else
+            // {
+            //     xlsbyte = HiSql.Excel.Properties.Resources.Excel_Template_Standard;
+            // }
             var dirPath = Path.GetDirectoryName(fileSavePath) ?? string.Empty;
             if (!Directory.Exists(dirPath))
             {
                 Directory.CreateDirectory(dirPath);
             }
-            File.WriteAllBytes(fileSavePath, xlsbyte);
+            if (xlsbyte != null)
+            {
+                File.WriteAllBytes(fileSavePath, xlsbyte);
+                FileStream file = new FileStream(
+                    filePath,
+                    FileMode.Open,
+                    FileAccess.Read,
+                    FileShare.ReadWrite
+                );
+                //将文件读到内存，在内存中操作excel
+                this.workbook = new SXSSFWorkbook(new XSSFWorkbook(file));
+            }
+            else
+            {
+                workbook = new SXSSFWorkbook(new XSSFWorkbook());
+            }
             filePath = fileSavePath;
-            FileStream file = new FileStream(
-                filePath,
-                FileMode.Open,
-                FileAccess.Read,
-                FileShare.ReadWrite
-            );
-            //将文件读到内存，在内存中操作excel
-            this.workbook = new SXSSFWorkbook(new XSSFWorkbook(file));
         }
 
         Dictionary<string, DataTableHeaderInfo> headerMap =

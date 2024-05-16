@@ -329,7 +329,7 @@ namespace HiSql.Excel.Test
             }
             var savePath = AppContext.BaseDirectory + "/Export/test.xlsx";
 
-            var excelObj = new ExcelExportHelperV2(savePath, true);
+            var excelObj = new ExcelExportHelperV2(savePath, false);
 
             await excelObj.WriteDataTableToSheet(
                 "测试表",
