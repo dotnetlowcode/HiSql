@@ -128,6 +128,7 @@ namespace HiSql.Extension
                         var tempValue = index * 100 / max;
                         if (tempValue > progress)
                         {
+                            progress = tempValue;
                             progressAction(tempValue);
                         }
                     },
