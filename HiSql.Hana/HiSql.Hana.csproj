@@ -2,7 +2,7 @@
 
   <PropertyGroup>
 	  <!--net461;-->
-	  <TargetFrameworks>net5.0;netcoreapp3.1;net6.0</TargetFrameworks>
+	  <TargetFrameworks>net5.0;net6.0</TargetFrameworks>
     <Authors>tansar</Authors>
     <Version>1.0.6.3</Version>
     <Company>dotnetlowcode</Company>
@@ -24,28 +24,6 @@
   <ItemGroup>
     <ProjectReference Include="..\HiSql\HiSql.csproj" />
   </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
-    <Reference Include="Sap.Data.Hana.Core.v2.1">
-      <HintPath>..\HanaDLL\Sap.Data.Hana.Core.v2.1.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
-	<ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
-		<Reference Include="Sap.Data.Hana.Core.v2.1">
-			<HintPath>..\HanaDLL\Sap.Data.Hana.Core.v2.1.dll</HintPath>
-		</Reference>
-	</ItemGroup>
-	<ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
-		<Reference Include="Sap.Data.Hana.Core.v2.1">
-			<HintPath>..\HanaDLL\Sap.Data.Hana.Core.v2.1.dll</HintPath>
-		</Reference>
-	</ItemGroup>
-	<ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
-		<Reference Include="Sap.Data.Hana.Core.v2.1">
-			<HintPath>..\HanaDLL\Sap.Data.Hana.Core.v2.1.dll</HintPath>
-		</Reference>
-	</ItemGroup>
 
 	<!--<ItemGroup Condition="'$(TargetFramework)' == 'net461'">
 		<HintPath>..\HanaDLL\Sap.Data.Hana.Core.v2.1.dll</HintPath>
@@ -74,5 +52,11 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Sap.Data.Hana.Core.v2.1">
+      <HintPath>..\..\..\..\Program Files\sap\hdbclient\dotnetcore\v2.1\Sap.Data.Hana.Core.v2.1.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>
