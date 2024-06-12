@@ -120,7 +120,7 @@ namespace HiSql
             }
             else
             {
-                throw new Exception($"InitTabMaping获取表结构信息因为未获取到独占锁，无法创建并获取表信息或表不存在");
+                throw new Exception($"InitTabMaping获取表结构信息因为未获取到独占锁，无法创建并获取表信息或表不存在,keyname:[{keyname}]");
             }
 
             //以下这种方式可能导至两个请求同时执行
