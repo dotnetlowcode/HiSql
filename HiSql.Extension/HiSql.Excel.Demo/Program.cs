@@ -2,9 +2,13 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using HiSql.Extension;
+using Newtonsoft.Json;
 
 namespace HiSql.Excel.Test
 {
@@ -12,8 +16,25 @@ namespace HiSql.Excel.Test
     {
         static async Task Main(string[] args)
         {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             Console.WriteLine("Hello World!");
+            ///Users/chenwei/ITalk/attachment/2024-05/test.zip
+            //解压缩
+            // var zipFile = @"/Users/chenwei/ITalk/attachment/2024-05/test.zip";
+            // Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            // ZipFile.ExtractToDirectory(
+            //     zipFile,
+            //     "/Users/chenwei/ITalk/attachment/2024-05/",
+            //     entryNameEncoding: Encoding.GetEncoding("gb2312")
+            // );
+            // // GB2312
+            // var text = File.ReadAllText(
+            //     "/Users/chenwei/ITalk/attachment/2024-05/20885316586521040156_20230523_账务明细.csv",
+            //     Encoding.GetEncoding("gb2312")
+            // );
             await HiSqlExcelV2ImageExport();
+            //await DataToJson();
+
             //ReadExcelName();
             //BuildExceBigData();
             //BuildExcel_1();
@@ -340,7 +361,7 @@ namespace HiSql.Excel.Test
                 {
                     Console.WriteLine("进度:" + progress + "%");
                 },
-                "测试A"
+                "Sheet名字A"
             );
 
             await excelObj.WriteDataTableToSheet(
@@ -351,10 +372,23 @@ namespace HiSql.Excel.Test
                 {
                     Console.WriteLine("进度:" + progress + "%");
                 },
-                "测试B"
+                "Sheet名字B"
             );
 
             excelObj.SaveSheetToFile();
+        }
+
+        static async Task DataToJson()
+        {
+            HiSqlClient sqlClient = Demo_Init.GetSqlClient();
+            var dt = await sqlClient
+                //.HiSql("select * from ThProductSpu order by YearMd")
+                .HiSql(
+                    "select * from vw_ThProductSpu where ThirdName='tmall' and YearMd='20240514'  and IsByGram=1"
+                )
+                .ToEObjectAsync();
+            var jsonStr = Newtonsoft.Json.JsonConvert.SerializeObject(dt, Formatting.Indented);
+            await File.WriteAllTextAsync("/Volumes/Work_JX/WeekReport/json.txt", jsonStr);
         }
     }
 }
