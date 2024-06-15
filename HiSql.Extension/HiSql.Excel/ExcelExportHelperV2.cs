@@ -29,6 +29,11 @@ namespace HiSql.Extension
         /// 列值类型
         /// </summary>
         public ExcelValueType ValueType { get; set; } = ExcelValueType.Text;
+
+        /// <summary>
+        /// 未找到的图片的填充地址
+        /// </summary>
+        public string NotFoundImageUrl { get; set; } = string.Empty;
     }
 
     public class ExcelExportHelperV2
@@ -149,7 +154,7 @@ namespace HiSql.Extension
                                 imgPath = "https:" + imgPath;
                             }
                             imgPath = imgPath.Replace("w_80,h_80", "w_500,h_500"); //替换为大图
-                            var imgId = await imageGetHelper.getImageId(sheet.Workbook, imgPath);
+                            var imgId = await imageGetHelper.getImageId(sheet.Workbook, imgPath,headerInfo.NotFoundImageUrl);
                             if (imgId == -1)
                             {
                                 //图片不存在

@@ -44,7 +44,7 @@ namespace HiSql.Excel
                                 imgPath = "https:" + imgPath;
                             }
                             imgPath = imgPath.Replace("w_80,h_80", "w_500,h_500"); //替换为大图
-                            var imgId = await imageGetHelper.getImageId(sheet.Workbook, imgPath);
+                            var imgId = await imageGetHelper.getImageId(sheet.Workbook, imgPath, headerInfo.NotFoundImageUrl);
                             if (imgId == -1)
                             {
                                 //图片不存在
