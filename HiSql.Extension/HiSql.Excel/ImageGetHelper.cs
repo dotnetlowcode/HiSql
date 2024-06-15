@@ -88,7 +88,7 @@ namespace HiSql.Extension
 
         int notFoundId = -1;
 
-        public async Task<int> getImageId(IWorkbook _workBook, string url)
+        public async Task<int> getImageId(IWorkbook _workBook, string url, string notFoundImageUrl)
         {
             if (workbookImageMap.ContainsKey(url))
             {
@@ -96,10 +96,16 @@ namespace HiSql.Extension
                 var imageId = workbookImageMap[url];
                 return imageId;
             }
-            var imgData = await base.GetImageData(url);
+            var getUrl = url;
+        reGet: var imgData = await base.GetImageData(getUrl);
             int imgId;
             if (imgData.Length == 0)
             {
+                if (!string.IsNullOrEmpty(notFoundImageUrl) && getUrl != notFoundImageUrl)
+                {
+                    getUrl = notFoundImageUrl;
+                    goto reGet;
+                }
                 if (notFoundId == -1)
                 {
                     var notFoundImagePath = AppContext.BaseDirectory + "/Template/NotFoundImage.png";

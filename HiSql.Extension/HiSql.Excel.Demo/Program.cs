@@ -346,6 +346,7 @@ namespace HiSql.Excel.Test
                 if (headObj.Title == "PicPath")
                 {
                     headObj.ValueType = ExcelValueType.Image;
+                    headObj.NotFoundImageUrl = "";
                 }
                 headers.Add(headObj);
             }
