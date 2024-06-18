@@ -1514,13 +1514,19 @@ namespace HiSql
 
         }
 
-        public override string EvalSha(string shaid, string[] keys, object[] values)
+        /// <summary>
+        /// 执行已经装入的redis sha脚本
+        /// </summary>
+        /// <param name="shaid"></param>
+        /// <param name="keys"></param>
+        /// <param name="values"></param>
+        /// <returns>如果值是单值时返回的是string 如果是多值是返回的是List<string> 的Json</returns>
+        /// <exception cref="Exception"></exception>
+        public override string EvalSha(string shaid, string[] keys, string[] values)
         {
             if (this.dic_sha.ContainsKey(shaid))
             {
                 RedisKey[] rediskeys=new RedisKey[] { };
-
-
                 RedisValue[] redisvalues=new RedisValue[] { };
 
                 if(keys!=null && keys.Length>0)
@@ -1536,12 +1542,28 @@ namespace HiSql
                     redisvalues = new RedisValue[values.Length];
                     for (int i = 0; i < values.Length; i++)
                     {
-                        redisvalues[i] = (RedisValue)values[i];
+                        redisvalues[i] =  ( RedisValue)values[i];
                     }
                 }
 
                 var result=_cache.ScriptEvaluate(this.dic_sha[shaid], rediskeys, redisvalues);
-                return result.ToString();
+                RedisValue[] redisValues = (RedisValue[])result;
+                List<string> lstresult = new List<string>();
+                if (redisValues != null && redisValues.Length > 0)
+                {
+                    foreach (RedisValue value in redisValues)
+                    {
+                        if (value.HasValue)
+                        {
+                            lstresult.Add(value.ToString());
+                        }
+                        else
+                            lstresult.Add(null);
+                    }
+                }
+                return lstresult.ToJson();
+                
+               
             }
             else
             {
@@ -1549,10 +1571,7 @@ namespace HiSql
             }
         }
 
-        public override T ExecuteLuaScript<T>(string luascript, string[] keys, object[] values)
-        {
-            throw new NotImplementedException();
-        }
+       
 
 
 

@@ -98,17 +98,9 @@ namespace HiSql
         /// <param name="keys"></param>
         /// <param name="values"></param>
         /// <returns></returns>
-        public abstract string EvalSha(string shaid,string[] keys, object[] values);
+        public abstract string EvalSha(string shaid,string[] keys, string[] values);
 
-        /// <summary>
-        /// 执行redis脚本
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="luascript"></param>
-        /// <param name="keys"></param>
-        /// <param name="values"></param>
-        /// <returns></returns>
-        public abstract T ExecuteLuaScript<T>(string luascript, string[] keys, object[] values);
+   
 
         public abstract Tuple<bool, string> LockOn(string key, LckInfo lckinfo, int expirySeconds = 30, int timeoutSeconds = 5);
         public abstract Tuple<bool, string> LockOn(string[] keys, LckInfo lckinfo, int expirySeconds = 30, int timeoutSeconds = 5);
