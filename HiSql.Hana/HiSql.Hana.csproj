@@ -1,34 +1,50 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <!--net461;-->
-    <TargetFrameworks>net5.0;net6.0</TargetFrameworks>
+	  <!--net461;-->
+	  <TargetFrameworks>net5.0;netcoreapp3.1;net6.0</TargetFrameworks>
     <Authors>tansar</Authors>
-    <Version>1.0.6.3</Version>
+    <Version>1.0.6.4</Version>
     <Company>dotnetlowcode</Company>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-
+   
     <Description>该包支持Hana 内存数据库 依赖于HiSql.dll包运行</Description>
-
+   
     <ApplicationIcon>hisql-hana-logo.ico</ApplicationIcon>
-
+   
     <PackageIcon>hisql-hana-logo.jpg</PackageIcon>
-
+   
     <PackageIconUrl />
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Data.Odbc" Version="5.0.0" />
+    <PackageReference Include="System.Data.Odbc" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\HiSql\HiSql.csproj" />
   </ItemGroup>
 
-  <!--<ItemGroup Condition="'$(TargetFramework)' == 'net461'">
+	<ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
+		<Reference Include="Sap.Data.Hana.Core.v2.1">
+			<HintPath>..\HanaDLL\Sap.Data.Hana.Core.v2.1.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
+		<Reference Include="Sap.Data.Hana.Core.v2.1">
+			<HintPath>..\HanaDLL\Sap.Data.Hana.Core.v2.1.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
+		<Reference Include="Sap.Data.Hana.Core.v2.1">
+			<HintPath>..\HanaDLL\Sap.Data.Hana.Core.v2.1.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+
+	<!--<ItemGroup Condition="'$(TargetFramework)' == 'net461'">
 		<HintPath>..\HanaDLL\Sap.Data.Hana.Core.v2.1.dll</HintPath>
 	</ItemGroup>-->
-
+	
 
 
 
@@ -56,7 +72,7 @@
 
   <ItemGroup>
     <Reference Include="Sap.Data.Hana.Core.v2.1">
-      <HintPath>..\..\..\..\Program Files\sap\hdbclient\dotnetcore\v2.1\Sap.Data.Hana.Core.v2.1.dll</HintPath>
+      <HintPath>..\HanaDLL\Sap.Data.Hana.Core.v2.1.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>

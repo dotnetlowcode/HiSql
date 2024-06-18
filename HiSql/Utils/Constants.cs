@@ -72,7 +72,7 @@ namespace HiSql
         /// <summary>
         /// 锁定表创建修改的key 
         /// </summary>
-        public readonly static string LockTablePre = "TAB:[$DbType$]:[$TabName$]";
+        public readonly static string LockTablePre = "DbServer:[$DbServer$]:TAB:[$DbType$]:[$TabName$]";
 
 
 
@@ -336,7 +336,7 @@ namespace HiSql
         /// 表结构缓存路径 (该key值支持redis的分块）
         /// 如:HiSql:Table:HoneORM:dbo:TableModel
         /// </summary>
-        public static string KEY_TABLE_CACHE_NAME = $"{KEY_PRE}{KEY_SEPRATE}Table{KEY_SEPRATE}[$DbType$]{KEY_SEPRATE}[$TABLE$]";
+        public static string KEY_TABLE_CACHE_NAME = $"{KEY_PRE}{KEY_SEPRATE}[$DbServer$]{KEY_SEPRATE}Table{KEY_SEPRATE}[$DbType$]{KEY_SEPRATE}[$TABLE$]";
 
 
 

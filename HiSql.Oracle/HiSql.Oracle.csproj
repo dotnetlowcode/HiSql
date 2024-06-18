@@ -4,7 +4,7 @@
 	  <TargetFrameworks>net461;net5.0;netcoreapp3.1;net6.0;net7.0</TargetFrameworks>
     <Authors>tansar</Authors>
     <Company>dotnetlowcode</Company>
-    <Version>1.0.6.3</Version>
+    <Version>1.0.6.4</Version>
     <Description>该包支持Oracle数据库 依赖于HiSql.dll包运行</Description>
     <ApplicationIcon>hisql-oracle-logo.ico</ApplicationIcon>
     <PackageIcon>hisql-oracle-logo.jpg</PackageIcon>
@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="System.Data.OracleClient" Version="1.0.8" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
   </ItemGroup>
 
   <ItemGroup>
@@ -60,14 +61,14 @@
   </ItemGroup>-->
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
-		<PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.19.130" />
+		<PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.4.0" />
 	</ItemGroup>
 	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1' or '$(TargetFramework)' == 'net6.0' or '$(TargetFramework)' == 'net5.0' or '$(TargetFramework)' == 'net7.0'">
-		<PackageReference Include="Oracle.ManagedDataAccess.Core" Version="3.21.4" />
+		<PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.4.0" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net45' or '$(TargetFramework)' == 'net461'">
-		<PackageReference Include="Oracle.ManagedDataAccess" Version="19.13.0" />
+		<PackageReference Include="Oracle.ManagedDataAccess" Version="19.18.0" />
 	</ItemGroup>
 
 	<ItemGroup>

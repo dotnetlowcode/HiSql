@@ -374,7 +374,8 @@ namespace HiSql
             List<HiColumn> _lstmodi = new List<HiColumn>();
             List<object> _lstdel = new List<object>();
             HiSqlClient _client = null;
-            string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", tabname.ToLower()).Replace("[$DbType$]", Context.CurrentConnectionConfig.DbType.ToString());
+            
+            string _keyname = HiSqlCommProvider.GetTabCacheKey(tabname, Context.CurrentConnectionConfig);
             TabInfo newtabinfo = this.Context.MCache.GetCache<TabInfo>(_keyname);
             if (newtabinfo == null)
             {
@@ -404,7 +405,8 @@ namespace HiSql
                         tabInfo = TabDefinitionToEntity(dts, dbConfig.DbMapping);
                         if (!CheckTabExists(tabname))
                         {
-                            HiSqlCommProvider.LockTableExecAction(tabname, () => { this.BuildTabCreate(tabInfo); });
+                            //HiSqlCommProvider.LockTableExecAction(_keyname, () => { this.BuildTabCreate(tabInfo); });
+                            this.BuildTabCreate(tabInfo);
                         }
                         else
                         {
@@ -505,7 +507,7 @@ namespace HiSql
 
                 if (_lstdel.Count > 0 || _lstmodi.Count > 0)
                 {
-                    HiSqlCommProvider.LockTableExecAction(tabname, () =>
+                    HiSqlCommProvider.LockTableExecAction(_keyname, () =>
                     {
                         //_client = this.Context.CloneClient();
 

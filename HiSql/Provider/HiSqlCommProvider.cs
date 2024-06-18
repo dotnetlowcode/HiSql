@@ -16,23 +16,7 @@ namespace HiSql
     /// </summary>
     public static partial class HiSqlCommProvider
     {
-        /// <summary>
-        /// 映射表结构
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        public static void InitMapping<T>(List<string> keylst)
-        {
-            InitMapping(typeof(T));
-        }
-
-
-        public static void InitMaping(TableDefinition table)
-        {
-            string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$DBSERVER$]", table.DbServer)
-                .Replace("[$SCHEMA$]", table.Schema)
-                .Replace("[$TABLE$]", table.TabName)
-                ;
-        }
+        
 
         /// <summary>
         /// 初始化表结构缓存
@@ -120,7 +104,7 @@ namespace HiSql
             }
             else
             {
-                throw new Exception($"InitTabMaping获取表结构信息因为未获取到独占锁，无法创建并获取表信息或表不存在,keyname:[{keyname}]");
+                throw new Exception($"InitTabMaping获取表结构信息因为未获取到独占锁，无法创建并获取表信息或表不存在,key:[{keyname}]");
             }
 
             //以下这种方式可能导至两个请求同时执行
@@ -135,18 +119,19 @@ namespace HiSql
 
             //        throw;
             //    }
+
             //});
         }
 
         /// <summary>
         /// 锁定表对象，执行操作
         /// </summary>
-        /// <param name="tabname"></param>
+        /// <param name="keyname"></param>
         /// <param name="action"></param>
-        public static void LockTableExecAction(string tabname, Action  action)
+        public static void LockTableExecAction(string keyname, Action  action)
         {
-            string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", tabname);
-            
+            //string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", tabname);
+            string _keyname = keyname;
 
             bool locked = false;
             var lckinfo = new LckInfo() { UName = "hisql", EventName = "InitTabMaping" };
@@ -183,12 +168,27 @@ namespace HiSql
         /// 移除表结构缓存信息
         /// </summary>
         /// <param name="tabname"></param>
-        public static void RemoveTabInfoCache(string tabname,DBType dBType)
+        public static void RemoveTabInfoCache(string tabname, ConnectionConfig config)
         {
-            string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", tabname.ToLower()).Replace("[$DbType$]", dBType.ToString());
+            string _keyname = GetTabCacheKey(tabname, config);
             if (CacheContext.MCache.Exists(_keyname))
                 CacheContext.MCache.RemoveCache(_keyname);
 
+        }
+
+
+        /// <summary>
+        /// 获取指定表的表结构缓存Key
+        /// </summary>
+        /// <param name="tabname"></param>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        public static string GetTabCacheKey(string tabname, ConnectionConfig config)
+        {
+            string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", tabname.ToLower()).Replace("[$DbType$]", config.DbType.ToString())
+                .Replace("[$DbServer$]", config.DbServer)
+                ;
+            return _keyname;
         }
 
 

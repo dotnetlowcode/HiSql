@@ -168,8 +168,8 @@ namespace HiSql
             {
                 sqldm = Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{this.Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
                 sqldm.Context = this.Context;
-
-                string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", this.Table.TabName.ToLower()).Replace("[$DbType$]", this.Context.CurrentConnectionConfig.DbType.ToString());
+                
+                string _keyname = HiSqlCommProvider.GetTabCacheKey(this.Table.TabName.ToLower(), this.Context.CurrentConnectionConfig);
                 tabinfo = this.Context.DMInitalize.GetTabStruct(this.Table.TabName);
 
                 //if (Constants.HiSysTable["Hi_FieldModel"].Equals(this.Table.TabName, StringComparison.OrdinalIgnoreCase))

@@ -110,12 +110,12 @@ namespace HiSql
             IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
 
             //获取当前最新物理表结构信息
-            HiSqlCommProvider.RemoveTabInfoCache(tabname, _sqlClient.Context.CurrentConnectionConfig.DbType);
+            HiSqlCommProvider.RemoveTabInfoCache(tabname, _sqlClient.Context.CurrentConnectionConfig);
             //获取最新
             TabInfo tabinfo = idm.GetTabStruct(tabname);
             var col = addColumn(idm, tabinfo, hiColumn, opLevel);
             //获取当前最新物理表结构信息
-            HiSqlCommProvider.RemoveTabInfoCache(tabname, _sqlClient.Context.CurrentConnectionConfig.DbType);
+            HiSqlCommProvider.RemoveTabInfoCache(tabname, _sqlClient.Context.CurrentConnectionConfig);
             //获取最新
             tabinfo = idm.GetTabStruct(tabname);
             return col;
@@ -278,7 +278,7 @@ namespace HiSql
             {
                 if (!CheckTabExists(tabInfo.TabModel.TabName))
                 {
-                    string _key = Constants.LockTablePre.Replace("[$TabName$]", tabInfo.TabModel.TabName).Replace("[$DbType$]",_sqlClient.CurrentConnectionConfig.DbType.ToString());
+                    string _key = Constants.LockTablePre.Replace("[$TabName$]", tabInfo.TabModel.TabName).Replace("[$DbType$]",_sqlClient.CurrentConnectionConfig.DbType.ToString()).Replace("[$DbServer$]",_sqlClient.CurrentConnectionConfig.DbServer);
                     var rtnlck = Lock.CheckLock(_key);
                     if (rtnlck.Item1)
                     {
@@ -535,7 +535,7 @@ namespace HiSql
             IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
 
             //获取当前最新物理表结构信息
-            HiSqlCommProvider.RemoveTabInfoCache(tabname, _sqlClient.Context.CurrentConnectionConfig.DbType);
+            HiSqlCommProvider.RemoveTabInfoCache(tabname, _sqlClient.Context.CurrentConnectionConfig);
             //获取最新
             TabInfo tabinfo = idm.GetTabStruct(tabname);
             return delColumn(idm, tabinfo, hiColumn, opLevel);
@@ -694,12 +694,12 @@ namespace HiSql
                     _sqlClient.Delete(Constants.HiSysTable["Hi_TabModel"].ToString(), new { TabName = tabname, DbServer = "", DbName = "" }).ExecCommand();
                     _sqlClient.Delete(Constants.HiSysTable["Hi_FieldModel"].ToString()).Where($"TabName='{tabname.ToSqlInject()}' and DbServer='' and DbName='' ").ExecCommand();
 
-                    HiSqlCommProvider.RemoveTabInfoCache(tabname, _sqlClient.CurrentConnectionConfig.DbType);
+                    HiSqlCommProvider.RemoveTabInfoCache(tabname, _sqlClient.CurrentConnectionConfig);
                     return v > 0;
                 }
                 else
                 {
-                    HiSqlCommProvider.RemoveTabInfoCache(tabname, _sqlClient.CurrentConnectionConfig.DbType);
+                    HiSqlCommProvider.RemoveTabInfoCache(tabname, _sqlClient.CurrentConnectionConfig);
                     return _sqlClient.Drop(tabname).ExecCommand() > 0;
                 }
 
@@ -1194,7 +1194,7 @@ namespace HiSql
             string _sql = "";
             IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
             //获取当前最新物理表结构信息
-            HiSqlCommProvider.RemoveTabInfoCache(tabname, _sqlClient.Context.CurrentConnectionConfig.DbType);
+            HiSqlCommProvider.RemoveTabInfoCache(tabname, _sqlClient.Context.CurrentConnectionConfig);
             //获取最新
             TabInfo tabinfo = idm.GetTabStruct(tabname);
 
@@ -1293,14 +1293,14 @@ namespace HiSql
             HiColumn _col = hiColumn.CloneProperoty();
             IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
             //获取当前最新物理表结构信息
-            HiSqlCommProvider.RemoveTabInfoCache(tabname, _sqlClient.Context.CurrentConnectionConfig.DbType);
+            HiSqlCommProvider.RemoveTabInfoCache(tabname, _sqlClient.Context.CurrentConnectionConfig);
             //获取最新
             TabInfo tabinfo = idm.GetTabStruct(tabname);
             var rtn = reColumn(idm, tabinfo, hiColumn, opLevel);
             if (opLevel == OpLevel.Execute && rtn.Item1)
             {
                 _sqlClient.Update(Constants.HiSysTable["Hi_FieldModel"], hiColumn).OnlyWhere($"TabName='{hiColumn.TabName}' and FieldName='{_col.FieldName}' and DbServer='{hiColumn.DbServer}' and DbName='{hiColumn.DbName}'").ExecCommand();
-                HiSqlCommProvider.RemoveTabInfoCache(tabname, _sqlClient.Context.CurrentConnectionConfig.DbType);
+                HiSqlCommProvider.RemoveTabInfoCache(tabname, _sqlClient.Context.CurrentConnectionConfig);
             }
        
             return rtn;
@@ -1329,7 +1329,7 @@ namespace HiSql
             TabInfo tab = _sqlClient.Context.DMInitalize.GetTabStruct(tabInfo.TabModel.TabName);
             IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
             //获取当前最新物理表结构信息
-            HiSqlCommProvider.RemoveTabInfoCache(tabInfo.TabModel.TabName, _sqlClient.Context.CurrentConnectionConfig.DbType);
+            HiSqlCommProvider.RemoveTabInfoCache(tabInfo.TabModel.TabName, _sqlClient.Context.CurrentConnectionConfig);
             //获取最新
             TabInfo tabinfo = idm.GetTabStruct(tabInfo.TabModel.TabName);
             List<FieldChange> fieldChanges = HiSqlCommProvider.TabToCompare(tabInfo, tab, _sqlClient.Context.CurrentConnectionConfig.DbType);
@@ -1579,7 +1579,7 @@ namespace HiSql
                                 //_sqlClient.BeginTran();
 
                                 if(tabInfo.TabModel.TabName.Equals(Constants.HiSysTable["Hi_FieldModel"].ToString(),StringComparison.OrdinalIgnoreCase))
-                                    HiSqlCommProvider.RemoveTabInfoCache(Constants.HiSysTable["Hi_FieldModel"].ToString(), _sqlClient.Context.CurrentConnectionConfig.DbType);
+                                    HiSqlCommProvider.RemoveTabInfoCache(Constants.HiSysTable["Hi_FieldModel"].ToString(), _sqlClient.Context.CurrentConnectionConfig);
 
                                  
                                 //}
@@ -1615,7 +1615,7 @@ namespace HiSql
             }
 
             //刷新表结构缓存
-            HiSqlCommProvider.RemoveTabInfoCache(tabInfo.TabModel.TabName,_sqlClient.Context.CurrentConnectionConfig.DbType);
+            HiSqlCommProvider.RemoveTabInfoCache(tabInfo.TabModel.TabName,_sqlClient.Context.CurrentConnectionConfig);
             TabInfo _temptabinfo = idm.GetTabStruct(tabInfo.TabModel.TabName);
 
             return new Tuple<bool, string, string>(_isok, _msg, _sql);
@@ -1654,7 +1654,7 @@ namespace HiSql
 
             IDM idm = buildIDM(_sqlClient.Context.CurrentConnectionConfig.DbType);
             //获取当前最新物理表结构信息
-            HiSqlCommProvider.RemoveTabInfoCache(tabname, _sqlClient.Context.CurrentConnectionConfig.DbType);
+            HiSqlCommProvider.RemoveTabInfoCache(tabname, _sqlClient.Context.CurrentConnectionConfig);
             //获取最新
             TabInfo tabinfo = idm.GetTabStruct(tabname);
 
@@ -1674,7 +1674,7 @@ namespace HiSql
                 if (opLevel == OpLevel.Execute)
                 {
                     //移除表缓存结构
-                    HiSqlCommProvider.RemoveTabInfoCache(tabname, _sqlClient.Context.CurrentConnectionConfig.DbType);
+                    HiSqlCommProvider.RemoveTabInfoCache(tabname, _sqlClient.Context.CurrentConnectionConfig);
                     _sqlClient.BeginTran();
                     try
                     {

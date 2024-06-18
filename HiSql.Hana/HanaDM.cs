@@ -369,7 +369,8 @@ namespace HiSql
             HiSqlClient _client = null;
 
             //优先使用二级缓存
-            string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", tabname.ToLower()).Replace("[$DbType$]", Context.CurrentConnectionConfig.DbType.ToString());
+            
+            string _keyname = HiSqlCommProvider.GetTabCacheKey(tabname, Context.CurrentConnectionConfig);
             TabInfo newtabinfo = this.Context.MCache.GetCache<TabInfo>(_keyname);
             if (newtabinfo == null)
             {
@@ -398,7 +399,9 @@ namespace HiSql
                         tabInfo = TabDefinitionToEntity(dts, dbConfig.DbMapping);
                         if (!CheckTabExists(tabname))
                         {
-                            HiSqlCommProvider.LockTableExecAction(tabname, () => { this.BuildTabCreate(tabInfo); });
+                            //此处不用加锁， 外层有锁
+                            //HiSqlCommProvider.LockTableExecAction(_keyname, () => { this.BuildTabCreate(tabInfo); });
+                            this.BuildTabCreate(tabInfo);
                         }
                         else
                         {
@@ -502,7 +505,7 @@ namespace HiSql
 
                 if (_lstdel.Count > 0 || _lstmodi.Count > 0)
                 {
-                    HiSqlCommProvider.LockTableExecAction(tabname, () =>
+                    HiSqlCommProvider.LockTableExecAction(_keyname, () =>
                     {
                         //_client = this.Context.CloneClient();
 
