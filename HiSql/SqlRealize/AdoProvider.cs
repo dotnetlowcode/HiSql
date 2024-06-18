@@ -15,8 +15,8 @@ namespace HiSql
 
     /// <summary>
     /// ADO 操作
-    /// 
-    /// modi by tgm date:2022.6.7 
+    ///
+    /// modi by tgm date:2022.6.7
     /// 1.事务提交或事务回滚 自动关闭数据库连接
     /// 2.语句执行有异常 自动关闭链接
     /// 3.当出现多个开启事务时将会把前一个事务Commit然后在开启新的事务
@@ -142,7 +142,7 @@ namespace HiSql
         /// </summary>
         /// <param name="sourceTable"></param>
         /// <param name="tabName"></param>
-        public abstract Task<int> BulkCopy(DataTable sourceTable, TabInfo tabInfo,Dictionary<string,string> columnMapping=null);
+        public abstract Task<int> BulkCopy(DataTable sourceTable, TabInfo tabInfo, Dictionary<string, string> columnMapping = null);
 
 
         /// <summary>
@@ -205,9 +205,9 @@ namespace HiSql
 
         }
 
-        public virtual int ExecBulkCopyCommand(DataTable sourceTable, TabInfo tabInfo, Dictionary<string,string> columnMapping=null)
+        public virtual int ExecBulkCopyCommand(DataTable sourceTable, TabInfo tabInfo, Dictionary<string, string> columnMapping = null)
         {
-            return  this.BulkCopy(sourceTable, tabInfo, columnMapping).ConfigureAwait(false).GetAwaiter().GetResult();
+            return this.BulkCopy(sourceTable, tabInfo, columnMapping).ConfigureAwait(false).GetAwaiter().GetResult();
         }
         public virtual int ExecBulkCopyCommand<T>(List<T> lstdata, TabInfo tabInfo, Dictionary<string, string> columnMapping = null)
         {
@@ -245,7 +245,7 @@ namespace HiSql
                 //2023.4.11 事务回滚则关闭连接
                 //if (this.Context.CurrentConnectionConfig.IsAutoClose)
                 //{
-                    this.Close();
+                this.Close();
                 //}
             }
         }
@@ -277,7 +277,7 @@ namespace HiSql
         #endregion
 
 
-        #region Aop事件 
+        #region Aop事件
 
         //sql执行前事件
         public virtual Action<string, HiParameter[]> OnLogSqlExecuting => this.Context.CurrentConnectionConfig.AppEvents?.OnLogSqlExecuting;
@@ -415,7 +415,7 @@ namespace HiSql
 #if NET461
             return this.ExecCommandSynch(sql, parameters);
 #else
-            
+
             return this.ExecCommandAsync(sql, parameters).ConfigureAwait(false).GetAwaiter().GetResult();
 #endif
 
@@ -429,7 +429,7 @@ namespace HiSql
             try
             {
 
-#region 执行前操作
+                #region 执行前操作
                 ResolveParameter(ref sql, parameters);
                 if (FormatSql != null)
                 {
@@ -448,12 +448,12 @@ namespace HiSql
 
                     }
                 }
-#endregion
+                #endregion
                 DbCommand sqlCommand = GetCommand(sql, parameters);
                 count = await sqlCommand.ExecuteNonQueryAsync();
                 sqlCommand.Dispose();
 
-#region 执行后操作
+                #region 执行后操作
 
                 if (IsSqlLog)
                 {
@@ -467,7 +467,7 @@ namespace HiSql
 
                     }
                 }
-#endregion
+                #endregion
                 //return count;
             }
             catch (Exception E)
@@ -537,7 +537,7 @@ namespace HiSql
             try
             {
 
-#region 执行前操作
+                #region 执行前操作
                 ResolveParameter(ref sql, null);
                 if (FormatSql != null)
                 {
@@ -558,15 +558,15 @@ namespace HiSql
 
                     }
                 }
-#endregion
+                #endregion
                 DbCommand sqlCommand = GetCommand(sql, null);
 
                 //_effect = await sqlCommand.ExecuteNonQueryAsync();
                 _effect = await sqlCommand.ExecuteScalarAsync();
-                if (_effect ==null) _effect = 1;
+                if (_effect == null) _effect = 1;
                 sqlCommand.Dispose();
 
-#region 执行后操作
+                #region 执行后操作
 
                 if (IsSqlLog)
                 {
@@ -580,7 +580,7 @@ namespace HiSql
 
                     }
                 }
-#endregion
+                #endregion
                 //return count;
             }
             catch (Exception E)
@@ -670,14 +670,14 @@ namespace HiSql
 
                     }
                 }
-#endregion
+                #endregion
 
                 DbCommand sqlCommand = GetCommand(sql, parameters);
 
                 //IDataReader sqlDataReader = await sqlCommand.ExecuteReaderAsync(this.IsAutoClose() ? CommandBehavior.CloseConnection : CommandBehavior.Default);
                 IDataReader sqlDataReader = sqlCommand.ExecuteReader(this.IsAutoClose() ? CommandBehavior.CloseConnection : CommandBehavior.Default);
 
-#region 执行后操作
+                #region 执行后操作
                 if (this.IsSqlLog)
                 {
                     //执行后日志记录
@@ -694,7 +694,7 @@ namespace HiSql
                 //ChooseConnectionEnd(sql);
 
 
-#endregion
+                #endregion
                 return sqlDataReader;
             }
             catch (Exception E)
@@ -754,13 +754,13 @@ namespace HiSql
 
                     }
                 }
-#endregion
+                #endregion
 
                 DbCommand sqlCommand = GetCommand(sql, parameters);
 
                 IDataReader sqlDataReader = await sqlCommand.ExecuteReaderAsync(this.IsAutoClose() ? CommandBehavior.CloseConnection : CommandBehavior.Default);
 
-#region 执行后操作
+                #region 执行后操作
                 if (this.IsSqlLog)
                 {
                     //执行后日志记录
@@ -777,7 +777,7 @@ namespace HiSql
                 //ChooseConnectionEnd(sql);
 
 
-#endregion
+                #endregion
                 return sqlDataReader;
             }
             catch (Exception E)
@@ -786,7 +786,7 @@ namespace HiSql
                 ExecuteError(sql, parameters, E);
                 this.Close();
                 throw E;
-                
+
             }
             finally
             {
@@ -816,7 +816,7 @@ namespace HiSql
         {
             try
             {
-#region  执行前操作
+                #region  执行前操作
                 ResolveParameter(ref sql, parameters);
                 if (FormatSql != null)
                 {
@@ -837,7 +837,7 @@ namespace HiSql
 
                     }
                 }
-#endregion
+                #endregion
                 //IDbCommand sqlCommand = GetCommand(sql, parameters);
                 //IDataReader sqlDataReader = sqlCommand.ExecuteReader(this.IsAutoClose() ? CommandBehavior.CloseConnection : CommandBehavior.Default);
                 IDataAdapter dataAdapter = this.GetAdapter();
@@ -861,7 +861,7 @@ namespace HiSql
 
 
 
-#region 执行后操作
+                #region 执行后操作
                 if (this.IsSqlLog)
                 {
                     //执行后日志记录
@@ -871,14 +871,13 @@ namespace HiSql
                         {
                             OnLogSqlExecuted(sql, parameters);
                         });
-
                     }
                 }
 
                 //ChooseConnectionEnd(sql);
 
 
-#endregion
+                #endregion
                 return DT;
             }
             catch (Exception E)
@@ -902,7 +901,7 @@ namespace HiSql
         {
             try
             {
-#region  执行前操作
+                #region  执行前操作
                 ResolveParameter(ref sql, parameters);
                 if (FormatSql != null)
                 {
@@ -921,17 +920,18 @@ namespace HiSql
 
                     }
                 }
-#endregion
+                #endregion
                 DataSet ds = new DataSet();
                 using (DbDataAdapter dataAdapter = this.GetAdapter())
                 {
-                    using (DbCommand sqlCommand = GetCommand(sql, parameters)) {
+                    using (DbCommand sqlCommand = GetCommand(sql, parameters))
+                    {
                         this.SetCommandToAdapter(dataAdapter, sqlCommand);
                         dataAdapter.Fill(ds);
                     }
                 }
-                
-#region 执行后操作
+
+                #region 执行后操作
                 if (this.IsSqlLog)
                 {
                     //执行后日志记录
@@ -944,7 +944,7 @@ namespace HiSql
 
                     }
                 }
-#endregion
+                #endregion
                 return ds;
             }
             catch (Exception E)
@@ -972,7 +972,7 @@ namespace HiSql
             {
                 deleGetTable _deleGetTable = new deleGetTable(getDataTable);
 
-             
+
                 var workTask = Task.Run(() => _deleGetTable.Invoke(sql, parameters));
                 bool flag = workTask.Wait(this.Context.CurrentConnectionConfig.SqlExecTimeOut, new CancellationToken(false));
                 if (flag)
@@ -991,7 +991,7 @@ namespace HiSql
 
             //return getDataTable(sql, parameters);
         }
-        public DataSet GetDataSet(List<string> sqlList, List<HiParameter[]>  parametersList)
+        public DataSet GetDataSet(List<string> sqlList, List<HiParameter[]> parametersList)
         {
             for (int i = 0; i < sqlList.Count; i++)
             {
@@ -1004,7 +1004,7 @@ namespace HiSql
             DataSet ds = new DataSet();
 
             //支持返回多个结果集
-            if (this.Context.CurrentConnectionConfig.DbType == DBType.SqlServer 
+            if (this.Context.CurrentConnectionConfig.DbType == DBType.SqlServer
                 || this.Context.CurrentConnectionConfig.DbType == DBType.MySql
                 || this.Context.CurrentConnectionConfig.DbType == DBType.Sqlite
                || this.Context.CurrentConnectionConfig.DbType == DBType.PostGreSql
@@ -1090,16 +1090,16 @@ namespace HiSql
         }
 
 
-#region 委托事件
+        #region 委托事件
         public virtual Func<string, string> FormatSql { get; set; }
         public bool IsLogSql { get; set; }
 
 
 
-#endregion
+        #endregion
 
 
-#region 扩展方法
+        #region 扩展方法
 
         /// <summary>
         /// 检测数据库连接
@@ -1129,13 +1129,13 @@ namespace HiSql
                 OnSqlError(new HiSqlException(this.Context, E, sql));
             }
         }
-#endregion
+        #endregion
 
 
-#region 解析参数
+        #region 解析参数
         void ResolveParameter(ref string sql, HiParameter[] parameters)
         {
-            if (parameters!=null && parameters.HasValue())
+            if (parameters != null && parameters.HasValue())
             {
                 foreach (HiParameter item in parameters)
                 {
@@ -1146,7 +1146,7 @@ namespace HiSql
                     {
                         if (Tool.RegexMatch($@"{item.ParameterName}\b", sql))
                         {
-                            if ( type.FullName.IsList())
+                            if (type.FullName.IsList())
                             {
                                 var newValues = new List<string>();
                                 foreach (var inData in item.Values as IEnumerable)
@@ -1178,7 +1178,8 @@ namespace HiSql
                                     sql = sql.Replace(item.ParameterName, newValues.ToArray().ToSqlIn());
                                 }
                                 item.Values = DBNull.Value;
-                            }else if (type.IsIn(HiSql.Constants.IntType, HiSql.Constants.DecType, HiSql.Constants.ShortType,
+                            }
+                            else if (type.IsIn(HiSql.Constants.IntType, HiSql.Constants.DecType, HiSql.Constants.ShortType,
                                 HiSql.Constants.LongType, HiSql.Constants.FloatType))
                             {
                                 value = item.Values.ToString();
@@ -1203,7 +1204,7 @@ namespace HiSql
                                 value = $"'{item.Values.ToString().ToSqlInject()}'";
                             }
 
-                            Regex regex = new Regex($@"{item.ParameterName}\b",RegexOptions.IgnoreCase);
+                            Regex regex = new Regex($@"{item.ParameterName}\b", RegexOptions.IgnoreCase);
                             sql = regex.Replace(sql, value);
                         }
                         else
@@ -1264,10 +1265,10 @@ namespace HiSql
             }
         }
 
-#endregion
+        #endregion
 
 
-#region  选择连接
+        #region  选择连接
         void ChooseConnectionStart(string sql)
         {
             DBAction _dbaction = GetAction(sql);

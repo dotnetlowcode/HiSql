@@ -86,7 +86,9 @@ namespace HiSql.Extension
     {
         Dictionary<string, int> workbookImageMap = new Dictionary<string, int>();
 
-        public async Task<int> getImageId(IWorkbook _workBook, string url)
+        int notFoundId = -1;
+
+        public async Task<int> getImageId(IWorkbook _workBook, string url, string notFoundImageUrl)
         {
             if (workbookImageMap.ContainsKey(url))
             {
@@ -94,12 +96,28 @@ namespace HiSql.Extension
                 var imageId = workbookImageMap[url];
                 return imageId;
             }
-            var imgData = await base.GetImageData(url);
+            var getUrl = url;
+        reGet: var imgData = await base.GetImageData(getUrl);
+            int imgId;
             if (imgData.Length == 0)
             {
-                return -1;
+                if (!string.IsNullOrEmpty(notFoundImageUrl) && getUrl != notFoundImageUrl)
+                {
+                    getUrl = notFoundImageUrl;
+                    goto reGet;
+                }
+                if (notFoundId == -1)
+                {
+                    var notFoundImagePath = AppContext.BaseDirectory + "/Template/NotFoundImage.png";
+                    imgData = File.ReadAllBytes(notFoundImagePath);
+                    notFoundId = _workBook.AddPicture(imgData, PictureType.JPEG);
+                }
+                imgId = notFoundId;
             }
-            var imgId = _workBook.AddPicture(imgData, PictureType.JPEG);
+            else
+            {
+                imgId = _workBook.AddPicture(imgData, PictureType.JPEG);
+            }
             workbookImageMap[url] = imgId;
             return imgId;
         }

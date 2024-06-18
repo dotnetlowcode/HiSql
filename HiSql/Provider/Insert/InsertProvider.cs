@@ -1036,14 +1036,14 @@ namespace HiSql
                                         var result = checkFieldValue(hiColumn, _rowidx, _value);
                                         if (result.Item1)
                                         {
-                                            _rowdic.Add(hiColumn.FieldName, result.Item2);
+                                            _rowdic[hiColumn.FieldName]=result.Item2;
                                         }
                                         #endregion
                                     }
                                     else
                                     {
                                         var rtn = defaultValue(hiColumn, _rowidx);
-                                        _rowdic.Add(hiColumn.FieldName, rtn.Item2);
+                                        _rowdic[hiColumn.FieldName]= rtn.Item2;
                                     }
                                 }
                                 else

@@ -496,7 +496,7 @@ namespace HiSql
                             //如果不一样（则有变更物理表） 则以物理表的数据为准
 
                             var phytabInfo = TabDefinitionToEntity(dts, dbConfig.DbMapping);
-                            List<FieldChange> fieldChanges = HiSqlCommProvider.TabToCompare(phytabInfo, tabInfo,DBType.Sqlite);
+                            List<FieldChange> fieldChanges = HiSqlCommProvider.TabToCompare(phytabInfo, tabInfo, DBType.Sqlite);
                             List<HiColumn> lstcolumn = tabInfo.GetColumns;
 
                             phytabInfo = HiSqlCommProvider.TabMerge(phytabInfo, tabInfo);
@@ -1134,12 +1134,12 @@ namespace HiSql
 
             var oldTableInfo = GetTabStruct(tabInfo.TabModel.TabName);
 
-           
+
             string temp_table = $"_sqliteexpert_temp_table_{DateTime.Now.ToFileTime().ToString()}";
             StringBuilder _sql = new StringBuilder();
             _sql.AppendLine(dbConfig.GetModiTableSAVEPOINT);
             _sql.AppendLine(dbConfig.Re_Table.Replace("[$ReTabName$]", $"{temp_table}"));
-            foreach (var hiColumn in tabInfo.Columns.Where(t=>!t.FieldName.Equals(t.ReFieldName) && !string.IsNullOrWhiteSpace(t.ReFieldName)))
+            foreach (var hiColumn in tabInfo.Columns.Where(t => !t.FieldName.Equals(t.ReFieldName) && !string.IsNullOrWhiteSpace(t.ReFieldName)))
             {
                 hiColumn.FieldName = hiColumn.ReFieldName;
             }
@@ -1152,7 +1152,7 @@ namespace HiSql
 
             _sql.AppendLine(dbConfig.Drop_Table.Replace("[$TabName$]", temp_table));
 
-            if (Constants.HiSysTable["Hi_TabModel"].Equals(tabInfo.TabModel.TabName, StringComparison.OrdinalIgnoreCase) 
+            if (Constants.HiSysTable["Hi_TabModel"].Equals(tabInfo.TabModel.TabName, StringComparison.OrdinalIgnoreCase)
                 || Constants.HiSysTable["Hi_FieldModel"].Equals(tabInfo.TabModel.TabName, StringComparison.OrdinalIgnoreCase))
             {
                 _sql.AppendLine(DeleteTabStruct(tabInfo.TabModel));
@@ -1220,7 +1220,7 @@ namespace HiSql
                 string insertFieldsStr = string.Empty;
                 if (tabFieldAction == TabFieldAction.DELETE)
                 {
-                    _tabcopy.Columns.RemoveAll(t => t.FieldName == hiColumn.FieldName );
+                    _tabcopy.Columns.RemoveAll(t => t.FieldName == hiColumn.FieldName);
                     selectFieldsStr = insertFieldsStr = string.Join(",", _tabcopy.Columns.Select(t => dbConfig.Field_Pre + t.FieldName + dbConfig.Field_After).ToArray());
                 }
 
@@ -1241,7 +1241,7 @@ namespace HiSql
 
 
                 _sql.AppendLine(BuildTabCreateSql(_tabcopy.TabModel, _tabcopy.Columns));
-                
+
                 _sql.AppendLine($"insert into {dbConfig.Table_Pre}{_tabcopy.TabModel.TabName}{dbConfig.Table_After}({insertFieldsStr}) select {selectFieldsStr} from {temp_table}  ;");
 
                 _sql.AppendLine(dbConfig.Drop_Table.Replace("[$TabName$]", temp_table));
@@ -1288,11 +1288,11 @@ namespace HiSql
                                 .Replace("[$EXTEND$]", hiTable.TableType == TableType.Var && hiColumn.IsPrimary ? "primary key" : "")
                                 ;
                             break;
-                        
+
                         case "char":
                             _str_temp_field = _str_temp_field.Replace("[$FieldName$]", hiColumn.FieldName)
                                 .Replace("[$FieldLen$]", hiColumn.FieldLen < 0 ? "8000" : hiColumn.FieldLen.ToString())
-                                .Replace("[$IsNull$]",  hiColumn.IsPrimary ? "NOT NULL" : hiColumn.IsNull == false ? "NULL" : "NOT NULL")
+                                .Replace("[$IsNull$]", hiColumn.IsPrimary ? "NOT NULL" : hiColumn.IsNull == false ? "NULL" : "NOT NULL")
                                 .Replace("[$Default$]", hiColumn.IsPrimary ? "" : GetDbDefault(hiColumn))
                                 .Replace("[$EXTEND$]", hiTable.TableType == TableType.Var && hiColumn.IsPrimary ? "primary key" : "")
                                 ;
@@ -1449,7 +1449,7 @@ namespace HiSql
             DataTable dt = new DataTable() { };
             dt.Columns.Add(new DataColumn("TableId", Type.GetType("System.Int32")));
             dt.Columns.Add(new DataColumn("TableName", Type.GetType("System.String")));
-            dt.Columns.Add(new DataColumn("IndexId", Type.GetType("System.Int32")));            
+            dt.Columns.Add(new DataColumn("IndexId", Type.GetType("System.Int32")));
             dt.Columns.Add(new DataColumn("IndexName", Type.GetType("System.String")));
             dt.Columns.Add(new DataColumn("IndexType", Type.GetType("System.String")));
             dt.Columns.Add(new DataColumn("ColumnIdx", Type.GetType("System.Int32")));
@@ -1465,7 +1465,7 @@ namespace HiSql
             dt.Columns.Add(new DataColumn("IsIncludedColumn", Type.GetType("System.String")));
             foreach (DataRow item in dt_temp.Rows)
             {
-                dt.Rows.Add(1, tableName, item["cid"].ToString(), indexName, IsPrimary? "Key_Index" : "Index", item["cid"].ToString(), item["cid"].ToString(), item["name"].ToString(), item["seqno"].ToString(), IsPrimary ? "Y" : "N", 
+                dt.Rows.Add(1, tableName, item["cid"].ToString(), indexName, IsPrimary ? "Key_Index" : "Index", item["cid"].ToString(), item["cid"].ToString(), item["name"].ToString(), item["seqno"].ToString(), IsPrimary ? "Y" : "N",
                    "N"
                    , "N", "N", "N", "N", "N");
 
@@ -1512,7 +1512,7 @@ namespace HiSql
             {
                 string _tab_sql = dt_sql.Rows[0]["sql"].ToString();
 
-                List<Dictionary<string,string>> lstdic= Tool.RegexGrps(@"(?<field>[^,\(]*AUTOINCREMENT)", _tab_sql);
+                List<Dictionary<string, string>> lstdic = Tool.RegexGrps(@"(?<field>[^,\(]*AUTOINCREMENT)", _tab_sql);
                 if (lstdic.Count > 0)
                 {
                     //说明是有主键
@@ -1524,8 +1524,8 @@ namespace HiSql
                             Dictionary<string, string> _dic = Tool.RegexGrp(@"\[?(?<fieldname>[\w]+)\]?\s*", dic["field"]);
                             if (_dic.ContainsKey("fieldname"))
                             {
-                                DataRow drow = dt.AsEnumerable().Where(t => t.Field<string>("FieldName").ToString().Equals(_dic["fieldname"].ToString(),StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-                                if(drow!=null)
+                                DataRow drow = dt.AsEnumerable().Where(t => t.Field<string>("FieldName").ToString().Equals(_dic["fieldname"].ToString(), StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                                if (drow != null)
                                     drow["IsIdentity"] = true;
                             }
 
@@ -1605,7 +1605,7 @@ namespace HiSql
 
             _tempsql = _tempsql.Replace("[$Where$]", _where);
 
-           // List<string> sqlList = new List<string>() { _tempsqlcount, _tempsql };
+            // List<string> sqlList = new List<string>() { _tempsqlcount, _tempsql };
 
             List<string> sqlList = new List<string>() { _tempsql };
             List<HiParameter[]> parameters = new List<HiParameter[]>() {
@@ -1828,7 +1828,7 @@ namespace HiSql
                     //.Replace("[$Primary$]", hiTable.TableType == TableType.Var ? "" : dbConfig.Table_Key3)
                     ;
                 if (_create_tabname.Substring(0, 1) != "#" && (_create_tabname.Substring(0, 1) != "@"
-                    && (!Constants.HiSysTable["Hi_TabModel"].Equals(_create_tabname,StringComparison.OrdinalIgnoreCase) && !Constants.HiSysTable["Hi_FieldModel"].Equals(_create_tabname, StringComparison.OrdinalIgnoreCase))
+                    && (!Constants.HiSysTable["Hi_TabModel"].Equals(_create_tabname, StringComparison.OrdinalIgnoreCase) && !Constants.HiSysTable["Hi_FieldModel"].Equals(_create_tabname, StringComparison.OrdinalIgnoreCase))
                     ))
                 {
                     _temp_create = _temp_create
@@ -1936,9 +1936,9 @@ namespace HiSql
                             if (hiColumn != null)
                             {
                                 if (hastabname)
-                                    sb_sql.Append($"{dbConfig.Table_Pre}{ Tool.GetDbTabName(hiColumn, field)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{ Tool.GetDbFieldName(hiColumn, field)}{dbConfig.Field_After}");
+                                    sb_sql.Append($"{dbConfig.Table_Pre}{Tool.GetDbTabName(hiColumn, field)}{dbConfig.Table_After}.{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, field)}{dbConfig.Field_After}");
                                 else
-                                    sb_sql.Append($"{dbConfig.Field_Pre}{ Tool.GetDbFieldName(hiColumn, field)}{dbConfig.Field_After}");
+                                    sb_sql.Append($"{dbConfig.Field_Pre}{Tool.GetDbFieldName(hiColumn, field)}{dbConfig.Field_After}");
                                 string _value = whereResult.Result["value"].ToString();
                                 if (hiColumn != null)
                                 {
@@ -3196,7 +3196,7 @@ namespace HiSql
                 {
                     _value = value.ToString();
                     _likesymbol = Tool.RegexGrps(Constants.REG_ISLIKEQUERY, _value).Count;
-                    if (_value.Length <= hiColumn.FieldLen+ _likesymbol || hiColumn.FieldLen < 0)
+                    if (_value.Length <= hiColumn.FieldLen + _likesymbol || hiColumn.FieldLen < 1)
                     {
                         if (hiColumn.IsPrimary && string.IsNullOrEmpty(_value))
                         {
@@ -3292,7 +3292,7 @@ namespace HiSql
 
                     if (!string.IsNullOrEmpty(dic["flag"].ToString()))
                         nvalue = dic["flag"].ToString();
-                   
+
 
                     //add by tgm date:2023.3.6.12 当为模版语法时可忽略检测表及字段
                     if (_hiColumn != null)
@@ -3363,7 +3363,7 @@ namespace HiSql
                     if (!_istempfield)
                     {
                         //非模板字段
-                        if (_value.Length <= hiColumn.FieldLen+ _likesymbol || hiColumn.FieldLen < 0)
+                        if (_value.Length <= hiColumn.FieldLen + _likesymbol || hiColumn.FieldLen < 1)
                         {
                             if (hiColumn.IsPrimary && string.IsNullOrEmpty(_value))
                             {
@@ -3476,7 +3476,7 @@ namespace HiSql
                     if (!Tool.RegexMatch(Constants.REG_ISLIKEQUERY, _value))
                         throw new Exception($"当前使用了模糊查询但值[{_value}]未指定[%]符号 ");
                     _likesymbol = Tool.RegexGrps(Constants.REG_ISLIKEQUERY, _value).Count;
-                    if (_value.Length <= hiColumn.FieldLen+ _likesymbol || hiColumn.FieldLen < 0)
+                    if (_value.Length <= hiColumn.FieldLen + _likesymbol || hiColumn.FieldLen < 0)
                         _value = $"'{_value.ToSqlInject()}'";
                     else
                         throw new Exception($"过滤条件字段[{filterDefinition.Field.AsFieldName}]指定的值超过了限定长度[{hiColumn.FieldLen}]");
@@ -3487,7 +3487,7 @@ namespace HiSql
                     if (!Tool.RegexMatch(Constants.REG_ISLIKEQUERY, _value))
                         throw new Exception($"当前使用了模糊查询但值[{_value}]未指定[%]符号 ");
                     _likesymbol = Tool.RegexGrps(Constants.REG_ISLIKEQUERY, _value).Count;
-                    if (_value.LengthZH() <= hiColumn.FieldLen+ _likesymbol || hiColumn.FieldLen < 0)
+                    if (_value.LengthZH() <= hiColumn.FieldLen + _likesymbol || hiColumn.FieldLen < 0)
                         _value = $"'{_value.ToSqlInject()}'";
                     else
                         throw new Exception($"过滤条件字段[{filterDefinition.Field.AsFieldName}]指定的值超过了限定长度[{hiColumn.FieldLen}]");
@@ -3554,7 +3554,7 @@ namespace HiSql
         {
             string _sql = dbConfig.Get_IndexDetail.Replace("[$TabName$]", tabname).Replace("[$IndexName$]", indexname);
             List<TabIndexDetail> lstindex = new List<TabIndexDetail>();
-            DataTable dt = ConvertIndexDetailFromPRAGMA(Context.DBO.GetDataTable(_sql),tabname, indexname, indexname.IndexOf("sqlite_autoindex_") > -1);
+            DataTable dt = ConvertIndexDetailFromPRAGMA(Context.DBO.GetDataTable(_sql), tabname, indexname, indexname.IndexOf("sqlite_autoindex_") > -1);
             if (dt.Rows.Count > 0)
             {
                 foreach (DataRow dr in dt.Rows)
@@ -3607,7 +3607,7 @@ namespace HiSql
             }
 
             _sql.AppendLine(BuildTabCreateSql(tabInfo.TabModel, tabInfo.Columns));
-            var fieldsStr = string.Join(",", tabInfo.Columns.Select(t => dbConfig.Field_Pre + t.FieldName+ dbConfig.Field_After).ToArray());
+            var fieldsStr = string.Join(",", tabInfo.Columns.Select(t => dbConfig.Field_Pre + t.FieldName + dbConfig.Field_After).ToArray());
             _sql.AppendLine($"insert into {dbConfig.Table_Pre}{tabInfo.TabModel.TabName}{dbConfig.Table_After}({fieldsStr}) select {fieldsStr} from {temp_table}  ; ");
 
             _sql.AppendLine(dbConfig.Drop_Table.Replace("[$TabName$]", temp_table));
