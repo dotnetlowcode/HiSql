@@ -89,5 +89,15 @@ namespace HiSql.Excel.Properties {
                 return ((byte[])(obj));
             }
         }
+        
+        /// <summary>
+        ///   查找 System.Byte[] 类型的本地化资源。
+        /// </summary>
+        internal static byte[] NotFound {
+            get {
+                object obj = ResourceManager.GetObject("NotFound", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
     }
 }

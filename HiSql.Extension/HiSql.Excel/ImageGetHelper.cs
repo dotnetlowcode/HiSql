@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -108,8 +110,7 @@ namespace HiSql.Extension
                 }
                 if (notFoundId == -1)
                 {
-                    var notFoundImagePath = AppContext.BaseDirectory + "/Template/NotFoundImage.png";
-                    imgData = File.ReadAllBytes(notFoundImagePath);
+                    imgData = HiSql.Excel.Properties.Resources.NotFound; //File.ReadAllBytes(notFoundImagePath);
                     notFoundId = _workBook.AddPicture(imgData, PictureType.JPEG);
                 }
                 imgId = notFoundId;
