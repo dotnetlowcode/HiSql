@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
+using StackExchange.Redis;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -914,6 +915,21 @@ namespace HiSql
                 }
             }
             return lckInfos;
+        }
+
+        public override string LoadScript(string luascript)
+        {
+            throw new Exception($"基于本机的访问模式无法使用[LoadScript]方法,该方法仅限于Redis环境下使用");
+        }
+
+        public override string EvalSha(string shaid, string[] keys, object[] values)
+        {
+            throw new Exception($"基于本机的访问模式无法使用[EvalSha]方法,该方法仅限于Redis环境下使用");
+        }
+
+        public override T ExecuteLuaScript<T>(string luascript, string[] keys, object[] values)
+        {
+            throw new Exception($"基于本机的访问模式无法使用[ExecuteLuaScript]方法,该方法仅限于Redis环境下使用");
         }
 
 

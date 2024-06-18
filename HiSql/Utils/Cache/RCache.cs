@@ -18,6 +18,7 @@ namespace HiSql
 
         private readonly string UniqueId = Guid.NewGuid().ToString();
         private StackExchange.Redis.IDatabase _cache;
+        private StackExchange.Redis.IServer _server;
         private ConnectionMultiplexer _connectMulti;
         private string _cache_notity_channel_remove = "hisql_cache_notity_channel@{0}__:remove";
         private MCache _MemoryCache;
@@ -268,6 +269,19 @@ namespace HiSql
                 _connectMulti = ConnectionMultiplexer.Connect(_connstr);
                 _cache = _connectMulti.GetDatabase(this._options.Database);
 
+            }
+           
+        }
+
+        private void CheckRedisServer()
+        {
+            CheckRedis();
+            if (_server == null || !_server.IsConnected)
+            {
+                string _connstr = $"{this._options.Host}:{this._options.Port}";
+                if (!string.IsNullOrEmpty(this._options.PassWord))
+                    _connstr = $"{_connstr},password={this._options.PassWord}";
+                _server = _connectMulti.GetServer(_connstr);
             }
         }
 
@@ -1473,6 +1487,75 @@ namespace HiSql
         /// </summary>
         public override CacheType CacheType => CacheType.RCache;
 
+        public string ExecLuaScript(string script, object obj = null)
+        {
+            var scriptObj = LuaScript.Prepare(script);
+            var redisResult = _cache.ScriptEvaluate(scriptObj, obj);
+            return redisResult.ToString();
+        }
+
+        public override string LoadScript(string luascript)
+        {
+            string shaid = string.Empty;
+            CheckRedisServer();
+            var bytes=_server.ScriptLoad(luascript);
+            
+            //成功加载脚本后需要进行缓存
+            if (bytes != null && bytes.Length > 0)
+            {
+                shaid=BitConverter.ToString(bytes).Replace("-", "").ToLower();
+                if (!this.dic_sha.ContainsKey(shaid))
+                {
+                    this.dic_sha.Add(shaid,bytes);
+                }
+
+            }
+            return shaid;
+
+        }
+
+        public override string EvalSha(string shaid, string[] keys, object[] values)
+        {
+            if (this.dic_sha.ContainsKey(shaid))
+            {
+                RedisKey[] rediskeys=new RedisKey[] { };
+
+
+                RedisValue[] redisvalues=new RedisValue[] { };
+
+                if(keys!=null && keys.Length>0)
+                {
+                    rediskeys = new RedisKey[keys.Length];
+                    for (int i = 0; i < keys.Length; i++)
+                    {
+                        rediskeys[i] = (RedisKey)keys[i];
+                    }
+                }
+                if(values!=null && values.Length>0)
+                {
+                    redisvalues = new RedisValue[values.Length];
+                    for (int i = 0; i < values.Length; i++)
+                    {
+                        redisvalues[i] = (RedisValue)values[i];
+                    }
+                }
+
+                var result=_cache.ScriptEvaluate(this.dic_sha[shaid], rediskeys, redisvalues);
+                return result.ToString();
+            }
+            else
+            {
+                throw new Exception($"Redis ShaId:[{shaid}] 不存在");
+            }
+        }
+
+        public override T ExecuteLuaScript<T>(string luascript, string[] keys, object[] values)
+        {
+            throw new NotImplementedException();
+        }
+
+
+
         #region 私有变量
         LckInfo getLockInfo(LckInfo lckInfo, int expirySeconds, int times)
         {
@@ -1519,13 +1602,7 @@ namespace HiSql
             return redisResult.ToString();
         }
 
-        public string ExecLuaScript(string script, object obj = null)
-        {
-            var scriptObj = LuaScript.Prepare(script);
-            var redisResult = _cache.ScriptEvaluate(scriptObj, obj);
-            return redisResult.ToString();
-        }
-
+       
         //bool lockOn(string key, int expirySeconds = 5)
         //{
         //    expirySeconds = expirySeconds < 0 ? 5 : expirySeconds;
