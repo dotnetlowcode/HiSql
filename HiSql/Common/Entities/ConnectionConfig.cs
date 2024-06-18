@@ -139,10 +139,21 @@ namespace HiSql
         /// </summary>
         public string DbServer
         {
-            get{ return _dbserver;}
+            get{
+                if (string.IsNullOrEmpty(_dbserver)) {
+                    _dbserver = "default";
+                }
+                return _dbserver;
+            
+            }
             set { 
                     
-                _dbserver = value; 
+                _dbserver = value;
+
+                if (!HiSql.Tool.RegexMatch("^[\\w-]+$", _dbserver))
+                {
+                    throw new Exception($"连接配置设置的[DbServer]:{_dbserver}命名不符合规范");
+                }
             
             }
         }
