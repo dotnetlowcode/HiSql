@@ -117,7 +117,10 @@ namespace HiSql
                 }
 
 
-                lstColumn.Add(hiColumn);
+                if (hiColumn.IsIgnore == false) //如果标记了 忽略，则不作为数据库字段 add by timpeng 2024-6-28
+                {
+                    lstColumn.Add(hiColumn);
+                }
             }
             return new Tuple<HiTable, List<HiColumn>>(hiTable, lstColumn);
         }

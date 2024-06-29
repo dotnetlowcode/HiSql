@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using HiSql.SqlServerUnitTest;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -45,7 +46,21 @@ namespace HiSql
             {
                 get; set;
             }
-
+            [HiColumn(IsIgnore = true)]
+            public string Descript22
+            {
+                get; set;
+            }
+            [HiColumn(IsIgnore = true)]
+            public string Descript33
+            {
+                get; set;
+            }
+            [HiColumn(IsIgnore = true)]
+            public string Descript44
+            {
+                get; set;
+            }
         }
         class H_Test : StandField
         {
@@ -91,13 +106,13 @@ namespace HiSql
             //Demo1_Insert4(sqlClient);
             //Demo1_Insert5(sqlClient);
             //Demo1_Insert6(sqlClient);
-            //Demo1_Insert7(sqlClient);
+            Demo1_Insert7(sqlClient);
             //Demo_dynamic(sqlClient);
 
             //Demo1_Insert8(sqlClient);
             //Demo1_Insert9(sqlClient);
 
-            Demo1_Insert11(sqlClient);
+           // Demo1_Insert11(sqlClient);
             //Demo1_Insert12(sqlClient);
             //Demo1_Insert13(sqlClient);
         }
@@ -328,8 +343,18 @@ namespace HiSql
             //sqlClient.Update("Hi_FieldModel", new { TabName = "HTest01", FieldName = "UTYP", Regex = @"" ,IsRefTab=true,RefTab= "H_UType",RefField="UTYP", RefFields = "UTYP,UTypeName",RefFieldDesc= "类型编码,类型名称",RefWhere="UTYP<>''" }).ExecCommand();
             //sqlClient.Update("Hi_FieldModel", new { TabName = "HTest01", FieldName = "UName", Regex = @"^[\w]+[^']$" ,IsRefTab=false,RefTab= "",RefField="", RefFields = "",RefFieldDesc= "",RefWhere="" }).ExecCommand();
             //sqlClient.BeginTran(IsolationLevel.ReadUncommitted);
+           // sqlClient.DbFirst.DropTable(typeof(HTest01).Name);
 
-            int _effect1 = sqlClient.Insert("HTest01", new HTest01 { SID = 123456, UName = "tansar", Age = 25, Salary = 1999, Descript = "hello world" }).ExecCommand();
+            bool isok = sqlClient.DbFirst.CheckTabExists(typeof(HTest01).Name);
+            if (isok == false)
+            {
+                sqlClient.DbFirst.CreateTable(typeof(HTest01));
+            }
+
+
+            sqlClient.CodeFirst.Truncate("HTest01");
+
+            int _effect1 = sqlClient.Insert("HTest01", new HTest01 { SID = (int) DateTime.Now.Ticks, UName = "tansar", Age = 25, Salary = 1999, Descript = "hello world" }).ExecCommand();
 
 
             //sqlClient.Delete("HTest01", new HTest01 { SID = 123456 }).ExecCommand();

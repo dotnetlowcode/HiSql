@@ -1407,6 +1407,11 @@ namespace HiSql
                     int _psize = 1000;
                     foreach (HiColumn hiColumn in arrcol_tab)
                     {
+                        if (hiColumn.IsRefTab && hiColumn.RefTab.IsNullOrEmpty())
+                        {
+                            System.Console.WriteLine($@"表关联配置校验-校验列 {hiColumn.TabName} {hiColumn.FieldName} IsRefTab配置错误，RefTab为空 ");
+                            continue;
+                        }
                         int _scount = 0;
                         if (dic_hash_reg.ContainsKey(hiColumn.FieldName))
                         {

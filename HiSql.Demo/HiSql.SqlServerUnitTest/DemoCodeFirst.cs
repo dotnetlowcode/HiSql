@@ -15,7 +15,7 @@ namespace HiSql
             //CodeFirst_Table(sqlClient);
             //Snro_Demo(sqlClient);
             CodeFirst_Install(sqlClient);
-            string s = Console.ReadLine();
+            //string s = Console.ReadLine();
         }
 
 
