@@ -23,6 +23,15 @@ namespace HiSql
         private string _cache_notity_channel_remove = "hisql_cache_notity_channel@{0}__:remove";
         private MCache _MemoryCache;
         private RedisOptions _options;
+
+        /// <summary>
+        /// redis 加锁脚本的sha id值
+        /// </summary>
+        string lck_shaid = "";
+        /// <summary>
+        /// redis 解锁脚本的sha id值
+        /// </summary>
+        string unlck_shaid = "";
         public RCache(RedisOptions options)
         {
             if (options == null)
@@ -105,6 +114,12 @@ namespace HiSql
                     });
                 }
             }
+            //加载本至redis 
+
+            //加锁脚本 add by tgm date:2024.7.2
+            lck_shaid=this.LoadScript(LockScriptFormat_v2);
+            //解锁脚本 add by tgm date:2024.7.2
+            unlck_shaid = this.LoadScript(UnlockScript_v2);
         }
 
         /// <summary>
@@ -130,6 +145,23 @@ namespace HiSql
                     end
                 end
                 return cnt";
+        /// <summary>
+        /// 解锁脚本2
+        /// KEYS[1] =hsetkey 的 argv[1]=""
+        /// </summary>
+        const String UnlockScript_v2 = @"
+                local hsetkey = KEYS[1]
+                local i = 2                
+                local cnt = 0
+                for i = 2,#ARGV
+                do
+                    if redis.call(""get"",KEYS[i]) == ARGV[i] then
+                        redis.call(""del"",KEYS[i])
+                        redis.call('hdel', hsetkey, ARGV[i])
+                        cnt = cnt +  1
+                    end
+                end
+                return cnt";
         const String LockScriptFormat = @"
                         -- lock.lua
                         -- 同时锁定多个资源
@@ -150,6 +182,37 @@ namespace HiSql
                                 redis.call('expire',KEYS[i],{0})
                                 redis.call('hset', string1, KEYS[i], string3)
                                 redis.call('expire',string1,{0})
+                            end
+                            return true
+                        end
+                        return false
+                        ";
+
+        /// <summary>
+        /// KEYS[1]=hsetkey ARGV[1]=key_exp
+        /// KEYS]2]=hsetval ARGV[2]=key_exp
+        /// </summary>
+        const String LockScriptFormat_v2 = @"
+                        -- lock.lua
+                        -- 同时锁定多个资源
+                        local key_exp = ARGV[1]
+                        local hsetkey = KEYS[1]
+                        local hsetval = KEYS[2]
+                        local non_exist = true
+                        
+                        local i = 3
+                        for i = 3,#ARGV
+                        do
+                            local r = redis.call('GET',KEYS[i])
+                            non_exist = (non_exist and not r)
+                        end
+                        if non_exist then
+                            for i = 3,#ARGV
+                            do
+                                redis.call('set',KEYS[i],ARGV[i])
+                                redis.call('expire',KEYS[i],key_exp)
+                                redis.call('hset', hsetkey, KEYS[i], hsetval)
+                                redis.call('expire',hsetkey,key_exp)
                             end
                             return true
                         end
@@ -670,8 +733,11 @@ namespace HiSql
 
             Stopwatch stopwatch = Stopwatch.StartNew();
 
-            RedisKey[] rediskeys = new RedisKey[keys.Length];
-            RedisValue[] redisvalues = new RedisValue[keys.Length];
+            int _argcount = 1;//前几个参数作为固定参与传入redis脚本
+            RedisKey[] rediskeys = new RedisKey[keys.Length+ _argcount];
+            RedisValue[] redisvalues = new RedisValue[keys.Length+ _argcount];
+            rediskeys[0] = _lockhashname;
+            redisvalues[0] = "";
             for (int i = 0; i < keys.Length; i++)
             {
                 var newkey = keys[i];
@@ -679,11 +745,11 @@ namespace HiSql
                     newkey = _lockkeyPrefix + newkey;
                 newkey = GetRegionKey(newkey);
 
-                rediskeys[i] = newkey;
-                redisvalues[i] = lckinfo.UName;
+                rediskeys[i+ _argcount] = newkey;
+                redisvalues[i+ _argcount] = lckinfo.UName;
             }
             string luaStr = String.Format(UnlockScript, _lockhashname);
-            var redisResult = _cache.ScriptEvaluate(luaStr, rediskeys, redisvalues);
+            var redisResult = _cache.ScriptEvaluate(this.dic_sha[unlck_shaid], rediskeys, redisvalues);
             //Console.WriteLine($"{lckinfo.UName}释放锁：{string.Join(",", rediskeys)}  成功释放数量：{redisResult.ToString()}");
             foreach (string key in rediskeys)
             {
@@ -1004,8 +1070,16 @@ namespace HiSql
                 return LockOn(keys[0], lckinfo, expirySeconds, timeoutSeconds);
             }
 
-            RedisKey[] rediskeys = new RedisKey[keys.Length];
-            RedisValue[] redisvalues = new RedisValue[keys.Length];
+            int _argcount = 2;
+            RedisKey[] rediskeys = new RedisKey[keys.Length+ _argcount];
+            RedisValue[] redisvalues = new RedisValue[keys.Length+ _argcount];
+
+            rediskeys[0] = _lockhashname;
+            redisvalues[0] = expirySeconds;
+
+            rediskeys[1] = JsonConvert.SerializeObject(lckinfo).Replace("\"", "\\\"");
+            redisvalues[1] = expirySeconds;
+
             for (int i = 0; i < keys.Length; i++)
             {
                 var newkey = keys[i];
@@ -1013,8 +1087,8 @@ namespace HiSql
                     newkey = _lockkeyPrefix + newkey;
                 newkey = GetRegionKey(newkey);
 
-                rediskeys[i] = newkey;
-                redisvalues[i] = lckinfo.UName;
+                rediskeys[i + _argcount] = newkey;
+                redisvalues[i+ _argcount] = lckinfo.UName;
             }
             var getlocked = false;
             string luaStr = String.Format(LockScriptFormat, expirySeconds, _lockhashname, JsonConvert.SerializeObject(lckinfo).Replace("\"", "\\\""));
@@ -1028,7 +1102,9 @@ namespace HiSql
 
             while (!getlocked && stopwatch.Elapsed <= getlockElapsed)
             {
-                var redisResult = _cache.ScriptEvaluate(luaStr, rediskeys, redisvalues);
+
+                //var redisResult = _cache.ScriptEvaluate(luaStr, rediskeys, redisvalues);
+                var redisResult = _cache.ScriptEvaluate(this.dic_sha[lck_shaid], rediskeys, redisvalues);
                 if (((bool)redisResult))
                 {
                     getlocked = true;
@@ -1570,8 +1646,54 @@ namespace HiSql
                 throw new Exception($"Redis ShaId:[{shaid}] 不存在");
             }
         }
+        /// <summary>
+        /// 执行已经装入的redis sha脚本
+        /// 注意一定要在lua脚本中自定义返回 true|false
+        /// </summary>
+        /// <param name="shaid"></param>
+        /// <param name="keys"></param>
+        /// <param name="values"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public override bool EvalBoolSha(string shaid, RedisKey[] rediskeys, RedisValue[] redisvalues)
+        {
+            if (this.dic_sha.ContainsKey(shaid))
+            {
+                //RedisKey[] rediskeys = new RedisKey[] { };
+                //RedisValue[] redisvalues = new RedisValue[] { };
 
-       
+                //if (keys != null && keys.Length > 0)
+                //{
+                //    rediskeys = new RedisKey[keys.Length];
+                //    for (int i = 0; i < keys.Length; i++)
+                //    {
+                //        rediskeys[i] = (RedisKey)keys[i];
+                //    }
+                //}
+                //if (values != null && values.Length > 0)
+                //{
+                //    redisvalues = new RedisValue[values.Length];
+                //    for (int i = 0; i < values.Length; i++)
+                //    {
+                //        redisvalues[i] = (RedisValue)values[i];
+                //    }
+                //}
+
+                var result = _cache.ScriptEvaluate(this.dic_sha[shaid], rediskeys, redisvalues);
+                if (((bool)result))
+                    return true;
+                else 
+                    return false; 
+                
+
+
+            }
+            else
+            {
+                throw new Exception($"Redis ShaId:[{shaid}] 不存在");
+            }
+        }
+
 
 
 

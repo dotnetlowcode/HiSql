@@ -924,10 +924,14 @@ namespace HiSql
 
         public override string EvalSha(string shaid, string[] keys, string[] values)
         {
-            throw new Exception($"基于本机的访问模式无法使用[EvalSha]方法,该方法仅限于Redis环境下使用");
+            throw new Exception($"本地缓存模式无法使用[EvalSha]方法,该方法仅限于Redis环境下使用");
         }
 
-   
+        public override bool EvalBoolSha(string shaid, RedisKey[] rediskeys, RedisValue[] redisvalues)
+        {
+            throw new Exception($"本地缓存模式无法使用[EvalBoolSha]方法,该方法仅限于Redis环境下使用");
+        }
+
 
 
         /// <summary>
