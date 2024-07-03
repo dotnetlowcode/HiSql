@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -32,6 +33,12 @@ namespace HiSql
         /// redis 解锁脚本的sha id值
         /// </summary>
         string unlck_shaid = "";
+
+        /// <summary>
+        /// 检测锁是否存在的 sha id值
+        /// </summary>
+        string chklck_shaid = "";
+
         public RCache(RedisOptions options)
         {
             if (options == null)
@@ -120,6 +127,8 @@ namespace HiSql
             lck_shaid=this.LoadScript(LockScriptFormat_v2);
             //解锁脚本 add by tgm date:2024.7.2
             unlck_shaid = this.LoadScript(UnlockScript_v2);
+            //检测锁是否存在的脚本
+            chklck_shaid = this.LoadScript(CheckScript);
         }
 
         /// <summary>
@@ -131,6 +140,31 @@ namespace HiSql
         //    else
         //        return 0
         //    end";
+
+
+        //检测表锁是否存在
+        const String CheckScript = @"
+            local _exist = 0
+            local hgetkey=KEYS[1]
+
+            local hgetval;
+            local result={}
+
+            local i = 2
+            for i = 2,#KEYS do
+                _exist = redis.call('exists',KEYS[i])
+                if _exist==1 then
+                    hgetval=redis.call('HGET', hgetkey, KEYS[i])
+                    result[1]=1
+                    result[2]=hgetval
+                    result[3]=KEYS[i]
+                    return result
+                end
+            end
+            result[1]=_exist
+            result[2]=''
+            return result
+            ";
 
         const String UnlockScript = @"
                 local string1 = '{0}'
@@ -980,6 +1014,11 @@ namespace HiSql
             timeoutSeconds = timeoutSeconds < 0 ? 5 : timeoutSeconds;
             timeoutSeconds = timeoutSeconds > _max_timeout ? _max_timeout : timeoutSeconds;
 
+            if (lckinfo.LockTime == null)
+                lckinfo.LockTime = DateTime.Now;
+
+            lckinfo.ExpireTime = lckinfo.LockTime.AddSeconds(expirySeconds);
+
             bool getlocked = false;
             var getlockElapsed = TimeSpan.FromSeconds(timeoutSeconds);
             if (!isBlockingMode)
@@ -1077,7 +1116,18 @@ namespace HiSql
             rediskeys[0] = _lockhashname;
             redisvalues[0] = expirySeconds;
 
-            rediskeys[1] = JsonConvert.SerializeObject(lckinfo).Replace("\"", "\\\"");
+            //rediskeys[1] = JsonConvert.SerializeObject(lckinfo).Replace("\"", "\\\"");
+            //if(keys.Count()==1)
+            //    lckinfo.Key = keys[0];
+
+            if(lckinfo.LockTime==null)
+                lckinfo.LockTime=DateTime.Now;
+
+            lckinfo.ExpireTime= lckinfo.LockTime.AddSeconds(expirySeconds);
+
+
+            string _lckjson= JsonConvert.SerializeObject(lckinfo); 
+            rediskeys[1] = _lckjson;
             redisvalues[1] = expirySeconds;
 
             for (int i = 0; i < keys.Length; i++)
@@ -1091,7 +1141,7 @@ namespace HiSql
                 redisvalues[i+ _argcount] = lckinfo.UName;
             }
             var getlocked = false;
-            string luaStr = String.Format(LockScriptFormat, expirySeconds, _lockhashname, JsonConvert.SerializeObject(lckinfo).Replace("\"", "\\\""));
+            //string luaStr = String.Format(LockScriptFormat, expirySeconds, _lockhashname, JsonConvert.SerializeObject(lckinfo).Replace("\"", "\\\""));
 
             var getlockElapsed = TimeSpan.FromSeconds(timeoutSeconds);
             if (!isBlockingMode)
@@ -1232,15 +1282,84 @@ namespace HiSql
 
         public override Tuple<bool, string> CheckLock(params string[] keys)
         {
+            CheckRedis();
+            List<string> lstkeys=new List<string> ();
+
+            bool islock = false;
+            string msg = string.Empty;
+            lstkeys.Add(_lockhashname);
             foreach (var key in keys)
             {
-                var res = CheckLock(key);
-                if (res.Item1)
+                if (!key.Contains(_lockkeyPrefix))
+                    lstkeys.Add( _lockkeyPrefix + key);
+            }
+            string result = EvalSha(chklck_shaid, lstkeys.ToArray(), null);
+            List<string> lst = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(result);
+            if (lst.Count >= 2)
+            {
+                if (lst[0].Equals("0"))
                 {
-                    return res;
+                    islock = false;
+                    msg = $"未被锁定";
+                }
+                else if (lst[0].Equals("1"))
+                {
+                    islock = true;
+                    if (!string.IsNullOrEmpty(lst[1]))
+                    {
+                        
+                        LckInfo info= Newtonsoft.Json.JsonConvert.DeserializeObject<LckInfo>(lst[1]);
+                        string _key = lst[2] != null ? lst[2] : "";
+                        if (string.IsNullOrEmpty(info.Key))
+                        {
+                            if (!string.IsNullOrEmpty(_key))
+                                msg = $"key:[{_key}]";
+                        }
+                        else
+                            msg = $"key:[{info.Key}]";
+                        
+                        if (info != null)
+                        {
+                            if (!string.IsNullOrEmpty(info.UName))
+                                msg += $" 被[{info.UName}]";
+                            if (!string.IsNullOrEmpty(info.EventName)) msg += $" 在[{info.EventName}]";
+
+                            if (info.LockTime != null)
+                            {
+                                if (info.LockTime.Year >= 1970)
+                                    msg += $" 于[{info.LockTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}]进行锁定";
+
+                                if (info.ExpireTime != null)
+                                {
+                                    if (info.ExpireTime.Year >= DateTime.Now.Year)
+                                    {
+                                        msg += $" 预计[{info.ExpireTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}]自动解锁";
+                                    }
+                                }
+                            }
+                            else
+                                msg += "进行锁定";
+                            if (!string.IsNullOrEmpty(info.Descript))
+                            {
+                                msg += $" 备注:{info.Descript}";
+                            }
+                        }
+                        else
+                        {
+                            msg += $"已经被锁定";
+                        }
+                        
+                    }else
+                        msg += $"已经被锁定";
+
+                }
+                else
+                {
+                    islock = false;
+                    msg = $"无法识别锁定状态";
                 }
             }
-            return new Tuple<bool, string>(false, $"key:[{string.Join(",", keys)}]未被锁定");
+            return new Tuple<bool, string>(islock, msg);
         }
         /// <summary>
         /// 锁定并执行业务
@@ -1290,6 +1409,11 @@ namespace HiSql
             }
             timeoutSeconds = timeoutSeconds < 0 ? 5 : timeoutSeconds;
             timeoutSeconds = timeoutSeconds > _max_timeout ? _max_timeout : timeoutSeconds;
+
+            if (lckinfo.LockTime == null)
+                lckinfo.LockTime = DateTime.Now;
+
+            lckinfo.ExpireTime = lckinfo.LockTime.AddSeconds(expirySeconds);
 
             bool getlocked = false;
             var getlockElapsed = TimeSpan.FromSeconds(timeoutSeconds);
@@ -1445,6 +1569,11 @@ namespace HiSql
             }
             timeoutSeconds = timeoutSeconds < 0 ? 5 : timeoutSeconds;
             timeoutSeconds = timeoutSeconds > _max_timeout ? _max_timeout : timeoutSeconds;
+
+            if (lckinfo.LockTime == null)
+                lckinfo.LockTime = DateTime.Now;
+
+            lckinfo.ExpireTime = lckinfo.LockTime.AddSeconds(expirySeconds);
 
             CancellationTokenSource tokenSource = new CancellationTokenSource();
             CancellationToken cancellationToken = tokenSource.Token;

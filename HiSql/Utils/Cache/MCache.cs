@@ -320,6 +320,10 @@ namespace HiSql
             timeoutSeconds = timeoutSeconds < 0 ? 5 : timeoutSeconds;
             timeoutSeconds = timeoutSeconds > _max_timeout ? _max_timeout : timeoutSeconds;
 
+            if (lckinfo.LockTime == null)
+                lckinfo.LockTime = DateTime.Now;
+
+            lckinfo.ExpireTime = lckinfo.LockTime.AddSeconds(expirySeconds);
             string msg = "";
             var flag = false;
             //创建key
@@ -465,7 +469,7 @@ namespace HiSql
             key = GetRegionKey(key);
 
             bool _islock = false;
-            string _msg = "";
+            string msg = "";
             if (GetCache<LckInfo>(key) != null)
             {
                 //MCaceh 检查锁只有是 缓存对象在，且 HashTable有值才是锁定状态  pengxy on 2022 10 14 
@@ -473,15 +477,47 @@ namespace HiSql
                 if (!string.IsNullOrEmpty(_lockinfo))
                 {
                     _islock = true;
-                    LckInfo lckInfo = JsonConvert.DeserializeObject<LckInfo>(_lockinfo);
-                    _msg = $"key:[{_key}]已经被[{lckInfo.UName}]在[{lckInfo.EventName}]于[{lckInfo.LockTime.ToString("yyyy-MM-dd HH:mm:ss")}]锁定!";
+                    LckInfo info = JsonConvert.DeserializeObject<LckInfo>(_lockinfo);
+ 
+
+                    if (info != null)
+                    {
+                        if (!string.IsNullOrEmpty(info.UName))
+                            msg += $" 被[{info.UName}]";
+                        if (!string.IsNullOrEmpty(info.EventName)) msg += $" 在[{info.EventName}]";
+
+                        if (info.LockTime != null)
+                        {
+                            if (info.LockTime.Year >= 1970)
+                                msg += $" 于[{info.LockTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}]进行锁定";
+
+                            if (info.ExpireTime != null)
+                            {
+                                if (info.ExpireTime.Year >= DateTime.Now.Year)
+                                {
+                                    msg += $" 预计[{info.ExpireTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}]自动解锁";
+                                }
+                            }
+                        }
+                        else
+                            msg += "进行锁定";
+                        if (!string.IsNullOrEmpty(info.Descript))
+                        {
+                            msg += $" 备注:{info.Descript}";
+                        }
+                    }
+                    else
+                    {
+                        msg += $"已经被锁定";
+                    }
                 }
+                else msg += $"已经被锁定";
             }
             else
             {
-                _msg = $"key:[{_key}]未被锁定";
+                msg = $"未被锁定";
             }
-            return new Tuple<bool, string>(_islock, _msg);
+            return new Tuple<bool, string>(_islock, msg);
         }
 
 
@@ -495,7 +531,7 @@ namespace HiSql
                     return res;
                 }
             }
-            return new Tuple<bool, string>(false, $"key:[{string.Join(",", keys)}]未被锁定");
+            return new Tuple<bool, string>(false, $"未被锁定");
         }
         public override Tuple<bool, string> LockOnExecuteNoWait(string key, Action action, LckInfo lckinfo, int expirySeconds = 30)
         {
@@ -523,7 +559,10 @@ namespace HiSql
 
             timeoutSeconds = timeoutSeconds < 0 ? 5 : timeoutSeconds;
             timeoutSeconds = timeoutSeconds > _max_timeout ? _max_timeout : timeoutSeconds;
+            if (lckinfo.LockTime == null)
+                lckinfo.LockTime = DateTime.Now;
 
+            lckinfo.ExpireTime = lckinfo.LockTime.AddSeconds(expirySeconds);
             string msg = "";
             var flag1 = false;
             //创建key
@@ -691,7 +730,10 @@ namespace HiSql
 
             timeoutSeconds = timeoutSeconds < 0 ? 5 : timeoutSeconds;
             timeoutSeconds = timeoutSeconds > _max_timeout ? _max_timeout : timeoutSeconds;
+            if (lckinfo.LockTime == null)
+                lckinfo.LockTime = DateTime.Now;
 
+            lckinfo.ExpireTime = lckinfo.LockTime.AddSeconds(expirySeconds);
             string msg = "";
             bool flag = false;
             var getlockResult = LockOn(keys, lckinfo, expirySeconds, timeoutSeconds);
