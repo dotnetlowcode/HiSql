@@ -4,7 +4,7 @@
 	  <!--net461;-->
 	  <TargetFrameworks>net5.0;netcoreapp3.1;net6.0</TargetFrameworks>
     <Authors>tansar</Authors>
-    <Version>1.0.6.7</Version>
+    <Version>1.0.6.8</Version>
     <Company>dotnetlowcode</Company>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
    
@@ -72,7 +72,7 @@
 
   <ItemGroup>
     <Reference Include="Sap.Data.Hana.Core.v2.1">
-      <HintPath>..\HanaDLL\windows\Sap.Data.Hana.Core.v2.1.dll</HintPath>
+      <HintPath>..\HanaDLL\linuxDll\Sap.Data.Hana.Core.v2.1.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>

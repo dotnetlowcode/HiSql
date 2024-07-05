@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace HiSql
 {
@@ -49,6 +50,13 @@ namespace HiSql
         /// <param name="value"></param>
         /// <param name="second">设置多少秒后过期</param>
         void SetCache(string key, object value, int second);
+
+        /// <summary>
+        /// 批量设置key
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <param name="second"></param>
+        void SetCache(IDictionary<string,string> dic, int second);
 
         //void SetCache(string key, object value, double expirationMinute);  //设置滑动过期， 因redis暂未找到自带的滑动过期类的API，暂无需实现该接口
         /// <summary>

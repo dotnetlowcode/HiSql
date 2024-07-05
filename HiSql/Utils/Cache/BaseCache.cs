@@ -122,6 +122,13 @@ namespace HiSql
         public abstract void SetCache(string key, object value);
         public abstract void SetCache(string key, object value, DateTimeOffset expiryAbsoulte);
         public abstract void SetCache(string key, object value, int second);
-        public abstract bool UnLock(LckInfo lckinfo, params string[] keys);
+        public abstract bool UnLock(params string[] keys);
+
+        /// <summary>
+        /// 批量设置key
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <param name="second">过期时间(s) 不设置则为-1</param>
+        public abstract void SetCache(IDictionary<string, string> dic, int second=-1);
     }
 }

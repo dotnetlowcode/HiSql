@@ -61,7 +61,7 @@ namespace HiSql.UnitTest
             //Query_Demo16(sqlClient);
             //Query_Demo17(sqlClient);
             //Query_Demo18(sqlClient);
-            //Query_Demo19(sqlClient);
+            Query_Demo19(sqlClient);
             // Query_Demo20(sqlClient);
             //Query_Demo21();
             //Query_Demo22(sqlClient);
@@ -83,7 +83,8 @@ namespace HiSql.UnitTest
 
         static void Query_Demo22(HiSqlClient sqlClient)
         {
-            var _paramsql = sqlClient.HiSql(@"select * from Hi_FieldModel where tabname in (@TabName)  and fieldname=@fieldname and tabname in (select tabname from hi_tabmodel where tabname in (@TabName) )", new { TabName = new List<string> { "Hi_TestQuery", "Hi_FieldModel" }, FieldName = "DbServer" }).ToSql();
+            var _paramsql = sqlClient.HiSql(@"select * from Hi_FieldModel where
+tabname in (@TabName)  and fieldname=@fieldname and tabname in (select tabname from hi_tabmodel where tabname in (@TabName) )", new { TabName = new List<string> { "Hi_TestQuery", "Hi_FieldModel" }, FieldName = "DbServer" }).ToSql();
             Console.WriteLine(_paramsql);
         }
         static void Query_MyFlowDto(HiSqlClient sqlClient)
@@ -687,7 +688,10 @@ namespace HiSql.UnitTest
 
             //var sql = sqlClient.HiSql("select a.tabname from hi_fieldmodel as a inner join Hi_TabModel as  b on a.tabname =b.tabname inner join Hi_TabModel as c on a.tabname=c.tabname where a.tabname='h_test'  and a.FieldType in (11,41,21)  ").ToSql();
 
-            var sql = sqlClient.HiSql("select a.tabname from hi_fieldmodel as a inner join Hi_TabModel as  b on a.tabname =b.tabname inner join Hi_TabModel as c on a.tabname=c.tabname where a.tabname='h_test'  and a.FieldType in (11,41,21)  order by a.FieldType ").Take(2).Skip(2).ToSql();
+            var sql = sqlClient.HiSql(@"			select a.tabname from hi_fieldmodel as a
+			inner
+			join
+			Hi_TabModel as  b on a.tabname =b.tabname inner join Hi_TabModel as c on a.tabname=c.tabname where a.tabname='h_test'  and a.FieldType in (11,41,21)  order by a.FieldType").Take(2).Skip(2).ToSql();
 
 
             string sql2 = sqlClient.HiSql("select A.FieldType from Hi_FieldModel as a inner join Hi_TabModel as b on a.tabname=b.tabname where A.TabName='GD_UniqueCodeInfo' group by a.fieldtype order by a.fieldtype  asc ").Take(2).Skip(2)

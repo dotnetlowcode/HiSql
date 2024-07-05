@@ -95,7 +95,7 @@ namespace HiSql
             }
             finally
             {
-                if (locked) { CacheContext.MCache.UnLock(lckinfo, _keyname); }
+                if (locked) { CacheContext.MCache.UnLock(new string[] { _keyname }); }
 
             }
             if (tableInfo != null)
@@ -161,7 +161,7 @@ namespace HiSql
             }
             finally
             {
-                if (locked) { CacheContext.MCache.UnLock(lckinfo, _keyname); }
+                if (locked) { CacheContext.MCache.UnLock(new string[] { _keyname }); }
             }
         }
         /// <summary>

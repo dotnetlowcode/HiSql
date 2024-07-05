@@ -113,9 +113,9 @@ namespace HiSql
         /// </summary>
         /// <param name="keys">一个或多个key</param>
         /// <returns></returns>
-        public static bool UnLock(LckInfo lckinfo, params string[] keys)
+        public static bool UnLock(params string[] keys)
         {
-            return _lock.UnLock(lckinfo, keys);
+            return _lock.UnLock( keys);
         }
     }
 }
