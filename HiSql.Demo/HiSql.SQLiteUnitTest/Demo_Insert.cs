@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using HiSql.SqliteUnitTest.Model;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -94,8 +95,46 @@ namespace HiSql
             //Demo1_Insert8(sqlClient);//忽略
             // Demo1_Insert9(sqlClient);//ok
 
-          //Demo1_Insert11(sqlClient);////ok
-           // Demo1_Insert12(sqlClient);//ok
+            //Demo1_Insert11(sqlClient);////ok
+            // Demo1_Insert12(sqlClient);//ok
+
+            Demo1_Insert13(sqlClient);
+        }
+
+        static void Demo1_Insert13(HiSqlClient _sqlClient)
+        {
+            string _tmp_name = "#tm_stock";
+            TabInfo sttabinfo = _sqlClient.DbFirst.GetTabStruct(typeof(ThStock).Name);
+            var tabinfo = createRefTmpTable(sttabinfo, _tmp_name, new List<string> { "CompanyCode", "WorksCode", "LocationCode", "BarCode", "MaterialCode" });
+            if (!_sqlClient.DbFirst.CheckTabExists(_tmp_name))
+                _sqlClient.DbFirst.CreateTable(tabinfo);
+            else
+                _sqlClient.Delete(_tmp_name).ExecCommand();
+            //this.Context.MCache.GetCache<TabInfo>(table.TabName);
+            _sqlClient.Context.MCache.SetCache(tabinfo.TabModel.TabName, tabinfo);
+            _sqlClient.Insert(tabinfo.TabModel.TabName, new List<object> {
+                            new {CompanyCode="6000",WorksCode="9999",LocationCode="7001",BarCode="9000144444",MaterialCode="9215555" }
+                        }).ExecCommand();
+            _sqlClient.BeginTran();
+            try
+            {
+
+
+
+                var ds = _sqlClient.HiSql($"select * from {tabinfo.TabModel.TabName}").ToDynamic();
+
+                //_sqlClient.TrunCate(_tmp_name).ExecCommand();
+                _sqlClient.Delete(_tmp_name).ExecCommand();
+                _sqlClient.Drop($"{tabinfo.TabModel.TabName}").ExecCommand();
+
+
+                _sqlClient.CommitTran();
+
+            }
+            catch (Exception ex)
+            {
+                _sqlClient.RollBackTran();
+            }
         }
 
 
@@ -466,6 +505,44 @@ namespace HiSql
 
 
 
+        }
+        /// <summary>
+        /// 参考指定的表进行创建临时表
+        /// </summary>
+        /// <param name="tabInfo"></param>
+        /// <param name="tabname"></param>
+        /// <param name="lstfield"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        static TabInfo createRefTmpTable(TabInfo tabInfo, string tabname, List<string> lstfield)
+        {
+            if (tabname.IndexOf("#") != 0)
+                throw new Exception($"定义的表名[{tabname}]不是临时表");
+
+            TabInfo tabinfo = new TabInfo();
+            tabinfo.TabModel = new HiTable { DbServer = "", DbName = "", TabName = tabname, TabDescript = "批次临时表", TabStoreType = TabStoreType.Column, TabStatus = TabStatus.Use };
+
+
+            foreach (string field in lstfield)
+            {
+                var newcol = tabInfo.Columns.Where(c => c.FieldName.ToLower().Equals(field.ToLower())).FirstOrDefault();
+                if (newcol != null && !newcol.IsIdentity)
+                {
+                    HiColumn _newcol = ClassExtensions.DeepCopy<HiColumn>(newcol);
+                    _newcol.IsBllKey = false;
+                    _newcol.IsPrimary = false;
+                    _newcol.TabName = tabname;
+                    tabinfo.Columns.Add(_newcol);
+                }
+            }
+            if (tabInfo.Columns.Count > 0)
+            {
+                return tabinfo;
+            }
+            else
+            {
+                throw new Exception($"参照表创建的临时表中无任何字段");
+            }
         }
     }
 }
