@@ -89,6 +89,6 @@ namespace HiSql
         /// </summary>
         /// <param name="keys">一个或多个key</param>
         /// <returns></returns>
-        public bool UnLock(LckInfo lckinfo, params string[] keys);
+        public bool UnLock(params string[] keys);
     }
 }

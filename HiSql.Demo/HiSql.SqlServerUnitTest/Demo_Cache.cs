@@ -43,7 +43,7 @@ namespace HiSql
                 //执行采购订单处理业务
 
                 //解锁
-                HiSql.Lock.UnLock(lckinfo, _key);
+                HiSql.Lock.UnLock( _key);
             }
 
             //同时加锁多个key 如果有一个key被其它任务加锁那么 锁定失败

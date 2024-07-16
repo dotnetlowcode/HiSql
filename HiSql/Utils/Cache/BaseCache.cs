@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -100,7 +101,16 @@ namespace HiSql
         /// <returns></returns>
         public abstract string EvalSha(string shaid,string[] keys, string[] values);
 
-   
+        /// <summary>
+        /// 执行redis脚本 并返回bool 状态
+        /// 注意:一定要在脚本是自定义返回 true|false
+        /// </summary>
+        /// <param name="shaid"></param>
+        /// <param name="keys"></param>
+        /// <param name="values"></param>
+        /// <returns></returns>
+        public abstract bool EvalBoolSha(string shaid, RedisKey[] rediskeys, RedisValue[] redisvalues);
+
 
         public abstract Tuple<bool, string> LockOn(string key, LckInfo lckinfo, int expirySeconds = 30, int timeoutSeconds = 5);
         public abstract Tuple<bool, string> LockOn(string[] keys, LckInfo lckinfo, int expirySeconds = 30, int timeoutSeconds = 5);
@@ -112,6 +122,13 @@ namespace HiSql
         public abstract void SetCache(string key, object value);
         public abstract void SetCache(string key, object value, DateTimeOffset expiryAbsoulte);
         public abstract void SetCache(string key, object value, int second);
-        public abstract bool UnLock(LckInfo lckinfo, params string[] keys);
+        public abstract bool UnLock(params string[] keys);
+
+        /// <summary>
+        /// 批量设置key
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <param name="second">过期时间(s) 不设置则为-1</param>
+        public abstract void SetCache(IDictionary<string, string> dic, int second=-1);
     }
 }

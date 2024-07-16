@@ -28,8 +28,17 @@ namespace HiSql
 
             var version = CacheContext.LocalMCahe.GetOrCreate(typeof(SqliteDM).FullName + "_DBVersion", () =>
             {
-                var _version = new DBVersion() { Version = new Version("3.0.0") };
+                string _regex = "(?<sqlite>[^\\\\/]+)(?=\\.db)";
+                Dictionary<string, string> dic = HiSql.Tool.RegexGrp(_regex, this.Context.CurrentConnectionConfig.ConnectionString);
+                string vdesc = "";
+                if (dic != null && dic.ContainsKey("sqlite"))
+                    vdesc = dic["sqlite"].ToString();
 
+                var _version = new DBVersion() { Version = new Version("3.0.0") ,VersionDesc= vdesc };
+
+                
+                
+                //this.Context.CurrentConnectionConfig.ConnectionString
                 //var table = Context.DBO.GetDataTable(dbConfig.GetVersion);
                 //if (table.Rows.Count > 0)
                 //{

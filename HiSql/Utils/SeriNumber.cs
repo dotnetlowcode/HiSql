@@ -88,74 +88,79 @@ namespace HiSql
                 {
                     if (!_snowId.ContainsKey(_key))
                     {
-                        HiSqlClient _sqlClient = SqlClient.Context.CloneClient();
+
+                        
                         var rtn = Lock.LockOnExecuteNoWait(_key, () =>
                         {
-                            Hi_Snro _snro = null;
-                            _sqlClient.BeginTran();
+                            //modi by tgm date:2024.7.5
+                            using (var _sqlClient = SqlClient.Context.CloneClient())
+                            {
+                                Hi_Snro _snro = null;
+                                _sqlClient.BeginTran();
 
-                            _snro = _sqlClient.HiSql($"select * from {Constants.HiSysTable["Hi_Snro"].ToString()} where SNRO='{snro.ToSqlInject()}' and SNUM='{snum.ToString()}'").ToList<Hi_Snro>().FirstOrDefault();
-                            if (_snro == null)
-                            {
-                                throw new Exception($"编号规则{snro}-{snum}不存在");
-                            }
-                            if (!_snro.IsSnow)
-                            {
-                                //预先创建
-                                Tuple<bool, string, List<string>> rtn = Create(ref _snro, count > _snro.CacheSpace ? count : _snro.CacheSpace);
-                                if (rtn.Item1)
+                                _snro = _sqlClient.HiSql($"select * from {Constants.HiSysTable["Hi_Snro"].ToString()} where SNRO='{snro.ToSqlInject()}' and SNUM='{snum.ToString()}'").ToList<Hi_Snro>().FirstOrDefault();
+                                if (_snro == null)
                                 {
-                                    _snro.CurrCacheSpace = 0;
-                                    _sqlClient.Update("Hi_Snro", _snro).Only("CurrNum","PreChar", "CurrAllNum", "CurrCacheSpace").ExecCommand();
-                                    _sqlClient.CommitTran();
-                                    if (!_snroNumber.ContainsKey(_key))
-                                        _snroNumber.Add(_key, rtn.Item3);
+                                    throw new Exception($"编号规则{snro}-{snum}不存在");
+                                }
+                                if (!_snro.IsSnow)
+                                {
+                                    //预先创建
+                                    Tuple<bool, string, List<string>> rtn = Create(ref _snro, count > _snro.CacheSpace ? count : _snro.CacheSpace);
+                                    if (rtn.Item1)
+                                    {
+                                        _snro.CurrCacheSpace = 0;
+                                        _sqlClient.Update("Hi_Snro", _snro).Only("CurrNum", "PreChar", "CurrAllNum", "CurrCacheSpace").ExecCommand();
+                                        _sqlClient.CommitTran();
+                                        if (!_snroNumber.ContainsKey(_key))
+                                            _snroNumber.Add(_key, rtn.Item3);
+                                        else
+                                        {
+                                            foreach (string n in rtn.Item3)
+                                            {
+                                                if (!_snroNumber[_key].Any(_n => _n.Equals(n)))
+                                                    _snroNumber[_key].Add(n);
+                                                else
+                                                    throw new Exception($"编号:{snro}-{snum} 生成了重复的号码:{n} 请检查编号配置");
+                                            }
+                                        }
+                                    }
                                     else
                                     {
-                                        foreach (string n in rtn.Item3)
-                                        {
-                                            if (!_snroNumber[_key].Any(_n => _n.Equals(n)))
-                                                _snroNumber[_key].Add(n);
-                                            else
-                                                throw new Exception($"编号:{snro}-{snum} 生成了重复的号码:{n} 请检查编号配置");
-                                        }
+                                        _sqlClient.RollBackTran();
+                                        throw new Exception($"编号:{snro}-{snum}创建失败:{rtn.Item2}");
                                     }
                                 }
                                 else
                                 {
+                                    //雪花ID不需要更新表
                                     _sqlClient.RollBackTran();
-                                    throw new Exception($"编号:{snro}-{snum}创建失败:{rtn.Item2}");
+
+                                    IdGenerate idGenerate = null;
+                                    if (Global.NumberOptions.SnowType == SnowType.IdWorker)
+                                        idGenerate = new IdWorker(Global.NumberOptions.WorkId, _snro.SnowTick);
+                                    else if (Global.NumberOptions.SnowType == SnowType.IdSnow)
+                                        idGenerate = new IdSnow(Global.NumberOptions.WorkId, _snro.SnowTick);
+                                    else
+                                        throw new Exception($"未能识别的雪ID生成引擎:{Global.NumberOptions.SnowType.ToString()}");
+
+                                    _snowId.Add(_key, idGenerate);
+
+
+                                    List<long> ids = new List<long>();
+
+
+                                    ids = _snowId[_key].NextId(count);
+                                    if (ids.Count == 0)
+                                        throw new Exception($"编号:{snro}-{snum} 创建雪花ID失败");
+
+                                    foreach (long id in ids)
+                                    {
+                                        lstnumber.Add(id.ToString()); ;
+                                    }
                                 }
                             }
-                            else
-                            {
-                                //雪花ID不需要更新表
-                                _sqlClient.RollBackTran();
-                               
-                                IdGenerate idGenerate = null;
-                                if (Global.NumberOptions.SnowType == SnowType.IdWorker)
-                                    idGenerate = new IdWorker(Global.NumberOptions.WorkId, _snro.SnowTick);
-                                else if (Global.NumberOptions.SnowType == SnowType.IdSnow)
-                                    idGenerate = new IdSnow(Global.NumberOptions.WorkId, _snro.SnowTick);
-                                else
-                                    throw new Exception($"未能识别的雪ID生成引擎:{Global.NumberOptions.SnowType.ToString()}");
-
-                                _snowId.Add(_key, idGenerate);
-                                
-
-                                List<long> ids = new List<long>();
-
-
-                                ids = _snowId[_key].NextId(count);
-                                if (ids.Count == 0)
-                                    throw new Exception($"编号:{snro}-{snum} 创建雪花ID失败");
-
-                                foreach (long id in ids)
-                                {
-                                    lstnumber.Add(id.ToString()); ;
-                                }
-                            }
-                        }, new LckInfo { UName = _sqlClient.CurrentConnectionConfig.User });
+                            }, new LckInfo { UName = SqlClient.CurrentConnectionConfig.User });
 
                         if (!rtn.Item1)
                             throw new Exception($"编号:{snro}-{snum} 错误:{rtn.Item2} ");

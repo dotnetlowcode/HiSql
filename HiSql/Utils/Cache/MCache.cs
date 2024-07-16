@@ -140,7 +140,29 @@ namespace HiSql
             expirationTime = expirationTime.AddSeconds(second);
             SetCache(key, value, expirationTime);
         }
-
+        /// <summary>
+        /// 批量设置key
+        /// </summary>
+        /// <param name="dic"></param>
+        /// <param name="second"></param>
+        /// <exception cref="Exception"></exception>
+        public override void SetCache(IDictionary<string, string> dic, int second = -1)
+        {
+            if (dic != null && dic.Count > 0)
+            {
+                foreach (string key in dic.Keys)
+                {
+                    if (second > 0)
+                    {
+                        SetCache(key, dic[key], second);
+                    }
+                    else
+                        SetCache(key, dic[key]);
+                }
+            }
+            else
+                throw new Exception($"请传入需要批量设置的key信息");
+        }
 
         /// <summary>
         /// 移除缓存缓存对象
@@ -320,6 +342,10 @@ namespace HiSql
             timeoutSeconds = timeoutSeconds < 0 ? 5 : timeoutSeconds;
             timeoutSeconds = timeoutSeconds > _max_timeout ? _max_timeout : timeoutSeconds;
 
+            if (lckinfo.LockTime == null)
+                lckinfo.LockTime = DateTime.Now;
+
+            lckinfo.ExpireTime = lckinfo.LockTime.AddSeconds(expirySeconds);
             string msg = "";
             var flag = false;
             //创建key
@@ -449,7 +475,7 @@ namespace HiSql
                 //加锁失败或超时
                 foreach (var key in lockedKey)
                 {
-                    UnLock(lckinfo, key);
+                    UnLock(key);
                 }
                 return new Tuple<bool, string>(tuple.Item1, tuple.Item2);
 
@@ -465,7 +491,7 @@ namespace HiSql
             key = GetRegionKey(key);
 
             bool _islock = false;
-            string _msg = "";
+            string msg = "";
             if (GetCache<LckInfo>(key) != null)
             {
                 //MCaceh 检查锁只有是 缓存对象在，且 HashTable有值才是锁定状态  pengxy on 2022 10 14 
@@ -473,15 +499,47 @@ namespace HiSql
                 if (!string.IsNullOrEmpty(_lockinfo))
                 {
                     _islock = true;
-                    LckInfo lckInfo = JsonConvert.DeserializeObject<LckInfo>(_lockinfo);
-                    _msg = $"key:[{_key}]已经被[{lckInfo.UName}]在[{lckInfo.EventName}]于[{lckInfo.LockTime.ToString("yyyy-MM-dd HH:mm:ss")}]锁定!";
+                    LckInfo info = JsonConvert.DeserializeObject<LckInfo>(_lockinfo);
+ 
+
+                    if (info != null)
+                    {
+                        if (!string.IsNullOrEmpty(info.UName))
+                            msg += $" 被[{info.UName}]";
+                        if (!string.IsNullOrEmpty(info.EventName)) msg += $" 在[{info.EventName}]";
+
+                        if (info.LockTime != null)
+                        {
+                            if (info.LockTime.Year >= 1970)
+                                msg += $" 于[{info.LockTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}]进行锁定";
+
+                            if (info.ExpireTime != null)
+                            {
+                                if (info.ExpireTime.Year >= DateTime.Now.Year)
+                                {
+                                    msg += $" 预计[{info.ExpireTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}]自动解锁";
+                                }
+                            }
+                        }
+                        else
+                            msg += "进行锁定";
+                        if (!string.IsNullOrEmpty(info.Descript))
+                        {
+                            msg += $" 备注:{info.Descript}";
+                        }
+                    }
+                    else
+                    {
+                        msg += $"已经被锁定";
+                    }
                 }
+                else msg += $"已经被锁定";
             }
             else
             {
-                _msg = $"key:[{_key}]未被锁定";
+                msg = $"未被锁定";
             }
-            return new Tuple<bool, string>(_islock, _msg);
+            return new Tuple<bool, string>(_islock, msg);
         }
 
 
@@ -495,7 +553,7 @@ namespace HiSql
                     return res;
                 }
             }
-            return new Tuple<bool, string>(false, $"key:[{string.Join(",", keys)}]未被锁定");
+            return new Tuple<bool, string>(false, $"未被锁定");
         }
         public override Tuple<bool, string> LockOnExecuteNoWait(string key, Action action, LckInfo lckinfo, int expirySeconds = 30)
         {
@@ -523,7 +581,10 @@ namespace HiSql
 
             timeoutSeconds = timeoutSeconds < 0 ? 5 : timeoutSeconds;
             timeoutSeconds = timeoutSeconds > _max_timeout ? _max_timeout : timeoutSeconds;
+            if (lckinfo.LockTime == null)
+                lckinfo.LockTime = DateTime.Now;
 
+            lckinfo.ExpireTime = lckinfo.LockTime.AddSeconds(expirySeconds);
             string msg = "";
             var flag1 = false;
             //创建key
@@ -590,7 +651,7 @@ namespace HiSql
                     flag = workTask.Wait(timeoutSeconds * _millsecond, cancellationToken);
                     if (flag)
                     {
-                        UnLock(lckinfo, key);
+                        UnLock(key);
                         msg = $"key:[{key}]锁定并操作业务成功!锁已自动释放";
                     }
                     else
@@ -606,7 +667,7 @@ namespace HiSql
                                     tokenSource.Cancel();
                                     thread.Interrupt();
                                 }
-                                UnLock(lckinfo, key);
+                                UnLock( key);
                                 flag = false;
                                 msg = $"key:[{key}]锁定操作业务失败!超过最大[{_times}]次续锁没有完成,操作被撤销";
                                 break;
@@ -623,7 +684,7 @@ namespace HiSql
                                 if (flag)
                                 {
                                     flag = true;
-                                    UnLock(lckinfo, key);
+                                    UnLock( key);
                                     msg = $"key:[{key}]锁定并操作业务成功!续锁{_timesa + 1}次,锁已经自动释放";
                                     break;
                                 }
@@ -652,7 +713,7 @@ namespace HiSql
                     //}
                     finally
                     {
-                        UnLock(lckinfo, key);
+                        UnLock( key);
                     }
                     return new Tuple<bool, string>(flag, msg);
                 }
@@ -691,7 +752,10 @@ namespace HiSql
 
             timeoutSeconds = timeoutSeconds < 0 ? 5 : timeoutSeconds;
             timeoutSeconds = timeoutSeconds > _max_timeout ? _max_timeout : timeoutSeconds;
+            if (lckinfo.LockTime == null)
+                lckinfo.LockTime = DateTime.Now;
 
+            lckinfo.ExpireTime = lckinfo.LockTime.AddSeconds(expirySeconds);
             string msg = "";
             bool flag = false;
             var getlockResult = LockOn(keys, lckinfo, expirySeconds, timeoutSeconds);
@@ -730,7 +794,7 @@ namespace HiSql
                     flag = workTask.Wait(timeoutSeconds * _millsecond, cancellationToken);
                     if (flag)
                     {
-                        UnLock(lckinfo, keys);
+                        UnLock( keys);
                         msg = $"key:[{string.Join(",", keys)}]锁定并操作业务成功!锁已自动释放";
                     }
                     else
@@ -745,7 +809,7 @@ namespace HiSql
                                     tokenSource.Cancel();
                                     thread.Interrupt();
                                 }
-                                UnLock(lckinfo, keys);
+                                UnLock( keys);
                                 flag = false;
                                 msg = $"key:[{string.Join(",", keys)}]锁定操作业务失败!超过最大[{_times}]次续锁没有完成,操作被撤销";
                                 break;
@@ -768,7 +832,7 @@ namespace HiSql
                                 flag = workTask.Wait(timeoutSeconds * _millsecond, cancellationToken);
                                 if (flag)
                                 {
-                                    UnLock(lckinfo, keys);
+                                    UnLock( keys);
                                     flag = true;
                                     msg = $"key:[{string.Join(",", keys)}]锁定并操作业务成功!续锁{_timesa + 1}次,锁已经自动释放";
                                     break;
@@ -798,7 +862,7 @@ namespace HiSql
                     //}
                     finally
                     {
-                        UnLock(lckinfo, keys);
+                        UnLock( keys);
                     }
                     return new Tuple<bool, string>(flag, msg);
                 }
@@ -833,7 +897,7 @@ namespace HiSql
         /// </summary>
         /// <param name="keys"></param>
         /// <returns></returns>
-        public override bool UnLock(LckInfo lckInfo, params string[] keys)
+        public override bool UnLock(params string[] keys)
         {
             if (keys.Length == 0) return true;
             foreach (string key in keys)
@@ -924,10 +988,16 @@ namespace HiSql
 
         public override string EvalSha(string shaid, string[] keys, string[] values)
         {
-            throw new Exception($"基于本机的访问模式无法使用[EvalSha]方法,该方法仅限于Redis环境下使用");
+            throw new Exception($"本地缓存模式无法使用[EvalSha]方法,该方法仅限于Redis环境下使用");
         }
 
-   
+        public override bool EvalBoolSha(string shaid, RedisKey[] rediskeys, RedisValue[] redisvalues)
+        {
+            throw new Exception($"本地缓存模式无法使用[EvalBoolSha]方法,该方法仅限于Redis环境下使用");
+        }
+
+        
+
 
 
         /// <summary>

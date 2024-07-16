@@ -10,7 +10,69 @@ namespace HiSql.UnitTest
 {
     class Demo_Init
     {
+        public static HiSqlClient GetSqliteClient()
+        {
+            //Global.RedisOn = true;
+            // Global.RedisOptions = new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "", CacheRegion = "", Database = 3, EnableMultiCache = false, KeyspaceNotificationsEnabled = false };
 
+            //string DriverPath = "/Users/tansar/work/project/ThirdApi/ThirdApi/ThirdApi/bin/Debug/net6.0/Data/Db/";
+            string DriverPath = "D:\\Project\\ThirdApi\\ThirdApi\\ThirdApi\\bin\\Debug\\net6.0\\Data\\Db";
+            string dbName = Path.Combine(DriverPath, $"LocalServer_{DateTime.Now.ToString("yyyyMM")}_Third.db");
+            string connStr = new SQLiteConnectionStringBuilder()
+            {
+                DataSource = dbName
+                ,
+                //  Password = "admin"
+            }.ToString();
+
+            HiSqlClient sqlclient = new HiSqlClient(
+                     new ConnectionConfig()
+                     {
+                         DbType = DBType.Sqlite,
+                         DbServer = "local-HoneBI",
+                         ConnectionString = connStr,
+                         User = "hisql",//可以指定登陆用户的帐号
+                         Schema = "main",
+                         IsEncrypt = true,
+                         IsAutoClose = false,
+                         SqlExecTimeOut = 60000,
+                         AppEvents = new AopEvent()
+                         {
+                             OnDbDecryptEvent = (connstr) =>
+                             {
+                                 //解密连接字段
+                                 //Console.WriteLine($"数据库连接:{connstr}");
+                                 return connstr;
+                             },
+                             OnLogSqlExecuting = (sql, param) =>
+                             {
+                                 //sql执行前 日志记录 (异步)
+
+                                 //Console.WriteLine($"sql执行前记录{sql} time:{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss ffff")}");
+                             },
+                             OnLogSqlExecuted = (sql, param) =>
+                             {
+                                 //sql执行后 日志记录 (异步)
+                                 //Console.WriteLine($"sql执行后记录{sql} time:{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss ffff")}");
+                             },
+                             OnSqlError = (sqlEx) =>
+                             {
+                                 //sql执行错误后 日志记录 (异步)
+                                 Console.WriteLine(sqlEx.Message.ToString());
+                             },
+                             OnTimeOut = (int timer) =>
+                             {
+                                 //Console.WriteLine($"执行SQL语句超过[{timer.ToString()}]毫秒...");
+                             }
+                         }
+                     }
+                     );
+
+
+
+            //Console.WriteLine($" 版本号：{sqlclient.Context.DMTab.DBVersion().Version}  版本描述：{sqlclient.Context.DMTab.DBVersion().VersionDesc}");
+            return sqlclient;
+        }
         public static HiSqlClient GetSqlClient()
         {
             //Global.RedisOn = true;
@@ -73,6 +135,6 @@ namespace HiSql.UnitTest
             Console.WriteLine($" 版本号：{sqlclient.Context.DMTab.DBVersion().Version}  版本描述：{sqlclient.Context.DMTab.DBVersion().VersionDesc}");
             return sqlclient;
         }
-
+        
     }
 }

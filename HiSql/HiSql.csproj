@@ -3,12 +3,12 @@
 	<PropertyGroup>
 		<TargetFrameworks>net461;net5.0;netcoreapp3.1;net6.0;net7.0;net8.0</TargetFrameworks>
 		<LangVersion>9.0</LangVersion>
-		<Version>1.0.6.5</Version>
+		<Version>1.0.6.8</Version>
 		<Authors>tansar</Authors>
 		<Company>dotnetlowcode</Company>
 		<Description>HiSql 核心包
 
-支持SqlServer,MySql,Oracle,Hana,PostGreSql 根据需要单独再引用支持的包
+支持SqlServer,MySql,Oracle,Hana,PostGreSql,Sqlite 根据需要单独再引用支持的包
 新增hisql语法 一套sql在不同库执行</Description>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageIcon>hisql-logo.jpg</PackageIcon>
