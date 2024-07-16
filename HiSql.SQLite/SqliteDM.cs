@@ -3731,6 +3731,8 @@ namespace HiSql
         {
             string _sql = dbConfig.Get_TableDataCount.Replace("[$TabName$]", $"{dbConfig.Schema_Pre}{this.Context.CurrentConnectionConfig.Schema}{dbConfig.Schema_After}.{dbConfig.Table_Pre}{tabname}{dbConfig.Table_After}");
 
+            _sql = dbConfig.Get_TableDataCount.Replace("[$TabName$]", $"{dbConfig.Table_Pre}{tabname}{dbConfig.Table_After}"); //pegnxy on 2024-7-16 不需要 Schema
+
             string v = this.Context.DBO.ExecScalar(_sql).ToString();
             int _effect = Convert.ToInt32(v);
             return _effect;
