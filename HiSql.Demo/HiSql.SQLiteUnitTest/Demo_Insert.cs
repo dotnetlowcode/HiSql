@@ -113,7 +113,8 @@ namespace HiSql
             //this.Context.MCache.GetCache<TabInfo>(table.TabName);
             _sqlClient.Context.MCache.SetCache(tabinfo.TabModel.TabName, tabinfo);
             _sqlClient.Insert(tabinfo.TabModel.TabName, new List<object> {
-                            new {CompanyCode="6000",WorksCode="9999",LocationCode="7001",BarCode="9000144444",MaterialCode="9215555" }
+                            new {CompanyCode="7000",WorksCode="9999",LocationCode="7001",BarCode="9003288315",MaterialCode="000000000090016712" },
+                            new {CompanyCode="7000",WorksCode="9999",LocationCode="7001",BarCode="9003294148",MaterialCode="000000000090020684" }
                         }).ExecCommand();
             _sqlClient.BeginTran();
             try
@@ -121,7 +122,11 @@ namespace HiSql
 
 
 
-                var ds = _sqlClient.HiSql($"select * from {tabinfo.TabModel.TabName}").ToDynamic();
+                var ds = _sqlClient.HiSql($"select a.CompanyCode,a.WorksCode,a.LocationCode,a.BarCode,a.MaterialCode,a.StockInventory,a.TransInventory,a.FreezeInventory,a.WithHoldInventory,a.Unit" +
+                            $" from {typeof(ThStock).Name} as a " +
+                            $" inner join  {tabinfo.TabModel.TabName} as b on a.CompanyCode=b.CompanyCode and a.WorksCode=b.WorksCode and a.LocationCode=b.LocationCode and a.BarCode=b.BarCode and a.MaterialCode=b.MaterialCode "
+
+                            ).ToTable();
 
                 //_sqlClient.TrunCate(_tmp_name).ExecCommand();
                 _sqlClient.Delete(_tmp_name).ExecCommand();
