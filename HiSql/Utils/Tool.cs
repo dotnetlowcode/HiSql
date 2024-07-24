@@ -1,10 +1,11 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace HiSql
 {
@@ -19,21 +20,101 @@ namespace HiSql
             /// <returns></returns>
             public static string GetLocalIPAddress()
             {
-                System.Net.IPAddress[] addressList = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
                 string strNativeIP = "";
                 string strServerIP = "";
-                if (addressList.Length > 1)
+                try
                 {
-                    strNativeIP = addressList[0].ToString();
-                    strServerIP = addressList[1].ToString();
+                    System.Net.IPAddress[] addressList = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
+
+                    if (addressList.Length > 1)
+                    {
+                        strNativeIP = addressList[0].ToString();
+                        strServerIP = addressList[1].ToString();
+                    }
+                    else if (addressList.Length == 1)
+                    {
+                        strServerIP = addressList[0].ToString();
+                    }
+
+                    bool isRunningInContainer = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"));
+                    if (isRunningInContainer)
+                    {
+                        strServerIP = strServerIP + GetContainerName();
+                    }
                 }
-                else if (addressList.Length == 1)
+                catch (Exception ex)
                 {
-                    strServerIP = addressList[0].ToString();
+                    try
+                    {
+                        // 获取可用网卡
+                        var nics = NetworkInterface.GetAllNetworkInterfaces()?.Where(network => network.OperationalStatus == OperationalStatus.Up);
+
+                        // 获取所有可用网卡IP信息
+                        var ipCollection = nics?.Select(x => x.GetIPProperties())?.SelectMany(x => x.UnicastAddresses);
+
+                        foreach (var ipadd in ipCollection)
+                        {
+                            if (!IPAddress.IsLoopback(ipadd.Address) && ipadd.Address.AddressFamily == AddressFamily.InterNetwork)
+                            {
+                                strServerIP = ipadd.Address.ToString();
+                                break;
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        // ignored
+                    }
+                    //strServerIP = Environment.MachineName;
                 }
+
+               
                 return strServerIP;
             }
+
+            public static string GetMachineName()
+            {
+                string MachineName = "";
+                try
+                {
+                    MachineName = Environment.MachineName;
+                    bool isRunningInContainer = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER"));
+                    if (isRunningInContainer)
+                    {
+                        MachineName = MachineName + GetContainerName();
+                    }
+
+                    return MachineName;
+                }
+                catch (Exception)
+                {
+
+                }
+
+                return MachineName;
+            }
+            private static string GetContainerName()
+            {
+                try
+                {
+                    string containerIdFile = "/proc/1/cpuset";
+                    string containerId = System.IO.File.ReadAllText(containerIdFile).Trim();
+                    string containerName = containerId.Substring(containerId.LastIndexOf('/') + 1);
+                    if (containerName.IsNullOrEmpty() == false)
+                    {
+                        containerName = containerName.Length > 20 ? containerName.Substring(0, 12) : containerName;
+                    }
+                    return "_" + containerName;
+                }
+                catch (Exception)
+                {
+                    return "_null";
+                }
+            }
         }
+
+        
+
         /// <summary>
         /// 正则表达式获取匹配内容
         /// \"(?<grp>[\s\S]*)\"
@@ -41,7 +122,7 @@ namespace HiSql
         /// <param name="regex"></param>
         /// <param name="text"></param>
         /// <returns></returns>
-        public static Dictionary<string, string> RegexGrp(string regex,string text)
+        public static Dictionary<string, string> RegexGrp(string regex, string text)
         {
             Regex _regex = new Regex(regex, RegexOptions.IgnoreCase | RegexOptions.Multiline);
             Dictionary<string, string> _dic = new Dictionary<string, string>();
@@ -50,7 +131,7 @@ namespace HiSql
             {
                 foreach (string name in _regex.GetGroupNames())
                 {
-                    if(!_dic.ContainsKey(name))
+                    if (!_dic.ContainsKey(name))
                         _dic.Add(name, _match.Groups[_regex.GroupNumberFromName(name)].Value);
                 }
                 _match = _match.NextMatch();
@@ -132,7 +213,7 @@ namespace HiSql
         /// <param name="_text"></param>
         /// <param name="grpname"></param>
         /// <returns></returns>
-        public static List<string> RegexGrps(string _regex, string _text,string grpname)
+        public static List<string> RegexGrps(string _regex, string _text, string grpname)
         {
             List<string> lst = new List<string>();
 
@@ -167,7 +248,7 @@ namespace HiSql
         /// <param name="text"></param>
         /// <param name="isunsigned">是否无符号</param>
         /// <returns></returns>
-        public static bool IsDecimal(string text,bool isunsigned=false)
+        public static bool IsDecimal(string text, bool isunsigned = false)
         {
             if (!isunsigned)
                 return new Regex(@"^[-]?\d+(?:[\.]?)[\d]*$", RegexOptions.IgnoreCase | RegexOptions.Multiline).Match(text).Success;
@@ -197,7 +278,7 @@ namespace HiSql
         /// <returns></returns>
         public static bool CharIsInt(string text, bool isunsigned = false)
         {
-            if(!isunsigned)
+            if (!isunsigned)
                 return new Regex(@"^[\']{1}(?<num>[-]?\d+)[\']{1}$", RegexOptions.IgnoreCase | RegexOptions.Multiline).Match(text).Success;
             else
                 return new Regex(@"^[\']{1}(?<num>\d+)[\']{1}$", RegexOptions.IgnoreCase | RegexOptions.Multiline).Match(text).Success;
@@ -308,7 +389,7 @@ namespace HiSql
                     myfield.TabName = _reg_fun["tab"].ToString();
                     myfield.FieldName = _reg_fun["field"].ToString();
 
-                    
+
                     if (!string.IsNullOrEmpty(myfield.AsFieldName))
                         result = new Tuple<bool, FieldDefinition>(true, myfield);
                     else
@@ -325,7 +406,7 @@ namespace HiSql
         /// <returns></returns>
         public static Tuple<bool, FieldDefinition> CheckQueryField(string text)
         {
-            Tuple<bool, FieldDefinition> result =new Tuple<bool, FieldDefinition>(false,null) ;
+            Tuple<bool, FieldDefinition> result = new Tuple<bool, FieldDefinition>(false, null);
             if (text is null || string.IsNullOrEmpty(text)) return result;
             Dictionary<string, string> _reg = RegexGrp(Constants.REG_FIELDANDRENAME, text);
             if (_reg.Count > 0)
@@ -337,7 +418,7 @@ namespace HiSql
                 myfield.AsFieldName = _reg["refield"].ToString();
                 result = new Tuple<bool, FieldDefinition>(true, myfield);
             }
-            
+
             else
             {
                 Dictionary<string, string> _reg_fun = RegexGrp(Constants.REG_FUNCTION, text);
@@ -365,7 +446,7 @@ namespace HiSql
                             break;
                         default:
                             break;
-                        
+
                     }
 
                     myfield.SqlName = text;
@@ -373,7 +454,7 @@ namespace HiSql
                     myfield.FieldName = _reg_fun["field"].ToString();
 
                     myfield.AsFieldName = _reg_fun["refield"].ToString();
-                    if(!string.IsNullOrEmpty(myfield.AsFieldName))
+                    if (!string.IsNullOrEmpty(myfield.AsFieldName))
                         result = new Tuple<bool, FieldDefinition>(true, myfield);
                     else
                         result = new Tuple<bool, FieldDefinition>(false, null);
@@ -457,12 +538,12 @@ namespace HiSql
         /// <returns></returns>
         public static Tuple<bool, string> CheckTabName(string text)
         {
-            Tuple<bool, string> result=new Tuple<bool, string> (false,"");
+            Tuple<bool, string> result = new Tuple<bool, string>(false, "");
             if (text is null) return result;
             if (RegexMatch(Constants.REG_TABNAME, text))
                 result = new Tuple<bool, string>(true, text.Trim());
             else
-                result = new Tuple<bool, string>(false, text );
+                result = new Tuple<bool, string>(false, text);
             return result;
         }
         /// <summary>
@@ -472,7 +553,7 @@ namespace HiSql
         /// <returns></returns>
         public static Tuple<bool, string> CheckFieldName(string text)
         {
-            Tuple<bool, string> result=new Tuple<bool, string> (false,"");
+            Tuple<bool, string> result = new Tuple<bool, string>(false, "");
             if (text is null) return result;
             if (RegexMatch(Constants.REG_NAME, text))
                 result = new Tuple<bool, string>(true, text.Trim());
@@ -489,7 +570,7 @@ namespace HiSql
         /// <returns></returns>
         public static Tuple<bool, FieldDefinition> CheckField(string text)
         {
-            Tuple<bool, FieldDefinition> result=new Tuple<bool, FieldDefinition> (false,null);
+            Tuple<bool, FieldDefinition> result = new Tuple<bool, FieldDefinition>(false, null);
             if (text is null) return result;
             Dictionary<string, string> _reg = RegexGrp(Constants.REG_FIELDNAME, text);
             if (_reg.Count > 0)
@@ -513,10 +594,10 @@ namespace HiSql
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        public static Tuple<bool, FieldDefinition,FieldDefinition> CheckOnField(string text)
+        public static Tuple<bool, FieldDefinition, FieldDefinition> CheckOnField(string text)
         {
 
-            Tuple<bool, FieldDefinition, FieldDefinition> result=new Tuple<bool, FieldDefinition, FieldDefinition> (false,null,null);
+            Tuple<bool, FieldDefinition, FieldDefinition> result = new Tuple<bool, FieldDefinition, FieldDefinition>(false, null, null);
             if (text is null) return result;
             Dictionary<string, string> _reg = RegexGrp(Constants.REG_JOINON, text);
             if (_reg.Count > 0)
@@ -533,9 +614,10 @@ namespace HiSql
                 rightfield.FieldName = _reg["rfield"].ToString();
                 rightfield.AsFieldName = _reg["rfield"].ToString();//默认
 
-                result = new Tuple<bool, FieldDefinition,FieldDefinition>(true, leftfield, rightfield);
-            }else
-                result= new Tuple<bool, FieldDefinition, FieldDefinition>(false, null, null);
+                result = new Tuple<bool, FieldDefinition, FieldDefinition>(true, leftfield, rightfield);
+            }
+            else
+                result = new Tuple<bool, FieldDefinition, FieldDefinition>(false, null, null);
             return result;
 
         }
