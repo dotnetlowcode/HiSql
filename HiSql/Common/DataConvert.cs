@@ -38,7 +38,7 @@ namespace HiSql
         }
 
 
-        static T fillData<T>(T ef,string fname, Dictionary<string, string> dic_type , List<PropertyInfo> listInfo, PropertyInfo pinfo,object value, DBType dbtype)
+        static T fillData<T>(T ef, string fname, Dictionary<string, string> dic_type, List<PropertyInfo> listInfo, PropertyInfo pinfo, object value, DBType dbtype)
         {
             string _fullname = pinfo.PropertyType.FullName;
 
@@ -75,9 +75,11 @@ namespace HiSql
                                 if (value.GetType().FullName.IndexOf("HanaDecimal") >= 0)
                                 {
                                     pinfo.SetValue(ef, Convert.ToDecimal(value));
-                                }else
+                                }
+                                else
                                     pinfo.SetValue(ef, value);
-                            }else
+                            }
+                            else
                                 pinfo.SetValue(ef, value);
                         }
                     }
@@ -90,7 +92,7 @@ namespace HiSql
                         }
                         else if (_fullname.IndexOf("int64", StringComparison.OrdinalIgnoreCase) > 0)
                         {
-                            pinfo.SetValue(ef, Convert.ToInt64( _value));
+                            pinfo.SetValue(ef, Convert.ToInt64(_value));
                         }
                         else if (_fullname.IndexOf("int32", StringComparison.OrdinalIgnoreCase) > 0)
                         {
@@ -102,9 +104,9 @@ namespace HiSql
                         }
                         else if (_fullname.IndexOf("date", StringComparison.OrdinalIgnoreCase) > 0)
                         {
-                            pinfo.SetValue(ef, string.IsNullOrEmpty(_value)?DateTime.MinValue: Convert.ToDateTime(_value));
+                            pinfo.SetValue(ef, string.IsNullOrEmpty(_value) ? DateTime.MinValue : Convert.ToDateTime(_value));
                         }
-                        else    
+                        else
                             pinfo.SetValue(ef, value);
                     }
                 }
@@ -114,7 +116,7 @@ namespace HiSql
             return ef;
         }
 
-        public static List<T> ToList<T>(IDataReader dataReader,DBType dbtype)
+        public static List<T> ToList<T>(IDataReader dataReader, DBType dbtype)
         {
             List<T> lst = new List<T>();
             Type type = typeof(T);
@@ -124,7 +126,7 @@ namespace HiSql
 
             Dictionary<string, PropertyInfo> dic_propinfo = new Dictionary<string, PropertyInfo>();
 
-            Dictionary<string,string> dic_fieldname=new Dictionary<string,string>();
+            Dictionary<string, string> dic_fieldname = new Dictionary<string, string>();
 
             List<PropertyInfo> listInfo = type.GetProperties().Where(p => p.CanWrite && p.CanRead && p.MemberType == MemberTypes.Property).ToList();//
             for (int i = 0; i < dataReader.FieldCount; i++)
@@ -139,11 +141,11 @@ namespace HiSql
             {
                 if (!dic_propinfo.ContainsKey(pinfo.Name.ToLower()))
                 {
-                    dic_propinfo.Add(pinfo.Name.ToLower(),pinfo);
+                    dic_propinfo.Add(pinfo.Name.ToLower(), pinfo);
                 }
             }
-            
-            DataTable dt_schema=dataReader.GetSchemaTable();
+
+            DataTable dt_schema = dataReader.GetSchemaTable();
 
             if (dt_schema.Rows.Count > 0)
             {
@@ -164,7 +166,7 @@ namespace HiSql
                     string _fullname = "";
                     if (listInfo.Count > fieldNameList.Count)
                     {
-                       
+
                         foreach (string n in fieldNameList)
                         {
                             PropertyInfo pinfo = dic_propinfo.ContainsKey(n.ToLower()) ? dic_propinfo[n.ToLower()] : null; // listInfo.Where(p => p.Name.ToLower() == n.ToLower()).FirstOrDefault();
@@ -175,7 +177,7 @@ namespace HiSql
                                 if (dataReader[n] is not DBNull)
                                 {
 
-                                    t1 = fillData(t1,n, dic_type, listInfo, pinfo, dataReader[n], dbtype);
+                                    t1 = fillData(t1, n, dic_type, listInfo, pinfo, dataReader[n], dbtype);
                                     //_fullname = pinfo.PropertyType.FullName;
                                     //if (_fullname.IndexOf("bool", StringComparison.OrdinalIgnoreCase) >= 0)
                                     //{
@@ -228,7 +230,7 @@ namespace HiSql
                     {
                         foreach (PropertyInfo pinfo in listInfo)
                         {
-                            string n = dic_fieldname.ContainsKey(pinfo.Name.ToLower())? dic_fieldname[pinfo.Name.ToLower()]:string.Empty;// fieldNameList.Where(fn => fn.ToLower() == pinfo.Name.ToLower()).FirstOrDefault();
+                            string n = dic_fieldname.ContainsKey(pinfo.Name.ToLower()) ? dic_fieldname[pinfo.Name.ToLower()] : string.Empty;// fieldNameList.Where(fn => fn.ToLower() == pinfo.Name.ToLower()).FirstOrDefault();
                             if (!string.IsNullOrEmpty(n))
                             {
 
@@ -266,7 +268,7 @@ namespace HiSql
                                 }
                                 else
                                 {
-                        
+
                                     if (pinfo.PropertyType.IsIn<Type>(Constants.LongType, Constants.IntType, Constants.DecType, Constants.FloatType, Constants.ShortType, Constants.DobType))
                                     {
                                         pinfo.SetValue(t1, 0);
@@ -406,7 +408,7 @@ namespace HiSql
                 return default(T);
             //T t = Activator.CreateInstance<T>();
             T t = new T();
-           
+
             DataColumnCollection Columns = dr.Table.Columns;
             foreach (PropertyInfo property in propertys)
             {
@@ -440,11 +442,12 @@ namespace HiSql
         /// <typeparam name="T"></typeparam>
         /// <param name="lst"></param>
         /// <returns></returns>
-        static public DataTable ToTable<T>(List<T> lst,TabInfo tabInfo,string user="HiSql", bool ignoreStandardTimeField = true) {
+        static public DataTable ToTable<T>(List<T> lst, TabInfo tabInfo, string user = "HiSql", bool ignoreStandardTimeField = true)
+        {
 
-            DataTable table= BuildDataTable(tabInfo, ignoreStandardTimeField);
+            DataTable table = BuildDataTable(tabInfo, ignoreStandardTimeField);
             var _typname = "";
-            Type _type = null ;
+            Type _type = null;
 
             Type _typedic = typeof(Dictionary<string, object>);
             Type _typedicstr = typeof(Dictionary<string, string>);
@@ -485,14 +488,14 @@ namespace HiSql
                 var columns = table.Columns;
                 foreach (Dictionary<string, object> _dic in _list_data)
                 {
-                   
+
                     DataRow drow = table.NewRow();
                     foreach (DataColumn dc in columns)
                     {
                         object _value = null;
                         if (_dic.Keys.Any(t => t.Equals(dc.ColumnName, StringComparison.OrdinalIgnoreCase)))//pengxy 支持Age 大写小混写
                         {
-                            _value = _dic[_dic.Keys.FirstOrDefault(t => t.Equals(dc.ColumnName, StringComparison.OrdinalIgnoreCase)).ToString()]; 
+                            _value = _dic[_dic.Keys.FirstOrDefault(t => t.Equals(dc.ColumnName, StringComparison.OrdinalIgnoreCase)).ToString()];
                         }
                         //if (_dic.ContainsKey(dc.ColumnName))
                         //{
@@ -510,11 +513,11 @@ namespace HiSql
                         {
                             if (Constants.IsStandardUserField(dc.ColumnName))
                             {
-                                _value = user;
+                                _value = _value.IsNullOrEmpty() ? user : _value;
                             }
                             if (Constants.IsStandardUserField(dc.ColumnName))
                             {
-                                _value = DateTime.Now;
+                                _value = _value.IsNullOrEmpty() ? DateTime.Now : _value;
                             }
                         }
                         if (_value != null)
@@ -531,7 +534,7 @@ namespace HiSql
                                 else
                                     drow[dc.ColumnName] = 0;
                             }
-                            else if (dc.DataType == Constants.IntType )
+                            else if (dc.DataType == Constants.IntType)
                             {
                                 if (_value != null)
                                     drow[dc.ColumnName] = Convert.ToInt32(_value);
@@ -568,7 +571,8 @@ namespace HiSql
                                 if (_value != null && bool.TryParse(_value.ToString(), out bool tryValue))
                                 {
                                     drow[dc.ColumnName] = tryValue;
-                                }else  if (_value != null)
+                                }
+                                else if (_value != null)
                                 {
                                     if (_value.GetType() == Constants.BoolType)
                                         drow[dc.ColumnName] = _value;
@@ -614,16 +618,16 @@ namespace HiSql
                         {
                             if (Constants.IsStandardUserField(dc.ColumnName))
                             {
-                                _value = user;
+                                _value = _value.IsNullOrEmpty() ? user : _value;
                             }
                             if (Constants.IsStandardTimeField(dc.ColumnName))
                             {
-                                _value = DateTime.Now;
+                                _value = _value.IsNullOrEmpty() ? DateTime.Now : _value;
                             }
                         }
                         if (_value != null)
                         {
-                              Type _typ = _value.GetType();
+                            Type _typ = _value.GetType();
                             if (dc.DataType == Constants.StringType)
                             {
                                 drow[dc.ColumnName] = _value;
@@ -684,7 +688,7 @@ namespace HiSql
             else if (_type == _typedicstr)
             {
                 var columns = table.Columns;
-                foreach (var  data in lst)
+                foreach (var data in lst)
                 {
                     #region 解析 Dictionary<string, string>
                     Dictionary<string, string> _dic = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -695,7 +699,7 @@ namespace HiSql
                         string _value = null;
                         if (_dic.Keys.Any(t => t.Equals(dc.ColumnName, StringComparison.OrdinalIgnoreCase))) //pengxy 支持Age 大写小混写
                         {
-                            _value = _dic[_dic.Keys.FirstOrDefault(t => t.Equals(dc.ColumnName, StringComparison.OrdinalIgnoreCase)).ToString()]; 
+                            _value = _dic[_dic.Keys.FirstOrDefault(t => t.Equals(dc.ColumnName, StringComparison.OrdinalIgnoreCase)).ToString()];
                         }
                         //if (_dic.ContainsKey(dc.ColumnName))
                         //{
@@ -713,11 +717,19 @@ namespace HiSql
                         {
                             if (Constants.IsStandardUserField(dc.ColumnName))
                             {
-                                _value = user;
+                                _value = _value.IsNullOrEmpty() ? user : _value;
                             }
                             if (Constants.IsStandardTimeField(dc.ColumnName))
                             {
-                                _value = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+                                _value = _value.IsNullOrEmpty() ? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") : _value;
+                                if (_value != null)
+                                {
+                                    DateTime _temp = DateTime.Now;
+                                    if (DateTime.TryParse(_value.ToString(), out _temp))
+                                    {
+                                        _value = _temp.ToString("yyyy-MM-dd HH:mm:ss.fff");
+                                    }
+                                }
                             }
                         }
                         if (_value != null)
@@ -733,7 +745,7 @@ namespace HiSql
                                 else
                                     drow[dc.ColumnName] = 0;
                             }
-                            else if (dc.DataType == Constants.IntType )
+                            else if (dc.DataType == Constants.IntType)
                             {
                                 if (!string.IsNullOrEmpty(_value))
                                     drow[dc.ColumnName] = Convert.ToInt32(_value);
@@ -760,13 +772,14 @@ namespace HiSql
                                 {
                                     drow[dc.ColumnName] = DateTime.Now;
                                 }
-                                else {
+                                else
+                                {
                                     if (!string.IsNullOrEmpty(_value))
                                         drow[dc.ColumnName] = Convert.ToDateTime(_value);
                                     else
                                         drow[dc.ColumnName] = DateTime.MinValue;
                                 }
-                                    
+
                             }
                             else if (dc.DataType == Constants.BoolType)
                             {
@@ -797,13 +810,13 @@ namespace HiSql
                 Type type = lst[0].GetType();
                 PropertyInfo[] properties = type.GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
 
-                Dictionary<string,PropertyInfo> dic = new Dictionary<string,PropertyInfo>( StringComparer.OrdinalIgnoreCase);
+                Dictionary<string, PropertyInfo> dic = new Dictionary<string, PropertyInfo>(StringComparer.OrdinalIgnoreCase);
                 foreach (PropertyInfo prop in properties)
                 {
-                    if(!dic.ContainsKey(prop.Name))
+                    if (!dic.ContainsKey(prop.Name))
                         dic.Add(prop.Name, prop);
                     else
-                        dic[prop.Name]=prop;
+                        dic[prop.Name] = prop;
 
                 }
 
@@ -816,8 +829,8 @@ namespace HiSql
                     foreach (DataColumn dc in columns)
                     {
                         PropertyInfo pinfo = null;
-                        if(dic.ContainsKey(dc.ColumnName))
-                            pinfo= dic[dc.ColumnName];
+                        if (dic.ContainsKey(dc.ColumnName))
+                            pinfo = dic[dc.ColumnName];
                         if (pinfo != null)
                         {
                             var obj = pinfo.GetValue(lst[i]);
@@ -827,7 +840,7 @@ namespace HiSql
                         {
                             if (Constants.IsStandardUserField(dc.ColumnName))
                             {
-                                drow[dc.ColumnName] = user;
+                                drow[dc.ColumnName] = drow[dc.ColumnName] .IsNullOrEmpty()? user : drow[dc.ColumnName];
                                 //row[i] = user;
                             }
                         }
@@ -839,7 +852,7 @@ namespace HiSql
             }
             return table;
         }
-        static public DataTable BuildDataTable(TabInfo tabInfo, bool ignoreStandardTimeField = true )
+        static public DataTable BuildDataTable(TabInfo tabInfo, bool ignoreStandardTimeField = true)
         {
             DataTable table = null;
             if (tabInfo != null)
@@ -885,7 +898,7 @@ namespace HiSql
                     {
                         dc.DataType = typeof(Int32);
                     }
-                    else if (column.FieldType.IsIn<HiType>( HiType.SMALLINT))
+                    else if (column.FieldType.IsIn<HiType>(HiType.SMALLINT))
                     {
                         dc.DataType = typeof(Int16);
                     }
@@ -916,16 +929,16 @@ namespace HiSql
             return table;
         }
 
-        static public string ToCSV<T>(List<T> lst, TabInfo tabInfo, DBType dbType,bool hasHeader=false, string user="HiSql")
+        static public string ToCSV<T>(List<T> lst, TabInfo tabInfo, DBType dbType, bool hasHeader = false, string user = "HiSql")
         {
             StringBuilder sbcsv = new StringBuilder();
             DataTable table = BuildDataTable(tabInfo);
             var _typname = "";
             Type _type = null;
 
-        
-            
-         
+
+
+
 
 
             Type _typedic = typeof(Dictionary<string, object>);
@@ -949,7 +962,7 @@ namespace HiSql
                 }
                 sbcsv.AppendLine();
             }
-            
+
 
 
 
@@ -1001,11 +1014,11 @@ namespace HiSql
                         {
                             if (Constants.IsStandardUserField(dc.ColumnName))
                             {
-                                _value = user;
+                                _value = _value.IsNullOrEmpty() ? user: _value;
                             }
                             if (Constants.IsStandardUserField(dc.ColumnName))
                             {
-                                _value = DateTime.Now;
+                                _value = _value.IsNullOrEmpty() ? DateTime.Now : _value;
                             }
                         }
                         if (_value != null)
@@ -1051,7 +1064,7 @@ namespace HiSql
                                     else
                                         sbcsv.Append(DateTime.MinValue.ToString("yyyy-MM-dd HH:mm:ss.fff"));
                                 }
-                                
+
                             }
                             else if (dc.DataType == Constants.BoolType)
                             {
@@ -1081,7 +1094,7 @@ namespace HiSql
                                     else
                                         sbcsv.Append("0");
                                 }
-                                    
+
                             }
                         }
 
@@ -1123,11 +1136,11 @@ namespace HiSql
                         {
                             if (Constants.IsStandardUserField(dc.ColumnName))
                             {
-                                _value = user;
+                                _value = _value.IsNullOrEmpty()? user : _value;
                             }
                             if (Constants.IsStandardTimeField(dc.ColumnName))
                             {
-                                _value = DateTime.Now;
+                                _value = _value.IsNullOrEmpty()? DateTime.Now : _value;
                             }
                         }
                         if (_value != null)
@@ -1135,7 +1148,7 @@ namespace HiSql
                             Type _typ = _value.GetType();
                             if (dc.DataType == Constants.StringType)
                             {
-                                
+
                                 sbcsv.Append($"\"{_value.ToString().Replace("\"", "\"\"")}\"");
                             }
                             else if (dc.DataType == Constants.DecType || dc.DataType == Constants.FloatType)
@@ -1161,7 +1174,7 @@ namespace HiSql
                             }
                             else if (dc.DataType == Constants.DateType || dc.DataType == Constants.DateTimeOffsetType)
                             {
-                                
+
                                 if (Constants.IsStandardTimeField(dc.ColumnName))
                                 {
                                     sbcsv.Append(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"));
@@ -1208,7 +1221,7 @@ namespace HiSql
                             sbcsv.Append(",");
                         _idx++;
                     }
-                    
+
                     sbcsv.AppendLine();
                     #endregion
                 }
@@ -1216,7 +1229,7 @@ namespace HiSql
             else if (_type == _typedicstr)
             {
                 var columns = table.Columns;
-                int _idx=0;
+                int _idx = 0;
                 foreach (var data in lst)
                 {
                     #region 解析 Dictionary<string, string>
@@ -1243,11 +1256,20 @@ namespace HiSql
                         {
                             if (Constants.IsStandardUserField(dc.ColumnName))
                             {
-                                _value = user;
+                                _value = _value.IsNullOrEmpty()? user : _value;
                             }
                             if (Constants.IsStandardTimeField(dc.ColumnName))
                             {
-                                _value = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+                                _value = _value.IsNullOrEmpty()? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") : _value;
+
+                                if (_value != null)
+                                {
+                                    DateTime _temp = DateTime.Now;
+                                    if (DateTime.TryParse(_value.ToString(), out _temp))
+                                    {
+                                        _value = _temp.ToString("yyyy-MM-dd HH:mm:ss.fff");
+                                    }
+                                }
                             }
                         }
                         if (_value != null)
@@ -1279,7 +1301,7 @@ namespace HiSql
                             }
                             else if (dc.DataType == Constants.DateType || dc.DataType == Constants.DateTimeOffsetType)
                             {
-                                
+
                                 if (Constants.IsStandardTimeField(dc.ColumnName))
                                 {
                                     sbcsv.Append(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"));
@@ -1329,7 +1351,7 @@ namespace HiSql
                     }
 
                     sbcsv.AppendLine();
-                    
+
                     #endregion
                 }
             }
@@ -1349,7 +1371,7 @@ namespace HiSql
                     var rowidx = 0;
                     foreach (DataColumn dc in columns)
                     {
-                        
+
                         var pinfo = properties.Where(p => p.Name.ToLower() == dc.ColumnName.ToLower()).FirstOrDefault();
                         if (pinfo != null)
                         {
@@ -1406,13 +1428,13 @@ namespace HiSql
                             sbcsv.Append(",");
 
                         rowidx++;
-                        
+
                     }
                     sbcsv.AppendLine();
                 }
                 #endregion
             }
-            
+
 
             return sbcsv.ToString();
         }
@@ -1425,7 +1447,7 @@ namespace HiSql
         /// <returns></returns>
         static public string ToCSV(DataTable table, DBType dbType, bool hasHeader = false)
         {
-            
+
             /*理论上讲还要根据字段的类型及长度 来校验数据 以期再更新*/
             StringBuilder sbcsv = new StringBuilder();
 
@@ -1465,7 +1487,8 @@ namespace HiSql
                             else
                                 sbcsv.Append("0");
                         }
-                    }else
+                    }
+                    else
                         sbcsv.Append(drow[i].ToString());
                     if (i <= colcount - 1)
                         sbcsv.Append(",");
@@ -1484,8 +1507,8 @@ namespace HiSql
         /// <returns></returns>
         static public List<TDynamic> ToExpandObjectList(this DataTable dt)
         {
-            var list=new List<TDynamic>();
-           var columns=  dt.Columns;
+            var list = new List<TDynamic>();
+            var columns = dt.Columns;
             foreach (DataRow item in dt.Rows)
             {
                 var obj = new TDynamic();
@@ -1519,7 +1542,7 @@ namespace HiSql
             return list;
         }
 
-        
+
 
         /// <summary>
         /// 把IDataReader对象转成实体类。
@@ -1623,43 +1646,44 @@ namespace HiSql
             List<Hi_FieldModel> l = new List<Hi_FieldModel>();
             foreach (var item in hi_FieldModels)
             {
-               l.Add(item.CloneFieldModel());
+                l.Add(item.CloneFieldModel());
             }
             return l;
         }
         public static Hi_FieldModel CloneFieldModel(this Hi_FieldModel hi_FieldModel)
         {
-            Hi_FieldModel l = new Hi_FieldModel() {
-                DbServer=hi_FieldModel.DbServer,
-                DbName=hi_FieldModel.DbName,
+            Hi_FieldModel l = new Hi_FieldModel()
+            {
+                DbServer = hi_FieldModel.DbServer,
+                DbName = hi_FieldModel.DbName,
                 TabName = hi_FieldModel.TabName,
-                DBDefault = hi_FieldModel.DBDefault,    
-                DefaultValue = hi_FieldModel.DefaultValue,  
-                FieldDec    = hi_FieldModel.FieldDec,
+                DBDefault = hi_FieldModel.DBDefault,
+                DefaultValue = hi_FieldModel.DefaultValue,
+                FieldDec = hi_FieldModel.FieldDec,
                 FieldDesc = hi_FieldModel.FieldDesc,
-                FieldType = hi_FieldModel.FieldType,    
+                FieldType = hi_FieldModel.FieldType,
                 FieldLen = hi_FieldModel.FieldLen,
                 FieldName = hi_FieldModel.FieldName,
                 IsBllKey = hi_FieldModel.IsBllKey,
                 IsIdentity = hi_FieldModel.IsIdentity,
-                IsIgnore = hi_FieldModel.IsIgnore,  
+                IsIgnore = hi_FieldModel.IsIgnore,
                 IsNull = hi_FieldModel.IsNull,
-                IsObsolete = hi_FieldModel.IsObsolete,  
+                IsObsolete = hi_FieldModel.IsObsolete,
                 IsPrimary = hi_FieldModel.IsPrimary,
                 IsRefTab = hi_FieldModel.IsRefTab,
-                IsRequire = hi_FieldModel.IsRequire,    
-                IsSearch = hi_FieldModel.IsSearch,  
+                IsRequire = hi_FieldModel.IsRequire,
+                IsSearch = hi_FieldModel.IsSearch,
                 IsShow = hi_FieldModel.IsShow,
                 IsSys = hi_FieldModel.IsSys,
-                RefField = hi_FieldModel.RefField,  
-                RefFieldDesc = hi_FieldModel.RefFieldDesc,  
-                RefFields = hi_FieldModel.RefFields,    
-                RefTab = hi_FieldModel.RefTab,  
-                RefWhere = hi_FieldModel.RefWhere,  
-                Regex = hi_FieldModel.Regex,    
+                RefField = hi_FieldModel.RefField,
+                RefFieldDesc = hi_FieldModel.RefFieldDesc,
+                RefFields = hi_FieldModel.RefFields,
+                RefTab = hi_FieldModel.RefTab,
+                RefWhere = hi_FieldModel.RefWhere,
+                Regex = hi_FieldModel.Regex,
                 SNO = hi_FieldModel.SNO,
                 SNO_NUM = hi_FieldModel.SNO_NUM,
-                SortNum = hi_FieldModel.SortNum,    
+                SortNum = hi_FieldModel.SortNum,
                 SrchMode = hi_FieldModel.SrchMode,
                 CreateName = hi_FieldModel.CreateName,
                 CreateTime = hi_FieldModel.CreateTime,
@@ -1673,12 +1697,14 @@ namespace HiSql
 
         public static TabInfo CloneTabInfo(this TabInfo tabInfo)
         {
-            TabInfo l = new TabInfo() { 
-               Columns = CloneHiColumnList(tabInfo.Columns),
-               DbTabName = tabInfo.DbTabName,
-               EntityName = tabInfo.EntityName
-               
-               , TabModel = tabInfo.TabModel.CloneCopy()
+            TabInfo l = new TabInfo()
+            {
+                Columns = CloneHiColumnList(tabInfo.Columns),
+                DbTabName = tabInfo.DbTabName,
+                EntityName = tabInfo.EntityName
+
+               ,
+                TabModel = tabInfo.TabModel.CloneCopy()
             };
             return l;
         }
@@ -1719,10 +1745,17 @@ namespace HiSql
                 RefField = hiColumn.RefField,
                 RefFieldDesc = hiColumn.RefFieldDesc,
                 RefFields = hiColumn.RefFields,
-                ReFieldName = hiColumn.ReFieldName, RefTab = hiColumn.RefTab, RefWhere = hiColumn.RefWhere, Regex = hiColumn.Regex,
-                SNO = hiColumn.SNO, SNO_NUM = hiColumn.SNO_NUM, SortNum = hiColumn.SortNum, SrchMode = hiColumn.SrchMode
-                , DbServer = hiColumn.DbServer
-                
+                ReFieldName = hiColumn.ReFieldName,
+                RefTab = hiColumn.RefTab,
+                RefWhere = hiColumn.RefWhere,
+                Regex = hiColumn.Regex,
+                SNO = hiColumn.SNO,
+                SNO_NUM = hiColumn.SNO_NUM,
+                SortNum = hiColumn.SortNum,
+                SrchMode = hiColumn.SrchMode
+                ,
+                DbServer = hiColumn.DbServer
+
             };
 
             return l;

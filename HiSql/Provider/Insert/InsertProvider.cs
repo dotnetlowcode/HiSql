@@ -1650,7 +1650,7 @@ namespace HiSql
                         if (hiColumn.DBDefault == HiTypeDBDefault.FUNDATE)
                         {
                             if (Context.CurrentConnectionConfig.DbType == DBType.Oracle)
-                                _value = $"timestamp'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'";
+                                _value = $"timestamp'{(_value.IsNullOrEmpty() ? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") : _value)}'";
                             else
                                 _value = $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'";
                         }
@@ -1695,16 +1695,16 @@ namespace HiSql
                 if (hiColumn.DBDefault != HiTypeDBDefault.FUNDATE)
                 {
                     if(Context.CurrentConnectionConfig.DbType==DBType.Oracle)
-                        _value = $"timestamp'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'";
+                        _value = $"timestamp'{(_value.IsNullOrEmpty()? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") :_value)}'";
                     else
-                        _value = $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'";
+                        _value = $"'{(_value.IsNullOrEmpty() ? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") : _value)}'";
                     rtn = new Tuple<bool, string>(true, _value);
 
                 }
             }
             else if (Constants.IsStandardUserField(hiColumn.FieldName))
             {
-                _value = $"'{Context.CurrentConnectionConfig.User}'";
+                _value = $"'{(_value.IsNullOrEmpty()? Context.CurrentConnectionConfig.User:_value)}'";
                 rtn = new Tuple<bool, string>(true, _value);
             }
             else
@@ -1855,7 +1855,7 @@ namespace HiSql
                     _dic = (Dictionary<string, string>)objdata;
             }
 
-            string _value;
+            string _value = null;
             foreach (HiColumn hiColumn in hiColumns)
             {
                 if (!isDic)
@@ -1994,18 +1994,18 @@ namespace HiSql
                         if (hiColumn.DBDefault != HiTypeDBDefault.FUNDATE)
                         {
                             if (!_values.ContainsKey(hiColumn.FieldName))
-                                _values.Add(hiColumn.FieldName, $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                                _values.Add(hiColumn.FieldName, $"'{( _value.IsNullOrEmpty()? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") : _value)}'");
                             else
-                                _values[hiColumn.FieldName] = $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'";
+                                _values[hiColumn.FieldName] = $"'{(_value.IsNullOrEmpty() ? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") : _value)}'";
                         }
 
                     }
                     else if (hiColumn.FieldName == "CreateName" || hiColumn.FieldName == "ModiName")
                     {
                         if (!_values.ContainsKey(hiColumn.FieldName))
-                            _values.Add(hiColumn.FieldName, $"'{Context.CurrentConnectionConfig.User}'");
+                            _values.Add(hiColumn.FieldName, $"'{(_value.IsNullOrEmpty() ? Context.CurrentConnectionConfig.User : _value)}'");
                         else
-                            _values[hiColumn.FieldName] = $"'{Context.CurrentConnectionConfig.User}'";
+                            _values[hiColumn.FieldName] = $"'{(_value.IsNullOrEmpty() ? Context.CurrentConnectionConfig.User : _value)}'";
                     }
                     #endregion
                 }
@@ -2096,9 +2096,9 @@ namespace HiSql
                         if (hiColumn.DBDefault != HiTypeDBDefault.FUNDATE)
                         {
                             if (!_values.ContainsKey(hiColumn.FieldName))
-                                _values.Add(hiColumn.FieldName, $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                                _values.Add(hiColumn.FieldName, $"'{(_value.IsNullOrEmpty() ? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") : _value)}'");
                             else
-                                _values[hiColumn.FieldName] = $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'";
+                                _values[hiColumn.FieldName] = $"'{(_value.IsNullOrEmpty() ? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") : _value)}'";
                         }
 
                     }
@@ -2106,10 +2106,10 @@ namespace HiSql
                     {
                         if (!_values.ContainsKey(hiColumn.FieldName))
                         {
-                            _values.Add(hiColumn.FieldName, $"'{Context.CurrentConnectionConfig.User}'");
+                            _values.Add(hiColumn.FieldName, $"'{(_value.IsNullOrEmpty() ? Context.CurrentConnectionConfig.User : _value)}'");
                         }
                         else
-                            _values[hiColumn.FieldName] = $"'{Context.CurrentConnectionConfig.User}'";
+                            _values[hiColumn.FieldName] = $"'{(_value.IsNullOrEmpty() ? Context.CurrentConnectionConfig.User : _value) }'";
 
 
                     }
