@@ -56,7 +56,15 @@ namespace HiSql
             }
             else
             {
-                throw new Exception("不支持该类型");
+                List<PropertyInfo> attrs = type.GetProperties().Where(p => p.MemberType == MemberTypes.Property && p.CanRead == true).ToList();
+                if (attrs.Count > 0)
+                {
+                    foreach (PropertyInfo p in attrs)
+                    {
+                        _dicO.Add(p.Name, p.GetValue(objdata));
+                    }
+                }else
+                    throw new Exception("不支持该类型");
             }
         }
        

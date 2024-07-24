@@ -1,4 +1,5 @@
-﻿using HiSql.SqlServerUnitTest;
+﻿using HiSql.SqliteUnitTest.Model;
+using HiSql.SqlServerUnitTest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,11 @@ namespace HiSql
             //CodeFirst_Table(sqlClient);
             //Snro_Demo(sqlClient);
             //CodeFirst_Install(sqlClient);
+
+            ThStock thStock = new ThStock { BarCode = "hello world", MaterialCode = "" };
+            TDynamic tdync = new TDynamic(thStock);
+
+
             string s = Console.ReadLine();
         }
 
