@@ -165,12 +165,6 @@ namespace HiSql
                 catch (Exception ex)
                 {
                     _sqlClient.CurrentConnectionConfig.IsCheckTableRefData = _ischeck;
-                    Console.WriteLine("hisql："+ex.Message);
-                    Console.WriteLine("hisql：" + ex.StackTrace);
-
-                    Console.WriteLine("hisql：" + ex.InnerException?.Message);
-                    Console.WriteLine("hisql：" + ex.InnerException?.StackTrace);
-
                     throw ex;
                 }
                 

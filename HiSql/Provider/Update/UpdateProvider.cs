@@ -545,31 +545,20 @@ namespace HiSql
                                     var _column = hiColumns.Where(h => h.FieldName.ToLower() == "moditime").FirstOrDefault();
                                     if (_column != null)
                                     {
-                                        string _oldValue = null;
-
                                         if (_values.ContainsKey(_column.FieldName))
-                                        {
-                                            _oldValue = _values[_column.FieldName];
                                             _values.Remove(_column.FieldName);
-                                        }
-                                            
 
                                         if (Context.CurrentConnectionConfig.DbType == DBType.Oracle)
-                                            _values.Add(_column.FieldName, $"timestamp'{(_oldValue.IsNullOrEmpty()? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") : _oldValue)}'");
+                                            _values.Add(_column.FieldName, $"timestamp'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
                                         else
-                                            _values.Add(_column.FieldName, $"'{(_oldValue.IsNullOrEmpty() ? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") : _oldValue)}'");
+                                            _values.Add(_column.FieldName, $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
                                     }
                                     _column = hiColumns.Where(h => h.FieldName.ToLower() == "modiname").FirstOrDefault();
                                     if (_column != null)
                                     {
-                                        string _oldValue = null;
-
                                         if (_values.ContainsKey(_column.FieldName))
-                                        {
-                                            _oldValue = _values[_column.FieldName];
                                             _values.Remove(_column.FieldName);
-                                        }
-                                        _values.Add(_column.FieldName, $"'{(_oldValue.IsNullOrEmpty() ? this.Context.CurrentConnectionConfig.User:_oldValue)}'");
+                                        _values.Add(_column.FieldName, $"'{this.Context.CurrentConnectionConfig.User}'");
                                     }
                                     lst_value.Add(_values);
                                     lst_primary.Add(_primary);
@@ -663,28 +652,19 @@ namespace HiSql
                                     var _column = hiColumns.Where(h => h.FieldName.ToLower() == "moditime").FirstOrDefault();
                                     if (_column != null)
                                     {
-                                        string _oldValue = null;
                                         if (_values.ContainsKey(_column.FieldName))
-                                        {
-                                            _oldValue = _values[_column.FieldName];
                                             _values.Remove(_column.FieldName);
-                                        }
-                                            
                                         if (Context.CurrentConnectionConfig.DbType == DBType.Oracle)
-                                            _values.Add(_column.FieldName, $"timestamp'{(_oldValue.IsNullOrEmpty()? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"):_oldValue)}'");
+                                            _values.Add(_column.FieldName, $"timestamp'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
                                         else
-                                            _values.Add(_column.FieldName, $"'{(_oldValue.IsNullOrEmpty() ? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") : _oldValue)}'");
+                                            _values.Add(_column.FieldName, $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
                                     }
                                     _column = hiColumns.Where(h => h.FieldName.ToLower() == "modiname").FirstOrDefault();
                                     if (_column != null)
                                     {
-                                        string _oldValue = null;
                                         if (_values.ContainsKey(_column.FieldName))
-                                        {
-                                            _oldValue = _values[_column.FieldName];
                                             _values.Remove(_column.FieldName);
-                                        }
-                                        _values.Add(_column.FieldName, $"'{(_oldValue.IsNullOrEmpty() ? this.Context.CurrentConnectionConfig.User : _oldValue)}'");
+                                        _values.Add(_column.FieldName, $"'{this.Context.CurrentConnectionConfig.User}'");
                                     }
                                     lst_value.Add(_values);
                                     lst_primary.Add(_primary);
@@ -861,29 +841,19 @@ namespace HiSql
                                 var _column = hiColumns.Where(h => h.FieldName.ToLower() == "moditime").FirstOrDefault();
                                 if (_column != null)
                                 {
-                                    string _oldValue = string.Empty;
-
                                     if (_values.ContainsKey(_column.FieldName))
-                                    {
-                                        _oldValue = _values[_column.FieldName];
                                         _values.Remove(_column.FieldName);
-                                    }
-                                       
                                     if (Context.CurrentConnectionConfig.DbType == DBType.Oracle)
-                                        _values.Add(_column.FieldName, $"timestamp'{(_oldValue.IsNullOrEmpty()? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"):_oldValue)}'");
+                                        _values.Add(_column.FieldName, $"timestamp'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
                                     else
-                                        _values.Add(_column.FieldName, $"'{(_oldValue.IsNullOrEmpty() ? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") : _oldValue)}'");
+                                        _values.Add(_column.FieldName, $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
                                 }
                                 _column = hiColumns.Where(h => h.FieldName.ToLower() == "modiname").FirstOrDefault();
                                 if (_column != null)
                                 {
-                                    string _oldValue = string.Empty;
                                     if (_values.ContainsKey(_column.FieldName))
-                                    {
-                                        _oldValue = _values[_column.FieldName];
                                         _values.Remove(_column.FieldName);
-                                    }
-                                    _values.Add(_column.FieldName, $"'{ (_oldValue.IsNullOrEmpty()? this.Context.CurrentConnectionConfig.User : _oldValue)}'");
+                                    _values.Add(_column.FieldName, $"'{this.Context.CurrentConnectionConfig.User}'");
                                 }
 
 
@@ -1027,7 +997,7 @@ namespace HiSql
             }
             else if (Constants.IsStandardUserField(hiColumn.FieldName))
             {
-                _value = $"'{(_value.IsNullOrEmpty()? Context.CurrentConnectionConfig.User : _value)}'";
+                _value = $"'{Context.CurrentConnectionConfig.User}'";
                 rtn = new Tuple<bool, string>(true, _value);
             }
             else
@@ -1445,24 +1415,19 @@ namespace HiSql
                 }
                 else if (hiColumn.FieldName.ToLower() == "ModiName".ToLower())
                 {
-                    string _oldValue  = _values.ContainsKey(hiColumn.FieldName) ? _values[hiColumn.FieldName] : Context.CurrentConnectionConfig.User;
-
                     if (!_values.ContainsKey(hiColumn.FieldName))
-                        _values.Add(hiColumn.FieldName, $"'{_oldValue}'");
+                        _values.Add(hiColumn.FieldName, $"'{Context.CurrentConnectionConfig.User}'");
                     else
-                        _values[hiColumn.FieldName] = $"'{_oldValue}'";
+                        _values[hiColumn.FieldName] = $"'{Context.CurrentConnectionConfig.User}'";
 
 
                 }
                 else if (hiColumn.FieldName.ToLower() == "ModiTime".ToLower())
                 {
-                    string _oldValue = _values.ContainsKey(hiColumn.FieldName) ? _values[hiColumn.FieldName] : DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
-
-
                     if (!_values.ContainsKey(hiColumn.FieldName))
-                        _values.Add(hiColumn.FieldName, $"'{_oldValue}'");
+                        _values.Add(hiColumn.FieldName, $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
                     else
-                        _values[hiColumn.FieldName] = $"'{_oldValue}'";
+                        _values[hiColumn.FieldName] = $"'{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}'";
                 }
             }
 
