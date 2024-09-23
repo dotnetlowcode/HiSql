@@ -756,7 +756,18 @@ namespace HiSql
                                         }
                                         else
                                         {
-                                            _dic.Add(hiColumn.FieldName, ((int)objprop.GetValue(objdata)).ToString());
+                                            string _val= objprop.GetValue(objdata).ToString();
+                                            if (Tool.IsInt(_val))
+                                            {
+                                                _dic.Add(hiColumn.FieldName, _val);
+                                            }
+                                            else if (Tool.RegexMatch("`(?<field>[-\\w_]+)`", _val))
+                                            {
+                                                _dic.Add(hiColumn.FieldName, _val);
+                                            }
+                                            else
+                                                throw new Exception($"字段[{hiColumn.FieldName}] 出现非法字符");
+                                            //_dic.Add(hiColumn.FieldName, ((int)objprop.GetValue(objdata)).ToString());
                                         }
 
                                     }
