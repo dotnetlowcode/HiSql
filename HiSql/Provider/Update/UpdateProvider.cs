@@ -766,7 +766,7 @@ namespace HiSql
                                                 _dic.Add(hiColumn.FieldName, _val);
                                             }
                                             else
-                                                throw new Exception($"字段[{hiColumn.FieldName}] 出现非法字符");
+                                                _dic.Add(hiColumn.FieldName, ((int)objprop.GetValue(objdata)).ToString());
                                             //_dic.Add(hiColumn.FieldName, ((int)objprop.GetValue(objdata)).ToString());
                                         }
 

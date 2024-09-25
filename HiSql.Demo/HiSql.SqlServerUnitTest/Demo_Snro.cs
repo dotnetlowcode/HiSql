@@ -45,7 +45,7 @@ namespace HiSql
             Global.SnroOn = true;
             for (int i = 0; i < 100; i++)
             {
-                string num = SnroNumber.NewNumber("SALENO", 1);
+                string num = SnroNumber.NewNumber("Products", 1);
 
                 Console.WriteLine($"编号创建成功：{num}");
             }
