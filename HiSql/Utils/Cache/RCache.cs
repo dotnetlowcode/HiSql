@@ -345,8 +345,8 @@ namespace HiSql
             if (_server == null || !_server.IsConnected)
             {
                 string _connstr = $"{this._options.Host}:{this._options.Port}";
-                if (!string.IsNullOrEmpty(this._options.PassWord))
-                    _connstr = $"{_connstr},password={this._options.PassWord}";
+                //if (!string.IsNullOrEmpty(this._options.PassWord))
+                //    _connstr = $"{_connstr},password={this._options.PassWord}";
                 _server = _connectMulti.GetServer(_connstr);
             }
         }

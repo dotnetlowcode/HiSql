@@ -119,7 +119,9 @@ namespace HiSql
 
         public T Field<T>(string name)
         {
-            return (T) GetProperty(name);
+            if (GetProperty(name) != null)
+                return (T)GetProperty(name);
+            else  throw new Exception($"[{name}] is not exists");
         }
 
         /// <summary>
@@ -176,15 +178,25 @@ namespace HiSql
             return new TDynamic(exobj);
         }
         
-
+        /// <summary>
+        /// 获取所有属性清单
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<string> GetPropertys()
         {
             return _dicO.Keys;
         }
 
+        /// <summary>
+        /// 获取动态类属性 如果不存在则会返回null
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public object GetProperty(string name)
         {
-            return _dicO[name];
+            if(_dicO[name]!=null)
+                return _dicO[name];
+            return null;
         }
     }
 }
