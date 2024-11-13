@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HiSql.PostGreSqlUnitTest.Table;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -32,9 +33,20 @@ namespace HiSql.PostGreSqlUnitTest
             //Demo1_Insert3(sqlClient);
             //Demo1_Modi(sqlClient);
             //Demo1_Modi2(sqlClient);
-            Demo4_Insert1(sqlClient);
+            //Demo4_Insert1(sqlClient);
+            Demo5_Insert(sqlClient);
             string s = Console.ReadLine();
         }
+        static void Demo5_Insert(HiSqlClient sqlClient) {
+            bool isexits=sqlClient.DbFirst.CheckTabExists(typeof(HTest02).Name);
+            if (!isexits) {
+                sqlClient.DbFirst.CreateTable(typeof(HTest02));
+            }
+            sqlClient.Delete(typeof(HTest02).Name).ExecCommand();
+            string _sql = sqlClient.Insert(typeof(HTest02).Name, new HTest02 { SID = 1, UName = "tansar" }).ToSql();
+            sqlClient.Insert(typeof(HTest02).Name,new HTest02 {  SID=1, UName ="tansar"} ).ExecCommand();
+        }
+
         static void Demo4_Insert1(HiSqlClient sqlClient)
         {
             TabInfo tabinfo = sqlClient.Context.DMInitalize.GetTabStruct("HTest01");

@@ -1795,7 +1795,7 @@ namespace HiSql
                 }
                 else if (hiColumn.FieldType.IsIn<HiType>(HiType.DATE, HiType.DATETIME))
                 {
-                    if (!string.IsNullOrEmpty(_value) && _value!=null)
+                    if (!string.IsNullOrEmpty(_value) && _value != null)
                     {
                         DateTime dtime = DateTime.Parse(_value);
                         //DateTime dtime = DateTime.Now;
@@ -1806,8 +1806,24 @@ namespace HiSql
                             else
                                 rtn = new Tuple<bool, string>(true, $"'{dtime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
                         }
-                    }else
-                        rtn = new Tuple<bool, string>(true, $"null");
+                    }
+                    else
+                    {
+                        //if (hiColumn.IsNull)
+                        //{
+                        //    rtn = new Tuple<bool, string>(true, $"null");
+                        //}
+                        //else
+                        //{
+                        //    rtn = new Tuple<bool, string>(true, $"0001-01-01 00:00:00");
+                        //}
+                        ///日期如果未赋值 那么默认为以下日期 add by tgm date:2024.11.13
+                        if (Context.CurrentConnectionConfig.DbType == DBType.Oracle)
+                        {
+                            rtn = new Tuple<bool, string>(true, $"timestamp'0001-01-01 00:00:00'");
+                        }else
+                            rtn = new Tuple<bool, string>(true, $"'0001-01-01 00:00:00'");
+                    }
                 }
                 else
                 {
