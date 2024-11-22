@@ -34,7 +34,7 @@ namespace HiSql
         /// </summary>
         /// <param name="cacheRegion">缓存区域名称。建议以系统名称命名。如 CRM</param>
         /// <param name="memoryCacheOptions">MemoryCache缓存参数配置</param>
-        public MCache(string cacheRegion, MemoryCacheOptions memoryCacheOptions = null)//
+        public MCache(string cacheRegion, MemoryCacheOptions memoryCacheOptions = null):base(null)
         {
             if (cacheRegion.IsNullOrEmpty())
             {
