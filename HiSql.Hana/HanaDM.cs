@@ -2593,7 +2593,7 @@ namespace HiSql
                 #region 非子查询
                 if (_islist && hiColumn.FieldType.IsIn<HiType>(HiType.NCHAR, HiType.NVARCHAR, HiType.GUID, HiType.VARCHAR, HiType.CHAR))
                 {
-                    List<string> lstobj = (List<string>)value;
+                    List<string> lstobj = Tool.ConverterObjToList<string>(value);//(List<string>)value;
                     bool _isen = hiColumn.FieldType.IsIn<HiType>(HiType.NCHAR, HiType.NVARCHAR, HiType.GUID);
                     foreach (string str in lstobj)
                     {
@@ -2626,7 +2626,7 @@ namespace HiSql
                 }
                 else if (_islist && hiColumn.FieldType.IsIn<HiType>(HiType.BIGINT))
                 {
-                    List<Int64> lstobj = (List<Int64>)value;
+                    List<Int64> lstobj = Tool.ConverterObjToList<Int64>(value);// (List<Int64>)value;
                     foreach (Int64 di in lstobj)
                     {
                         if (_idx < lstobj.Count - 1)
@@ -2640,7 +2640,7 @@ namespace HiSql
                 }
                 else if (_islist && hiColumn.FieldType.IsIn<HiType>(HiType.INT))
                 {
-                    List<int> lstobj = (List<int>)value;
+                    List<int> lstobj = Tool.ConverterObjToList<int>(value);//(List<int>)value;
                     foreach (int di in lstobj)
                     {
                         if (_idx < lstobj.Count - 1)
@@ -2654,7 +2654,7 @@ namespace HiSql
                 }
                 else if (_islist && hiColumn.FieldType.IsIn<HiType>(HiType.SMALLINT))
                 {
-                    List<Int16> lstobj = (List<Int16>)value;
+                    List<Int16> lstobj = Tool.ConverterObjToList<Int16>(value);// (List<Int16>)value;
                     foreach (Int16 di in lstobj)
                     {
                         if (_idx < lstobj.Count - 1)
@@ -2668,7 +2668,7 @@ namespace HiSql
                 }
                 else if (_islist && hiColumn.FieldType.IsIn<HiType>(HiType.DECIMAL))
                 {
-                    List<decimal> lstobj = (List<decimal>)value;
+                    List<decimal> lstobj = Tool.ConverterObjToList<decimal>(value);// (List<decimal>)value;
                     foreach (decimal di in lstobj)
                     {
                         if (_idx < lstobj.Count - 1)
@@ -2681,7 +2681,7 @@ namespace HiSql
                 }
                 else if (_islist && hiColumn.FieldType.IsIn<HiType>(HiType.DATETIME, HiType.DATE))
                 {
-                    List<string> lstobj = (List<string>)value;
+                    List<string> lstobj = Tool.ConverterObjToList<string>(value);//(List<string>)value;
                     foreach (string str in lstobj)
                     {
                         if (_idx < lstobj.Count - 1)
@@ -2693,7 +2693,7 @@ namespace HiSql
                 }
                 else if (_islist)
                 {
-                    List<string> lstobj = (List<string>)value;
+                    List<string> lstobj = Tool.ConverterObjToList<string>(value);//(List<string>)value;
                     foreach (string str in lstobj)
                     {
                         if (_idx < lstobj.Count - 1)
@@ -2721,7 +2721,7 @@ namespace HiSql
             {
                 if (_islist)
                 {
-                    List<string> lstobj = (List<string>)value;
+                    List<string> lstobj = Tool.ConverterObjToList<string>(value);//(List<string>)value;
                     foreach (string str in lstobj)
                     {
                         if (_idx < lstobj.Count - 1)

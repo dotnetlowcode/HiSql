@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Numerics;
 
 namespace HiSql.PostGreSqlUnitTest
 {
@@ -6,6 +9,15 @@ namespace HiSql.PostGreSqlUnitTest
     {
         static void Main(string[] args)
         {
+
+            object ttt = new List<object>(){ "1.2" };
+            var t2 = ttt.GetType();
+            var ttt33 = Tool.ConverterObjToList<decimal>(ttt);
+            foreach (var value in ttt33)
+            {
+               Console.WriteLine(value);
+            }
+
             //Console.WriteLine("Hello World!");
             HiSqlClient sqlClient = Demo_Init.GetSqlClient();
             sqlClient.CodeFirst.InstallHisql();
