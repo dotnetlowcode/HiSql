@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
 namespace HiSql
 {
@@ -401,12 +402,18 @@ namespace HiSql
                 obj = _MemoryCache.GetCache(key);
                 if (obj.IsNullOrEmpty())
                 {
-                    
+
                     var val = _cache.StringGetWithExpiry(key);
                     if (val.Value.HasValue)
                     {
-                        obj = val.Value.ToString();
+                        obj = this.GetZipValue(val.Value);
+
                         _MemoryCache.SetCache(key, obj,  DateTime.Now.Add(val.Expiry.HasValue? val.Expiry.Value:TimeSpan.FromSeconds(10)));
+
+                        if (obj.IndexOf("\"") >= 0)
+                        {
+                            obj = JsonConvert.DeserializeObject(obj)?.ToString();
+                        }
                     }
 
                     else
@@ -416,15 +423,18 @@ namespace HiSql
             else
             {
                 var val = _cache.StringGet(key);
-                
-                //(byte[])val
 
                 if (val.HasValue)
                     obj = this.GetZipValue(val);
                 else
                     obj = string.Empty;
-            }
 
+                if (obj.IndexOf("\"") >= 0 && val.HasValue)
+                {
+                    obj = JsonConvert.DeserializeObject(obj)?.ToString();
+                }
+            }
+           
             return obj;
         }
 
@@ -444,9 +454,15 @@ namespace HiSql
                     var cachevalue = _cache.StringGetWithExpiry(key);
                     if (!cachevalue.Value.IsNull)
                     {
-                        value = JsonConvert.DeserializeObject<T>(cachevalue.Value);
+                        //判断是否是压缩的二进制 如果是则进行解压
+                        string _strvale = string.Empty;
+                        if (cachevalue.Value.HasValue)
+                            _strvale = this.GetZipValue(cachevalue.Value);
+                        //内存里面保存 解压后的、序列化的数据
 
-                        _MemoryCache.SetCache(key, value, DateTime.Now.Add(cachevalue.Expiry.HasValue ? cachevalue.Expiry.Value : TimeSpan.FromSeconds(10)));
+                        _MemoryCache.SetCache(key, _strvale, DateTime.Now.Add(cachevalue.Expiry.HasValue ? cachevalue.Expiry.Value : TimeSpan.FromSeconds(10)));
+
+                        value = JsonConvert.DeserializeObject<T>(_strvale);
                     }
                 }
                 else
