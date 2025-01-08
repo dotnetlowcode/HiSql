@@ -21,7 +21,7 @@ namespace HiSql.UnitTest
                          //ConnectionString = "server=(local);uid=sa;pwd=Hone@123;database=Hone;Encrypt=True; TrustServerCertificate=True;",//; MultipleActiveResultSets = true;
                          //User = "tansar",//可以指定登陆用户的帐号
                          //ConnectionString = "server=121.201.110.194,43109; uid=HoneDev;pwd=Dev@Hone; database=Hone_Flow_Dev;Encrypt=True; TrustServerCertificate=True;",//; MultipleActiveResultSets = true;
-                         ConnectionString = "server=192.168.10.119,33633;uid=sa;pwd=testdb@2023;database=TTShop;MultipleActiveResultSets=true;",//; MultipleActiveResultSets = true;
+                         ConnectionString = "Data Source=192.168.10.88,7433;Initial Catalog=ThirdApi_QAS;User Id=dev003;Password=dev003@123;Connect Timeout=900;TrustServerCertificate=True;Max Pool Size=300;",//; MultipleActiveResultSets = true;
                          //SlaveConnectionConfigs = new List<SlaveConnectionConfig> {
                          //    { new SlaveConnectionConfig{ ConnectionString=" server=(local);uid=sa;pwd=Hone@123;database=Hone;Encrypt=True; TrustServerCertificate=True;" , Weight=3} },
                          //    //{ new SlaveConnectionConfig{ ConnectionString=" server=(local);uid=sa;pwd=Hone@123;database=HiSql; " , Weight=3} },

@@ -12,6 +12,11 @@ namespace HiSql.PostGreSqlUnitTest
         static void Main(string[] args)
         {
 
+            HiSqlClient _sqlClient = Demo_Init.GetSqlClient();
+           // _sqlClient.CodeFirst.InstallHisql();
+            var t = _sqlClient.DbFirst.GetTabStruct("ThOrderSku");
+
+
             var LckInfo = new LckInfo() { Key = "test" };
 
             var LckInfo2 = new LckInfo() { Key = "test" };

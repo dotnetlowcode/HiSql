@@ -42,9 +42,9 @@ namespace HiSql.PostGreSqlUnitTest
         }
         public static void Init(HiSqlClient sqlClient)
         {
-            //Delete_Demo(sqlClient);
+            Delete_Demo(sqlClient);
             //Delete_Demo2(sqlClient);
-            Drop_Demo(sqlClient);
+            //Drop_Demo(sqlClient);
         }
         static void Drop_Demo(HiSqlClient sqlClient)
         {

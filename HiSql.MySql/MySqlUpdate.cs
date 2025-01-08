@@ -85,6 +85,11 @@ namespace HiSql
                 {
                     sql_where = Context.DMTab.BuilderWhereSql(new List<TableDefinition> { this.Table }, dictabinfo, null, this.Wheres, false, false);
                 }
+                if (tabinfo != null && tabinfo.PrimaryKey.Count == 0 && (sql_where.IsNullOrEmpty() && IsOnlyWhere == false))
+                {
+                    throw new Exception($"要更新的表【{this.Table.TabName}】无主键，为避免全表更新，请指定条件或创建主键。");
+                }
+
                 Tuple<List<Dictionary<string, string>>, List<Dictionary<string, string>>> rtn_check = this.CheckAllData(this.Table, tabinfo, _field, this.Data, this.Wheres.Count > 0 || _hisqlwhere, _isonly);
                 int _idx = 0;
                 foreach (object obj in this.Data)

@@ -523,7 +523,7 @@ namespace HiSql
                                     if (column != null)
                                     {
                                         //lstobj.Add(new { TabName = column.TabName, FieldName = column.FieldName });
-                                        _lstdel.Add(new { TabName = column.TabName, FieldName = column.FieldName });
+                                        _lstdel.Add(new { TabName = column.TabName, FieldName = column.FieldName, DbServer = lstcolumn.Count > 0 ? lstcolumn[0].DbServer : "", DbName = lstcolumn.Count > 0 ? lstcolumn[0].DbName : "" });
                                     }
                                 }
                                 if (lstobj.Count > 0)

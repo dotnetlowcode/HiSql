@@ -468,7 +468,7 @@ namespace HiSql
                             phytabInfo = HiSqlCommProvider.TabMerge(phytabInfo, tabInfo);
                             List<HiColumn> phyclumn = phytabInfo.GetColumns;
                             var delfield = fieldChanges.Where(f => f.Action == TabFieldAction.DELETE).ToList();
-                            var modifield = fieldChanges.Where(f => f.Action == TabFieldAction.ADD || (f.Action == TabFieldAction.MODI && f.IsTabChange == true)).ToList();
+                            var modifield = fieldChanges.Where(f => f.Action == TabFieldAction.ADD || (f.Action == TabFieldAction.MODI && f.IsTabChange == true)).ToList();                            
                             if (delfield != null && delfield.Count > 0)
                             {
                                 List<object> lstobj = new List<object>();
@@ -478,7 +478,7 @@ namespace HiSql
                                     if (column != null)
                                     {
                                         //lstobj.Add(new { TabName = column.TabName, FieldName = column.FieldName });
-                                        _lstdel.Add(new { TabName = column.TabName, FieldName = column.FieldName });
+                                        _lstdel.Add(new { TabName = column.TabName, FieldName = column.FieldName, DbServer = lstcolumn.Count>0? lstcolumn[0].DbServer:"", DbName = lstcolumn.Count > 0 ? lstcolumn[0].DbName : "" });
                                     }
                                 }
                                 if (lstobj.Count > 0)
