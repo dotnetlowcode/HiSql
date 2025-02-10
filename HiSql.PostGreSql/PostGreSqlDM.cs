@@ -1578,6 +1578,15 @@ namespace HiSql
                 {
                     //带描述的创建创建
                     StringBuilder sb_sqlcomment = new StringBuilder();
+                    if (hiTable.TabDescript.IsNullOrEmpty() == false)
+                    {
+                        sb_sqlcomment.AppendLine(
+                            dbConfig.Table_Comment
+                                .Replace("[$TabDesc$]", hiTable.TabDescript)
+                                .Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema)
+                                .Replace("[$TabName$]", _create_tabname)
+                            );
+                    }
                     foreach (HiColumn hiColumn in lstHiTable)
                     {
                         sb_sqlcomment.AppendLine(
@@ -1599,6 +1608,15 @@ namespace HiSql
                 {
                     //带描述的创建创建
                     StringBuilder sb_sqlcomment = new StringBuilder();
+                    if (hiTable.TabDescript.IsNullOrEmpty() == false)
+                    {
+                        sb_sqlcomment.AppendLine(
+                            dbConfig.Table_Comment
+                                .Replace("[$TabDesc$]", hiTable.TabDescript)
+                                .Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema)
+                                .Replace("[$TabName$]", _create_tabname)
+                            );
+                    }
                     foreach (HiColumn hiColumn in lstHiTable)
                     {
                         sb_sqlcomment.AppendLine(

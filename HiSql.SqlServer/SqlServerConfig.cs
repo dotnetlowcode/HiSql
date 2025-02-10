@@ -63,6 +63,8 @@ namespace HiSql
 
         string _temp_field_comment = "";
 
+        string _temp_table_comment = "";
+
         /// <summary>
         /// 数据插入语句模版
         /// </summary>
@@ -296,6 +298,10 @@ namespace HiSql
         public  string Table_Key2 { get => _temp_table_key2;   }
         public  string Table_Key3 { get => _temp_table_key3;  }
         public  string Field_Comment { get => _temp_field_comment; }
+
+
+        public string Table_Comment { get => _temp_table_comment; }
+
         public  string Get_Table_Schema { get => _temp_get_table_schema;   }
 
         
@@ -692,7 +698,19 @@ namespace HiSql
 
                 .ToString();
 
-  
+            _temp_table_comment = new StringBuilder()
+                          .AppendLine("if exists(select a.name as TabName,a.name as FieldName,c.value as FieldDesc")
+                          .AppendLine("from sys.tables as a")
+                          .AppendLine("left join sys.extended_properties as c on c.major_id=a.object_id and c.minor_id = 0")
+                          .AppendLine("where a.name='[$TabName$]' and c.value is not null)")
+                          .AppendLine("begin")
+                          .AppendLine("EXECUTE sp_updateextendedproperty N'MS_Description', N'[$TabDesc$]', N'SCHEMA', N'[$Schema$]', N'TABLE', N'[$TabName$]'")
+                          .AppendLine("end")
+                          .AppendLine("else")
+                          .AppendLine("begin")
+                          .AppendLine("EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'[$TabDesc$]' , @level0type=N'SCHEMA',@level0name=N'[$Schema$]', @level1type=N'TABLE',@level1name=N'[$TabName$]'")
+                          .AppendLine("end")
+                          .ToString();
 
             _temp_insert_statement = new StringBuilder()
                 .AppendLine($"insert into {_temp_schema_pre}dbo{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after}([$FIELDS$]) values([$VALUES$])")

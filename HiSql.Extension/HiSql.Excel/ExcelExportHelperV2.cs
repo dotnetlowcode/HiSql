@@ -280,12 +280,19 @@ namespace HiSql.Extension
             {
                 rowHandlerFun();
                 var excelRow = sheet.CreateRow(sheet.LastRowNum + 1);
+                int colIdx = 0;
                 for (int j = 0; j < dt.Columns.Count; j++)
                 {
-                    ICell _dCell = excelRow.CreateCell(j);
+                    var columnObj = dt.Columns[j];
+                    if (!headerMap.ContainsKey(columnObj.ColumnName))
+                    {
+                        continue;
+                    }
+
+                    ICell _dCell = excelRow.CreateCell(colIdx);
                     _dCell.CellStyle = textStyle;
                     var _value = dt.Rows[i][j].ToString().Trim();
-                    var columnObj = dt.Columns[j];
+                   
                     if (
                         columnObj.DataType == typeDec
                         || columnObj.DataType == typeInt
@@ -319,8 +326,13 @@ namespace HiSql.Extension
                     }
                     else
                         _dCell.SetCellValue(_value);
-                    var headInfo = headerMap[columnObj.ColumnName];
-                    await cellHandlerFun(sheet, excelRow, _dCell, headInfo);
+                    if (headerMap.ContainsKey(columnObj.ColumnName))
+                    {
+                        var headInfo = headerMap[columnObj.ColumnName];
+                        await cellHandlerFun(sheet, excelRow, _dCell, headInfo);
+                    }
+
+                    colIdx++;
                 }
             }
         }

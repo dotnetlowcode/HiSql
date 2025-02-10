@@ -13,11 +13,42 @@ using System.Threading.Tasks;
 
 namespace HiSql.UnitTest
 {
+    [Serializable]
+    [HiTable(IsEdit = true, TabName = "Test_SysDictData", TabDescript = "字典数据表Test_SysDictData")]
+    /// <summary>
+    /// 字典数据表
+    public class Test_SysDictData
+    {
+        /// <summary>
+        /// 字典主键-后台生成
+        /// </summary>
+        [HiColumn(FieldDesc = "字典主键-后台生成", IsPrimary = true, IsBllKey = true, IsNull = false, FieldType = HiType.VARCHAR, FieldLen = 50, FieldDec = 0, SortNum = 21, DBDefault = HiTypeDBDefault.EMPTY)]
+        public string DictCode { get; set; }
+
+        /// <summary>
+        /// 数据标签
+        /// </summary>
+        [HiColumn(FieldDesc = "数据标签", IsPrimary = false, IsBllKey = false, IsNull = false, FieldType = HiType.VARCHAR, FieldDec = 0, SortNum = 22, DBDefault = HiTypeDBDefault.EMPTY)]
+        public string DictLabel { get; set; }
+
+
+    }
     class Program
     {
         public delegate string MethodCaller(string firstName, string lastName);
         static void Main(string[] args)
         {
+
+            HiSqlClient _sqlClient = Demo_Init.GetSqlClient();
+
+            bool isexits = _sqlClient.DbFirst.CheckTabExists(typeof(Test_SysDictData).Name);
+            if (!isexits)
+            {
+                _sqlClient.DbFirst.CreateTable(typeof(Test_SysDictData));
+            }
+            var t = _sqlClient.DbFirst.GetTabStruct("Test_SysDictData");
+
+            return;
             /*
             Console.WriteLine("1:" + Thread.CurrentThread.ManagedThreadId);
             MethodCaller method = new MethodCaller(GetFullName);

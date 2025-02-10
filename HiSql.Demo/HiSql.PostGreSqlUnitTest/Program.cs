@@ -9,18 +9,42 @@ namespace HiSql.PostGreSqlUnitTest
 {
     class Program
     {
-        static void Main(string[] args)
+        [Serializable]
+        [HiTable(IsEdit = true, TabName = "Test_SysDictData", TabDescript = "字典数据表Test_SysDictData")]
+        /// <summary>
+        /// 字典数据表
+        public class Test_SysDictData
+        {
+            /// <summary>
+            /// 字典主键-后台生成
+            /// </summary>
+            [HiColumn(FieldDesc = "字典主键-后台生成", IsPrimary = true, IsBllKey = true, IsNull = false, FieldType = HiType.VARCHAR, FieldLen = 50, FieldDec = 0, SortNum = 21, DBDefault = HiTypeDBDefault.EMPTY)]
+            public string DictCode { get; set; }
+
+            /// <summary>
+            /// 数据标签
+            /// </summary>
+            [HiColumn(FieldDesc = "数据标签", IsPrimary = false, IsBllKey = false, IsNull = false, FieldType = HiType.VARCHAR, FieldDec = 0, SortNum = 22, DBDefault = HiTypeDBDefault.EMPTY)]
+            public string DictLabel { get; set; }
+
+
+        }
+            static void Main(string[] args)
         {
 
             HiSqlClient _sqlClient = Demo_Init.GetSqlClient();
-           // _sqlClient.CodeFirst.InstallHisql();
-            var t = _sqlClient.DbFirst.GetTabStruct("ThOrderSku");
+          
+            bool isexits = _sqlClient.DbFirst.CheckTabExists(typeof(Test_SysDictData).Name);
+            if (!isexits)
+            {
+                _sqlClient.DbFirst.CreateTable(typeof(Test_SysDictData));
+            }
+            var t = _sqlClient.DbFirst.GetTabStruct("Test_SysDictData");
 
 
             var LckInfo = new LckInfo() { Key = "test" };
 
             var LckInfo2 = new LckInfo() { Key = "test" };
-
             var rlt1 =  Lock.LockOnExecute("test", async  () => {
                 await Task.Run(() =>
                 {

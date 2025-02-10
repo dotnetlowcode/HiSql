@@ -54,6 +54,7 @@ namespace HiSql
         string _temp_table_key3_temp = "";
 
         string _temp_field_comment = "";
+        string _temp_table_comment = "";
 
         /// <summary>
         /// 数据插入语句模版
@@ -298,6 +299,12 @@ namespace HiSql
 
         public string Table_Key3_Temp { get => _temp_table_key3_temp; }
         public string Field_Comment { get => _temp_field_comment; }
+
+
+        public string Table_Comment { get => _temp_table_comment; }
+
+
+
         public string Get_Table_Schema { get => _temp_get_table_schema; }
 
         public string Get_HiTabModel { get => _temp_hitabmodel; }
@@ -781,6 +788,10 @@ namespace HiSql
                 .ToString();
 
 
+            _temp_table_comment = new StringBuilder()
+                .AppendLine($"COMMENT ON TABLE {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after} IS '[$TabDesc$]';")
+                // .AppendLine("GO")
+                .ToString();
 
             _temp_insert_statement = new StringBuilder()
                 .AppendLine($"insert into {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after}([$FIELDS$]) values([$VALUES$])")
