@@ -16,6 +16,25 @@ namespace HiSql.Unit.Test
         {
             _outputHelper = testOutputHelper;
         }
+        [Fact(DisplayName = "MCache")]
+        [Trait("MCache", "init_more")]
+        public void Cache_MCache_More()
+        {
+            LckInfo lckinfo = new LckInfo { UName = "hone", Ip = Tool.Net.GetLocalIPAddress() };
+            string _key = "order:10012245445";
+            var lck1= HiSql.Lock.LockOnExecute(_key, () => {
+                string _key2 = "od:125622";
+                var lck2=HiSql.Lock.LockOnExecute(_key2, () => {
+                    Console.WriteLine($"锁定业务处理:{_key} -{_key2}");
+                }, lckinfo);
+                if(lck2.Item1)
+                    Assert.True(true);
+                else Assert.False(true);
+            }, lckinfo);
+            if (lck1.Item1)
+                Assert.True(true);
+            else Assert.False(true);
+        }
 
         [Fact(DisplayName = "MCache")]
         [Trait("MCache", "init")]
