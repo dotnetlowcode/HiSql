@@ -8,7 +8,7 @@ namespace HiSql.PostGreSqlUnitTest
         {
             //Console.WriteLine("Hello World!");
             HiSqlClient sqlClient = Demo_Init.GetSqlClient();
-            Console.WriteLine($"数据库连接id" + sqlClient.Context.ConnectedId);
+            Console.WriteLine($"数据库连接Id" + sqlClient.Context.ConnectedId);
             //Demo_DbCode.Init(sqlClient);
             //DemoCodeFirst.Init(sqlClient);
            
