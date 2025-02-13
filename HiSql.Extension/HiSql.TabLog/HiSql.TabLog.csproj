@@ -15,5 +15,11 @@
 	<ItemGroup Condition="'$(TargetFramework)' == 'net461'">
 		<Reference Include="Microsoft.CSharp" />
 	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="CredentialStorage/" />
+	</ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="HiSql" Version="1.0.7.5" />
+	</ItemGroup>
 
 </Project>
