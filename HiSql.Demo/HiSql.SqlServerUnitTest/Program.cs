@@ -41,14 +41,14 @@ namespace HiSql.UnitTest
 
             HiSqlClient _sqlClient = Demo_Init.GetSqlClient();
 
-            bool isexits = _sqlClient.DbFirst.CheckTabExists(typeof(Test_SysDictData).Name);
-            if (!isexits)
-            {
-                _sqlClient.DbFirst.CreateTable(typeof(Test_SysDictData));
-            }
-            var t = _sqlClient.DbFirst.GetTabStruct("Test_SysDictData");
+            //bool isexits = _sqlClient.DbFirst.CheckTabExists(typeof(Test_SysDictData).Name);
+            //if (!isexits)
+            //{
+            //    _sqlClient.DbFirst.CreateTable(typeof(Test_SysDictData));
+            //}
+            //var t = _sqlClient.DbFirst.GetTabStruct("Test_SysDictData");
 
-            return;
+            //return;
             /*
             Console.WriteLine("1:" + Thread.CurrentThread.ManagedThreadId);
             MethodCaller method = new MethodCaller(GetFullName);
@@ -99,13 +99,13 @@ namespace HiSql.UnitTest
             //TestLike();
             // Console.WriteLine($"数据库连接id"+sqlcient.Context.ConnectedId);
             //Demo_Snro.Init(sqlcient);
-            Demo_Update.Init(sqlcient);
+            //Demo_Update.Init(sqlcient);
             //Demo_Query.Init(sqlcient);
 
             //Demo_Delete.Init(sqlcient);
 
             //DemoCodeFirst.Init(sqlcient);
-            //Demo_Insert.Init(sqlcient);
+            Demo_Insert.Init(sqlcient);
 
             //Demo_DbCode.Init(sqlcient);
             //Demo_Cache.Init(sqlcient);

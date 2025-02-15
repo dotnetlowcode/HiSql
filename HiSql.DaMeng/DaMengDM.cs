@@ -750,11 +750,18 @@ namespace HiSql
 
         #region 接口实现
 
-        public string BuildInsertSql(Dictionary<string, string> _values, bool isbulk = false)
+        public string BuildInsertSql(TableType tableType,Dictionary<string, string> _values, bool isbulk = false)
         {
             //Insert_StateMent
-            string _insert_temp = dbConfig.Insert_StateMentv2.Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema);
-
+            //string _insert_temp = dbConfig.Insert_StateMentv2.Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema);
+            string _insert_temp = dbConfig.Insert_StateMentv2;
+            //add by tgm date:2025.2.15
+            if (tableType.IsIn<TableType>(TableType.Var, TableType.Local, TableType.Global))
+            {
+                _insert_temp = dbConfig.Insert_Temp_StateMent;
+            }
+           
+            _insert_temp = _insert_temp.Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema);
 
 
             StringBuilder _sb_field = new StringBuilder();
@@ -910,8 +917,15 @@ namespace HiSql
                 }
                 else if (!istrunctate && isdrop)
                 {
-                    ///删除表数据
-                    _temp_delete = dbConfig.Drop_Table;
+                    if (table.TableType.IsIn<TableType>(TableType.Local, TableType.Global))
+                    {
+                        _temp_delete = dbConfig.Drop_Local_Table;
+                    }
+                    else
+                    {
+                        ///删除表数据
+                        _temp_delete = dbConfig.Drop_Table;
+                    }
                     _temp_delete = _temp_delete
                         .Replace("[$Schema$]", _schema)
                         .Replace("[$TabName$]", table.TabName);

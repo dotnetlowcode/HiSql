@@ -290,6 +290,8 @@ namespace HiSql
                         var rtnexe=  Lock.LockOnExecute(_key, () => {
 
                             isok = _sqlClient.Context.DMInitalize.BuildTabCreate(tabInfo) > 0;
+                            if(tabInfo.TabModel.TableType.IsIn<TableType>(TableType.Var,TableType.Local,TableType.Global))
+                                _sqlClient.Context.MCache.SetCache(tabInfo.TabModel.TabName, tabInfo);
                         }, new LckInfo { UName = _sqlClient.CurrentConnectionConfig.User,Ip=Tool.Net.GetLocalIPAddress() });
 
 

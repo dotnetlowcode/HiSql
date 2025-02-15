@@ -139,7 +139,10 @@ namespace HiSql
         /// </summary>
         public string Insert_StateMentv2 { get;   }
 
-       
+        /// <summary>
+        /// 插入临时表的语句模版
+        /// </summary>
+        public string Insert_Temp_StateMent { get;}
         public string Update_Statement { get; }
 
 
@@ -165,6 +168,9 @@ namespace HiSql
 
         public string Drop_Table { get; }
 
+        public string Drop_Global_Table { get; }
+
+        public string Drop_Local_Table { get; }
 
         public string Add_Column { get; }
 

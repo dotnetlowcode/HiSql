@@ -374,11 +374,11 @@ namespace HiSql
                             string _sql = String.Empty;
                             if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.Sqlite) && _mergeinto) //由于DBType.Sqlite mergeinto的方法实现逻辑与其它的数据库完全不一样只能特殊处理
                             {
-                                _sql = sqldm.BuildInsertSql(_values, i > p * DbConfig.BlukSize).Replace("[$TabName$]", _insertTabName).Replace("insert", "replace");//i > p * _bluksize
+                                _sql = sqldm.BuildInsertSql(tabinfo.TabModel.TableType,_values, i > p * DbConfig.BlukSize).Replace("[$TabName$]", _insertTabName).Replace("insert", "replace");//i > p * _bluksize
                             }
                             else
                             {
-                                _sql = sqldm.BuildInsertSql(_values, i > p * DbConfig.BlukSize).Replace("[$TabName$]", _insertTabName);//i > p * _bluksize
+                                _sql = sqldm.BuildInsertSql(tabinfo.TabModel.TableType, _values, i > p * DbConfig.BlukSize).Replace("[$TabName$]", _insertTabName);//i > p * _bluksize
                             }
                             sb_sql.Append(_sql);
                             _times++;
