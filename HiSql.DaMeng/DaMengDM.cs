@@ -1975,7 +1975,7 @@ namespace HiSql
                     sb_join.Append($" right join");
                 sb_join.Append($" {dbConfig.Table_Pre}{dictabinfo[joinDefinition.Right.TabName].TabModel.TabName}{dbConfig.Table_After}  {dbConfig.Table_Pre}{joinDefinition.Right.AsTabName.ToLower()}{dbConfig.Table_After}");
                 sb_join.Append(" on ");
-
+                bool isFirstOnCondition = true;
                 if (!joinDefinition.IsFilter && joinDefinition.Filter == null)
                 {
 
@@ -1998,7 +1998,12 @@ namespace HiSql
                                 {
                                     throw new Exception($"join 关联表[{joinDefinition.Right.AsTabName}] 条件字段[{hiColumnL.FieldName}]与[{hiColumnR.FieldName}]长度不一致 会导致性能问题");
                                 }
+                                if (isFirstOnCondition == false)
+                                {
+                                    sb_join.Append(" and ");
+                                }
                                 sb_join.Append($"{dbConfig.Table_Pre}{joinOnFilterDefinition.Left.AsTabName}{dbConfig.Table_After}.{dbConfig.Field_Pre}{joinOnFilterDefinition.Left.AsFieldName}{dbConfig.Field_After}={dbConfig.Table_Pre}{joinOnFilterDefinition.Right.AsTabName}{dbConfig.Table_After}.{dbConfig.Field_Pre}{joinOnFilterDefinition.Right.AsFieldName}{dbConfig.Field_After}");
+                                isFirstOnCondition = false;
                             }
                         }
                         //sb_join.AppendLine("");
