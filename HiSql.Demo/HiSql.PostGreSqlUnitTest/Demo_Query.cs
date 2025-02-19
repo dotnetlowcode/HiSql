@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HiSql.PostGreSqlUnitTest.Table;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
@@ -24,7 +25,73 @@ namespace HiSql.PostGreSqlUnitTest
             //Query_Demo15(sqlClient);
             //Query_Demo16(sqlClient);
             //Query_Demo18(sqlClient);
-            Query_Demo19(sqlClient);
+            //Query_Demo19(sqlClient);
+            Query_Demo20(sqlClient);
+        }
+        static void Query_Demo20(HiSqlClient sqlClient)
+        {
+
+           var task = Task.Run( async() =>
+            {
+                bool isexits = sqlClient.DbFirst.CheckTabExists(typeof(HTest02).Name);
+                if (!isexits)
+                {
+                    sqlClient.DbFirst.CreateTable(typeof(HTest02));
+                }
+                sqlClient.Delete(typeof(HTest02).Name).ExecCommand();
+
+                sqlClient.Insert(typeof(HTest02).Name, new HTest02 { SID = 1, UName = "tansar" }).ExecCommand();
+                var cnt87 = sqlClient.Insert(typeof(HTest02).Name, new HTest02 { SID = 1 + new Random().Next(1000, 2000), UName = "tansar" }).ExecCommand();
+
+                var tbInfo = sqlClient.DbFirst.GetTabStruct(typeof(HTest02).Name).CloneTabInfo();
+                tbInfo.TabModel.TabName = "#test02";
+                var cnt = sqlClient.DbFirst.CreateTable(tbInfo);
+
+                cnt87 = sqlClient.Insert("#test02", new HTest02 { SID = 1, UName = "tansar" }).ExecCommand();
+                for (int i = 0; i < 10; i++)
+                {
+
+
+                    cnt87 = sqlClient.Insert("#test02", new HTest02 { SID = 1 + new Random().Next(1000, 2000), UName = "tansar" }).ExecCommand();
+
+                }
+
+                var sqldbHTest02 = sqlClient.HiSql("select * from HTest02 ").ToTable();
+
+                var sqldbtest02 = sqlClient.HiSql("select * from #test02 ").ToTable();
+
+                var sqldb = sqlClient.HiSql("select a.* from #test02 as a join HTest02 as b on a.SID = b.sid ").ToTable();
+
+                var _obj = await sqlClient.HiSql("select a.* from #test02 as a join HTest02 as b on a.SID = b.sid ").ToEObjectAsync();
+
+                await sqlClient.Update("HTest02").Set(new { SID = 1, UName = "tansar" + new Random().Next(1000, 2000) }).ExecCommandAsync();
+
+                var sqldbSql = sqlClient.HiSql("select a.* from #test02 as a join HTest02 as b on a.SID = b.sid ").ToSql();
+
+                Console.WriteLine(sqldbSql);
+
+                Console.WriteLine(_obj.ToJson());
+
+            });
+
+
+
+            
+
+            //var sql = sqlClient.HiSql("select a.tabname from hi_fieldmodel as a inner join Hi_TabModel as  b on a.tabname =b.tabname inner join Hi_TabModel as c on a.tabname=c.tabname where a.tabname='h_test'  and a.FieldType in (11,41,21)  ").ToSql();
+
+            //var sql = sqlClient.HiSql("select a.tabname from hi_fieldmodel as a inner join Hi_TabModel as  b on a.tabname =b.tabname inner join Hi_TabModel as c on a.tabname=c.tabname where a.tabname='h_test'  and a.FieldType in (11,41,21)  order by a.FieldType ").Take(2).Skip(2).ToSql();
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
+            task.Wait();
+
+            sw.Stop();
+            Console.WriteLine($"语句编译 耗时{sw.Elapsed}");
+
+            //string sql3 = sqlClient.HiSql("select  a.UniqueCode,a.BarCode,a.CategoryId from GD_UniqueCodeInfo as a").ToSql();
+
         }
         static void Query_Demo19(HiSqlClient sqlClient)
         {
@@ -62,7 +129,6 @@ namespace HiSql.PostGreSqlUnitTest
             //string sql3 = sqlClient.HiSql("select  a.UniqueCode,a.BarCode,a.CategoryId from GD_UniqueCodeInfo as a").ToSql();
 
         }
-
         static void Query_Demo18(HiSqlClient sqlClient)
         {
             string sql = sqlClient.HiSql("select FieldName, count(FieldName) as NAME_count,max(FieldType) as FieldType_max from Hi_FieldModel  group by FieldName").ToSql();
