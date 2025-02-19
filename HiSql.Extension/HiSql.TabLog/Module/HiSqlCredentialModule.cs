@@ -1,34 +1,54 @@
-using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using HiSql.TabLog.Interface;
+using HiSql.TabLog.Model;
+using HiSql.TabLog.Queue;
 
 namespace HiSql.TabLog.Module
 {
-    public class HiSqlCredentialModule : ICredentialModule<HiSqlCredential, HiOperateLog>
+    /// <summary>
+    /// HiSql操作日志
+    /// </summary>
+    public class HiOperateLog : IOperationLog
     {
-        public HiSqlCredentialModule(HiSqlCredentialStorage _storage)
+        /// <summary>
+        /// 当前操作记录关联的表名
+        /// </summary>
+        public string TableName { get; set; }
+    }
+
+    /// <summary>
+    /// HiSql操作凭证
+    /// </summary>
+    public class HiSqlCredential : ICredential<HiOperateLog, Hi_TabManager>
+    {
+        /// <summary>
+        /// 操作凭证关联的表名
+        /// </summary>
+        public string TableName { get; set; }
+    }
+
+    public class HiSqlCredentialModule
+        : ICredentialModule<HiSqlCredential, HiOperateLog, Hi_TabManager>
+    {
+        HiSqlTabLogQueue queue;
+
+        public HiSqlCredentialModule(HiSqlTabLogQueue _queue)
         {
-            storage = _storage;
+            queue = _queue;
         }
 
-        private HiSqlCredentialStorage storage { get; set; }
-
-        protected override Task<HiSqlCredential> GenerateCredential()
+        protected override Task<HiSqlCredential> InitCredential()
         {
-            var hiTabManager = this.storage.hi_TabManager;
-            var credentialId = SnroNumber.NewNumber(hiTabManager.SNRO, hiTabManager.SNUM);
-            var credential = new HiSqlCredential
-            {
-                CredentialId = credentialId,
-                TableName = hiTabManager.TabName
-            };
+            var credential = new HiSqlCredential();
             return Task.FromResult(credential);
         }
 
         protected override Task SaveCredential(HiSqlCredential credential)
         {
-            return storage.SaveCredential(credential);
+            var state = credential.State;
+            credential.CredentialId = SnroNumber.NewNumber(state.SNRO, state.SNUM);
+            queue.EnqueueLog(credential);
+            return Task.CompletedTask;
         }
     }
 }

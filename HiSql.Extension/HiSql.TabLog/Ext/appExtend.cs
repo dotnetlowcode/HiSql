@@ -4,6 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using HiSql.TabLog.Interface;
 using HiSql.TabLog.Model;
+using HiSql.TabLog.Module;
+using HiSql.TabLog.Queue;
+using HiSql.TabLog.Service;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 
@@ -13,12 +16,30 @@ namespace HiSql.TabLog.Ext
     {
         public static Func<IServiceScope, string, HiSqlClient> GetSqlClientByName { get; set; }
 
+        public static Func<IServiceScope> FuncGetScope { get; set; }
+
+        public static IServiceCollection AddTabLogServer(this IServiceCollection services)
+        {
+            //注册日志队列
+            services.AddSingleton<HiSqlTabLogQueue>();
+
+            //注册日志处理模块
+            services.AddSingleton<HiSqlCredentialModule>();
+
+            //注册后台日志保存服务
+            services.AddHostedService<BackgroundTabLogService>();
+
+            return services;
+        }
+
         public static Task SetupTable(
             HiSqlClient sqlClient,
-            Func<IServiceScope, string, HiSqlClient> _getSqlClientByName
+            Func<IServiceScope, string, HiSqlClient> _getSqlClientByName,
+            Func<IServiceScope> _funcGetScope
         )
         {
             GetSqlClientByName = _getSqlClientByName;
+            FuncGetScope = _funcGetScope;
             List<Type> _tabTypes = new List<Type> { typeof(ILogTable) };
             var _listType = AppDomain
                 .CurrentDomain.GetAssemblies()
@@ -69,29 +90,42 @@ namespace HiSql.TabLog.Ext
         {
             //读取Hi_TabManager,并初始化日志表
             var tableName = typeof(Hi_TabManager).Name;
-            var templateTableName = typeof(Th_DetailLog).Name;
-            var logDetailStruct = sqlClient.DbFirst.GetTabStruct(templateTableName);
-            var jsonColumns = JArray.FromObject(logDetailStruct.Columns);
-            var createTableClient = GetSqlClientByName(scope, logTable.DbServer);
+            var templateMainTableName = typeof(Th_MainLog).Name;
+            var detailTemplateTableName = typeof(Th_DetailLog).Name;
+
             //检查主键编号规则是否存在,放在本库,不放存储库
             checkPrimaryKey(sqlClient, logTable);
-            //检查表是否存在
-            var _isExits = createTableClient.DbFirst.CheckTabExists(logTable.TabName);
-            if (!_isExits)
+
+            for (int i = 0; i < 2; i++)
             {
-                var columns = jsonColumns.ToObject<List<HiColumn>>();
-                var tableStruct = new TabInfo
+                var checkTableName = logTable.MainTabLog;
+                var templateTableName = templateMainTableName;
+                if (i == 1)
                 {
-                    TabModel = new HiTable { TabName = logTable.TabName },
-                    Columns = columns
-                };
-                if (!createTableClient.DbFirst.CreateTable(tableStruct))
-                    Console.WriteLine($"\t\t创建表[{logTable.TabName}]失败...");
+                    checkTableName = logTable.DetailTabLog;
+                    templateTableName = detailTemplateTableName;
+                }
+                var templateTableStruct = sqlClient.DbFirst.GetTabStruct(templateTableName);
+                var jsonColumns = JArray.FromObject(templateTableStruct.Columns);
+                var createTableClient = GetSqlClientByName(scope, logTable.DbServer);
+                //检查表是否存在
+                var _isExits = createTableClient.DbFirst.CheckTabExists(checkTableName);
+                if (!_isExits)
+                {
+                    var columns = jsonColumns.ToObject<List<HiColumn>>();
+                    var tableStruct = new TabInfo
+                    {
+                        TabModel = new HiTable { TabName = checkTableName },
+                        Columns = columns
+                    };
+                    if (!createTableClient.DbFirst.CreateTable(tableStruct))
+                        Console.WriteLine($"\t\t创建表[{checkTableName}]失败...");
+                    else
+                        Console.WriteLine($"\t\t创建表[{checkTableName}]成功...");
+                }
                 else
-                    Console.WriteLine($"\t\t创建表[{logTable.TabName}]成功...");
+                    Console.WriteLine($"\t\t表[{checkTableName}]已经存在");
             }
-            else
-                Console.WriteLine($"\t\t表[{logTable.TabName}]已经存在");
 
             //获取配置信息
             //检查目标表是否已经初始化好
@@ -106,6 +140,7 @@ namespace HiSql.TabLog.Ext
         /// <param name="setting"></param>
         private static void checkPrimaryKey(HiSqlClient client, Hi_TabManager setting)
         {
+            SnroNumber.SqlClient = client;
             var tempList = client
                 .Query("Hi_Snro")
                 .Field("SNRO")

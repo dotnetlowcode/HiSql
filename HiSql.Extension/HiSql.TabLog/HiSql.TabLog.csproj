@@ -16,10 +16,8 @@
 		<Reference Include="Microsoft.CSharp" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Folder Include="CredentialStorage/" />
-	</ItemGroup>
-	<ItemGroup>
-	  <PackageReference Include="HiSql" Version="1.0.7.5" />
+	  <PackageReference Include="HiSql" Version="1.0.7.6" />
+	  <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
 	</ItemGroup>
 
 </Project>
