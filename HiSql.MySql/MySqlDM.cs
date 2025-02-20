@@ -472,7 +472,7 @@ namespace HiSql
                                     if (column != null)
                                     {
                                         //lstobj.Add(new { TabName = column.TabName, FieldName = column.FieldName });
-                                        _lstdel.Add(new { TabName = column.TabName, FieldName = column.FieldName });
+                                        _lstdel.Add(new { TabName = column.TabName, FieldName = column.FieldName, DbServer = lstcolumn.Count > 0 ? lstcolumn[0].DbServer : "", DbName = lstcolumn.Count > 0 ? lstcolumn[0].DbName : "" });
                                     }
                                 }
                                 if (lstobj.Count > 0)
@@ -735,12 +735,19 @@ namespace HiSql
 
         #region 接口实现
 
-        public string BuildInsertSql(Dictionary<string, string> _values, bool isbulk = false)
+        public string BuildInsertSql(TableType tableType,Dictionary<string, string> _values, bool isbulk = false)
         {
 
             string _insert_temp = dbConfig.Insert_StateMent;
             StringBuilder _sb_field = new StringBuilder();
             StringBuilder _sb_value = new StringBuilder();
+
+            //add by tgm date:2025.2.15
+            if (tableType.IsIn<TableType>(TableType.Var, TableType.Local, TableType.Global))
+            {
+                _insert_temp = dbConfig.Insert_Temp_StateMent;
+            }
+
             _insert_temp = _insert_temp.Replace("[$Schema$]", Context.CurrentConnectionConfig.Schema);
             int _i = 0;
             foreach (string n in _values.Keys)
@@ -886,8 +893,15 @@ namespace HiSql
                 }
                 else if (!istrunctate && isdrop)
                 {
-                    ///删除表数据
-                    _temp_delete = dbConfig.Drop_Table;
+                    if (table.TableType.IsIn<TableType>(TableType.Local, TableType.Global))
+                    {
+                        _temp_delete = dbConfig.Drop_Local_Table;
+                    }
+                    else
+                    {
+                        ///删除表数据
+                        _temp_delete = dbConfig.Drop_Table;
+                    }
                     _temp_delete = _temp_delete
                         .Replace("[$Schema$]", _schema)
                         .Replace("[$TabName$]", table.TabName);
@@ -1851,7 +1865,7 @@ namespace HiSql
                     sb_join.Append($" right join");
                 sb_join.Append($" {dbConfig.Table_Pre}{dictabinfo[joinDefinition.Right.TabName].TabModel.TabName}{dbConfig.Table_After} as {dbConfig.Table_Pre}{joinDefinition.Right.AsTabName.ToLower()}{dbConfig.Table_After}");
                 sb_join.Append(" on ");
-
+                bool isFirstOnCondition = true;
                 if (!joinDefinition.IsFilter && joinDefinition.Filter == null)
                 {
 
@@ -1874,7 +1888,12 @@ namespace HiSql
                                 {
                                     throw new Exception($"join 关联表[{joinDefinition.Right.AsTabName}] 条件字段[{hiColumnL.FieldName}]与[{hiColumnR.FieldName}]长度不一致 会导致性能问题");
                                 }
+                                if (isFirstOnCondition == false)
+                                {
+                                    sb_join.Append(" and ");
+                                }
                                 sb_join.Append($"{dbConfig.Table_Pre}{joinOnFilterDefinition.Left.AsTabName}{dbConfig.Table_After}.{dbConfig.Field_Pre}{joinOnFilterDefinition.Left.AsFieldName}{dbConfig.Field_After}={dbConfig.Table_Pre}{joinOnFilterDefinition.Right.AsTabName}{dbConfig.Table_After}.{dbConfig.Field_Pre}{joinOnFilterDefinition.Right.AsFieldName}{dbConfig.Field_After}");
+                                isFirstOnCondition = false;
                             }
                         }
                         //sb_join.AppendLine("");
@@ -2525,7 +2544,7 @@ namespace HiSql
                 #region 非子查询
                 if (_islist && hiColumn.FieldType.IsIn<HiType>(HiType.NCHAR, HiType.NVARCHAR, HiType.GUID, HiType.VARCHAR, HiType.CHAR))
                 {
-                    List<string> lstobj = (List<string>)value;
+                    List<string> lstobj = Tool.ConverterObjToList<string>(value);// (List<string>)value;
                     bool _isen = hiColumn.FieldType.IsIn<HiType>(HiType.NCHAR, HiType.NVARCHAR, HiType.GUID);
                     foreach (string str in lstobj)
                     {
@@ -2558,7 +2577,7 @@ namespace HiSql
                 }
                 else if (_islist && hiColumn.FieldType.IsIn<HiType>(HiType.BIGINT))
                 {
-                    List<Int64> lstobj = (List<Int64>)value;
+                    List<Int64> lstobj = Tool.ConverterObjToList<Int64>(value);//(List<Int64>)value;
                     foreach (Int64 di in lstobj)
                     {
                         if (_idx < lstobj.Count - 1)
@@ -2572,7 +2591,7 @@ namespace HiSql
                 }
                 else if (_islist && hiColumn.FieldType.IsIn<HiType>(HiType.INT))
                 {
-                    List<int> lstobj = (List<int>)value;
+                    List<int> lstobj = Tool.ConverterObjToList<int>(value);// (List<int>)value;
                     foreach (int di in lstobj)
                     {
                         if (_idx < lstobj.Count - 1)
@@ -2586,7 +2605,7 @@ namespace HiSql
                 }
                 else if (_islist && hiColumn.FieldType.IsIn<HiType>(HiType.SMALLINT))
                 {
-                    List<Int16> lstobj = (List<Int16>)value;
+                    List<Int16> lstobj = Tool.ConverterObjToList<Int16>(value);// (List<Int16>)value;
                     foreach (Int16 di in lstobj)
                     {
                         if (_idx < lstobj.Count - 1)
@@ -2600,7 +2619,7 @@ namespace HiSql
                 }
                 else if (_islist && hiColumn.FieldType.IsIn<HiType>(HiType.DECIMAL))
                 {
-                    List<decimal> lstobj = (List<decimal>)value;
+                    List<decimal> lstobj = Tool.ConverterObjToList<decimal>(value);// (List<decimal>)value;
                     foreach (decimal di in lstobj)
                     {
                         if (_idx < lstobj.Count - 1)
@@ -2613,7 +2632,7 @@ namespace HiSql
                 }
                 else if (_islist && hiColumn.FieldType.IsIn<HiType>(HiType.DATETIME, HiType.DATE))
                 {
-                    List<string> lstobj = (List<string>)value;
+                    List<string> lstobj = Tool.ConverterObjToList<string>(value);// (List<string>)value;
                     foreach (string str in lstobj)
                     {
                         if (_idx < lstobj.Count - 1)
@@ -2625,7 +2644,7 @@ namespace HiSql
                 }
                 else if (_islist)
                 {
-                    List<string> lstobj = (List<string>)value;
+                    List<string> lstobj = Tool.ConverterObjToList<string>(value);//(List<string>)value;
                     foreach (string str in lstobj)
                     {
                         if (_idx < lstobj.Count - 1)
@@ -2653,7 +2672,7 @@ namespace HiSql
             {
                 if (_islist)
                 {
-                    List<string> lstobj = (List<string>)value;
+                    List<string> lstobj = Tool.ConverterObjToList<string>(value);// (List<string>)value;
                     foreach (string str in lstobj)
                     {
                         if (_idx < lstobj.Count - 1)

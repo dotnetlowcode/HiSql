@@ -63,12 +63,16 @@ namespace HiSql
 
         string _temp_field_comment = "";
 
+        string _temp_table_comment = "";
+
         /// <summary>
         /// 数据插入语句模版
         /// </summary>
         string _temp_insert_statement = "";
         string _temp_insert_statementv2 = "";
-        
+
+        //插入临时表的语句模板
+        string _temp_insert_statementv3 = "";
 
         /// <summary>
         /// 获取表结构信息模版
@@ -101,7 +105,7 @@ namespace HiSql
         string _temp_truncate = "";
 
         string _temp_droptable = "";
-
+        string _temp_drop_tmp_table = "";//删除临时表
 
 
         string _temp_addcolumn = "alter table [$TabName$] add [$TempColumn$] ";
@@ -279,6 +283,16 @@ namespace HiSql
 
         public string Fun_CurrDATE { get => _temp_fun_date; }
         public string Drop_Table { get => _temp_droptable; }
+
+        /// <summary>
+        /// 删除全局临时表
+        /// </summary>
+        public string Drop_Global_Table { get => _temp_drop_tmp_table; }
+
+        /// <summary>
+        /// 删除本地临时表 add by tgm date:2025.2.14
+        /// </summary>
+        public string Drop_Local_Table { get => _temp_drop_tmp_table; }
         public  string Table_Global_Create { get => _temp_create_temp_global_table;   }
         public string Table_Global_Create_Drop { get => _temp_create_temp_global_table_drop; }
         public string Table_Local_Create { get => _temp_create_temp_local_table; }
@@ -296,11 +310,19 @@ namespace HiSql
         public  string Table_Key2 { get => _temp_table_key2;   }
         public  string Table_Key3 { get => _temp_table_key3;  }
         public  string Field_Comment { get => _temp_field_comment; }
+
+
+        public string Table_Comment { get => _temp_table_comment; }
+
         public  string Get_Table_Schema { get => _temp_get_table_schema;   }
 
         
         public  string Insert_StateMent { get => _temp_insert_statement;   }
 
+        /// <summary>
+        /// 插入临时表的模版
+        /// </summary>
+        public string Insert_Temp_StateMent { get => _temp_insert_statementv3; }
         public  string Insert_StateMentv2 { get => _temp_insert_statementv2;   }
 
         /// <summary>
@@ -692,7 +714,19 @@ namespace HiSql
 
                 .ToString();
 
-  
+            _temp_table_comment = new StringBuilder()
+                          .AppendLine("if exists(select a.name as TabName,a.name as FieldName,c.value as FieldDesc")
+                          .AppendLine("from sys.tables as a")
+                          .AppendLine("left join sys.extended_properties as c on c.major_id=a.object_id and c.minor_id = 0")
+                          .AppendLine("where a.name='[$TabName$]' and c.value is not null)")
+                          .AppendLine("begin")
+                          .AppendLine("EXECUTE sp_updateextendedproperty N'MS_Description', N'[$TabDesc$]', N'SCHEMA', N'[$Schema$]', N'TABLE', N'[$TabName$]'")
+                          .AppendLine("end")
+                          .AppendLine("else")
+                          .AppendLine("begin")
+                          .AppendLine("EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'[$TabDesc$]' , @level0type=N'SCHEMA',@level0name=N'[$Schema$]', @level1type=N'TABLE',@level1name=N'[$TabName$]'")
+                          .AppendLine("end")
+                          .ToString();
 
             _temp_insert_statement = new StringBuilder()
                 .AppendLine($"insert into {_temp_schema_pre}dbo{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after}([$FIELDS$]) values([$VALUES$])")
@@ -713,6 +747,9 @@ UNION ALL
                 .AppendLine($"insert into {_temp_schema_pre}dbo{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after}([$FIELDS$]) [$VALUES$]")
                 .ToString();
 
+            _temp_insert_statementv3= new StringBuilder()
+                .AppendLine($"insert into {_temp_schema_pre}dbo{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after}([$FIELDS$]) [$VALUES$]")
+                .ToString();
 
             /*
              * 
@@ -1005,6 +1042,8 @@ UNION ALL
 
             _temp_droptable = $"drop table {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after}";
 
+            //删除临时表
+            _temp_drop_tmp_table = $"drop table {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}[$TabName$]{_temp_table_after}";
 
             _temp_hitabmodel = $"select * from {_temp_schema_pre}[$Schema$]{_temp_schema_after}.{_temp_table_pre}{Constants.HiSysTable["Hi_TabModel"].ToString()}{_temp_table_after} where TabName=@TabName";
 

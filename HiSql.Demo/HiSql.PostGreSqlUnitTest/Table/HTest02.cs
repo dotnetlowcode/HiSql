@@ -39,6 +39,10 @@ namespace HiSql.PostGreSqlUnitTest.Table
         {
             get; set;
         }
-
+        [HiColumn(FieldDesc = "业务日期", FieldType = HiType.DATETIME, IsNull = false, SortNum = 6, IsSys = true, DBDefault = HiTypeDBDefault.EMPTY)]
+        public DateTime BusDate
+        {
+            get; set;
+        }
     }
 }

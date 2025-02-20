@@ -34,7 +34,7 @@ namespace HiSql
         /// </summary>
         /// <param name="cacheRegion">缓存区域名称。建议以系统名称命名。如 CRM</param>
         /// <param name="memoryCacheOptions">MemoryCache缓存参数配置</param>
-        public MCache(string cacheRegion, MemoryCacheOptions memoryCacheOptions = null)//
+        public MCache(string cacheRegion, MemoryCacheOptions memoryCacheOptions = null):base(null)
         {
             if (cacheRegion.IsNullOrEmpty())
             {
@@ -325,7 +325,7 @@ namespace HiSql
         /// <param name="expirySeconds"></param>
         /// <param name="timeoutSeconds"></param>
         /// <returns></returns>
-        public override Tuple<bool, string> LockOn(string key, LckInfo lckinfo, int expirySeconds = 30, int timeoutSeconds = 5)
+        public override Tuple<bool, string> LockOn(string key, LckInfo lockinfo, int expirySeconds = 30, int timeoutSeconds = 5)
         {
             var isBlockingMode = timeoutSeconds > 0; //是否阻塞等待模式
             if (!key.Contains(_lockkeyPrefix))
@@ -342,12 +342,15 @@ namespace HiSql
             timeoutSeconds = timeoutSeconds < 0 ? 5 : timeoutSeconds;
             timeoutSeconds = timeoutSeconds > _max_timeout ? _max_timeout : timeoutSeconds;
 
-            if (lckinfo.LockTime == null)
-                lckinfo.LockTime = DateTime.Now;
+            if (lockinfo.LockTime == null)
+                lockinfo.LockTime = DateTime.Now;
 
-            lckinfo.ExpireTime = lckinfo.LockTime.AddSeconds(expirySeconds);
+            lockinfo.ExpireTime = lockinfo.LockTime.AddSeconds(expirySeconds);
             string msg = "";
             var flag = false;
+
+            var lockObj = new LckInfo() { Descript = lockinfo.Descript, Key = key, UName = lockinfo.UName, Ip = lockinfo.Ip, EventName = lockinfo.EventName, ExpireTime = lockinfo.ExpireTime };
+
             //创建key
             if (GetCache<LckInfo>(key) == null)
             {
@@ -355,7 +358,7 @@ namespace HiSql
                 {
                     if (GetCache<LckInfo>(key) == null)
                     {
-                        SetCache(key, lckinfo, expirySeconds);
+                        SetCache(key, lockObj, expirySeconds);
                     }
                 }
             }
@@ -374,7 +377,7 @@ namespace HiSql
             }
             else
             {
-                SaveLockInfo(key, lckinfo);
+                SaveLockInfo(key, lockObj);
 
                 msg = "加锁成功";
                 flag = true;
@@ -560,7 +563,7 @@ namespace HiSql
             return LockOnExecute(key, action, lckinfo, expirySeconds, 0);
         }
 
-        public override Tuple<bool, string> LockOnExecute(string key, Action action, LckInfo lckinfo, int expirySeconds = 30, int timeoutSeconds = 5)
+        public override Tuple<bool, string> LockOnExecute(string key, Action action, LckInfo lockInfo, int expirySeconds = 30, int timeoutSeconds = 5)
         {
             var isBlockingMode = timeoutSeconds > 0; //是否阻塞等待模式
 
@@ -581,12 +584,14 @@ namespace HiSql
 
             timeoutSeconds = timeoutSeconds < 0 ? 5 : timeoutSeconds;
             timeoutSeconds = timeoutSeconds > _max_timeout ? _max_timeout : timeoutSeconds;
-            if (lckinfo.LockTime == null)
-                lckinfo.LockTime = DateTime.Now;
+            if (lockInfo.LockTime == null)
+                lockInfo.LockTime = DateTime.Now;
 
-            lckinfo.ExpireTime = lckinfo.LockTime.AddSeconds(expirySeconds);
+            lockInfo.ExpireTime = lockInfo.LockTime.AddSeconds(expirySeconds);
             string msg = "";
             var flag1 = false;
+
+            var lockObj = new LckInfo() { Descript = lockInfo.Descript, Key = key, UName = lockInfo.UName, Ip = lockInfo.Ip, EventName = lockInfo.EventName, ExpireTime = lockInfo.ExpireTime };
             //创建key
             if (GetCache<LckInfo>(key) == null)
             {
@@ -594,7 +599,7 @@ namespace HiSql
                 {
                     if (GetCache<LckInfo>(key) == null)
                     {
-                        SetCache(key, lckinfo, expirySeconds);
+                        SetCache(key, lockObj, expirySeconds);
                     }
                 }
             }
@@ -617,7 +622,7 @@ namespace HiSql
             }
             else
             {
-                SaveLockInfo(key, lckinfo);
+                SaveLockInfo(key, lockObj);
 
                 if (isBlockingMode)
                 {
@@ -644,7 +649,7 @@ namespace HiSql
                         //}
                         finally
                         {
-                            //UnLock(lckinfo, key);不可以再此处解锁
+                            //UnLock(lockObj, key);不可以再此处解锁
                         }
                     });
 
@@ -675,10 +680,10 @@ namespace HiSql
                             else
                             {
                                 //续锁
-                                SetCache(key, lckinfo, expirySeconds);
-                                lckinfo = getLockInfo(lckinfo, expirySeconds, _timesa);
+                                SetCache(key, lockObj, expirySeconds);
+                                lockObj = getLockInfo(lockObj, expirySeconds, _timesa);
 
-                                SaveLockInfo(key, lckinfo);
+                                SaveLockInfo(key, lockObj);
 
                                 flag = workTask.Wait(timeoutSeconds * _millsecond, cancellationToken);
                                 if (flag)

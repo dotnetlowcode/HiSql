@@ -37,6 +37,8 @@ namespace HiSql.PostGreSqlUnitTest
         static void Update_Demo4(HiSqlClient sqlClient)
         {
             string _sql = sqlClient.Update("H_Test").Set(new { UNAME = "UTYPE" }).Where("DID=1").ToSql();
+
+
         }
         static async Task Update_Demo(HiSqlClient sqlClient)
         {

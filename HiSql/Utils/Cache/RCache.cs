@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
 namespace HiSql
 {
@@ -138,7 +139,7 @@ namespace HiSql
             return _isok
     ";
 
-        public RCache(RedisOptions options)
+        public RCache(RedisOptions options):base(options)
         {
             if (options == null)
                 throw new ArgumentNullException("options");
@@ -345,8 +346,8 @@ namespace HiSql
             if (_server == null || !_server.IsConnected)
             {
                 string _connstr = $"{this._options.Host}:{this._options.Port}";
-                if (!string.IsNullOrEmpty(this._options.PassWord))
-                    _connstr = $"{_connstr},password={this._options.PassWord}";
+                //if (!string.IsNullOrEmpty(this._options.PassWord))
+                //    _connstr = $"{_connstr},password={this._options.PassWord}";
                 _server = _connectMulti.GetServer(_connstr);
             }
         }
@@ -401,12 +402,18 @@ namespace HiSql
                 obj = _MemoryCache.GetCache(key);
                 if (obj.IsNullOrEmpty())
                 {
-                    
+
                     var val = _cache.StringGetWithExpiry(key);
                     if (val.Value.HasValue)
                     {
-                        obj = val.Value.ToString();
+                        obj = this.GetZipValue(val.Value);
+
                         _MemoryCache.SetCache(key, obj,  DateTime.Now.Add(val.Expiry.HasValue? val.Expiry.Value:TimeSpan.FromSeconds(10)));
+
+                        if (obj.IndexOf("\"") >= 0)
+                        {
+                            obj = JsonConvert.DeserializeObject(obj)?.ToString();
+                        }
                     }
 
                     else
@@ -416,12 +423,18 @@ namespace HiSql
             else
             {
                 var val = _cache.StringGet(key);
+
                 if (val.HasValue)
-                    obj = val.ToString();
+                    obj = this.GetZipValue(val);
                 else
                     obj = string.Empty;
-            }
 
+                if (obj.IndexOf("\"") >= 0 && val.HasValue)
+                {
+                    obj = JsonConvert.DeserializeObject(obj)?.ToString();
+                }
+            }
+           
             return obj;
         }
 
@@ -441,9 +454,15 @@ namespace HiSql
                     var cachevalue = _cache.StringGetWithExpiry(key);
                     if (!cachevalue.Value.IsNull)
                     {
-                        value = JsonConvert.DeserializeObject<T>(cachevalue.Value);
+                        //判断是否是压缩的二进制 如果是则进行解压
+                        string _strvale = string.Empty;
+                        if (cachevalue.Value.HasValue)
+                            _strvale = this.GetZipValue(cachevalue.Value);
+                        //内存里面保存 解压后的、序列化的数据
 
-                        _MemoryCache.SetCache(key, value, DateTime.Now.Add(cachevalue.Expiry.HasValue ? cachevalue.Expiry.Value : TimeSpan.FromSeconds(10)));
+                        _MemoryCache.SetCache(key, _strvale, DateTime.Now.Add(cachevalue.Expiry.HasValue ? cachevalue.Expiry.Value : TimeSpan.FromSeconds(10)));
+
+                        value = JsonConvert.DeserializeObject<T>(_strvale);
                     }
                 }
                 else
@@ -454,9 +473,15 @@ namespace HiSql
             else
             {
                 var cachevalue = _cache.StringGet(key);
+                //判断是否是压缩的二进制 如果是则进行解压
+                string _strvale = string.Empty;
+                if (cachevalue.HasValue)
+                    _strvale = this.GetZipValue(cachevalue);
+
+
                 if (!cachevalue.IsNull)
                 {
-                    value = JsonConvert.DeserializeObject<T>(cachevalue);
+                    value = JsonConvert.DeserializeObject<T>(_strvale);
                 }
             }
 
@@ -496,8 +521,18 @@ namespace HiSql
                     throw new Exception("不能将Null存入缓存");
                 }
                 string _value = JsonConvert.SerializeObject(_val);
+                
+                
 
-                _cache.StringSet(key, _value, second > 0 ? TimeSpan.FromSeconds(second) : null, When.NotExists, CommandFlags.None);
+                ///判断是否启用压缩 仅在redis环境中 设置压缩
+                if (this.IsCanZip(_value))
+                {
+                    var _valzip = this.ZipCompress(_value);
+                    _cache.StringSet(key, _valzip, second > 0 ? TimeSpan.FromSeconds(second) : null, When.NotExists, CommandFlags.None);
+                }
+                else
+                    _cache.StringSet(key, _value, second > 0 ? TimeSpan.FromSeconds(second) : null, When.NotExists, CommandFlags.None);
+
 
                 if (this._options.EnableMultiCache)
                 {
@@ -524,7 +559,14 @@ namespace HiSql
                     T _val = value.Invoke();
                     string _value = JsonConvert.SerializeObject(_val);
 
-                    _cache.StringSet(key, _value, second > 0 ? TimeSpan.FromSeconds(second) : null, When.NotExists, CommandFlags.None);
+                    //数据压缩
+                    if (this.IsCanZip(_value))
+                    {
+                        var _valzip = this.ZipCompress(_value);
+                        _cache.StringSet(key, _valzip, second > 0 ? TimeSpan.FromSeconds(second) : null, When.NotExists, CommandFlags.None);
+                    }
+                    else
+                        _cache.StringSet(key, _value, second > 0 ? TimeSpan.FromSeconds(second) : null, When.NotExists, CommandFlags.None);
 
                     if (this._options.EnableMultiCache)
                     {
@@ -633,7 +675,14 @@ namespace HiSql
             var fullKey = GetRegionKey(key);
 
             string _value = JsonConvert.SerializeObject(value);
-            _cache.StringSet(fullKey, _value, second > 0 ? TimeSpan.FromSeconds(second) : null);
+            ///数据压缩
+            if (this.IsCanZip(_value))
+            {
+                var _valzip = this.ZipCompress(_value);
+                _cache.StringSet(fullKey, _valzip, second > 0 ? TimeSpan.FromSeconds(second) : null);
+            }
+            else
+                _cache.StringSet(fullKey, _value, second > 0 ? TimeSpan.FromSeconds(second) : null);
             //if (!string.IsNullOrWhiteSpace(_options.CacheRegion))
             //{
             //    _cache.HashSet(_options.CacheRegion, fullKey, "regionKey", When.Always, CommandFlags.FireAndForget);

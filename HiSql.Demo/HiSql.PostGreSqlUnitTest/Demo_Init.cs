@@ -16,7 +16,7 @@ namespace HiSql.PostGreSqlUnitTest
                          DbType = DBType.PostGreSql,
                          DbServer = "local-HoneBI",
                          //ConnectionString = "server=192.168.1.90,8433;uid=sa;pwd=Hone@123;database=HoneBI",
-                         ConnectionString = "PORT=5432;DATABASE=postgres;HOST=localhost;PASSWORD=Hone@123;USER ID=postgres",//; MultipleActiveResultSets = true;
+                         ConnectionString = "PORT=15432;DATABASE=thirdapi;HOST=192.168.10.141;PASSWORD=hone123;USER ID=root",//; MultipleActiveResultSets = true;
                          Schema = "public",
                          IsEncrypt = true,
                          IsAutoClose = false,

@@ -374,11 +374,11 @@ namespace HiSql
                             string _sql = String.Empty;
                             if (Context.CurrentConnectionConfig.DbType.IsIn<DBType>(DBType.Sqlite) && _mergeinto) //由于DBType.Sqlite mergeinto的方法实现逻辑与其它的数据库完全不一样只能特殊处理
                             {
-                                _sql = sqldm.BuildInsertSql(_values, i > p * DbConfig.BlukSize).Replace("[$TabName$]", _insertTabName).Replace("insert", "replace");//i > p * _bluksize
+                                _sql = sqldm.BuildInsertSql(tabinfo.TabModel.TableType,_values, i > p * DbConfig.BlukSize).Replace("[$TabName$]", _insertTabName).Replace("insert", "replace");//i > p * _bluksize
                             }
                             else
                             {
-                                _sql = sqldm.BuildInsertSql(_values, i > p * DbConfig.BlukSize).Replace("[$TabName$]", _insertTabName);//i > p * _bluksize
+                                _sql = sqldm.BuildInsertSql(tabinfo.TabModel.TableType, _values, i > p * DbConfig.BlukSize).Replace("[$TabName$]", _insertTabName);//i > p * _bluksize
                             }
                             sb_sql.Append(_sql);
                             _times++;
@@ -1795,7 +1795,7 @@ namespace HiSql
                 }
                 else if (hiColumn.FieldType.IsIn<HiType>(HiType.DATE, HiType.DATETIME))
                 {
-                    if (!string.IsNullOrEmpty(_value) && _value!=null)
+                    if (!string.IsNullOrEmpty(_value) && _value != null)
                     {
                         DateTime dtime = DateTime.Parse(_value);
                         //DateTime dtime = DateTime.Now;
@@ -1806,8 +1806,24 @@ namespace HiSql
                             else
                                 rtn = new Tuple<bool, string>(true, $"'{dtime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
                         }
-                    }else
-                        rtn = new Tuple<bool, string>(true, $"null");
+                    }
+                    else
+                    {
+                        //if (hiColumn.IsNull)
+                        //{
+                        //    rtn = new Tuple<bool, string>(true, $"null");
+                        //}
+                        //else
+                        //{
+                        //    rtn = new Tuple<bool, string>(true, $"0001-01-01 00:00:00");
+                        //}
+                        ///日期如果未赋值 那么默认为以下日期 add by tgm date:2024.11.13
+                        if (Context.CurrentConnectionConfig.DbType == DBType.Oracle)
+                        {
+                            rtn = new Tuple<bool, string>(true, $"timestamp'0001-01-01 00:00:00'");
+                        }else
+                            rtn = new Tuple<bool, string>(true, $"'0001-01-01 00:00:00'");
+                    }
                 }
                 else
                 {

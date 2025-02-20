@@ -38,13 +38,25 @@ namespace HiSql.UnitTest
 
         static void Update_Demo5(HiSqlClient sqlClient)
         {
+            sqlClient.CodeFirst.CreateTable(typeof(HTest01));
+            sqlClient.CodeFirst.Truncate("HTest01");
+            for (int i = 0; i < 2; i++)
+            {
+                int _effect1 = sqlClient.Insert("HTest01", new HTest01 { SID = i == 0 ? 1619572083:(int)DateTime.Now.Ticks, UName = "tansar-"+i, Age = 25, Salary = 1999, Descript = "hello world" }).ExecCommand();
+            }
+
             //string sql2 = sqlClient.Update("HTest01").Set(new { UName = "TEST" }).Where("SID=123456").ToSql();
             //string sql = sqlClient.Update("HTest01").Set(new { UName = "TEST" }).Where(new Filter { { "SID", OperType.EQ, 123456 } }).ToSql();
 
             sqlClient.CurrentConnectionConfig.User = "@阿荣。🌸 ";
-            string sql3=sqlClient.Update("HTest01", new { SID = 123456, Salary = "`Salary`+1" , CreateName ="asdfasdf"}).Exclude("SID").Where("SID = 123456").ToSql();
+            string sql3=sqlClient.Update("HTest01", new { SID = 1619572083, Salary = "`Salary`+1" , CreateName ="asdfasdf"}).Exclude("SID").Where("SID = 1619572083").ToSql();
 
-            sqlClient.Update("HTest01", new { SID = 123456, Salary = "`Salary`+1", CreateName = "@阿荣。🌸 " }).Exclude("SID").Where("SID = 123456").ExecCommand();
+            string sql33 = sqlClient.Update("HTest01", new { Salary = "`Salary`+1", CreateName = "asdfasdf" }).ToSql();
+
+            string sql332 = sqlClient.Update("HTest01", new {  Salary = "`Salary`+1", CreateName = "asdfasdf" }).ToSql();
+
+            string sql3323 = sqlClient.Update("HTest01", new { Salary = "`Salary`+1", CreateName = "asdfasdf" }).Where(new Filter { { "SID", OperType.EQ, 1619572083 } }).ToSql();
+            sqlClient.Update("HTest01", new { SID = 1619572083, Salary = "`Salary`+1", CreateName = "@阿荣。🌸 " }).Exclude("SID").Where("SID = 1619572083").ExecCommand();
 
         }
         static void Update_Demo4(HiSqlClient sqlClient)

@@ -61,7 +61,7 @@ namespace HiSql.UnitTest
             //Query_Demo16(sqlClient);
             //Query_Demo17(sqlClient);
             //Query_Demo18(sqlClient);
-            Query_Demo19(sqlClient);
+            //Query_Demo19(sqlClient);
             // Query_Demo20(sqlClient);
             //Query_Demo21();
             //Query_Demo22(sqlClient);
@@ -69,7 +69,9 @@ namespace HiSql.UnitTest
 
             //Query_Null(sqlClient);
             //Query_Null2(sqlClient);
-            //Query_MyFlowDto(sqlClient);
+           // Query_MyFlowDto(sqlClient);
+
+            Query_MyMultiJoinOn(sqlClient);
             //Query_Demo23(sqlClient);
             var s = Console.ReadLine();
         }
@@ -122,6 +124,10 @@ tabname in (@TabName)  and fieldname=@fieldname and tabname in (select tabname f
             List<Wf_Instance> lstdyn = sqlClient.HiSql($@"select WFNum,  FlowName, WFTitle, WFState, CreateClient, CreateSystem ,
         CreateUserID  from Wf_Instance where CreateUserID = 'U000101420' order by  CreateTime DESC").ToList<Wf_Instance>();
 
+            var querySql = sqlClient.Query("Wf_Instance").As("A").Field("D.GroupID", "D.GroupName")
+              .Join("Flow_Project").As("C").On(new HiSql.JoinOn { { "C.FlowID", "A.FlowID" } })
+              .Join("Flow_Group").As("D").On(new HiSql.JoinOn { { "D.GroupID", "C.FlowGroup" } }).ToSql();
+
             int totalCount = 0;
             var query = sqlClient.Query("Wf_Instance").As("A").Field("D.GroupID", "D.GroupName")
                 .Join("Flow_Project").As("C").On(new HiSql.JoinOn { { "C.FlowID", "A.FlowID" } })
@@ -130,7 +136,14 @@ tabname in (@TabName)  and fieldname=@fieldname and tabname in (select tabname f
 
 
         }
+        static void Query_MyMultiJoinOn(HiSqlClient sqlClient)
+        {
+            var querySql = sqlClient.Query("Hi_TabModel").As("A").Field("*")
+              .Join("Hi_FieldModel").As("C").On(new HiSql.JoinOn { { "C.DbName", "A.DbName" }, { "C.DbServer", "A.DbServer" } })
+              .Join("Hi_TabModel").As("D").On(new HiSql.JoinOn { { "D.DbName", "a.DbName" }, { "C.DbServer", "A.DbServer" } }).ToSql();
 
+
+        }
         static void Query_Null2(HiSqlClient sqlClient)
         {
             List<ExpandoObject> lstdyn = sqlClient.HiSql("select * from H_tst11").ToEObject();

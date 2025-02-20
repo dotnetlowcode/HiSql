@@ -179,7 +179,7 @@ namespace HiSql
 
         //初始化HiSql相关的表
 
-        string BuildInsertSql(Dictionary<string, string> _values, bool isbulk = false);
+        string BuildInsertSql(TableType tableType, Dictionary<string, string> _values, bool isbulk = false);
 
 
         /// <summary>

@@ -619,7 +619,79 @@ namespace HiSql
             else
                 result = new Tuple<bool, FieldDefinition, FieldDefinition>(false, null, null);
             return result;
+        }
 
+        /// <summary>
+        /// 将 Hisql查询条件的 object，在 In 条件匹配时，转换为List<T>。T根据字段类型需要指定
+        /// </summary>
+        /// <typeparam name="T">根据字段类型，指定返回</typeparam>
+        /// <param name="obj"></param>
+        /// <returns>返回指定类型的集合</returns>
+        public static List<T> ConverterObjToList<T>(object obj)
+        {
+            var list = new List<T>();
+
+            if (obj is List<int> intList)
+            {
+                if (typeof(T) == typeof(int))
+                    return intList as List<T>;
+
+                foreach (int value in intList)
+                {
+                    list.Add((T)Convert.ChangeType(value, typeof(T)));
+                }
+            }
+            if (obj is List<Int64> Int64List)
+            {
+                if (typeof(T) == typeof(Int64))
+                    return Int64List as List<T>;
+                if (typeof(T) == typeof(int))
+                    return Int64List as List<T>;
+
+                foreach (var value in Int64List)
+                {
+                    list.Add((T)Convert.ChangeType(value, typeof(T)));
+                }
+            }
+            if (obj is List<Int16> Int16List)
+            {
+                if (typeof(T) == typeof(Int16))
+                    return Int16List as List<T>;
+                foreach (var value in Int16List)
+                {
+                    list.Add((T)Convert.ChangeType(value, typeof(T)));
+                }
+            }
+            if (obj is List<decimal> decimalList)
+            {
+                if (typeof(T) == typeof(decimal))
+                    return decimalList as List<T>;
+                foreach (var value in decimalList)
+                {
+                    list.Add((T)Convert.ChangeType(value, typeof(T)));
+                }
+            }
+            if (obj is List<string> stringList)
+            {
+                if (typeof(T) == typeof(string))
+                    return stringList as List<T>;
+
+                foreach (var value in stringList)
+                {
+                    list.Add((T)Convert.ChangeType(value, typeof(T)));
+                }
+            }
+            if (obj is List<object> objList)
+            {
+                if (typeof(T) == typeof(object))
+                    return objList as List<T>;
+
+                foreach (var value in objList)
+                {
+                    list.Add((T)Convert.ChangeType(value, typeof(T)));
+                }
+            }
+            return list;
         }
 
     }

@@ -52,6 +52,22 @@ namespace HiSql
         /// </summary>
         public bool KeyspaceNotificationsEnabled { get; set; } = false;
 
+        /// <summary>
+        /// 是否启用zip压缩
+        /// </summary>
+        public bool IsZip { get; set; } = false;
+
+        /// <summary>
+        /// 字符长度超过该值则进行压缩
+        /// </summary>
+        public int ZipLen { get; set; } = 200;
+
+        /// <summary>
+        /// 是否强制解压 
+        /// 如果开启了强制解压即当所有的值从redis获取过来都尝试解压看数据是否是被压缩过的
+        /// 如果为否则当内容大于等于ZipLen 的值时才会进行尝试解压，理论上讲可以提升性能，弊端时如果redis中的数据  设置过多个ZipLen不同值的数据 可能会出现解析错误
+        /// </summary>
+        public bool IsForceDeZip { get; set; } = false;
 
     }
 }

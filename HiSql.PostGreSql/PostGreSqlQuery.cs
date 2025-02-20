@@ -150,7 +150,7 @@ namespace HiSql
                         //if (!string.IsNullOrEmpty(sb_sort.ToString()))
                         sb.AppendLine($" order by  {dbConfig.Field_Pre}_hi_rownum_{dbConfig.Field_After} asc");
 
-                        sb.AppendLine(string.Format("limit {0} OFFSET {1}", (this.CurrentPage - 1) * this.PageSize, this.PageSize));
+                        sb.AppendLine(string.Format("limit {0} OFFSET {1}", this.PageSize, (this.CurrentPage - 1) * this.PageSize));
                     }
 
                 }

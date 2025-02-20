@@ -756,7 +756,18 @@ namespace HiSql
                                         }
                                         else
                                         {
-                                            _dic.Add(hiColumn.FieldName, ((int)objprop.GetValue(objdata)).ToString());
+                                            string _val= objprop.GetValue(objdata).ToString();
+                                            if (Tool.IsInt(_val))
+                                            {
+                                                _dic.Add(hiColumn.FieldName, _val);
+                                            }
+                                            else if (Tool.RegexMatch("`(?<field>[-\\w_]+)`", _val))
+                                            {
+                                                _dic.Add(hiColumn.FieldName, _val);
+                                            }
+                                            else
+                                                _dic.Add(hiColumn.FieldName, ((int)objprop.GetValue(objdata)).ToString());
+                                            //_dic.Add(hiColumn.FieldName, ((int)objprop.GetValue(objdata)).ToString());
                                         }
 
                                     }
