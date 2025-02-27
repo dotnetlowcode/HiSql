@@ -1731,7 +1731,15 @@ namespace HiSql
             {
                 if (filterDefinition.FilterType == FilterType.BRACKET_LEFT)
                 {
-                    sb_where.Append(sb_where.Length > 1 ? " and (" : "(");
+                    string prevLogic = "";
+                    // pengxy on 2025-2-27  如果上一个条件是(说明还是开头，不需要任何逻辑符号,如果上一个条件是指定了or或 and,则不需要自动加上逻辑符号
+                    if (_idx - 1 > 0 && Wheres[_idx - 1].FilterType != FilterType.BRACKET_LEFT)
+                    {
+                        prevLogic = Wheres[_idx - 1].FilterType == FilterType.LOGI ? "" : " and ";
+                    }
+
+                    sb_where.Append(prevLogic + "(");
+                    //sb_where.Append(sb_where.Length > 1 ? " and (" : "(");
                 }
                 else if (filterDefinition.FilterType == FilterType.BRACKET_RIGHT)
                 {
@@ -1744,8 +1752,9 @@ namespace HiSql
                         }
                         else
                         {
-                            if (Wheres[_idx + 1].FilterType != FilterType.BRACKET_RIGHT)
-                                throw new Exception($"在括号[)]后如果还有其它的条件则必需要有逻辑操作符[and|or]");
+                            //pengxy on 2025-2-27 注释该判断.因为括号后面的条件会加上逻辑符号
+                            //if (Wheres[_idx + 1].FilterType != FilterType.BRACKET_RIGHT)
+                            //    throw new Exception($"在括号[)]后如果还有其它的条件则必需要有逻辑操作符[and|or]");
                         }
                     }
                 }

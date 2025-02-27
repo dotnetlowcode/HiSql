@@ -1,5 +1,6 @@
 ﻿using HiSql.PostGreSqlUnitTest.Table;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
@@ -30,8 +31,28 @@ namespace HiSql.PostGreSqlUnitTest
         }
         static void Query_Demo20(HiSqlClient sqlClient)
         {
+            var filters = new Filter();
 
-           var task = Task.Run( async() =>
+            filters.Add("(");
+            filters.Add("(");
+            filters.Add("SID", OperType.EQ, 0);
+
+            filters.Add(LogiType.OR);
+            filters.Add("UName", OperType.EQ, "asdf");
+            filters.Add(")");
+            filters.Add(LogiType.OR);
+
+            filters.Add("(");
+            filters.Add(LogiType.OR);
+            filters.Add("SID", OperType.EQ, 0);
+            filters.Add("UName", OperType.EQ, "asdf");
+            filters.Add(")"); 
+            filters.Add(")");
+            var query = sqlClient.Query("HTest02").Field(@"SID")
+               .Where(filters ).ToSql();
+            Console.WriteLine(query);
+            return;
+            var task = Task.Run( async() =>
             {
                 bool isexits = sqlClient.DbFirst.CheckTabExists(typeof(HTest02).Name);
                 if (!isexits)

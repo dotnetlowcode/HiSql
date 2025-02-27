@@ -48,7 +48,7 @@ namespace HiSql.UnitTest
             //Query_Demo2(sqlClient);
             //Query_Demo4(sqlClient);
             //Query_Demo5(sqlClient);
-            //Query_Demo6(sqlClient);
+            Query_Demo6(sqlClient);
             //Query_Demo7(sqlClient);
             //Query_Demo8(sqlClient);
             //Query_Demo9(sqlClient);
@@ -71,7 +71,7 @@ namespace HiSql.UnitTest
             //Query_Null2(sqlClient);
            // Query_MyFlowDto(sqlClient);
 
-            Query_MyMultiJoinOn(sqlClient);
+           // Query_MyMultiJoinOn(sqlClient);
             //Query_Demo23(sqlClient);
             var s = Console.ReadLine();
         }
@@ -939,13 +939,13 @@ Order By a.fieldNamE
                 .Join("Hi_TabModel").As("B").On(new JoinOn { { "A.TabName", "B.TabName" } })
                 .Join("Hi_TabModel").As("c").On(new JoinOn { { "A.TabName", "C.TabName" } })
                 .Where(new Filter {
-                    { "("},
+                    //{ "("}, { "("},
                     { "("},
                     {"A.TabName", OperType.EQ, "Hi_FieldModel"},
                     {"A.FieldName", OperType.EQ, "CreateName"},
                     { ")"},
-                    { ")"},
-                    { LogiType.OR},
+                    //{ ")"}, { ")"},
+                    //{ LogiType.OR},
                     { "("},
                     {"A.FieldType",OperType.BETWEEN,new RangDefinition(){ Low=10,High=99} },
                     { ")"}
