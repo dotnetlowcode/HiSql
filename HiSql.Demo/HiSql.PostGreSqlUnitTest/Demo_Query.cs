@@ -29,7 +29,7 @@ namespace HiSql.PostGreSqlUnitTest
             //Query_Demo19(sqlClient);
             Query_Demo20(sqlClient);
         }
-        static void Query_Demo20(HiSqlClient sqlClient)
+        static void Query_Demo21(HiSqlClient sqlClient)
         {
             var filters = new Filter();
 
@@ -43,15 +43,21 @@ namespace HiSql.PostGreSqlUnitTest
             filters.Add(LogiType.OR);
 
             filters.Add("(");
-            filters.Add(LogiType.OR);
             filters.Add("SID", OperType.EQ, 0);
+            filters.Add(LogiType.OR);
             filters.Add("UName", OperType.EQ, "asdf");
-            filters.Add(")"); 
             filters.Add(")");
+            filters.Add(")");
+            filters.Add(LogiType.AND);
+            filters.Add("SID", OperType.EQ, 0);
             var query = sqlClient.Query("HTest02").Field(@"SID")
-               .Where(filters ).ToSql();
+               .Where(filters).ToSql();
             Console.WriteLine(query);
             return;
+        }
+            static void Query_Demo20(HiSqlClient sqlClient)
+        {
+            
             var task = Task.Run( async() =>
             {
                 bool isexits = sqlClient.DbFirst.CheckTabExists(typeof(HTest02).Name);
@@ -71,11 +77,36 @@ namespace HiSql.PostGreSqlUnitTest
                 cnt87 = sqlClient.Insert("#test02", new HTest02 { SID = 1, UName = "tansar" }).ExecCommand();
                 for (int i = 0; i < 10; i++)
                 {
-
-
                     cnt87 = sqlClient.Insert("#test02", new HTest02 { SID = 1 + new Random().Next(1000, 2000), UName = "tansar" }).ExecCommand();
 
                 }
+
+                var query = sqlClient
+                           .Query("#test02")
+                           .As("t1")
+                           .Field("t2.*")
+                           .Join("HTest02", JoinType.Left)
+                           .As("t2");
+                var obj = new JoinOn();
+                obj.Add("t1.SID", "t2.SID");
+
+                query = query.On(obj);
+                var filters = new Filter();
+
+                filters.Add("SID", OperType.EQ, 0);
+                foreach (var fieldEle in filters.Elements.Where(t => t.FilterType == FilterType.CONDITION))
+                {
+                    fieldEle.Field.TabName = "HTest02";
+                    fieldEle.Field.AsTabName = "t2";
+                }
+
+                query.Where(filters);
+                var currSql = query.Skip(1).Take(30).ToSql();
+                
+                var tt = query.Skip(1).Take(30).ToTable();
+                Console.WriteLine(currSql);
+                return;
+
 
                 var sqldbHTest02 = sqlClient.HiSql("select * from HTest02 ").ToTable();
 
