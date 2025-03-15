@@ -1402,68 +1402,71 @@ namespace HiSql
                 //表关联配置校验
                 if (arrcol_tab.Count > 0 && Context.CurrentConnectionConfig.IsCheckTableRefData)
                 {
-                    HiSqlClient _sqlClient = Context.CloneClient();
-                    int _total = 0;
-                    int _psize = 1000;
-                    foreach (HiColumn hiColumn in arrcol_tab)
+                    //HiSqlClient _sqlClient = Context.CloneClient();
+                    using (var _sqlClient = Context.CloneClient())
                     {
-                        if (hiColumn.IsRefTab && hiColumn.RefTab.IsNullOrEmpty())
+                        int _total = 0;
+                        int _psize = 1000;
+                        foreach (HiColumn hiColumn in arrcol_tab)
                         {
-                            System.Console.WriteLine($@"表关联配置校验-校验列 {hiColumn.TabName} {hiColumn.FieldName} IsRefTab配置错误，RefTab为空 ");
-                            continue;
-                        }
-                        int _scount = 0;
-                        if (dic_hash_reg.ContainsKey(hiColumn.FieldName))
-                        {
-                            _scount = dic_hash_reg[hiColumn.FieldName].Count;
-                            //当源表的条件值大于需要匹配的值时 建议将匹配的值用in的方式传入进行匹配
-
-                            HashSet<string> _hash = new HashSet<string>();
-                            DataTable data = null;
-
-                            if (!string.IsNullOrEmpty(hiColumn.RefWhere.Trim()))
+                            if (hiColumn.IsRefTab && hiColumn.RefTab.IsNullOrEmpty())
                             {
-                                data = _sqlClient.Query(hiColumn.RefTab).Field(hiColumn.RefField).Where(hiColumn.RefWhere)
-                                .Skip(1).Take(_psize)
-                                .ToTable(ref _total);
+                                System.Console.WriteLine($@"表关联配置校验-校验列 {hiColumn.TabName} {hiColumn.FieldName} IsRefTab配置错误，RefTab为空 ");
+                                continue;
                             }
-                            else
+                            int _scount = 0;
+                            if (dic_hash_reg.ContainsKey(hiColumn.FieldName))
                             {
-                                data = _sqlClient.Query(hiColumn.RefTab).Field(hiColumn.RefField)
-                                  .Skip(1).Take(_psize)
-                                  .ToTable(ref _total);
+                                _scount = dic_hash_reg[hiColumn.FieldName].Count;
+                                //当源表的条件值大于需要匹配的值时 建议将匹配的值用in的方式传入进行匹配
 
-                            }
+                                HashSet<string> _hash = new HashSet<string>();
+                                DataTable data = null;
 
-                            if (data != null && data.Rows.Count > 0)
-                            {
-
-                                if (data.Rows.Count == _psize)
+                                if (!string.IsNullOrEmpty(hiColumn.RefWhere.Trim()))
                                 {
-                                    //源表值比较大
-                                    string _sql = dic_hash_reg[hiColumn.FieldName].ToArray().ToSqlIn(true);
-                                    if (!string.IsNullOrEmpty(hiColumn.RefWhere.Trim()))
-                                    {
-                                        //注意这里的语句是非原生sql 是hisql 可以在不同的数据库中编译执行
-                                        _sql = $"({hiColumn.RefWhere.Trim()}) and ({_sql})";
-                                    }
-                                    data = _sqlClient.Query(hiColumn.RefTab).Field(hiColumn.RefField).Where(_sql).ToTable();
-                                    _hash = DataConvert.DataTableFieldToHashSet(data, hiColumn.RefField);
+                                    data = _sqlClient.Query(hiColumn.RefTab).Field(hiColumn.RefField).Where(hiColumn.RefWhere)
+                                    .Skip(1).Take(_psize)
+                                    .ToTable(ref _total);
                                 }
                                 else
                                 {
-                                    //string _sql=DataTableFieldToList(data, hiColumn.RefField).ToArray().ToSqlIn(true);
-                                    _hash = DataConvert.DataTableFieldToHashSet(data, hiColumn.RefField);
+                                    data = _sqlClient.Query(hiColumn.RefTab).Field(hiColumn.RefField)
+                                      .Skip(1).Take(_psize)
+                                      .ToTable(ref _total);
+
                                 }
-                            }
-                            dic_hash_reg[hiColumn.FieldName].ExceptWith(_hash);
-                            if (dic_hash_reg[hiColumn.FieldName].Count > 0)
-                            {
-                                throw new Exception($"字段[{hiColumn.FieldName}]配置了表检测 值 [{dic_hash_reg[hiColumn.FieldName].ToArray()[0]}] 在表[{hiColumn.RefTab}]不存在");
+
+                                if (data != null && data.Rows.Count > 0)
+                                {
+
+                                    if (data.Rows.Count == _psize)
+                                    {
+                                        //源表值比较大
+                                        string _sql = dic_hash_reg[hiColumn.FieldName].ToArray().ToSqlIn(true);
+                                        if (!string.IsNullOrEmpty(hiColumn.RefWhere.Trim()))
+                                        {
+                                            //注意这里的语句是非原生sql 是hisql 可以在不同的数据库中编译执行
+                                            _sql = $"({hiColumn.RefWhere.Trim()}) and ({_sql})";
+                                        }
+                                        data = _sqlClient.Query(hiColumn.RefTab).Field(hiColumn.RefField).Where(_sql).ToTable();
+                                        _hash = DataConvert.DataTableFieldToHashSet(data, hiColumn.RefField);
+                                    }
+                                    else
+                                    {
+                                        //string _sql=DataTableFieldToList(data, hiColumn.RefField).ToArray().ToSqlIn(true);
+                                        _hash = DataConvert.DataTableFieldToHashSet(data, hiColumn.RefField);
+                                    }
+                                }
+                                dic_hash_reg[hiColumn.FieldName].ExceptWith(_hash);
+                                if (dic_hash_reg[hiColumn.FieldName].Count > 0)
+                                {
+                                    throw new Exception($"字段[{hiColumn.FieldName}]配置了表检测 值 [{dic_hash_reg[hiColumn.FieldName].ToArray()[0]}] 在表[{hiColumn.RefTab}]不存在");
+                                }
+
                             }
 
                         }
-
                     }
                 }
 
