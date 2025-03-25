@@ -1120,13 +1120,28 @@ namespace HiSql
                 var operateTypes = new List<OperationType> { OperationType.Insert };
                 if (insertProvider.IsModi())
                     operateTypes.Add(OperationType.Update);
+                else
+                {
+                    //判断主键是否为自增，就报异常，自增不能记日志因为缺少主键id值
+                    tabinfo.Columns.ForEach(fieldObj =>
+                    {
+                        if(fieldObj.IsIdentity)
+                        {
+                            throw new Exception("自增主键不能记录日志，因为缺少主键id值！");
+                        }
+                        if (!string.IsNullOrWhiteSpace(fieldObj.SNO))
+                        {
+                            throw new Exception("自增编号SNO主键不能记录日志，因为缺少主键id值！");
+                        }
+                    }) ;
+                }
                 var credentialModule = sqlProvider.GetCredentialModule();
                 //记录精确操作时间
-                var watch = Stopwatch.StartNew();
+                //var watch = Stopwatch.StartNew();
                 var operateDataList = HiSql.Utils.ListObjectConverter.ConvertToListOfDictionary(insertProvider.Data);
                 credentialObj = await credentialModule.RecordLog(sqlProvider, tableName, operateDataList, new List<Dictionary<string, string>>(0), func, operateTypes);
-                watch.Stop();
-                Console.WriteLine($"记录RecordLog日志耗时：{watch.ElapsedMilliseconds}ms");
+                //watch.Stop();
+                //Console.WriteLine($"记录RecordLog日志耗时：{watch.ElapsedMilliseconds}ms");
                 return credentialObj;
             }
             await func();
