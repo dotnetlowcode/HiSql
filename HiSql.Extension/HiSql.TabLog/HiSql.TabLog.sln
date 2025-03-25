@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HiSql.TabLog", "HiSql.TabLog.csproj", "{7C9B0334-781B-19DA-73E9-63018A7D1855}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7C9B0334-781B-19DA-73E9-63018A7D1855}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C9B0334-781B-19DA-73E9-63018A7D1855}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C9B0334-781B-19DA-73E9-63018A7D1855}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C9B0334-781B-19DA-73E9-63018A7D1855}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {87EF9C1C-D33D-4273-AEA2-D1624640B7C0}
+	EndGlobalSection
+EndGlobal

@@ -16,8 +16,10 @@
 		<Reference Include="Microsoft.CSharp" />
 	</ItemGroup>
 	<ItemGroup>
-	  <PackageReference Include="HiSql" Version="1.0.7.6" />
 	  <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="../../HiSql/HiSql.csproj" />
 	</ItemGroup>
 
 </Project>

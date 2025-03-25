@@ -4,6 +4,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using HiSql.Interface.TabLog;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace HiSql
 {
@@ -12,11 +14,7 @@ namespace HiSql
     /// </summary>
     public static class Instance
     {
-
-        
         static Dictionary<string, Assembly> DbAssembly = new Dictionary<string, Assembly>();
-
-
 
         public static Assembly GetHiql()
         {
@@ -45,12 +43,12 @@ namespace HiSql
                         catch (Exception E)
                         {
                             throw new Exception($"HiSql执行异常:请检查是否有引用[{Constants.NameSpace}.dll包!");
-
                         }
                     }
                 }
             }
         }
+
         public static Assembly GetAssembly(string dbtype)
         {
             if (DbAssembly.ContainsKey(dbtype.ToString()))
@@ -79,29 +77,30 @@ namespace HiSql
                         {
                             return null;
                             //throw new Exception($"HiSql执行异常:请检查是否有引用[{Constants.NameSpace}.{dbtype.ToString()}].dll包!");
-
                         }
                     }
                 }
             }
         }
 
-
         static Dictionary<string, Type> typeCache = new Dictionary<string, Type>();
-        public static bool NoCache =false;
+        public static bool NoCache = false;
+
         public static IDataBase GetDBO(ConnectionConfig connectionConfig)
         {
-            IDataBase _obj = Instance.CreateInstance<IDataBase>($"{Constants.NameSpace}.{connectionConfig.DbType.ToString()}{DbInterFace.Provider.ToString()}");
+            IDataBase _obj = Instance.CreateInstance<IDataBase>(
+                $"{Constants.NameSpace}.{connectionConfig.DbType.ToString()}{DbInterFace.Provider.ToString()}"
+            );
             if (_obj == null)
                 throw new Exception($"数据库类型[{connectionConfig.DbType.ToString()}] 不支持");
             return _obj;
-            
         }
-
 
         public static IUpdate GetUpdate(ConnectionConfig currentConfig)
         {
-            IUpdate _obj = Instance.CreateInstance<IUpdate>($"{Constants.NameSpace}.{currentConfig.DbType.ToString()}{DbInterFace.Update.ToString()}");
+            IUpdate _obj = Instance.CreateInstance<IUpdate>(
+                $"{Constants.NameSpace}.{currentConfig.DbType.ToString()}{DbInterFace.Update.ToString()}"
+            );
             if (_obj == null)
                 throw new Exception($"数据库类型[{currentConfig.DbType.ToString()}] 不支持更新业务");
             return _obj;
@@ -109,7 +108,9 @@ namespace HiSql
 
         public static IDelete GetDelete(ConnectionConfig currentConfig)
         {
-            IDelete _obj = Instance.CreateInstance<IDelete>($"{Constants.NameSpace}.{currentConfig.DbType.ToString()}{DbInterFace.Delete.ToString()}");
+            IDelete _obj = Instance.CreateInstance<IDelete>(
+                $"{Constants.NameSpace}.{currentConfig.DbType.ToString()}{DbInterFace.Delete.ToString()}"
+            );
             if (_obj == null)
                 throw new Exception($"数据库类型[{currentConfig.DbType.ToString()}] 不支持删除业务");
             return _obj;
@@ -117,19 +118,44 @@ namespace HiSql
 
         public static IQuery GetQuery(ConnectionConfig currentConfig)
         {
-            IQuery _obj = Instance.CreateInstance<IQuery>($"{Constants.NameSpace}.{currentConfig.DbType.ToString()}{DbInterFace.Query.ToString()}");
-            if(_obj == null)
+            IQuery _obj = Instance.CreateInstance<IQuery>(
+                $"{Constants.NameSpace}.{currentConfig.DbType.ToString()}{DbInterFace.Query.ToString()}"
+            );
+            if (_obj == null)
                 throw new Exception($"数据库类型[{currentConfig.DbType.ToString()}] 不支持查询业务");
             return _obj;
         }
 
         public static IInsert GetInsert(ConnectionConfig currentConfig)
         {
-            IInsert _obj = Instance.CreateInstance<IInsert>($"{Constants.NameSpace}.{currentConfig.DbType.ToString()}{DbInterFace.Insert.ToString()}");
+            IInsert _obj = Instance.CreateInstance<IInsert>(
+                $"{Constants.NameSpace}.{currentConfig.DbType.ToString()}{DbInterFace.Insert.ToString()}"
+            );
             if (_obj == null)
                 throw new Exception($"数据库类型[{currentConfig.DbType.ToString()}] 不支持数据写入业务");
             return _obj;
-            
+        }
+
+        static ICredentialModule tableLogModule;
+
+        static object objectLock = new object();
+
+        public static ICredentialModule GetTableLogModule()
+        {
+            if (tableLogModule != null)
+                return tableLogModule;
+            //加锁
+            lock (objectLock)
+            {
+                if (tableLogModule == null)
+                {
+                    // 从 HiSql.TabLog.dll 中的 HiSqlCredentialModule 类中获取实例
+                    var assembly = Assembly.Load("HiSql.TabLog");
+                    var type = assembly.GetType("HiSql.TabLog.Module.HiSqlCredentialModule");
+                    tableLogModule = Activator.CreateInstance(type) as ICredentialModule;
+                }
+            }
+            return tableLogModule;
         }
 
         #region 类缓存
@@ -190,7 +216,8 @@ namespace HiSql
                 {
                     throw new Exception($"数据库实现类[{className}]不符合标准");
                 }
-            }else
+            }
+            else
                 throw new Exception($"数据库实现类[{className}]不符合标准");
         }
 
@@ -224,6 +251,7 @@ namespace HiSql
             var result = (T)Activator.CreateInstance(type, true);
             return result;
         }
+
         private static T NoCacheGetCacheInstance<T>(string className)
         {
             string[] _dbtype = className.Split('.');

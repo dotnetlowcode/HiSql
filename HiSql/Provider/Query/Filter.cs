@@ -10,6 +10,15 @@ namespace HiSql
 {
     public class Filter : IEnumerable<FilterDefinition>
     {
+        public Filter()
+        {
+        }
+
+        public Filter(List<FilterDefinition> filterDefinitions)
+        {
+             this.Elements.AddRange(filterDefinitions);
+        }
+
         private readonly List<FilterDefinition> _elements = new List<FilterDefinition>();
 
         bool _ishisqlwhere = false;
