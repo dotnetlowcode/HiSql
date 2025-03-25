@@ -575,9 +575,20 @@ namespace HiSql
             return _values;
         }
 
-        int IDelete.ExecCommand()
+        public int ExecCommand()
         {
             return this.ExecCommandAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+
+
+        /// <summary>
+        /// 将当前操作向数据库执行
+        /// </summary>
+        /// <param name="credentialCallback">操作凭证</param>
+        /// <returns></returns>
+        public int ExecCommand(Action<HiSql.Interface.TabLog.Credential> credentialCallback)
+        {
+            return this.ExecCommandAsync(credentialCallback).ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
         public async Task<int> ExecCommandAsync()
@@ -598,11 +609,11 @@ namespace HiSql
         {
             var sql = this.ToSql();
             int deleteCount = 0;
-           var credentialObj=  await this.RecordLog(async () =>
-            {
-                deleteCount = await this.Context.DBO.ExecCommandAsync(sql);
-                return deleteCount > 0;
-            });
+            var credentialObj = await this.RecordLog(async () =>
+             {
+                 deleteCount = await this.Context.DBO.ExecCommandAsync(sql);
+                 return deleteCount > 0;
+             });
             credentialCallback(credentialObj);
             return deleteCount;
         }

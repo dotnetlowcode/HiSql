@@ -131,6 +131,9 @@ namespace HiSql
         int ExecCommand();
 
 
+        int ExecCommand(Action<HiSql.Interface.TabLog.Credential> credentialCallback);
+
+
         /// <summary>
         /// 执行结果
         /// </summary>

@@ -143,6 +143,19 @@ namespace HiSql
         {
             return this.ExecCommandAsync().ConfigureAwait(false).GetAwaiter().GetResult();
         }
+
+
+        /// <summary>
+        /// 将当前操作向数据库执行
+        /// </summary>
+        /// <param name="credentialCallback">操作凭证</param>
+        /// <returns></returns>
+        public int ExecCommand(Action<HiSql.Interface.TabLog.Credential> credentialCallback)
+        {
+            return this.ExecCommandAsync(credentialCallback).ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+
+
         public async Task<int> ExecCommandAsync()
         {
             string _sql = this.ToSql();
