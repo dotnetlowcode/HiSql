@@ -2,9 +2,9 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>net461;net5.0;netcoreapp3.1;net6.0</TargetFrameworks>
-		<Version>1.0.1.7</Version>
+		<Version>1.0.1.0</Version>
 		<Authors>tansar</Authors>
-		<Company>Hone</Company>
+		<Company>dotnetlowcode</Company>
 		<Description>
 			HiSql TableLog扩展
 
