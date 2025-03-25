@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using HiSql.Common.Entities.TabLog;
+using HiSql.Interface.TabLog;
 
 namespace HiSql
 {
@@ -1100,16 +1101,17 @@ namespace HiSql
         /// <param name="operateDataList"></param>
         /// <param name="func"></param>
         /// <returns></returns>
-        public static async Task RecordLog(
+        public static async Task<Credential> RecordLog(
             this InsertProvider insertProvider,
             Func<Task<bool>> func
         )
         {
+           Credential credentialObj = null;
             var tableName = insertProvider.Table.TabName;
             if (IgnoreLogTable(tableName))
             {
                 await func();
-                return;
+                return credentialObj;
             }
             var sqlProvider = insertProvider.Context;
             var tabinfo = sqlProvider.DMInitalize.GetTabStruct(tableName);
@@ -1120,14 +1122,15 @@ namespace HiSql
                     operateTypes.Add(OperationType.Update);
                 var credentialModule = sqlProvider.GetCredentialModule();
                 //记录精确操作时间
-                //var watch = Stopwatch.StartNew();
+                var watch = Stopwatch.StartNew();
                 var operateDataList = HiSql.Utils.ListObjectConverter.ConvertToListOfDictionary(insertProvider.Data);
-                await credentialModule.RecordLog(sqlProvider, tableName, operateDataList, new List<Dictionary<string, string>>(0), func, operateTypes);
-                //watch.Stop();
-                //Console.WriteLine($"记录RecordLog日志耗时：{watch.ElapsedMilliseconds}ms");
-                return;
+                credentialObj = await credentialModule.RecordLog(sqlProvider, tableName, operateDataList, new List<Dictionary<string, string>>(0), func, operateTypes);
+                watch.Stop();
+                Console.WriteLine($"记录RecordLog日志耗时：{watch.ElapsedMilliseconds}ms");
+                return credentialObj;
             }
             await func();
+            return credentialObj;
         }
 
 
@@ -1142,14 +1145,15 @@ namespace HiSql
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
 
-        public static async Task RecordLog(this UpdateProvider updateProvider, Func<Task<bool>> func, List<OperationType> operationTypes)
+        public static async Task<Credential> RecordLog(this UpdateProvider updateProvider, Func<Task<bool>> func)
         {
+            Credential credentialObj = null;
             var sqlProvider = updateProvider.Context;
             var tableName = updateProvider.Table.TabName;
             if (IgnoreLogTable(tableName))
             {
                 await func();
-                return;
+                return credentialObj;
             }
             var tabinfo = sqlProvider.DMInitalize.GetTabStruct(tableName);
             if (tabinfo.TabModel.IsLog)
@@ -1172,12 +1176,15 @@ namespace HiSql
                 var credentialModule = sqlProvider.GetCredentialModule();
                 //记录精确操作时间
                 //var watch = Stopwatch.StartNew();
-                await credentialModule.RecordLog(sqlProvider, tableName, operateDataList, new List<Dictionary<string, string>>(0), func, operationTypes);
+                credentialObj= await credentialModule.RecordLog(sqlProvider, tableName, operateDataList, new List<Dictionary<string, string>>(0), func, new List<OperationType> {
+                        OperationType.Update
+                });
                 //watch.Stop();
                 //Console.WriteLine($"记录RecordLog日志耗时：{watch.ElapsedMilliseconds}ms");
-                return;
+                return credentialObj;
             }
             await func();
+            return credentialObj;
         }
 
 
@@ -1188,14 +1195,15 @@ namespace HiSql
         /// <param name="func"></param>
         /// <param name="operationTypes"></param>
         /// <returns></returns>
-        public static async Task RecordLog(this DeleteProvider deleteProvider, Func<Task<bool>> func, List<OperationType> operationTypes)
+        public static async Task<Credential> RecordLog(this DeleteProvider deleteProvider, Func<Task<bool>> func)
         {
+            Credential credentialObj = null;
             var sqlProvider = deleteProvider.Context;
             var tableName = deleteProvider.Table.TabName;
             if (IgnoreLogTable(tableName))
             {
                 await func();
-                return;
+                return credentialObj;
             }
             var tabinfo = sqlProvider.DMInitalize.GetTabStruct(tableName);
             if (tabinfo.TabModel.IsLog)
@@ -1211,7 +1219,7 @@ namespace HiSql
                 {
                     var queryFieldList = new string[] { "*" };
                     var list = await sqlClient.Query(tableName).Field(queryFieldList).Where(where).ToEObjectAsync();
-                   var dicList= HiSql.Utils.ListObjectConverter.ConvertToListOfDictionary(list);
+                    var dicList = HiSql.Utils.ListObjectConverter.ConvertToListOfDictionary(list);
                     deleteList = HiSql.Utils.ListObjectConverter.ToDeleteWhere(dicList);
                 }
                 else
@@ -1222,13 +1230,13 @@ namespace HiSql
                 var credentialModule = sqlProvider.GetCredentialModule();
                 //记录精确操作时间
                 //var watch = Stopwatch.StartNew();
-                await credentialModule.RecordLog(sqlProvider, tableName, new List<Dictionary<string, object>>(0), deleteList,  func, operationTypes);
+                credentialObj= await credentialModule.RecordLog(sqlProvider, tableName, new List<Dictionary<string, object>>(0), deleteList, func, new List<OperationType> { OperationType.Delete });
                 //watch.Stop();
                 //Console.WriteLine($"记录RecordLog日志耗时：{watch.ElapsedMilliseconds}ms");
-                return;
+                return credentialObj;
             }
             await func();
-
+            return credentialObj;
         }
 
 
@@ -1239,7 +1247,7 @@ namespace HiSql
         /// <param name="tableName"></param>
         /// <param name="credentialId"></param>
         /// <returns></returns>
-        public static Task RollbackCredential(this HiSqlClient sqlClient, string tableName, string credentialId)
+        public static Task<List<Credential>> RollbackCredential(this HiSqlClient sqlClient, string tableName, string credentialId)
         {
             var credentialModule = sqlClient.Context.GetCredentialModule();
             return credentialModule.RollbackCredential(sqlClient, tableName, credentialId);

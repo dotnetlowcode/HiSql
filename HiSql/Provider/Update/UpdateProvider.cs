@@ -151,9 +151,22 @@ namespace HiSql
             {
                 updateCount = await this.Context.DBO.ExecCommandAsync(_sql);
                 return updateCount > 0;
-            }, new List<OperationType> {
-                    OperationType.Update
             });
+            return updateCount;
+        }
+
+
+
+        public async Task<int> ExecCommandAsync(Action<HiSql.Interface.TabLog.Credential> credentialCallback)
+        {
+            string _sql = this.ToSql();
+            var updateCount = 0;
+            var credentialObj = await this.RecordLog(async () =>
+            {
+                updateCount = await this.Context.DBO.ExecCommandAsync(_sql);
+                return updateCount > 0;
+            });
+            credentialCallback(credentialObj);
             return updateCount;
         }
 

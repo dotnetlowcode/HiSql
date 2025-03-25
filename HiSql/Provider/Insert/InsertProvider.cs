@@ -72,6 +72,20 @@ namespace HiSql
             return insertResult;
         }
 
+
+
+        public async Task<int> ExecCommandAsync(Action<Credential> credentialCallback)
+        {
+            var insertResult = 0;
+            var credentialObj = await this.RecordLog(async () =>
+             {
+                 insertResult = await this.ExecCommandCore();
+                 return insertResult > 0;
+             });
+            credentialCallback(credentialObj);
+            return insertResult;
+        }
+
         private async Task<int> ExecCommandCore()
         {
             int i = 0;
@@ -2541,6 +2555,7 @@ namespace HiSql
 
             return _values;
         }
+
 
         #endregion
     }

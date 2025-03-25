@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -82,69 +83,99 @@ namespace HiSql.TabLog.Service
             }
         }
 
+        /// <summary>
+        /// 表是否存在
+        /// </summary>
+        Dictionary<string, bool> tableExists = new Dictionary<string, bool>();
+
+        /// <summary>
+        /// 连接缓存
+        /// </summary>
+        Dictionary<string, HiSqlClient> dbClient = new Dictionary<string, HiSqlClient>();
+
+
         public async Task MainTask()
         {
             var credentialList = TabLogQueue.DequeueLog();
-            if (credentialList.Count > 0)
+            if (credentialList.Count == 0)
             {
-                //按数据库分组
-                var groupByDb = credentialList
-                    .Select(r =>
-                    {
-                        var tableLogConfig = (Hi_TabManager)r.State;
-                        return new { Credential = r, tableLogConfig, };
-                    })
-                    .GroupBy(r => r.tableLogConfig.DbServer);
-                foreach (var group in groupByDb)
+                return;
+            }
+            //按数据库分组
+            var groupByDb = credentialList
+                .Select(r =>
                 {
-                    //按表分组
-                    var groupByTable = group.GroupBy(r => r.tableLogConfig.TabName);
-                    var mainLogs = new Dictionary<string, List<Hi_MainLog>>();
-                    var detailLogs = new Dictionary<string, List<Hi_DetailLog>>();
-                    foreach (var credential in group)
-                    {
-                        var result = BuildCredentialLogs(credential.Credential);
-                        var mainLogTableName = credential.tableLogConfig.MainTabLog;
-                        var detailLogTableName = credential.tableLogConfig.DetailTabLog;
-                        if (credential.tableLogConfig.IsSplitLog == 1)
-                            detailLogTableName = detailLogTableName + DateTime.Now.ToString(credential.tableLogConfig.SplitFormat);
-                        
-                        if (result != null)
-                        {
-                            var mainLog = result.Item1;
-                            mainLog.DetailTabLog = detailLogTableName;
-                            var detailLog = result.Item2;
-                            if (!mainLogs.ContainsKey(mainLogTableName))
-                                mainLogs[mainLogTableName] = new List<Hi_MainLog>() { mainLog };
-                            else
-                                mainLogs[mainLogTableName].Add(mainLog);
+                    var tableLogConfig = (Hi_TabManager)r.State;
+                    return new { Credential = r, tableLogConfig, };
+                })
+                .GroupBy(r => r.tableLogConfig.DbServer);
+            foreach (var group in groupByDb)
+            {
+                //按表分组
+                var groupByTable = group.GroupBy(r => r.tableLogConfig.TabName);
+                var mainLogs = new Dictionary<string, List<Hi_MainLog>>();
+                var detailLogs = new Dictionary<string, List<Hi_DetailLog>>();
+                foreach (var credential in group)
+                {
+                    var result = BuildCredentialLogs(credential.Credential);
+                    var mainLogTableName = credential.tableLogConfig.MainTabLog;
+                    var detailLogTableName = credential.tableLogConfig.DetailTabLog;
+                    if (credential.tableLogConfig.IsSplitLog == 1)
+                        detailLogTableName = detailLogTableName + DateTime.Now.ToString(credential.tableLogConfig.SplitFormat);
 
-                            if (!detailLogs.ContainsKey(detailLogTableName))
-                                detailLogs[detailLogTableName] = new List<Hi_DetailLog>(detailLog);
-                            else
-                                detailLogs[detailLogTableName].AddRange(detailLog);
-                        }
-                    }
-
-                    //按数据库连接,按表分组插入日志
-                    using (var hisqlClient = InstallTableLog.GetSqlClientByName(group.Key))
+                    if (result != null)
                     {
-                        hisqlClient.BeginTran();
-                        foreach (var tableGroup in mainLogs)
-                        {
-                            InstallTableLog.CreateTableByTemplate<Hi_MainLog>(hisqlClient, tableGroup.Key);
-                            await hisqlClient.Insert(tableGroup.Key, tableGroup.Value).ExecCommandAsync();
-                        }
-                        foreach (var tableGroup in detailLogs)
-                        {
-                            //看表是否存在，不存在就创建
-                            InstallTableLog.CreateTableByTemplate<Hi_DetailLog>(hisqlClient, tableGroup.Key);
-                            await hisqlClient.Insert(tableGroup.Key, tableGroup.Value).ExecCommandAsync();
-                        }
-                        hisqlClient.CommitTran();
+                        var mainLog = result.Item1;
+                        mainLog.DetailTabLog = detailLogTableName;
+                        var detailLog = result.Item2;
+                        if (!mainLogs.ContainsKey(mainLogTableName))
+                            mainLogs[mainLogTableName] = new List<Hi_MainLog>() { mainLog };
+                        else
+                            mainLogs[mainLogTableName].Add(mainLog);
+
+                        if (!detailLogs.ContainsKey(detailLogTableName))
+                            detailLogs[detailLogTableName] = new List<Hi_DetailLog>(detailLog);
+                        else
+                            detailLogs[detailLogTableName].AddRange(detailLog);
                     }
                 }
+                var watch = Stopwatch.StartNew();
+                HiSqlClient hiSqlClient = null;
+                if (!dbClient.ContainsKey(group.Key))
+                {
+                    hiSqlClient = InstallTableLog.GetSqlClientByName(group.Key);
+                    dbClient.Add(group.Key, hiSqlClient);
+                }
+                else
+                {
+                    hiSqlClient = dbClient[group.Key];
+                }
+                //按数据库连接,按表分组插入日志
+                //hiSqlClient.BeginTran();
+                foreach (var tableGroup in mainLogs)
+                {
+                    if (!tableExists.ContainsKey(tableGroup.Key))
+                    {
+                        InstallTableLog.CreateTableByTemplate<Hi_MainLog>(hiSqlClient, tableGroup.Key);
+                        tableExists.Add(tableGroup.Key, true);
+                    }
+                    await hiSqlClient.Insert(tableGroup.Key, tableGroup.Value).ExecCommandAsync();
+                }
+                foreach (var tableGroup in detailLogs)
+                {
+                    //看表是否存在，不存在就创建
+                    if (!tableExists.ContainsKey(tableGroup.Key))
+                    {
+                        InstallTableLog.CreateTableByTemplate<Hi_DetailLog>(hiSqlClient, tableGroup.Key);
+                        tableExists.Add(tableGroup.Key, true);
+                    }
+                    await hiSqlClient.Insert(tableGroup.Key, tableGroup.Value).ExecCommandAsync();
+                }
+                //hiSqlClient.CommitTran();
+                watch.Stop();
+                Console.WriteLine($"独立日志{mainLogs.Count}条，保存耗时：{watch.ElapsedMilliseconds}ms");
             }
+
         }
 
         public Tuple<Hi_MainLog, List<Hi_DetailLog>> BuildCredentialLogs(Credential credential)

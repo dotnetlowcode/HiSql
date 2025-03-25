@@ -1,6 +1,8 @@
 using HiSql;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
+using System.Diagnostics;
 
 namespace WebApplication1.Controller
 {
@@ -23,18 +25,26 @@ namespace WebApplication1.Controller
         [HttpGet]
         public async Task<object> InsertTest()
         {
-            var dataList = await this
-                .hiSqlClient.Insert(
-                    "test",
-                    new
+            for (int k = 0; k < 10; k++)
+            {
+                //统计执行时间
+                var watch = Stopwatch.StartNew();
+                var dataList = new List<object>();
+                for (int i = 0; i < 1000; i++)
+                {
+                    dataList.Add(new
                     {
-                        Id = "R" + new Random().Next().ToString(),
+                        Id = "R" + new Random().Next().ToString() + i,
                         Name = "1111",
                         Desc = "Desc"
-                    }
-                )
-                .ExecCommandAsync();
-            return dataList;
+                    });
+                }
+                var insertValue = await hiSqlClient.Insert("test", dataList).ExecCommandAsync();
+                watch.Stop();
+                Console.WriteLine($"执行插入{k} {watch.ElapsedMilliseconds}ms");
+            }
+
+            return "OK";
         }
 
 
@@ -45,16 +55,20 @@ namespace WebApplication1.Controller
         [HttpGet]
         public async Task<object> UpdateTest()
         {
+            object creObj=null;
             var updateResult = await hiSqlClient
                 .Update("test", new
                 {
                     Desc = "UpdateOnly22"
                 })
                 .Where(
-                    new Filter() { { "Id", OperType.EQ, "KDAD" }, { "Name", OperType.EQ, "1111" } }
+                    new Filter() { { "Id", OperType.EQ, "R6261325320" }, { "Name", OperType.EQ, "1111" } }
                 )
-                .ExecCommandAsync();
-            return updateResult;
+                .ExecCommandAsync((tempCreObj) =>
+                {
+                    creObj = tempCreObj;
+                });
+            return creObj;
         }
 
 
@@ -85,17 +99,52 @@ namespace WebApplication1.Controller
         [HttpGet]
         public async Task<object> ModiTest()
         {
-            var dynamicObj = new TDynamic();
-            dynamicObj.SetProperty("Id", "R1294696794");
-            dynamicObj.SetProperty("Name", "1111");
-            dynamicObj.SetProperty("Desc", "DynamicValue");
+            //var dynamicObj = new TDynamic();
+            //dynamicObj.SetProperty("Id", "R1294696794");
+            //dynamicObj.SetProperty("Name", "1111");
+            //dynamicObj.SetProperty("Desc", "DynamicValue");
+            //var modiData = new List<object>()
+            //{
+            //    new
+            //    {
+            //        Id = "R1109113159",
+            //        Name = "1111",
+            //        Desc = "ModifyNoneEntity"
+            //    },
+            //    new Dictionary<string, object>
+            //    {
+            //        { "Id", "R1197732017" },
+            //        { "Name", "1111" },
+            //        { "Desc", "ModifyObjectValue" }
+            //    },
+            //    new Dictionary<string, string>
+            //    {
+            //        { "Id", "R1221956109" },
+            //        { "Name", "1111" },
+            //        { "Desc", "ModifyStringValue" }
+            //    },
+            //    dynamicObj
+            //};
+            //var modiResult = 0;
+            //foreach (var item in modiData)
+            //{
+            //    modiResult = await hiSqlClient.Modi("test", [
+            //    item
+            //    ]).ExecCommandAsync();
+            //}
+
+
+
+
+
+
             var modiData = new List<object>()
             {
-                new
+               new Dictionary<string, object>
                 {
-                    Id = "R1109113159",
-                    Name = "1111",
-                    Desc = "ModifyNoneEntity"
+                    { "Id", "R6261325320" },
+                    { "Name", "1111" },
+                    { "Desc", "ModifyObjectValue" }
                 },
                 new Dictionary<string, object>
                 {
@@ -103,21 +152,15 @@ namespace WebApplication1.Controller
                     { "Name", "1111" },
                     { "Desc", "ModifyObjectValue" }
                 },
-                new Dictionary<string, string>
+                new Dictionary<string, object>
                 {
                     { "Id", "R1221956109" },
                     { "Name", "1111" },
                     { "Desc", "ModifyStringValue" }
-                },
-                dynamicObj
+                }
             };
-            var modiResult = 0;
-            foreach (var item in modiData)
-            {
-                modiResult = await hiSqlClient.Modi("test", [
-                item
-                ]).ExecCommandAsync();
-            }
+            var modiResult = await hiSqlClient.Modi("test", modiData).ExecCommandAsync();
+
             return modiResult;
         }
 
@@ -126,10 +169,12 @@ namespace WebApplication1.Controller
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<string> Rollback()
+        public async Task<object> Rollback([FromQuery] string credentialId)
         {
-            await hiSqlClient.RollbackCredential("test", "20250324191000156");
-            return "OK";
+            if (string.IsNullOrWhiteSpace(credentialId))
+                return "需要参数" + credentialId;
+            var creList = await hiSqlClient.RollbackCredential("test", credentialId);
+            return creList;
         }
 
     }

@@ -39,7 +39,8 @@ namespace HiSql.TabLog.Module
             List<Dictionary<string, object>> modifyRows,
             List<Dictionary<string, string>> delRows,
             string tableName,
-            List<OperationType> operationTypes
+            List<OperationType> operationTypes,
+            StatisticsCallback statisticsCallback = null
         )
         {
             var operateLogs = new List<OperationLog>();
@@ -130,10 +131,10 @@ namespace HiSql.TabLog.Module
                         }
                     }
                     //计时
-                    //var watch = Stopwatch.StartNew();
+                    var watch = Stopwatch.StartNew();
                     updateOldList = await mainClient.Query(tableName).Field("*").Where(oldDataFilter).ToEObjectAsync();
-                    //watch.Stop();
-                    //Console.WriteLine($"记录老数据查询耗时：{watch.ElapsedMilliseconds}ms");
+                    watch.Stop();
+                    Console.WriteLine($"记录老数据查询耗时：{watch.ElapsedMilliseconds}ms");
                 }
                 else
                 {
@@ -236,6 +237,8 @@ namespace HiSql.TabLog.Module
                 operateLogs.Add(addLog);
             if (updateLog.OldValue.Count > 0)
                 operateLogs.Add(updateLog);
+            if (statisticsCallback != null)
+                statisticsCallback(addLog.NewValue.Count, delLog.OldValue.Count, updateLog.OldValue.Count);
             return operateLogs;
         }
 
@@ -243,6 +246,8 @@ namespace HiSql.TabLog.Module
         {
             var state = (Hi_TabManager)credential.State;
             credential.CredentialId = SnroNumber.NewNumber(state.SNRO, state.SNUM);
+
+
             TabLogQueue.EnqueueLog(credential);
             return Task.CompletedTask;
         }
@@ -337,7 +342,7 @@ namespace HiSql.TabLog.Module
             }
         }
 
-        public override async Task RecordLog(
+        public override async Task<Credential> RecordLog(
             HiSqlProvider sqlProvider,
             string tableName,
             List<Dictionary<string, object>> modiData,
@@ -345,50 +350,64 @@ namespace HiSql.TabLog.Module
             Func<Task<bool>> func, List<OperationType> operationTypes
         )
         {
-
+            Credential credentialObj = null;
             if (modiData.Count == 0 && delete.Count == 0)
             {
                 await func();
-                return;
+                return credentialObj;
             }
             Stopwatch watch;
             using (var sqlClient = sqlProvider.CloneClient())
             {
-                await Execute(
+                int cCount = 0;
+                int dCount = 0;
+                int mCount = 0;
+                credentialObj = await Execute(
                     async (tabName) =>
                     {
                         //获取表日志设置耗时
-                        //watch = Stopwatch.StartNew();
+                        watch = Stopwatch.StartNew();
                         var state = GetTableLogSetting(tableName, sqlClient);
                         if (state == null)
                             throw new Exception($"表{tableName}未设置日志设置");
-                        //watch.Stop();
-                        //Console.WriteLine($"获取表日志设置耗时：{watch.ElapsedMilliseconds}ms");
+                        watch.Stop();
+                        Console.WriteLine($"获取表日志设置耗时：{watch.ElapsedMilliseconds}ms");
                         //应用数据操作耗时
-                        //watch = Stopwatch.StartNew();
+                        watch = Stopwatch.StartNew();
                         var operateLogs = await ApplyDataOperate(
                             sqlClient,
                             modiData,
                             delete,
                             tableName,
-                            operationTypes
+                            operationTypes,
+                            (addCount, deleteCount, updateCount) =>
+                            {
+                                cCount = addCount;
+                                dCount = deleteCount;
+                                mCount = updateCount;
+                            }
                         );
-                        //watch.Stop();
-                        //Console.WriteLine($"应用数据操作耗时：{watch.ElapsedMilliseconds}ms");
+                        watch.Stop();
+                        Console.WriteLine($"应用数据操作耗时：{watch.ElapsedMilliseconds}ms");
                         return Tuple.Create(operateLogs, state as object);
                     },
                     tableName,
                     sqlClient.CurrentConnectionConfig.User
                 );
+                credentialObj.TableName= tableName;
+                credentialObj.CCount = cCount;
+                credentialObj.DCount = dCount;
+                credentialObj.MCount = mCount;
             }
             //执行原方法耗时
             //watch = Stopwatch.StartNew();
             await func();
             //watch.Stop();
             //Console.WriteLine($"执行原方法耗时：{watch.ElapsedMilliseconds}ms");
+            return credentialObj;
         }
 
-        public override async Task RollbackCredential(HiSqlClient sqlClient, string tableName, string credentialId)
+        public override async Task<List<Credential>> RollbackCredential(HiSqlClient sqlClient, string tableName, string credentialId)
         {
             var mangerObj = GetTableLogSetting(tableName, sqlClient);
             List<Hi_DetailLog> operateList;
@@ -453,14 +472,21 @@ namespace HiSql.TabLog.Module
                             throw new Exception("不支持的操作类型:" + item.ActionModel);
                     }
                 }
+                List<Credential> credentialList = new List<Credential>(2);
                 sqlClient.BeginTran();
                 if (modifyRows.Count > 0)
                 {
-                    await sqlClient.Modi(tableName, modifyRows).ExecCommandAsync();
+                    await sqlClient.Modi(tableName, modifyRows).ExecCommandAsync((credentialObj) =>
+                    {
+                        credentialList.Add(credentialObj);
+                    });
                 }
                 if (delRows.Count > 0)
                 {
-                    await sqlClient.Delete(tableName, delRows).ExecCommandAsync();
+                    await sqlClient.Delete(tableName, delRows).ExecCommandAsync((credentialObj) =>
+                    {
+                        credentialList.Add(credentialObj);
+                    });
                 }
                 var upCount = await logClient
                     .Update(mangerObj.MainTabLog)
@@ -477,6 +503,7 @@ namespace HiSql.TabLog.Module
                 sqlClient.CommitTran();
                 if (upCount < 1)
                     throw new Exception("该凭证已被回滚,或凭证不存在!");
+                return credentialList;
             }
         }
     }

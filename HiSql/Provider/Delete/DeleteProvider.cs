@@ -589,9 +589,21 @@ namespace HiSql
                   {
                       deleteCount = await this.Context.DBO.ExecCommandAsync(sql);
                       return deleteCount > 0;
-                  },
-                  new List<OperationType> { OperationType.Delete }
-            );
+                  });
+            return deleteCount;
+        }
+
+
+        public async Task<int> ExecCommandAsync(Action<HiSql.Interface.TabLog.Credential> credentialCallback)
+        {
+            var sql = this.ToSql();
+            int deleteCount = 0;
+           var credentialObj=  await this.RecordLog(async () =>
+            {
+                deleteCount = await this.Context.DBO.ExecCommandAsync(sql);
+                return deleteCount > 0;
+            });
+            credentialCallback(credentialObj);
             return deleteCount;
         }
     }

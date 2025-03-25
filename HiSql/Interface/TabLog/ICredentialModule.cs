@@ -7,6 +7,10 @@ namespace HiSql.Interface.TabLog
 {
     public abstract class ICredentialModule
     {
+
+        //定义统计委托
+       public  delegate void StatisticsCallback(int addCount, int deleteCount, int updateCount);
+
         /// <summary>
         /// 生成凭证ID
         /// </summary>
@@ -17,24 +21,14 @@ namespace HiSql.Interface.TabLog
         /// 开始操作包，返回凭证ID
         /// </summary>
         /// <returns></returns>
-        public async Task Execute(
+        public async Task<Credential> Execute(
             Func<string, Task<Tuple<List<OperationLog>, object>>> operationFunc,
             string tableName,
             string operateUserName
         )
         {
             var result = await operationFunc(tableName);
-            _ = Task.Run(async () =>
-            {
-                try
-                {
-                    await SaveCredential(result.Item1, result.Item2, operateUserName);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-            });
+            return await SaveCredential(result.Item1, result.Item2, operateUserName);
         }
 
         /// <summary>
@@ -77,7 +71,7 @@ namespace HiSql.Interface.TabLog
         /// <param name="state"></param>
         /// <param name="operateUserName"></param>
         /// <returns></returns>
-        public abstract Task RollbackCredential(
+        public abstract Task<List<Credential>> RollbackCredential(
             HiSqlClient sqlClient,
             string tableName,
             string credentialId
@@ -96,10 +90,11 @@ namespace HiSql.Interface.TabLog
             List<Dictionary<string, object>> modifyRows,
             List<Dictionary<string, string>> delRows,
             string tableName,
-            List<OperationType> operationTypes
+            List<OperationType> operationTypes,
+             StatisticsCallback statisticsCallback = null
         );
 
-        public abstract Task RecordLog(
+        public abstract Task<Credential> RecordLog(
             HiSqlProvider sqlProvider,
             string tableName,
             List<Dictionary<string, object>> data,

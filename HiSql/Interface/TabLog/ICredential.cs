@@ -15,6 +15,11 @@ namespace HiSql.Interface.TabLog
 
         public string CredentialId { get; set; }
 
+        [Newtonsoft.Json.JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
+        /// <summary>
+        /// 操作日志
+        /// </summary>
         public List<OperationLog> OperationLogs { get; set; }
 
         /// <summary>
@@ -27,6 +32,8 @@ namespace HiSql.Interface.TabLog
         /// </summary>
         public DateTime CreateTime { get; set; }
 
+        [Newtonsoft.Json.JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
         /// <summary>
         /// 透传数据
         /// </summary>
@@ -36,6 +43,21 @@ namespace HiSql.Interface.TabLog
         /// 父凭证ID
         /// </summary>
         public string RefCredentialId { get; set; }
+
+        /// <summary>
+        /// 创建数量
+        /// </summary>
+        public int CCount { get; set; }
+
+        /// <summary>
+        /// 修改数量
+        /// </summary>
+        public int DCount { get; set; }
+
+        /// <summary>
+        /// 删除数量
+        /// </summary>
+        public int MCount { get; set; }
     }
 
 

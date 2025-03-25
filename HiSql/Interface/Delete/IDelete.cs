@@ -60,6 +60,14 @@ namespace HiSql
         Task<int> ExecCommandAsync();
 
 
+        /// <summary>
+        /// 执行结果
+        /// </summary>
+        /// <param name="credentialCallback">返回操作凭证</param>
+        /// <returns></returns>
+        Task<int> ExecCommandAsync(Action<HiSql.Interface.TabLog.Credential> credentialCallback);
+
+
         string ToSql();
 
         Dictionary<string, string> CheckData(bool isDic, TableDefinition table, object objdata, IDMInitalize dMInitalize, TabInfo tabinfo);

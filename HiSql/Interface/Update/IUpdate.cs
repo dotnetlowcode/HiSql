@@ -139,6 +139,14 @@ namespace HiSql
 
 
         /// <summary>
+        /// 执行结果
+        /// </summary>
+        /// <param name="credentialCallback">返回操作凭证</param>
+        /// <returns></returns>
+        Task<int> ExecCommandAsync(Action<HiSql.Interface.TabLog.Credential> credentialCallback);
+
+
+        /// <summary>
         /// 生成该数据库类型的原生sql
         /// </summary>
         /// <returns></returns>
