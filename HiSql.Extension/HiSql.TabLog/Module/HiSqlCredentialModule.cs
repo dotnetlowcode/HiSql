@@ -523,6 +523,8 @@ namespace HiSql.TabLog.Module
                 {
                     await sqlClient.Modi(tableName, modifyRows).ExecCommandAsync((credentialObj) =>
                     {
+                        if (credentialObj == null)
+                            return;
                         credentialObj.RefCredentialId= credentialId;
                         credentialList.Add(credentialObj);
                     });
@@ -531,6 +533,8 @@ namespace HiSql.TabLog.Module
                 {
                     await sqlClient.Delete(tableName, delRows).ExecCommandAsync((credentialObj) =>
                     {
+                        if (credentialObj== null)
+                            return;
                         credentialObj.RefCredentialId= credentialId;
                         credentialList.Add(credentialObj);
                     });
