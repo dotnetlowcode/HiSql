@@ -93,7 +93,6 @@ namespace HiSql.TabLog.Service
         /// </summary>
         Dictionary<string, HiSqlClient> dbClient = new Dictionary<string, HiSqlClient>();
 
-
         public async Task MainTask()
         {
             var credentialList = TabLogQueue.DequeueLog();
@@ -121,7 +120,9 @@ namespace HiSql.TabLog.Service
                     var mainLogTableName = credential.tableLogConfig.MainTabLog;
                     var detailLogTableName = credential.tableLogConfig.DetailTabLog;
                     if (credential.tableLogConfig.IsSplitLog == 1)
-                        detailLogTableName = detailLogTableName + DateTime.Now.ToString(credential.tableLogConfig.SplitFormat);
+                        detailLogTableName =
+                            detailLogTableName
+                            + DateTime.Now.ToString(credential.tableLogConfig.SplitFormat);
 
                     if (result != null)
                     {
@@ -156,7 +157,10 @@ namespace HiSql.TabLog.Service
                 {
                     if (!tableExists.ContainsKey(tableGroup.Key))
                     {
-                        InstallTableLog.CreateTableByTemplate<Hi_MainLog>(hiSqlClient, tableGroup.Key);
+                        InstallTableLog.CreateTableByTemplate<Hi_MainLog>(
+                            hiSqlClient,
+                            tableGroup.Key
+                        );
                         tableExists.Add(tableGroup.Key, true);
                     }
                     await hiSqlClient.Insert(tableGroup.Key, tableGroup.Value).ExecCommandAsync();
@@ -166,7 +170,10 @@ namespace HiSql.TabLog.Service
                     //看表是否存在，不存在就创建
                     if (!tableExists.ContainsKey(tableGroup.Key))
                     {
-                        InstallTableLog.CreateTableByTemplate<Hi_DetailLog>(hiSqlClient, tableGroup.Key);
+                        InstallTableLog.CreateTableByTemplate<Hi_DetailLog>(
+                            hiSqlClient,
+                            tableGroup.Key
+                        );
                         tableExists.Add(tableGroup.Key, true);
                     }
                     await hiSqlClient.Insert(tableGroup.Key, tableGroup.Value).ExecCommandAsync();
@@ -175,14 +182,11 @@ namespace HiSql.TabLog.Service
                 //watch.Stop();
                 //Console.WriteLine($"独立日志{mainLogs.Count}条，保存耗时：{watch.ElapsedMilliseconds}ms");
             }
-
         }
 
         public Tuple<Hi_MainLog, List<Hi_DetailLog>> BuildCredentialLogs(Credential credential)
         {
             var settingObj = (Hi_TabManager)credential.State;
-            var credentialId = SnroNumber.NewNumber(settingObj.SNRO, settingObj.SNUM);
-            credential.CredentialId = credentialId;
             var operateUserName = credential.OperateUserName;
             var operateLogs = credential.OperationLogs;
             //分别统计Insert、Update、Delete的操作日志条数
@@ -277,8 +281,5 @@ namespace HiSql.TabLog.Service
                 return null;
             return new Tuple<Hi_MainLog, List<Hi_DetailLog>>(mainLog, dbLogs);
         }
-
-
-
     }
 }
