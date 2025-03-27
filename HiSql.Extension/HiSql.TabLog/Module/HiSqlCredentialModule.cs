@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Dynamic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using HiSql.Common.Entities.TabLog;
 using HiSql.Interface.TabLog;
@@ -131,10 +132,10 @@ namespace HiSql.TabLog.Module
                         }
                     }
                     //计时
-                    var watch = Stopwatch.StartNew();
+                    //var watch = Stopwatch.StartNew();
                     updateOldList = await mainClient.Query(tableName).Field("*").Where(oldDataFilter).ToEObjectAsync();
-                    watch.Stop();
-                    Console.WriteLine($"记录老数据查询耗时：{watch.ElapsedMilliseconds}ms");
+                    //watch.Stop();
+                    //Console.WriteLine($"记录老数据查询耗时：{watch.ElapsedMilliseconds}ms");
                 }
                 else
                 {
@@ -252,7 +253,7 @@ namespace HiSql.TabLog.Module
             return Task.CompletedTask;
         }
 
-        protected Hi_TabManager GetTableLogSetting(string tableName, HiSqlClient client)
+        public static Hi_TabManager GetTableLogSetting(string tableName, HiSqlClient client)
         {
             var cacheKey = "HiSqlOperateAndLog:" + tableName;
             var tableLogSetting = CacheContext.Cache.GetCache<Hi_TabManager>(cacheKey);
@@ -279,24 +280,85 @@ namespace HiSql.TabLog.Module
             return setting;
         }
 
+
+
+        public delegate IQuery QueryWhereBuilder(IQuery query, Hi_TabManager setting);
+
         /// <summary>
         /// 获取表日志数据详情
         /// </summary>
         /// <param name="state"></param>
         /// <param name="queryWhereBuilder"></param>
         /// <returns></returns>
-        public static async Task<Tuple<List<ExpandoObject>, int>> GetTableDetailLogs(
-            object state,
-            Func<IQuery, IQuery> queryWhereBuilder
+        public static async Task<Tuple<List<Hi_DetailLog>, int>> GetTableLogDetail(
+            HiSqlClient hiSqlClient,
+            string tableName,
+            string certId,
+            QueryWhereBuilder queryWhereBuilder
         )
         {
-            var tabManagerObj = (Hi_TabManager)state;
+            var tabManagerObj = GetTableLogSetting(tableName,hiSqlClient);
+            using (var queryClient = InstallTableLog.GetSqlClientByName(tabManagerObj.DbServer))
+            {
+                var mainLog = hiSqlClient.Query(tabManagerObj.MainTabLog).Field("*").Where(new Filter {
+                       { "LogId", OperType.EQ, certId }
+                   }).ToList<Hi_MainLog>().FirstOrDefault();
+                IQuery query = queryClient
+                    .Query(mainLog.DetailTabLog).Field("*");
+                query = queryWhereBuilder(query, tabManagerObj);
+                var totalCount = 0;
+                var list =  query.ToList<Hi_DetailLog>(ref totalCount);
+                return Tuple.Create(list, totalCount);
+            }
+        }
 
-            //MCount,CCount,DCount,IsRecover,RefLogId
+        /// <summary>
+        /// 获取日志主表数据
+        /// </summary>
+        /// <param name="state"></param>
+        /// <param name="queryWhereBuilder"></param>
+        /// <returns></returns>
+        public static async Task<Tuple<List<Hi_MainLog>, int>> GetTableMainLogs(
+            HiSqlClient hiSqlClient,
+            string tableName,
+            QueryWhereBuilder queryWhereBuilder
+        )
+        {
+            var state= GetTableLogSetting(tableName, hiSqlClient);
+            using (var queryClient = InstallTableLog.GetSqlClientByName(state.DbServer))
+            {
+                IQuery query = queryClient.Query(state.MainTabLog).Where(new Filter {
+                    {"TabName",OperType.EQ,tableName}
+                });
+                query = queryWhereBuilder(query,state);
+                var totalCount = 0;
+                var tempSql = query.ToSql();
+                var list =  query.ToList<Hi_MainLog>(ref totalCount);
+                return Tuple.Create(list, totalCount);
+            }
+        }
+
+
+
+
+        /// <summary>
+        /// 连表日志数据
+        /// </summary>
+        /// <param name="state"></param>
+        /// <param name="queryWhereBuilder"></param>
+        /// <returns></returns>
+        public static async Task<Tuple<List<ExpandoObject>, int>> GetTableDetailLogs(
+             HiSqlClient hiSqlClient,
+             string tableName,
+             string detailLogTableName,
+            QueryWhereBuilder queryWhereBuilder
+        )
+        {
+            var tabManagerObj = GetTableLogSetting(tableName, hiSqlClient);
             using (var queryClient = InstallTableLog.GetSqlClientByName(tabManagerObj.DbServer))
             {
                 IQuery query = queryClient
-                    .Query(tabManagerObj.DetailTabLog)
+                    .Query(detailLogTableName)
                     .As("t1")
                     .Field(
                         "t1.*",
@@ -309,38 +371,15 @@ namespace HiSql.TabLog.Module
                     .Join(tabManagerObj.MainTabLog, JoinType.Right)
                     .As("t2");
                 query = query
-                    .On(new JoinOn { { "t1.LogId", "t2.LogId" }, { "t1.TabName", "t2.TabName" } })
-                    .Sort("t1.CreateTime desc");
-                query = queryWhereBuilder(query);
+                    .On(new JoinOn { { "t1.LogId", "t2.LogId" }, { "t1.TabName", "t2.TabName" } });
+                query = queryWhereBuilder(query,tabManagerObj);
                 var totalCount = 0;
-                var tempSql = query.ToSql();
                 var list = await query.ToEObjectAsync(ref totalCount);
                 return Tuple.Create(list, totalCount);
             }
         }
 
-        /// <summary>
-        /// 获取日志主表数据
-        /// </summary>
-        /// <param name="state"></param>
-        /// <param name="queryWhereBuilder"></param>
-        /// <returns></returns>
-        public static async Task<Tuple<List<ExpandoObject>, int>> GetTableMainLogs(
-            Hi_TabManager state,
-            Func<IQuery, IQuery> queryWhereBuilder
-        )
-        {
-            //MCount,CCount,DCount,IsRecover,RefLogId
-            using (var queryClient = InstallTableLog.GetSqlClientByName(state.DbServer))
-            {
-                IQuery query = queryClient.Query(state.MainTabLog).Sort("CreateTime desc");
-                query = queryWhereBuilder(query);
-                var totalCount = 0;
-                var tempSql = query.ToSql();
-                var list = await query.ToEObjectAsync(ref totalCount);
-                return Tuple.Create(list, totalCount);
-            }
-        }
+
 
         public override async Task<Credential> RecordLog(
             HiSqlProvider sqlProvider,
@@ -356,9 +395,18 @@ namespace HiSql.TabLog.Module
                 await func();
                 return credentialObj;
             }
-            Stopwatch watch;
+            //Stopwatch watch;
             using (var sqlClient = sqlProvider.CloneClient())
             {
+                var settingObj = GetTableLogSetting(tableName, sqlClient);
+                //未设置日志配置或未打开日志功能
+                if (settingObj == null || settingObj.IsLog == 0)
+                {
+                    //输出警告日志
+                    Console.WriteLine($"警告：未设置日志配置或未打开日志功能,但HiSql配置中却打开了，表名：{tableName}");
+                    await func();
+                    return credentialObj;
+                }
                 int cCount = 0;
                 int dCount = 0;
                 int mCount = 0;
@@ -366,14 +414,11 @@ namespace HiSql.TabLog.Module
                     async (tabName) =>
                     {
                         //获取表日志设置耗时
-                        watch = Stopwatch.StartNew();
-                        var state = GetTableLogSetting(tableName, sqlClient);
-                        if (state == null)
-                            throw new Exception($"表{tableName}未设置日志设置");
-                        watch.Stop();
-                        Console.WriteLine($"获取表日志设置耗时：{watch.ElapsedMilliseconds}ms");
+                        //watch = Stopwatch.StartNew();
+                        //watch.Stop();
+                        //Console.WriteLine($"获取表日志设置耗时：{watch.ElapsedMilliseconds}ms");
                         //应用数据操作耗时
-                        watch = Stopwatch.StartNew();
+                        //watch = Stopwatch.StartNew();
                         var operateLogs = await ApplyDataOperate(
                             sqlClient,
                             modiData,
@@ -387,14 +432,14 @@ namespace HiSql.TabLog.Module
                                 mCount = updateCount;
                             }
                         );
-                        watch.Stop();
-                        Console.WriteLine($"应用数据操作耗时：{watch.ElapsedMilliseconds}ms");
-                        return Tuple.Create(operateLogs, state as object);
+                        //watch.Stop();
+                        //Console.WriteLine($"应用数据操作耗时：{watch.ElapsedMilliseconds}ms");
+                        return Tuple.Create(operateLogs, settingObj as object);
                     },
                     tableName,
                     sqlClient.CurrentConnectionConfig.User
                 );
-                credentialObj.TableName= tableName;
+                credentialObj.TableName = tableName;
                 credentialObj.CCount = cCount;
                 credentialObj.DCount = dCount;
                 credentialObj.MCount = mCount;
@@ -478,6 +523,7 @@ namespace HiSql.TabLog.Module
                 {
                     await sqlClient.Modi(tableName, modifyRows).ExecCommandAsync((credentialObj) =>
                     {
+                        credentialObj.RefCredentialId= credentialId;
                         credentialList.Add(credentialObj);
                     });
                 }
@@ -485,6 +531,7 @@ namespace HiSql.TabLog.Module
                 {
                     await sqlClient.Delete(tableName, delRows).ExecCommandAsync((credentialObj) =>
                     {
+                        credentialObj.RefCredentialId= credentialId;
                         credentialList.Add(credentialObj);
                     });
                 }

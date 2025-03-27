@@ -26,55 +26,56 @@ namespace HiSql.TabLog.Ext
             services.AddSingleton<ICredentialModule, HiSqlCredentialModule>();
             //注册后台日志保存服务
             services.AddHostedService<BackgroundTabLogService>();
-            SnroNumber.ConnectionString = getSqlClientByName(
-                ""
-            ).CurrentConnectionConfig.ConnectionString;
             Global.SnroOn = true;
             return services;
         }
 
-        //public static Task SetupTable(
-        //    HiSqlClient sqlClient,
-        //    Func<string, HiSqlClient> _getSqlClientByName
-        //)
-        //{
-        //    GetSqlClientByName = _getSqlClientByName;
-        //    List<Type> _tabTypes = new List<Type> { typeof(ILogTable) };
-        //    var _listType = AppDomain
-        //        .CurrentDomain.GetAssemblies()
-        //        .SelectMany(a => a.GetTypes())
-        //        .Where(t =>
-        //            _tabTypes.Any(k => k.IsAssignableFrom(t) && t != k) && t.IsClass && t.IsPublic
-        //        )
-        //        .ToList();
 
-        //    bool _isInit = true;
-        //    foreach (var type in _listType)
-        //    {
-        //        var tableName = type.Name;
-        //        //获取type的属性标记
-        //        var _attrs = type.GetCustomAttributes(typeof(HiSql.HiTable), true);
-        //        if (_attrs.Length > 0)
-        //        {
-        //            var tableSetting = _attrs[0] as HiSql.HiTable;
-        //            tableName = tableSetting?.TabName;
-        //        }
-        //        bool _isExits = sqlClient.DbFirst.CheckTabExists(tableName);
-        //        if (!_isExits)
-        //        {
-        //            if (!sqlClient.DbFirst.CreateTable(type))
-        //            {
-        //                Console.WriteLine($"\t\t创建表[{tableName}]失败...");
-        //                _isInit = false; //有一个创建失败就代表失败
-        //            }
-        //            else
-        //                Console.WriteLine($"\t\t创建表[{type.Name}]成功...");
-        //        }
-        //        else
-        //            Console.WriteLine($"\t\t表[{type.Name}]已经存在");
-        //    }
-        //    return Task.CompletedTask;
-        //}
+
+
+        /// <summary>
+        /// 安装日志扩展表
+        /// </summary>
+        /// <param name="sqlClient"></param>
+        /// <returns></returns>
+        public static Task SetupLogTable(HiSqlClient sqlClient)
+        {
+            List<Type> _tabTypes = new List<Type> { typeof(ILogTable) };
+            var _listType = AppDomain
+                .CurrentDomain.GetAssemblies()
+                .SelectMany(a => a.GetTypes())
+                .Where(t =>
+                    _tabTypes.Any(k => k.IsAssignableFrom(t) && t != k) && t.IsClass && t.IsPublic
+                )
+                .ToList();
+            bool _isInit = true;
+            foreach (var type in _listType)
+            {
+                var tableName = type.Name;
+                //获取type的属性标记
+                var _attrs = type.GetCustomAttributes(typeof(HiSql.HiTable), true);
+                if (_attrs.Length > 0)
+                {
+                    var tableSetting = _attrs[0] as HiSql.HiTable;
+                    tableName = tableSetting?.TabName;
+                }
+                bool _isExits = sqlClient.DbFirst.CheckTabExists(tableName);
+                if (!_isExits)
+                {
+                    if (!sqlClient.DbFirst.CreateTable(type))
+                    {
+                        Console.WriteLine($"\t\t创建表[{tableName}]失败...");
+                        _isInit = false; //有一个创建失败就代表失败
+                    }
+                    else
+                        Console.WriteLine($"\t\t创建表[{type.Name}]成功...");
+                }
+                else
+                    Console.WriteLine($"\t\t表[{type.Name}]已经存在");
+            }
+            return Task.CompletedTask;
+
+        }
 
 
 
@@ -95,7 +96,8 @@ namespace HiSql.TabLog.Ext
             {
                 lock (dbLock)
                 {
-                    if (!dbLock.ContainsKey(tableName)){
+                    if (!dbLock.ContainsKey(tableName))
+                    {
                         dbLock.Add(tableName, new object());
                     }
                 }
@@ -103,7 +105,7 @@ namespace HiSql.TabLog.Ext
 
             lock (dbLock[tableName])
             {
-                var sqlClient= GetSqlClientByName(logTable.DbServer);
+                var sqlClient = GetSqlClientByName(logTable.DbServer);
                 //检查主键编号规则是否存在,放在本库,不放存储库
                 checkPrimaryKey(sqlClient, logTable);
                 //for (int i = 0; i < 2; i++)

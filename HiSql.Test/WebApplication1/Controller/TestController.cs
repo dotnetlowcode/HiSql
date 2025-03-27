@@ -1,4 +1,5 @@
 using HiSql;
+using HiSql.TabLog.Module;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
@@ -55,16 +56,16 @@ namespace WebApplication1.Controller
         [HttpGet]
         public async Task<object> UpdateTest()
         {
-            object creObj=null;
-            var updateResult = await hiSqlClient
+            object creObj = null;
+            var updateResult = hiSqlClient
                 .Update("test", new
                 {
                     Desc = "UpdateOnly22"
                 })
                 .Where(
-                    new Filter() { { "Id", OperType.EQ, "R6261325320" }, { "Name", OperType.EQ, "1111" } }
+                    new Filter() { { "Id", OperType.EQ, "R1779617504" }, { "Name", OperType.EQ, "1111" } }
                 )
-                .ExecCommandAsync((tempCreObj) =>
+                .ExecCommand((tempCreObj) =>
                 {
                     creObj = tempCreObj;
                 });
@@ -175,6 +176,18 @@ namespace WebApplication1.Controller
                 return "需要参数" + credentialId;
             var creList = await hiSqlClient.RollbackCredential("test", credentialId);
             return creList;
+        }
+
+        [HttpGet]
+        public async Task<object> GetTableLog()//[FromQuery] string detailTableName, [FromQuery] string tableName
+        {
+            var tableName = "test";
+            var detailTableName = "Th_DetailLog202503";
+            return await HiSqlCredentialModule.GetTableDetailLogs(hiSqlClient, tableName, detailTableName, (query, settingObj) =>
+               {
+                   query = query.Sort(["CreateTime asc"]);
+                   return query;
+               });
         }
 
     }

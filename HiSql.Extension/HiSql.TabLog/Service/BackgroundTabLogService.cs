@@ -139,7 +139,7 @@ namespace HiSql.TabLog.Service
                             detailLogs[detailLogTableName].AddRange(detailLog);
                     }
                 }
-                var watch = Stopwatch.StartNew();
+                //var watch = Stopwatch.StartNew();
                 HiSqlClient hiSqlClient = null;
                 if (!dbClient.ContainsKey(group.Key))
                 {
@@ -172,8 +172,8 @@ namespace HiSql.TabLog.Service
                     await hiSqlClient.Insert(tableGroup.Key, tableGroup.Value).ExecCommandAsync();
                 }
                 //hiSqlClient.CommitTran();
-                watch.Stop();
-                Console.WriteLine($"独立日志{mainLogs.Count}条，保存耗时：{watch.ElapsedMilliseconds}ms");
+                //watch.Stop();
+                //Console.WriteLine($"独立日志{mainLogs.Count}条，保存耗时：{watch.ElapsedMilliseconds}ms");
             }
 
         }

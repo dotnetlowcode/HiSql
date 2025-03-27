@@ -1077,14 +1077,6 @@ namespace HiSql
             );
         }
 
-        static string[] tableLogSysTables = new string[]
-        {
-            "Hi_TabManager",
-            "Hi_DetailLog",
-            "Hi_MainLog",
-            "#",
-            "@"
-        };
 
         private static bool IgnoreLogTable(string tableName)
         {
