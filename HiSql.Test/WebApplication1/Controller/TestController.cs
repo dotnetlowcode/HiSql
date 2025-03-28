@@ -62,9 +62,10 @@ namespace WebApplication1.Controller
                 {
                     Desc = "UpdateOnly22"
                 })
-                .Where(
-                    new Filter() { { "Id", OperType.EQ, "R1779617504" }, { "Name", OperType.EQ, "1111" } }
-                )
+                //.Where(
+                //    new Filter() { { "Id", OperType.EQ, "R1779617504" }, { "Name", OperType.EQ, "1111" } }
+                //)
+                .Where("Id='R1000009932144' and Name='1111'")
                 .ExecCommand((tempCreObj) =>
                 {
                     creObj = tempCreObj;
@@ -82,13 +83,14 @@ namespace WebApplication1.Controller
         {
             var deleteResult = await hiSqlClient
                 .Delete("test")
-                .Where(
-                    new Filter()
-                    {
-                        { "Id", OperType.EQ, "R109198543" },
-                        { "Name", OperType.EQ, "1111" }
-                    }
-                )
+                 //.Where(
+                 //    new Filter()
+                 //    {
+                 //        { "Id", OperType.EQ, "R109198543" },
+                 //        { "Name", OperType.EQ, "1111" }
+                 //    }
+                 //)
+                 .Where("Id='R1779617504' and Name='1111'")
                 .ExecCommandAsync();
             return deleteResult;
         }
