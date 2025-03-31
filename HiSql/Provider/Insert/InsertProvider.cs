@@ -1758,7 +1758,7 @@ namespace HiSql
                         if (dic.ContainsKey(key))
                         {
                             string v = dic[key];
-                            if (v.Equals("''"))
+                            if (v.Equals("''") || v.Equals("N''"))
                             {
                                 if (dic_listnum[key].Count > 0)
                                 {
