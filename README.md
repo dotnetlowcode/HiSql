@@ -1,8 +1,8 @@
-# HiSql 
+# HiSql
 目前的ORM框架对是基于实体的，包发生变化或增加字段时比较麻烦，所以有了开发无体实ORM的想法,结合项目中对于数据库中操作的痛点通过HiSql来实现解决
 支持常用的数据库且国内第一个支持Hana的ORM框架
 ### 特点
-1. 支持无实体数据交互，（无需要创建实体类） 
+1. 支持无实体数据交互，（无需要创建实体类）
 2. 数据动态检测（类型，长度 与表结构预先匹配）
 3. 语法更帖近于原生SQL
 4. 支持超时监控（如监控过5S的执行的SQL语 并记录）
@@ -14,7 +14,7 @@
 
 1. 引用HiSql.dll文件
 2. 根据使用数据库的需要可以引用以下数据库实现的sdk
-   1. HiSql.sqlserver.dll 
+   1. HiSql.sqlserver.dll
    2. HiSql.hana.dll
    3. HiSql.mysql.dll
    4. HiSql.oracle.dll
@@ -29,7 +29,7 @@
 为了更好的服务于真正使用hisql的用户， 进群的伙伴必须是在github或gitee 上star了hisql项目或进行过捐的伙伴的方能进群
 
 
-### 初始安装 
+### 初始安装
 注：只需要执行一次即可
 ```c#
    sqlclient.CodeFirst.InstallHisql();
@@ -39,6 +39,132 @@
  目前流行的ORM框架如果需要动态的拼接查询语句，只能用原生的sql进行拼接，无法跨不同数据库执行。hisql推出新的语法一套语句可以在不同的数据库执行
 
 传统ORM框架最大的弊端就是完全要依赖于实体用lambda表达式写查询语句，但最大的问题就是如果业务场景需要动态拼接条件时只能又切换到原生数据库的sql语句进行完成，如果自行拼接开发人员还要解决防注入的问题,hisql 刚才完美的解决这些问题,Hisql底层已经对sql注入进行了处理，开发人员只要关注于业务开发
+
+
+# 项目更新日志
+
+## 2025年3月28日 发布更新
+
+本次更新新增了强大的日志记录模块，允许您记录表的所有更改，并通过生成的凭证 ID 进行数据反向恢复。
+
+### 1. 新增日志记录模块
+
+* **功能描述：**
+    * 记录所有表数据变更（新增、修改、删除）。
+    * 通过凭证 ID 实现数据回滚。
+* **安装和配置：**
+
+    1.  **NuGet 安装模块：**
+
+        安装 `HiSql.TabLog` 项目。
+
+    2.  **启动类 (Program.cs) 配置：**
+
+        * **初始化配置：**
+
+            ```csharp
+            builder.Services.AddTabLogServer((dbName)=>{
+                return HiSqlClient;
+            });
+            ```
+
+        * **增加扩展并初始化：**
+
+            在 `Program.cs` 中调用 `app.UseWebInit();`。
+
+            ```csharp
+            public static class WebExt
+            {
+                public static IApplicationBuilder UseWebInit(this IApplicationBuilder app)
+                {
+                    using (var sqlClient = DIServiceResolve.GetSqlClientByName(DbServerName.MainServer))
+                    {
+                        HiSql.TabLog.Ext.InstallTableLog.SetupLogTable(sqlClient).ConfigureAwait(false).GetAwaiter().GetResult();
+                    }
+                    return app;
+                }
+            }
+            ```
+
+    3.  **基本配置：**
+
+        完成上述配置后，需要进行表日志配置。
+
+## 日志功能启用条件
+
+**重要：** 日志功能是否生效取决于以下两个条件：
+
+* `Hi_TabModel` 表中 `IsLog` 字段必须设置为 `True`。
+* `Hi_TabManager` 表中 `IsLog` 字段必须设置为 `1`。
+
+## 日志切割功能
+
+为了应对频繁操作导致日志文件过大的情况，我们引入了日志切割功能。
+
+### 如何启用日志切割
+
+1.  在 `Hi_TabManager` 表中，将 `IsSplitLog` 字段设置为 `1`。
+2.  设置 `LogSplitFormat` 字段，指定日志文件切割的日期格式。
+
+### 日志切割格式
+
+`LogSplitFormat` 字段支持常见的日期格式，例如：
+
+* `yyyyMMdd` (年月日)
+* `yyyy-MM` (年-月)
+* `yyyyMM` (年月)
+
+* **`Hi_TabManager` 表日志配置：**
+
+    在 `Hi_TabManager` 表中添加日志配置。
+
+    | TabName | DbServer     | IsLog | MainTabLog | DetailTabLog | SNROSNUM | IsSplitLog | LogSplitFormat | IsRecover | IsDelLogModel | StoreDay | Remark     | CreateTime                | CreateName | ModiTime                  | ModiName |
+    | :------ | :----------- | :---- | :--------- | :----------- | :------- | :--------- | :------------- | :-------- | :------------ | :------- | :--------- | :------------------------ | :--------- | :------------------------ | :------- |
+    | test    | MainServer | 1     | Th_MainLog | Th_DetailLog | LogNum   | 1          | yyyMM          | 1         | HiSql         | 1000     | HiSql      | 2025-03-24 16:55:17.085028 | HiSql      | 2025-03-26 13:05:32.032 | HiSql    |
+
+* **凭证 ID 自增主键配置：**
+
+    | SNROSNUM | IsSnow | SnowTickStartNum | EndNum  | CurrNum | CurrAllNum | Length | IsNumber | IsHasPre | PreType | FixPreChar | PreCharCacheSpace | CurrCacheSpace | Descript       | CreateTime                | CreateName | ModiTime                  | ModiName |
+    | :------- | :----- | :--------------- | :------ | :------ | :--------- | :----- | :------- | :------- | :------ | :--------- | :---------------- | :------------- | :------------- | :------------------------ | :--------- | :------------------------ | :------- |
+    | LogNum   | 1      | false            | 0       | 1000000 | 9999999    | 1000   | 100      | 20250328 | 11      | 100        | 100               | 7              | true           | 2025-03-27 14:02:06.133431 | HiSql      | 2025-03-28 11:22:45.127 | HiSql    |
+
+### 2. 数据回滚
+
+完成配置后，对 `test` 表进行增、删、改操作时，系统将记录操作日志并返回凭证 ID。
+```csharp
+/// <summary>
+/// 更新测试
+/// </summary>
+/// <returns></returns>
+[HttpGet]
+public async Task<object> UpdateTest()
+{
+    HiSql.Interface.TabLog.Credential creObj = null;
+    var updateResult = hiSqlClient
+        .Update("test", new
+        {
+            Desc = "UpdateOnly22"
+        })
+        .Where(
+            new Filter() { { "Id", OperType.EQ, "R1779617504" }, { "Name", OperType.EQ, "1111" } }
+        )
+        .ExecCommand((tempCreObj) =>
+        {
+            creObj = tempCreObj;
+        });
+    return creObj;
+}
+```
+
+
+
+若需要撤回操作，可以使用凭证 ID 进行回滚：
+
+```csharp
+HiSqlClient sqlClient;
+sqlClient.RollbackCredential("test", "凭证Id");
+```
+
 
 ### 2024.4.16 发布更新
 1.修复SQlite 的已经BUG
@@ -73,7 +199,7 @@ var _paramsql = sqlClient.HiSql(@"select * from Hi_FieldModel where tabname in (
 ### 2023.04.11 更新
 1. 修复第一次获取表信息在多线程下会报表错的总是
 2. sqlserver的表结构信息字段为varchar|nvarchar|(max) 转到HANA及其它库抛出异常的问题
-3. 针对于HANA库中表中的字段类型包括[TEXT]类型使用[sqlClient.Modi] 方法抛出错误提示（HANA中的临时表不支持text类型） 
+3. 针对于HANA库中表中的字段类型包括[TEXT]类型使用[sqlClient.Modi] 方法抛出错误提示（HANA中的临时表不支持text类型）
 
 事务优化
 如果业务中需要使用多表且多动作更新请参数以下定法
@@ -89,7 +215,7 @@ void transDemo(HiSqlClient sqlClient)
     sqlClient.Delete(tabname).ExecCommand();
 
     using (var sqlClt = sqlClient.CreateUnitOfWork())
-    { 
+    {
         sqlClt.Insert(tabname, lstdata).ExecCommand();
 
         sqlClt.Modi(tabname, lstdata).ExecCommand();
@@ -284,7 +410,7 @@ HiSql.SnroNumber.SqlClient = sqlClient;
 
 
 2. 配置编号
-   
+
 ```c#
 List<object> list = new List<object>();
 ///生成销售订单编码 每分钟从0开始编号 如20220602145800001-20220602145899999
@@ -300,7 +426,7 @@ sqlClient.Modi("Hi_Snro", list).ExecCommand();
 ![](http://hisql.net/images/demo/h_test5.png)
 
 1. 绑定配置
-   
+
 
 
 ```c#
@@ -314,8 +440,8 @@ sqlClient.Update("hi_fieldmodel", new { TabName = "H_Test5", FieldName = "sid", 
 ```
 
 5. 插入数据
-   
-```c# 
+
+```c#
 List<object> list = new List<object>();
 for (int i = 0; i < 10000; i++)
 {
@@ -329,8 +455,8 @@ sqlClient.Insert("H_Test5", list).ExecCommand();
 ```
 
 6. 查看结果
-   
-   
+
+
 ![](http://hisql.net/images/demo/h_test5_result.png)
 
 
@@ -364,7 +490,7 @@ sqlClient.Insert("H_Test5", list).ExecCommand();
         client.Insert("H_UType", new { UTYP = "U4", UTypeName = "高级用户" }).ExecCommand();
 
         //client.RollBackTran();
-        
+
 
     }
 ```
@@ -444,7 +570,7 @@ One or more errors occurred.(Unknow collation:'utf8mb4_0900_ai_ci')
 详细教程请查看 [hisql 编号详细教程](https://hisql.net/guide/number.html)
 
 
-如下所示 
+如下所示
 1. 配置
 
 ```c#
@@ -455,8 +581,8 @@ One or more errors occurred.(Unknow collation:'utf8mb4_0900_ai_ci')
     //新增流水号配置
     //SNRO 表示主编号名称 SNUM 表示子编号ID
     var obj1 = new { SNRO = "MATDOC", SNUM = 1, IsSnow=false, SnowTick=0, StartNum = "9000000", EndNum = "9999999",Length=7, CurrNum = "9000000", IsNumber = true, IsHasPre = false, CacheSpace = 10, Descript = "物料主数据编号" };
-    
-    
+
+
     //新增雪花ID生成配置
     //SNRO 表示主编号名称 SNUM 表示子编号ID
     var obj2 = new { SNRO = "Order", SNUM = 1, IsSnow=true, SnowTick=145444, StartNum = "", EndNum = "",Length=7, CurrNum = "", IsNumber = true, IsHasPre = false, CacheSpace = 10, Descript = "订单号雪花ID" };
@@ -483,7 +609,7 @@ One or more errors occurred.(Unknow collation:'utf8mb4_0900_ai_ci')
 ```
 
 4. 启用分布式流水号
-   
+
 如果项目是分布式布署的一定要启用以下代码，否则会产生重复ID
 
 ```c#
@@ -561,7 +687,7 @@ IdWorker引擎性能实测生成10000个ID耗时`0.01364 `秒
     for (int i = 0; i < 10000; i++)
     {
         lst.Add(Snowflake.NextId());
-       
+
     }
     sw.Stop();
     Console.WriteLine($"耗时：{sw.Elapsed}秒");
@@ -727,7 +853,7 @@ hisql缓存支持多级缓存，优先取MemoryCache，再找redis缓存,如下�
     DataTable dt = sqlClient.HiSql("select * from GD_UniqueCodeInfo").ToTable();
     TabInfo tabInfo = sqlClient.Context.DMInitalize.GetTabStruct("GD_UniqueCodeInfo");
 
-    // TempType = Extension.TempType.HEADER 
+    // TempType = Extension.TempType.HEADER
     HiSql.Extension.Excel excel = new HiSql.Extension.Excel(new Extension.ExcelOptions() { TempType = Extension.TempType.HEADER });
     excel.Add(new Extension.ExcelHeader(1).Add("表名").Add("GD_UniqueCodeInfo"));//标识表名
 
@@ -763,7 +889,7 @@ hisql缓存支持多级缓存，优先取MemoryCache，再找redis缓存,如下�
 
 
 2. 生成带数据库字段标题的excel
-   
+
 生成excel
 ```c#
     HiSqlClient sqlClient = Demo_Init.GetSqlClient();
@@ -830,7 +956,7 @@ HiSql.Global.RedisOptions = new RedisOptions { Host = "172.16.80.178", PassWord 
 
 ### 2022.4.15 更新
 
-1. 新增获取表记录数 
+1. 新增获取表记录数
 ```c#
 //返回表Hi_FieldModel 中的记录数
 int lsttales = sqlClient.DbFirst.GetTableDataCount("Hi_FieldModel");
@@ -1030,7 +1156,7 @@ if (rtn.Item1)
 else
     Console.WriteLine(rtn.Item2);//输出失败原因
 ```
-6.  
+6.
 
 7.  自定义表结构TabInfo 自动同步变更物理表结构信息
 ```c#
@@ -1071,8 +1197,8 @@ foreach (TableInfo tableInfo in lsttales)
 ```c#
 //OpLevel.Execute  表示执行并返回生成的SQL
 //OpLevel.Check 表示仅做检测失败时返回消息且检测成功时返因生成的SQL
-var rtn = sqlClient.DbFirst.CreateView("vw_FModel", 
-    sqlClient.HiSql("select a.TabName,b.TabReName,b.TabDescript,a.FieldName,a.SortNum,a.FieldType from Hi_FieldModel as a inner join Hi_TabModel as b on a.TabName=b.TabName").ToSql(), 
+var rtn = sqlClient.DbFirst.CreateView("vw_FModel",
+    sqlClient.HiSql("select a.TabName,b.TabReName,b.TabDescript,a.FieldName,a.SortNum,a.FieldType from Hi_FieldModel as a inner join Hi_TabModel as b on a.TabName=b.TabName").ToSql(),
     OpLevel.Execute);
 
 if (rtn.Item1)
@@ -1141,7 +1267,7 @@ List<TabIndexDetail> lstindexdetails = sqlClient.DbFirst.GetTabIndexDetail("Hi_F
 foreach (TabIndexDetail tabIndexDetail in lstindexdetails)
 {
     Console.WriteLine($"TabName:{tabIndexDetail.TabName} IndexName:{tabIndexDetail.IndexName} IndexType:{tabIndexDetail.IndexType} ColumnName:{tabIndexDetail.ColumnName}");
-    
+
 }
 ```
 16. 删除指定索引
@@ -1180,7 +1306,7 @@ for (int i = 0; i < _count; i++)
     lstdata.Add(new Dictionary<string, object> { { "SID", (i + 1) }, { "UName", $"tansar{i}" }, { "Age", 20 + (i % 50) }, { "Salary", 5000 + (i % 2000) + random.Next(10) }, { "descript", "hello world" } });
 }
 
-int _effect = sqlClient.BulkCopyExecCommand("HTest01", lstdata); 
+int _effect = sqlClient.BulkCopyExecCommand("HTest01", lstdata);
 
 ```
 
@@ -1192,7 +1318,7 @@ int _effect = sqlClient.BulkCopyExecCommand("HTest01", lstdata);
 1. CodeFirst增加表删除功能
 ```c#
 sqlClient.CodeFirst.DropTable("H_Test4");
-``` 
+```
 2. CodeFirst 增加创建表功能
 ```c#
 
@@ -1212,7 +1338,7 @@ sqlClient.CodeFirst.CreateTable(typeof(H_Test4));
 ### 2021.12.25 更新
 1. 新增Update的where条件支持Hisql语句 hisql写法请参考2021.12.10-15更新
 ```c#
-//Where方法中可以写HiSql语法的条件 
+//Where方法中可以写HiSql语法的条件
 sqlClient.Update("H_Test").Set(new { UNAME = "UTYPE" }).Where("DID=1").ExecCommand();
 
 ```
@@ -1416,12 +1542,12 @@ HiSqlClient sqlclient = new HiSqlClient(
                  {
                      DbType = DBType.SqlServer,
                      DbServer="local-HoneBI",
-                     ConnectionString = "server=(local);uid=sa;pwd=H---#$3;database=hisql;",//; 
+                     ConnectionString = "server=(local);uid=sa;pwd=H---#$3;database=hisql;",//;
                      Schema = "dbo",
                      IsEncrypt = true,
                      IsAutoClose = false,
                      SqlExecTimeOut=60000,
-                     
+
                      AppEvents = new AopEvent()
                      {
                          OnDbDecryptEvent = (connstr) =>
@@ -1457,7 +1583,7 @@ HiSqlClient sqlclient = new HiSqlClient(
 
 ```
 
-### 初始安装 
+### 初始安装
 注：只需要执行一次即可
 ```c#
 sqlclient.CodeFirst.InstallHisql();
@@ -1468,7 +1594,7 @@ sqlclient.CodeFirst.InstallHisql();
 ### 表数据插入
 1. 单表单条数据插入
     Insert语法
-    参1："Hi_DataElement" 
+    参1："Hi_DataElement"
 
         可以是一个物理表也可以是临时表
     临时表的写法如 "#Hi_DataElement" 用1个#号表示 本地临时表 两个#号表示是全局临时表
@@ -1476,7 +1602,7 @@ sqlclient.CodeFirst.InstallHisql();
 
     参2：new { domain = "UTYPE" }
 
-        可以是匿名类也可以是实体类，匿名类的属性不区分大小写 如字段写的是[domain] 数据库中的字段为Domain 也默认就是对应的是Domain 
+        可以是匿名类也可以是实体类，匿名类的属性不区分大小写 如字段写的是[domain] 数据库中的字段为Domain 也默认就是对应的是Domain
 
     注：HiSql将会自动校验插入的值的类型，长度是否与底层目标数据库相匹配如果不匹配将会检测报错
 
@@ -1488,7 +1614,7 @@ sqlclient.CodeFirst.InstallHisql();
     以上语句并不会立即执行插入如要执行插入如下所示
     ```c#
     sqlclient.Insert("Hi_DataElement", new { domain = "UTYPE" }).ExecCommand();
-    
+
     ```
     查看生成的sql语句 通过以下方式也可以知道hisql底层对于当前类型的数据库生成的sql语句
 
@@ -1536,10 +1662,10 @@ sqlclient.CodeFirst.InstallHisql();
     ```
 ---
 
-3. 如果在表里存在就更新没有则更新 
+3. 如果在表里存在就更新没有则更新
    其实我们经常在业务开发中有这种业务场景，如果有该记录存在则更新没有则插入数据，一般是用存储过程或单独写sql语句，这两种方式都比较麻烦,而hisql提供了更加方便的写法如下所示
    注：如果当前表的主键是自增长的id 则无法使用该功能 HiSql检漏时会报异常
-   
+
     ```c#
     //当该记录存在时就会更新，不存在则会插入 支持批量操作
      sqlClient.Modi("H_Test", new { Hid = 1, UserName = "tansar", UserAge = 100, ReName = "Tom" }).ExecCommand();
@@ -1552,7 +1678,7 @@ sqlclient.CodeFirst.InstallHisql();
 ### 表数据查询
 
 1. 单表查询
-    
+
     返回结构可以ToTable ToJson ToList ToDynamic 本例演示ToTable
     1. 查询返回一个DataTable 同时这里也用到了排序
         ```c#
@@ -1581,7 +1707,7 @@ sqlclient.CodeFirst.InstallHisql();
     1. 多表关联并实现条件过滤且进行分页
         ```c#
         DataTable DT_RESULT = sqlclient.Query("Hi_FieldModel", "A").Field("A.FieldName as Fname")
-                    .Join("Hi_TabModel").As("B").On(new JoinOn { { "A.TabName", "B.TabName" } }) 
+                    .Join("Hi_TabModel").As("B").On(new JoinOn { { "A.TabName", "B.TabName" } })
                     .Where(new Filter {
                         {"A.TabName", OperType.EQ, "Hi_FieldModel"},
                         {"A.FieldType",OperType.BETWEEN,new RangDefinition(){ Low=10,High=99} },
@@ -1592,7 +1718,7 @@ sqlclient.CodeFirst.InstallHisql();
 
         ```c#
         DataTable DT_RESULT = sqlclient.Query("Hi_FieldModel", "A").Field("A.FieldName as Fname")
-                .Join("Hi_TabModel").As("B").On(new JoinOn { { "A.TabName", "B.TabName" } }) 
+                .Join("Hi_TabModel").As("B").On(new JoinOn { { "A.TabName", "B.TabName" } })
                 .Where(new Filter {
                     {"A.TabName", OperType.EQ, "Hi_FieldModel"},
                     {"A.FieldType",OperType.BETWEEN,new RangDefinition(){ Low=10,High=99} },
@@ -1619,7 +1745,7 @@ sqlclient.CodeFirst.InstallHisql();
         - count  样例 count(*) as scount
         - avg 样例 avg("score") as avgscore  注：score必须是数值型否则HiSql将会出现错误提示
         - sum 样例 sum("score") as sumscore  注：score必须是数值型否则HiSql将会出现错误提示
-        - min 样例 min("score")  as minscore 
+        - min 样例 min("score")  as minscore
         - max 样例 max("score") as maxscore
 
     4. 多表关联分页查询
@@ -1660,7 +1786,7 @@ sqlclient.CodeFirst.InstallHisql();
     DbRank.DENSERANK  不跳号排名
 
     DbRank.RANK 跳号排名
-    
+
     DbRank.ROWNUMBER 按记录行号排名
     ```c#
     DataTable dt_resultuinon = sqlclient.Query(
@@ -1683,7 +1809,7 @@ sqlclient.CodeFirst.InstallHisql();
 
     in 查询
     ```c#
-    
+
     DataTable dt= sqlClient.Context.DBO.GetDataTable("select * from dbo.Hi_FieldModel where TabName in (:TabName)", new HiParameter(":TabName",new List<string> { "Hi_TabModel", "Hi_FieldModel" }));
     ```
 
@@ -1701,7 +1827,7 @@ sqlclient.CodeFirst.InstallHisql();
 
     ```c#
     int _effect = sqlClient.Update("H_TEST", new { DID = 1, UNAME = "UTYPE", UNAME2 = "user123" }).Exclude("UNAME").ExecCommand();
-    
+
     ```
     以上代码生成的SQL如下,如果字段为主键会自动识别为更新条件，如果没有则会报错误
     ```sql
@@ -1726,7 +1852,7 @@ sqlclient.CodeFirst.InstallHisql();
 
     ```c#
     class H_Test
-    { 
+    {
         public int DID {
             get;set;
         }
@@ -1898,7 +2024,7 @@ SELECT "HI_TABMODEL"."TABNAME" AS "TABNAME",CASE
    WHEN "TABSTATUS" = 0 THEN '未激活'
    ELSE '未启用'
 END AS "TABS"
-,"HI_TABMODEL"."ISSYS" FROM  "HONEBI"."HI_TABMODEL" AS "HI_TABMODEL" 
+,"HI_TABMODEL"."ISSYS" FROM  "HONEBI"."HI_TABMODEL" AS "HI_TABMODEL"
 
 ```
 
