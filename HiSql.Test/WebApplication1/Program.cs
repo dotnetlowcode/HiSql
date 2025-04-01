@@ -1,6 +1,7 @@
 using HiSql.TabLog.Ext;
 using WebApplication1.Helper;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -18,7 +19,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+HiSqlInit.InitApp(app);
 app.MapControllers();
 
 app.Run();

@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
+using System.Net;
+using WebApplication1.Helper;
 
 namespace WebApplication1.Controller
 {
@@ -13,9 +15,12 @@ namespace WebApplication1.Controller
     {
         HiSqlClient hiSqlClient;
 
-        public TableLogController(HiSqlClient _hiSqlClient)
+        IServiceProvider serviceProvider;
+
+        public TableLogController(HiSqlClient _hiSqlClient, IServiceProvider _serviceProvider)
         {
             this.hiSqlClient = _hiSqlClient;
+            serviceProvider = _serviceProvider;
         }
 
 
@@ -26,24 +31,44 @@ namespace WebApplication1.Controller
         [HttpGet]
         public async Task<object> InsertTest()
         {
-            for (int k = 0; k < 10; k++)
+            //for (int k = 0; k < 10; k++)
+            //{
+            //统计执行时间
+            Console.WriteLine("A连接ID:" + this.hiSqlClient.Context.ConnectedId);
+            //await Task.Run(async () =>
+            //      {
+            try
             {
-                //统计执行时间
                 var watch = Stopwatch.StartNew();
                 var dataList = new List<object>();
-                for (int i = 0; i < 1000; i++)
+
+                for (int i = 0; i < 10; i++)
                 {
+                    var newClient = hiSqlClient; //HiSqlInit.serviceProvider.GetService<HiSqlClient>(); //hiSqlClient.Context.CloneClient();
+                    Console.WriteLine(i + "连接ID" + newClient.Context.ConnectedId);
+
+                    await Task.Delay(10);
                     dataList.Add(new
                     {
-                        Id = "R" + new Random().Next().ToString() + i,
+                        Id = "R" + new Random().Next(int.MinValue, int.MaxValue).ToString() + i,
                         Name = "1111",
                         Desc = "Desc"
                     });
+                    var insertValue = await newClient.Modi("test", dataList).ExecCommandAsync();
+                    watch.Stop();
+                    Console.WriteLine("OK" + DateTime.Now.ToString());
+                    //newClient.Dispose();
                 }
-                var insertValue = await hiSqlClient.Insert("test", dataList).ExecCommandAsync();
-                watch.Stop();
-                Console.WriteLine($"执行插入{k} {watch.ElapsedMilliseconds}ms");
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+
+            //});
+
+            //Console.WriteLine($"执行插入{k} {watch.ElapsedMilliseconds}ms");
+            //}
 
             return "OK";
         }
@@ -58,18 +83,15 @@ namespace WebApplication1.Controller
         {
             object creObj = null;
             var updateResult = hiSqlClient
-                .Update("test", new
+                .Update("HTest02", new
                 {
-                    Desc = "UpdateOnly22"
+                    Age = 11
                 })
                 //.Where(
                 //    new Filter() { { "Id", OperType.EQ, "R1779617504" }, { "Name", OperType.EQ, "1111" } }
                 //)
-                .Where("Id='R1000009932144' and Name='1111'")
-                .ExecCommand((tempCreObj) =>
-                {
-                    creObj = tempCreObj;
-                });
+                .Where("SID=1")
+                .ExecCommand();
             return creObj;
         }
 
@@ -145,7 +167,7 @@ namespace WebApplication1.Controller
             {
                new Dictionary<string, object>
                 {
-                    { "Id", "R6261325320" },
+                    { "Id", "R1000009932144" },
                     { "Name", "1111" },
                     { "Desc", "ModifyObjectValue" }
                 },
@@ -162,7 +184,9 @@ namespace WebApplication1.Controller
                     { "Desc", "ModifyStringValue" }
                 }
             };
-            var modiResult = await hiSqlClient.Modi("test", modiData).ExecCommandAsync();
+            var modiResult = await hiSqlClient.Modi("test", modiData).ExecCommandAsync((cert) => { 
+                Console.WriteLine(cert.CredentialId);
+            });
 
             return modiResult;
         }
@@ -187,7 +211,7 @@ namespace WebApplication1.Controller
             var detailTableName = "Th_DetailLog202503";
             return await HiSqlCredentialModule.GetTableDetailLogs(hiSqlClient, tableName, detailTableName, (query, settingObj) =>
                {
-                   query = query.Sort(["CreateTime asc"]);
+                   query = query.Sort(["CreateTime asc"]).Skip(1).Take(1);
                    return query;
                });
         }

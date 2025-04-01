@@ -341,6 +341,13 @@ namespace HiSql
         }
 
 
+        // Dispose 方法：释放资源
+        public void Dispose()
+        {
+            this.Context.Dispose();
+            GC.SuppressFinalize(this);
+        }
+
 
         #region 数据查询操作
 
