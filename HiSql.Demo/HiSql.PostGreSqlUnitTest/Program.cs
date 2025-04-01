@@ -136,7 +136,7 @@ namespace HiSql.PostGreSqlUnitTest
             //Demo_DbCode.Init(sqlClient);
            // DemoCodeFirst.Init(sqlClient);
            
-            Demo_Query.Init(sqlClient);
+            //Demo_Query.Init(sqlClient);
             //Demo_Insert.Init(sqlClient);
             //Demo_Update.Init(sqlClient);
             //Demo_Delete.Init(sqlClient);
