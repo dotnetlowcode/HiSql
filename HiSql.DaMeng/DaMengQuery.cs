@@ -124,7 +124,7 @@ namespace HiSql
 
                         if (!string.IsNullOrEmpty(sb_having.ToString()))
                         {
-                            sb_total.AppendLine($" having {sb_having.ToString()}");
+                            sb.AppendLine($" having {sb_having.ToString()}");
                         }
 
                         if (!string.IsNullOrEmpty(sb_sort.ToString()))
@@ -146,7 +146,7 @@ namespace HiSql
 
                         if (!string.IsNullOrEmpty(sb_having.ToString()))
                         {
-                            sb_total.AppendLine($" having {sb_having.ToString()}");
+                            sb.AppendLine($" having {sb_having.ToString()}");
                         }
 
                         sb.AppendLine(")   hi_sql ");//as

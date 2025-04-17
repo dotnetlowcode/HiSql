@@ -25,9 +25,9 @@ namespace HiSql.PostGreSqlUnitTest
             //Query_Demo13(sqlClient);
             //Query_Demo15(sqlClient);
             //Query_Demo16(sqlClient);
-            //Query_Demo18(sqlClient);
+            Query_Demo18(sqlClient);
             //Query_Demo19(sqlClient);
-            Query_Demo20(sqlClient);
+            //Query_Demo20(sqlClient);
         }
         static void Query_Demo20(HiSqlClient sqlClient)
         {
