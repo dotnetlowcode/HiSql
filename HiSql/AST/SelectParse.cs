@@ -81,6 +81,11 @@ namespace HiSql.AST
             public static string REG_SELECT_FIELDNAME = @"^(?:[\s]*)(?<fieldname>(?<flag>[\#]{1,2}|[\@]{1})?(?<tab>[\w]+)(?:[\.]{1})?(?<field>[\w]+))\s*";
 
             /// <summary>
+            /// where 条件中是否有字查询
+            /// </summary>
+            public static string REG_SELECT_SUB = @"\(\s*select(.*)\)";
+
+            /// <summary>
             /// 分隔符
             /// </summary>
             public static string REG_SELECT_SPLIT = @"^\s*\,\s*";
@@ -303,10 +308,10 @@ namespace HiSql.AST
                         //    return b.CompareTo(a);
                         //});
                         //_pos_idx = lstnum[0];
-                        
 
+                        bool _has_subselect = Tool.RegexMatch(Constants.REG_SELECT_SUB, sql);
 
-                        if (sql.LastIndexOf(')') > _pos_idx)
+                        if (_has_subselect ) //sql.LastIndexOf(')') > _pos_idx
                         {
                             //说明都是子语语句
                             var rtndic = Tool.RegexGrp(Constants.REG_SELECT_WHERE2, sql);
