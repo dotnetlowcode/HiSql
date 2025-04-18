@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-
+using HiSql.Common.Entities.TabLog;
 namespace HiSql
 {
     public class UpdateProvider : IUpdate
@@ -19,6 +19,7 @@ namespace HiSql
 
         List<Dictionary<string, string>> _values = new List<Dictionary<string, string>>();
         Filter _where;
+
 
         bool _onlywhere = false;
 
@@ -140,15 +141,46 @@ namespace HiSql
 
         public int ExecCommand()
         {
-            string _sql = this.ToSql();
-
-            return this.Context.DBO.ExecCommand(_sql);
+            return this.ExecCommandAsync().ConfigureAwait(false).GetAwaiter().GetResult();
         }
-        public Task<int> ExecCommandAsync()
+
+
+        /// <summary>
+        /// 将当前操作向数据库执行
+        /// </summary>
+        /// <param name="credentialCallback">操作凭证</param>
+        /// <returns></returns>
+        public int ExecCommand(Action<HiSql.Interface.TabLog.Credential> credentialCallback)
+        {
+            return this.ExecCommandAsync(credentialCallback).ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+
+
+        public async Task<int> ExecCommandAsync()
         {
             string _sql = this.ToSql();
+            int updateCount = 0;
+            await this.RecordLog(async () =>
+            {
+                updateCount = await this.Context.DBO.ExecCommandAsync(_sql);
+                return updateCount > 0;
+            });
+            return updateCount;
+        }
 
-            return this.Context.DBO.ExecCommandAsync(_sql);
+
+
+        public async Task<int> ExecCommandAsync(Action<HiSql.Interface.TabLog.Credential> credentialCallback)
+        {
+            string _sql = this.ToSql();
+            var updateCount = 0;
+            var credentialObj = await this.RecordLog(async () =>
+            {
+                updateCount = await this.Context.DBO.ExecCommandAsync(_sql);
+                return updateCount > 0;
+            });
+            credentialCallback(credentialObj);
+            return updateCount;
         }
 
 
@@ -756,7 +788,7 @@ namespace HiSql
                                         }
                                         else
                                         {
-                                            string _val= objprop.GetValue(objdata).ToString();
+                                            string _val = objprop.GetValue(objdata).ToString();
                                             if (Tool.IsInt(_val))
                                             {
                                                 _dic.Add(hiColumn.FieldName, _val);

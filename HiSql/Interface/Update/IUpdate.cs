@@ -131,11 +131,22 @@ namespace HiSql
         int ExecCommand();
 
 
+        int ExecCommand(Action<HiSql.Interface.TabLog.Credential> credentialCallback);
+
+
         /// <summary>
         /// 执行结果
         /// </summary>
         /// <returns></returns>
         Task<int> ExecCommandAsync();
+
+
+        /// <summary>
+        /// 执行结果
+        /// </summary>
+        /// <param name="credentialCallback">返回操作凭证</param>
+        /// <returns></returns>
+        Task<int> ExecCommandAsync(Action<HiSql.Interface.TabLog.Credential> credentialCallback);
 
 
         /// <summary>

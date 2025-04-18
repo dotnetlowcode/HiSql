@@ -60,8 +60,22 @@ namespace HiSql
         /// <summary>
         /// 将当前操作向数据库执行
         /// </summary>
+        /// <param name="credentialCallback">操作凭证</param>
+        /// <returns></returns>
+        int ExecCommand(Action<HiSql.Interface.TabLog.Credential> credentialCallback);
+
+        /// <summary>
+        /// 将当前操作向数据库执行
+        /// </summary>
         /// <returns>返回受影响的行数</returns>
         Task<int> ExecCommandAsync();
+
+        /// <summary>
+        /// 执行结果
+        /// </summary>
+        /// <param name="credentialCallback">返回操作凭证</param>
+        /// <returns></returns>
+        Task<int> ExecCommandAsync(Action<HiSql.Interface.TabLog.Credential> credentialCallback);
 
         /// <summary>
         /// 将当前操作生成SQL语句

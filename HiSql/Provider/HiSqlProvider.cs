@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
-using System.Data;
 using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
-using System.Diagnostics;
+using System.Threading.Tasks;
+using HiSql.Common.Entities.TabLog;
+using HiSql.Interface.TabLog;
 using Newtonsoft.Json.Linq;
 
 namespace HiSql
@@ -20,11 +22,8 @@ namespace HiSql
         //当前数据库连接
         private ConnectionConfig _currentConnectionConfig;
 
-
         //从库连接 当有多个连接时根据提供的权重配置随机产生一个从库连接（从库一定是与主库对应）
         private ConnectionConfig _slaveConnectionConfig;
-
-
 
         private string _connectedid = string.Empty;
 
@@ -34,8 +33,10 @@ namespace HiSql
         /// 数据连接ID
         /// 通过这个可以控制连接跨线程使用，当连接跨线程使用时就会出现很多不可控的错误
         /// </summary>
-        public string ConnectedId { get => _connectedid; }
-
+        public string ConnectedId
+        {
+            get => _connectedid;
+        }
 
         private Expression _expression;
 
@@ -49,7 +50,6 @@ namespace HiSql
             get { return _currentConnectionConfig; }
         }
 
-
         /// <summary>
         /// 从库连接
         /// </summary>
@@ -57,29 +57,35 @@ namespace HiSql
         {
             get
             {
-                if (_slaveConnectionConfig == null && CurrentConnectionConfig.SlaveConnectionConfigs != null)
+                if (
+                    _slaveConnectionConfig == null
+                    && CurrentConnectionConfig.SlaveConnectionConfigs != null
+                )
                 {
                     _slaveConnectionConfig = _currentConnectionConfig.CloneProperoty();
 
                     //根据权重承随机选择一个从库连接
-                    SlaveConnectionConfig sconnectionConfig = ConnManager.ChooseSlave(CurrentConnectionConfig.SlaveConnectionConfigs);
+                    SlaveConnectionConfig sconnectionConfig = ConnManager.ChooseSlave(
+                        CurrentConnectionConfig.SlaveConnectionConfigs
+                    );
                     if (sconnectionConfig != null)
                     {
                         //通过继承类的方式将 连接配置 生成 ConnectionConfig 类
-                        _slaveConnectionConfig = sconnectionConfig.MoveCross<SlaveConnectionConfig, ConnectionConfig>(_slaveConnectionConfig);
+                        _slaveConnectionConfig = sconnectionConfig.MoveCross<
+                            SlaveConnectionConfig,
+                            ConnectionConfig
+                        >(_slaveConnectionConfig);
                         _slaveConnectionConfig.SlaveConnectionConfigs = null;
-                        _slaveConnectionConfig.AppEvents = _currentConnectionConfig.AppEvents;// 事件同步
-                        _slaveConnectionConfig.IsCurrSlave = true;//给当前连接标识为从库
+                        _slaveConnectionConfig.AppEvents = _currentConnectionConfig.AppEvents; // 事件同步
+                        _slaveConnectionConfig.IsCurrSlave = true; //给当前连接标识为从库
                     }
                     else
                         _slaveConnectionConfig = null;
                 }
                 return _slaveConnectionConfig;
                 //return _slaveConnectionConfig;
-
             }
         }
-
 
         public IDMInitalize DMInitalize
         {
@@ -87,7 +93,9 @@ namespace HiSql
             {
                 if (_idm == null)
                 {
-                    _idm = Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
+                    _idm = Instance.CreateInstance<IDM>(
+                        $"{Constants.NameSpace}.{Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}"
+                    );
                     _idm.Context = Context;
                 }
                 IDMInitalize _idfmi = (IDMInitalize)_idm;
@@ -102,30 +110,31 @@ namespace HiSql
             {
                 if (_idm == null)
                 {
-                    _idm = Instance.CreateInstance<IDM>($"{Constants.NameSpace}.{Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}");
+                    _idm = Instance.CreateInstance<IDM>(
+                        $"{Constants.NameSpace}.{Context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.DM.ToString()}"
+                    );
                     _idm.Context = Context;
                 }
                 IDMTab dMTab = (IDMTab)_idm;
                 dMTab.Context = Context;
                 return dMTab;
             }
-
         }
 
         ICache _mcache = new MCache(null);
         public HiSqlClient Root;
+
         public HiSqlProvider(ConnectionConfig config)
         {
             _currentConnectionConfig = config;
             _connectedid = Guid.NewGuid().ToString("N").ToMd5();
-
         }
+
         public ICache MCache
         {
             get { return _mcache; }
             set { _mcache = value; }
         }
-
 
         IDataBase _dbo;
         HiSqlProvider _Context;
@@ -139,6 +148,8 @@ namespace HiSql
             set { this._dbo = value; }
         }
 
+
+
         public virtual IDataBase DBO
         {
             get
@@ -148,6 +159,7 @@ namespace HiSql
                     //实现数据库连接
                     var result = Instance.GetDBO(this.Context.CurrentConnectionConfig);
                     result.IsLogSql = _currentConnectionConfig.IsLog;
+
                     //this.ContextDBO = result;
                     _dbo = result;
 
@@ -169,16 +181,18 @@ namespace HiSql
                 _Context = this;
                 return _Context;
             }
-            set
-            {
-                _Context = value;
-            }
+            set { _Context = value; }
         }
 
         public ICodeFirst CodeFirst { get; set; }
 
         public IDbFirst DbFirst { get; set; }
 
+        public ICredentialModule GetCredentialModule()
+        {
+            //初始化表日志模块
+            return Instance.GetTableLogModule();
+        }
 
         /// <summary>
         /// 根据当前配置 克隆一个新的连接
@@ -192,7 +206,7 @@ namespace HiSql
 
         /// <summary>
         /// 创建工作单元
-        /// 默认开始事务,业务处理完成需要进行Commit 
+        /// 默认开始事务,业务处理完成需要进行Commit
         /// </summary>
         /// <returns></returns>
         public HiSqlClient CreateUnitOfWork()
@@ -203,9 +217,6 @@ namespace HiSql
             client.BeginTran();
             return client;
         }
-
-
-
 
         #region 查询
         public IQuery Query(params IQuery[] query)
@@ -218,8 +229,8 @@ namespace HiSql
             }
             result.Query(query);
             return result;
-
         }
+
         /// <summary>
         /// 表查询
         /// </summary>
@@ -227,11 +238,19 @@ namespace HiSql
         /// <param name="rename">表别名</param>
         /// <param name="dbMasterSlave">主从策略</param>
         /// <returns></returns>
-        public IQuery Query(string tabname, string rename, DbMasterSlave dbMasterSlave = DbMasterSlave.Default)
+        public IQuery Query(
+            string tabname,
+            string rename,
+            DbMasterSlave dbMasterSlave = DbMasterSlave.Default
+        )
         {
             IQuery result = null;
             //默认主从规则
-            bool _isslave = ConnManager.ChooseSlaveForTable(this.Context.SlaveConnectionConfig, tabname, dbMasterSlave);
+            bool _isslave = ConnManager.ChooseSlaveForTable(
+                this.Context.SlaveConnectionConfig,
+                tabname,
+                dbMasterSlave
+            );
             if (_isslave)
                 result = Instance.GetQuery(this.Context.SlaveConnectionConfig);
             else
@@ -241,6 +260,7 @@ namespace HiSql
             result.Query(tabname, rename);
             return result;
         }
+
         /// <summary>
         /// 表查询
         /// </summary>
@@ -252,20 +272,20 @@ namespace HiSql
             IQuery result = null;
             //默认主从规则
 
-            bool _isslave = ConnManager.ChooseSlaveForTable(this.Context.SlaveConnectionConfig, tabname, dbMasterSlave);
+            bool _isslave = ConnManager.ChooseSlaveForTable(
+                this.Context.SlaveConnectionConfig,
+                tabname,
+                dbMasterSlave
+            );
             if (_isslave)
                 result = Instance.GetQuery(this.Context.SlaveConnectionConfig);
             else
                 result = Instance.GetQuery(this.Context.CurrentConnectionConfig);
 
-
-
             result.Context = this.Context;
             result.Query(tabname);
             return result;
         }
-
-
 
         /// <summary>
         /// 执行Hisql语句
@@ -285,8 +305,6 @@ namespace HiSql
             //    result = Instance.GetQuery(this.Context.SlaveConnectionConfig);
             //else
             result = Instance.GetQuery(this.Context.CurrentConnectionConfig);
-
-
 
             result.Context = this.Context;
             result.HiSql(hisql, result);
@@ -430,19 +448,25 @@ namespace HiSql
         /// <param name="objparm">参数化对象如new {}</param>
         /// <param name="dbMasterSlave"></param>
         /// <returns></returns>
-        public IQuery HiSql(string sql, object objparm, DbMasterSlave dbMasterSlave = DbMasterSlave.Default)
+        public IQuery HiSql(
+            string sql,
+            object objparm,
+            DbMasterSlave dbMasterSlave = DbMasterSlave.Default
+        )
         {
-
             Type type = objparm.GetType();
             if (!Tool.RegexMatch("[\'\\\"]+", sql))
             {
-
-                Dictionary<string, object> dicparam = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+                Dictionary<string, object> dicparam = new Dictionary<string, object>(
+                    StringComparer.OrdinalIgnoreCase
+                );
 
                 #region 参数解析
                 if (type.IsAnonClass())
                 {
-                    List<PropertyInfo> attrs = type.GetProperties().Where(p => p.MemberType == MemberTypes.Property && p.CanRead == true).ToList();
+                    List<PropertyInfo> attrs = type.GetProperties()
+                        .Where(p => p.MemberType == MemberTypes.Property && p.CanRead == true)
+                        .ToList();
                     if (attrs.Count() > 0)
                     {
                         foreach (PropertyInfo p in attrs)
@@ -451,7 +475,6 @@ namespace HiSql
                                 dicparam[p.Name] = p.GetValue(objparm);
                             else
                                 dicparam.Add(p.Name, p.GetValue(objparm));
-
                         }
                     }
                 }
@@ -466,8 +489,6 @@ namespace HiSql
                         else
                             dicparam.Add(key, _dic[key]);
                     }
-
-
                 }
                 else if (type.IsDicObjectClass())
                 {
@@ -523,12 +544,13 @@ namespace HiSql
                         else
                             dicparam.Add(p.ParameterName, p.Values);
                     }
-
                 }
                 else
                 {
                     //实体类对象
-                    List<PropertyInfo> attrs = type.GetProperties().Where(p => p.MemberType == MemberTypes.Property && p.CanRead == true).ToList();
+                    List<PropertyInfo> attrs = type.GetProperties()
+                        .Where(p => p.MemberType == MemberTypes.Property && p.CanRead == true)
+                        .ToList();
                     if (attrs.Count() > 0)
                     {
                         foreach (PropertyInfo p in attrs)
@@ -537,17 +559,15 @@ namespace HiSql
                                 dicparam[p.Name] = p.GetValue(objparm);
                             else
                                 dicparam.Add(p.Name, p.GetValue(objparm));
-
                         }
                     }
                 }
 
-                #endregion 
+                #endregion
 
 
                 if (dicparam.Count() == 0)
                     throw new Exception($"未传任何参数");
-
 
                 //先判断是否有参数化
                 if (Tool.RegexMatch($@"{Constants.KeyParameterPre}\w+", sql))
@@ -555,11 +575,13 @@ namespace HiSql
                     //表示参数为@name 格式
                     #region 解析@name 参数格式
 
-                    
+
                     if (!Tool.RegexMatch(Constants.REG_HISQL_PARAM2, sql))
                     {
-
-                        var lstdic = Tool.RegexGrps($@"{Constants.KeyParameterPre}(?<pname>\w+)\b", sql);
+                        var lstdic = Tool.RegexGrps(
+                            $@"{Constants.KeyParameterPre}(?<pname>\w+)\b",
+                            sql
+                        );
 
                         foreach (Dictionary<string, string> _dic in lstdic)
                         {
@@ -569,34 +591,58 @@ namespace HiSql
                                 Type _type = dicparam[n].GetType();
                                 Regex regex = new Regex(@$"@{n}\b", RegexOptions.IgnoreCase);
 
-                                if (type.IsIn<Type>(Constants.ShortType, Constants.LongType, Constants.DecType, Constants.IntType, Constants.FloatType, Constants.DobType))
+                                if (
+                                    type.IsIn<Type>(
+                                        Constants.ShortType,
+                                        Constants.LongType,
+                                        Constants.DecType,
+                                        Constants.IntType,
+                                        Constants.FloatType,
+                                        Constants.DobType
+                                    )
+                                )
                                 {
                                     sql = regex.Replace(sql, dicparam[n].ToString());
                                 }
                                 else if (_type == Constants.BoolType)
                                 {
-
                                     if (dicparam[n].ToString().ToLower().Trim() == "true")
                                         sql = regex.Replace(sql, "1");
                                     else
                                         sql = regex.Replace(sql, "0");
                                 }
-                                else if (_type.IsIn<Type>(Constants.DateType, Constants.DateTimeOffsetType))
+                                else if (
+                                    _type.IsIn<Type>(
+                                        Constants.DateType,
+                                        Constants.DateTimeOffsetType
+                                    )
+                                )
                                 {
                                     DateTime dtime = Convert.ToDateTime(dicparam[n]);
-                                    sql = regex.Replace(sql, $"'{dtime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                                    sql = regex.Replace(
+                                        sql,
+                                        $"'{dtime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'"
+                                    );
                                 }
                                 else if (_type.IsIn<Type>(Constants.StringType, Constants.GuidType))
                                 {
-                                    sql = regex.Replace(sql, $"'{dicparam[n].ToString().ToSqlInject().ToSqlEnChar()}'");
+                                    sql = regex.Replace(
+                                        sql,
+                                        $"'{dicparam[n].ToString().ToSqlInject().ToSqlEnChar()}'"
+                                    );
                                 }
                                 else if (_type.FullName.IndexOf("List") > 0)
                                 {
-
-                                    var _dic_p1 = Tool.RegexGrps($@"{Constants.KeyParameterPre}(?<pname>\w+)\b", sql);
-                                    var _dic_p2 = Tool.RegexGrps(Constants.REG_HISQL_IN_PARAM2, sql);
+                                    var _dic_p1 = Tool.RegexGrps(
+                                        $@"{Constants.KeyParameterPre}(?<pname>\w+)\b",
+                                        sql
+                                    );
+                                    var _dic_p2 = Tool.RegexGrps(
+                                        Constants.REG_HISQL_IN_PARAM2,
+                                        sql
+                                    );
                                     string _insql = "";
-                                    if (_dic_p2!=null && _dic_p2.Count>0)
+                                    if (_dic_p2 != null && _dic_p2.Count > 0)
                                     {
                                         //foreach(var _o in )
 
@@ -612,17 +658,26 @@ namespace HiSql
                                         if (_type == _typ_string)
                                         {
                                             var list = dicparam[n] as List<string>;
-                                            _insql = AdoExtensions.ToSqlIn<string>(list.ToArray(), true);
+                                            _insql = AdoExtensions.ToSqlIn<string>(
+                                                list.ToArray(),
+                                                true
+                                            );
                                         }
                                         else if (_type == _typ_int)
                                         {
                                             var list = dicparam[n] as List<int>;
-                                            _insql = AdoExtensions.ToSqlIn<int>(list.ToArray(), false);
+                                            _insql = AdoExtensions.ToSqlIn<int>(
+                                                list.ToArray(),
+                                                false
+                                            );
                                         }
                                         else if (_type == _typ_decimal)
                                         {
                                             var list = dicparam[n] as List<decimal>;
-                                            _insql = AdoExtensions.ToSqlIn<decimal>(list.ToArray(), false);
+                                            _insql = AdoExtensions.ToSqlIn<decimal>(
+                                                list.ToArray(),
+                                                false
+                                            );
                                         }
                                         else if (_type == typeof(string[]))
                                         {
@@ -632,11 +687,16 @@ namespace HiSql
                                         else if (_type == typeof(List<long>))
                                         {
                                             var list = dicparam[n] as List<long>;
-                                            _insql = AdoExtensions.ToSqlIn<long>(list.ToArray(), false);
+                                            _insql = AdoExtensions.ToSqlIn<long>(
+                                                list.ToArray(),
+                                                false
+                                            );
                                         }
                                         else
                                         {
-                                            throw new HiSqlException($"类型[{_type.FullName}]不在允许的in集合内,仅允许string[],List<string>,List<int>,List<long>,List<decimal> 类型");
+                                            throw new HiSqlException(
+                                                $"类型[{_type.FullName}]不在允许的in集合内,仅允许string[],List<string>,List<int>,List<long>,List<decimal> 类型"
+                                            );
                                         }
 
                                         sql = regex.Replace(sql, $"{_insql}");
@@ -644,16 +704,24 @@ namespace HiSql
                                     else
                                     {
                                         if (sql.Contains(_dic["0"]))
-                                            throw new HiSqlException($"参数 {n} 是集合 只能放在in ({_dic["0"]})中");
+                                            throw new HiSqlException(
+                                                $"参数 {n} 是集合 只能放在in ({_dic["0"]})中"
+                                            );
                                     }
                                 }
                                 else if (type.IsIn<Type>(Constants.ObjType))
                                 {
-                                    sql = regex.Replace(sql, $"'{dicparam[n].ToString().ToSqlInject().ToSqlEnChar()}'");
+                                    sql = regex.Replace(
+                                        sql,
+                                        $"'{dicparam[n].ToString().ToSqlInject().ToSqlEnChar()}'"
+                                    );
                                 }
                                 else
                                 {
-                                    sql = regex.Replace(sql, $"'{dicparam[n].ToString().ToSqlInject().ToSqlEnChar()}'");
+                                    sql = regex.Replace(
+                                        sql,
+                                        $"'{dicparam[n].ToString().ToSqlInject().ToSqlEnChar()}'"
+                                    );
                                 }
                             }
                             else
@@ -665,7 +733,6 @@ namespace HiSql
                     else
                         throw new HiSqlException($"参数化名称不能使用@name 又用[$name$] 格式");
                     #endregion
-
                 }
                 else if (Tool.RegexMatch(Constants.REG_HISQL_PARAM2, sql))
                 {
@@ -681,7 +748,16 @@ namespace HiSql
                                 if (sql.IndexOf(n) >= 0)
                                 {
                                     Type _type = dicparam[n].GetType();
-                                    if (type.IsIn<Type>(Constants.ShortType, Constants.LongType, Constants.DecType, Constants.IntType, Constants.FloatType, Constants.DobType))
+                                    if (
+                                        type.IsIn<Type>(
+                                            Constants.ShortType,
+                                            Constants.LongType,
+                                            Constants.DecType,
+                                            Constants.IntType,
+                                            Constants.FloatType,
+                                            Constants.DobType
+                                        )
+                                    )
                                     {
                                         sql = sql.Replace(n, dicparam[n].ToString());
                                     }
@@ -692,20 +768,38 @@ namespace HiSql
                                         else
                                             sql = sql.Replace(n, "0");
                                     }
-                                    else if (_type.IsIn<Type>(Constants.DateType, Constants.DateTimeOffsetType))
+                                    else if (
+                                        _type.IsIn<Type>(
+                                            Constants.DateType,
+                                            Constants.DateTimeOffsetType
+                                        )
+                                    )
                                     {
                                         DateTime dtime = Convert.ToDateTime(dicparam[n]);
-                                        sql = sql.Replace(n, $"'{dtime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                                        sql = sql.Replace(
+                                            n,
+                                            $"'{dtime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'"
+                                        );
                                     }
-                                    else if (_type.IsIn<Type>(Constants.StringType, Constants.GuidType))
+                                    else if (
+                                        _type.IsIn<Type>(Constants.StringType, Constants.GuidType)
+                                    )
                                     {
-                                        sql = sql.Replace(n, $"'{dicparam[n].ToString().ToSqlInject().ToSqlEnChar()}'");
+                                        sql = sql.Replace(
+                                            n,
+                                            $"'{dicparam[n].ToString().ToSqlInject().ToSqlEnChar()}'"
+                                        );
                                     }
                                     else if (_type.FullName.IndexOf("List") > 0)
                                     {
-
-                                        var _dic_p1 = Tool.RegexGrps(Constants.REG_HISQL_PARAM2, sql);
-                                        var _dic_p2 = Tool.RegexGrps(Constants.REG_HISQL_IN_PARAM, sql);
+                                        var _dic_p1 = Tool.RegexGrps(
+                                            Constants.REG_HISQL_PARAM2,
+                                            sql
+                                        );
+                                        var _dic_p2 = Tool.RegexGrps(
+                                            Constants.REG_HISQL_IN_PARAM,
+                                            sql
+                                        );
                                         string _insql = "";
                                         if (_dic_p1.Count > 0 && _dic_p1.Count == _dic_p2.Count)
                                         {
@@ -718,18 +812,26 @@ namespace HiSql
                                             if (_type == _typ_string)
                                             {
                                                 var list = dicparam[n] as List<string>;
-                                                _insql = AdoExtensions.ToSqlIn<string>(list.ToArray(), true);
+                                                _insql = AdoExtensions.ToSqlIn<string>(
+                                                    list.ToArray(),
+                                                    true
+                                                );
                                             }
-
                                             else if (_type == _typ_int)
                                             {
                                                 var list = dicparam[n] as List<int>;
-                                                _insql = AdoExtensions.ToSqlIn<int>(list.ToArray(), false);
+                                                _insql = AdoExtensions.ToSqlIn<int>(
+                                                    list.ToArray(),
+                                                    false
+                                                );
                                             }
                                             else if (_type == _typ_decimal)
                                             {
                                                 var list = dicparam[n] as List<decimal>;
-                                                _insql = AdoExtensions.ToSqlIn<decimal>(list.ToArray(), false);
+                                                _insql = AdoExtensions.ToSqlIn<decimal>(
+                                                    list.ToArray(),
+                                                    false
+                                                );
                                             }
                                             else if (_type == typeof(string[]))
                                             {
@@ -739,14 +841,17 @@ namespace HiSql
                                             else if (_type == typeof(List<long>))
                                             {
                                                 var list = dicparam[n] as List<long>;
-                                                _insql = AdoExtensions.ToSqlIn<long>(list.ToArray(), false);
+                                                _insql = AdoExtensions.ToSqlIn<long>(
+                                                    list.ToArray(),
+                                                    false
+                                                );
                                             }
-
                                             else
                                             {
-                                                throw new HiSqlException($"类型[{_type.FullName}]不在允许的in集合内,仅允许string[],List<string>,List<int>,List<long>,List<decimal> 类型");
+                                                throw new HiSqlException(
+                                                    $"类型[{_type.FullName}]不在允许的in集合内,仅允许string[],List<string>,List<int>,List<long>,List<decimal> 类型"
+                                                );
                                             }
-
 
                                             sql = sql.Replace(n, $"{_insql}");
                                         }
@@ -754,54 +859,45 @@ namespace HiSql
                                         {
                                             throw new HiSqlException($"参数 {n} 是集合 只能放在in ({n})中");
                                         }
-
-
-
                                     }
                                     else if (type.IsIn<Type>(Constants.ObjType))
                                     {
-                                        sql = sql.Replace(n, $"'{dicparam[n].ToString().ToSqlInject().ToSqlEnChar()}'");
+                                        sql = sql.Replace(
+                                            n,
+                                            $"'{dicparam[n].ToString().ToSqlInject().ToSqlEnChar()}'"
+                                        );
                                     }
                                     else
                                     {
-                                        sql = sql.Replace(n, $"'{dicparam[n].ToString().ToSqlInject().ToSqlEnChar()}'");
+                                        sql = sql.Replace(
+                                            n,
+                                            $"'{dicparam[n].ToString().ToSqlInject().ToSqlEnChar()}'"
+                                        );
                                     }
                                 }
                                 else
                                     throw new HiSqlException($"参数 {n} 设置多余在参数化hisql中未使用");
-
                             }
                             else
                             {
                                 throw new HiSqlException($"参数 {n} 不符合参数规则 规则为[$参数名$]");
                             }
-
-
                         }
                     }
 
                     #endregion
                 }
-
-
-
             }
             else
                 throw new Exception($"参数化HiSql语句中不能出现[\'\"]单引号和又引号这种特殊字段且不允许参数化和非参数化混写");
 
-
             IQuery result = null;
             result = Instance.GetQuery(this.Context.CurrentConnectionConfig);
-
-
 
             result.Context = this.Context;
             result.HiSql(sql, result);
             return result;
         }
-
-
-
 
         #region 数据插入
         public IInsert Insert(string tabname, object objdata)
@@ -811,6 +907,7 @@ namespace HiSql
             result.Insert(tabname, objdata);
             return result;
         }
+
         public IInsert Insert(string tabname, List<object> lstobj)
         {
             IInsert result = Instance.GetInsert(this.Context.CurrentConnectionConfig);
@@ -826,6 +923,7 @@ namespace HiSql
             result.Insert<T>(tabname, lstobj);
             return result;
         }
+
         public IInsert Insert<T>(T objdata)
         {
             IInsert result = Instance.GetInsert(this.Context.CurrentConnectionConfig);
@@ -833,6 +931,7 @@ namespace HiSql
             result.Insert<T>(objdata);
             return result;
         }
+
         public IInsert Insert<T>(string tabname, T objdata)
         {
             IInsert result = Instance.GetInsert(this.Context.CurrentConnectionConfig);
@@ -840,6 +939,7 @@ namespace HiSql
             result.Insert<T>(tabname, objdata);
             return result;
         }
+
         public IInsert Insert<T>(List<T> lstdata)
         {
             IInsert result = Instance.GetInsert(this.Context.CurrentConnectionConfig);
@@ -871,7 +971,12 @@ namespace HiSql
             }
             else
             {
-                DataTable sourcetable = DataConvert.ToTable(lstdata, tabInfo, Context.CurrentConnectionConfig.User, Context.CurrentConnectionConfig.DbType != DBType.DaMeng);//DaMengBulkCopy字段必须和数据库表一致 pengxy on 20220606
+                DataTable sourcetable = DataConvert.ToTable(
+                    lstdata,
+                    tabInfo,
+                    Context.CurrentConnectionConfig.User,
+                    Context.CurrentConnectionConfig.DbType != DBType.DaMeng
+                ); //DaMengBulkCopy字段必须和数据库表一致 pengxy on 20220606
                 Dictionary<string, string> columnMap = new Dictionary<string, string>();
                 foreach (DataColumn dc in sourcetable.Columns)
                 {
@@ -879,10 +984,8 @@ namespace HiSql
                 }
                 return this.Context.DBO.ExecBulkCopyCommand(sourcetable, tabInfo, columnMap);
             }
-
-
-
         }
+
         /// <summary>
         /// 批量写入
         /// </summary>
@@ -894,14 +997,18 @@ namespace HiSql
             Dictionary<string, string> columnMap = new Dictionary<string, string>();
             foreach (DataColumn dc in sourcetable.Columns)
             {
-                if (tabInfo.Columns.Any(t => t.FieldName.Equals(dc.ColumnName, StringComparison.OrdinalIgnoreCase)))
+                if (
+                    tabInfo.Columns.Any(t =>
+                        t.FieldName.Equals(dc.ColumnName, StringComparison.OrdinalIgnoreCase)
+                    )
+                )
                 {
                     columnMap.Add(dc.ColumnName, dc.ColumnName);
                 }
             }
             return this.Context.DBO.ExecBulkCopyCommand(sourcetable, tabInfo, columnMap);
-            
         }
+
         public Task<int> BulkCopyExecCommandAsyc(TabInfo tabInfo, DataTable sourcetable)
         {
             Dictionary<string, string> columnMap = new Dictionary<string, string>();
@@ -911,6 +1018,7 @@ namespace HiSql
             }
             return this.Context.DBO.ExecBulkCopyCommandAsync(sourcetable, tabInfo, columnMap);
         }
+
         public Task<int> BulkCopyExecCommandAsyc<T>(TabInfo tabInfo, List<T> lstdata)
         {
             Dictionary<string, string> columnMap = new Dictionary<string, string>();
@@ -927,17 +1035,18 @@ namespace HiSql
             }
             else
             {
-                DataTable sourcetable = DataConvert.ToTable(lstdata, tabInfo, this.Context.CurrentConnectionConfig.User);
+                DataTable sourcetable = DataConvert.ToTable(
+                    lstdata,
+                    tabInfo,
+                    this.Context.CurrentConnectionConfig.User
+                );
                 foreach (DataColumn dc in sourcetable.Columns)
                 {
                     columnMap.Add(dc.ColumnName, dc.ColumnName);
                 }
                 return this.Context.DBO.ExecBulkCopyCommandAsync(sourcetable, tabInfo, columnMap);
             }
-
         }
-
-
 
         public IInsert Modi(string tabname, List<object> lstobj)
         {
@@ -946,6 +1055,7 @@ namespace HiSql
             result.Modi(tabname, lstobj);
             return result;
         }
+
         public IInsert Modi<T>(string tabname, T objdata)
         {
             IInsert result = Instance.GetInsert(this.Context.CurrentConnectionConfig);
@@ -953,6 +1063,7 @@ namespace HiSql
             result.Modi<T>(tabname, objdata);
             return result;
         }
+
         public IInsert Modi<T>(T objdata)
         {
             IInsert result = Instance.GetInsert(this.Context.CurrentConnectionConfig);
@@ -960,6 +1071,7 @@ namespace HiSql
             result.Modi<T>(objdata);
             return result;
         }
+
         public IInsert Modi<T>(List<T> lstdata)
         {
             IInsert result = Instance.GetInsert(this.Context.CurrentConnectionConfig);
@@ -967,6 +1079,7 @@ namespace HiSql
             result.Modi<T>(lstdata);
             return result;
         }
+
         public IInsert Modi<T>(string tabname, List<T> lstdata)
         {
             IInsert result = Instance.GetInsert(this.Context.CurrentConnectionConfig);
@@ -1025,6 +1138,7 @@ namespace HiSql
             result.Update<T>(lstobj);
             return result;
         }
+
         public IUpdate Update<T>(string tabname, List<T> lstobj)
         {
             IUpdate result = Instance.GetUpdate(this.Context.CurrentConnectionConfig);
@@ -1042,6 +1156,7 @@ namespace HiSql
             result.Delete(tabname);
             return result;
         }
+
         public IDelete Delete(string tabname, object objdata)
         {
             IDelete result = Instance.GetDelete(this.Context.CurrentConnectionConfig);
@@ -1049,13 +1164,13 @@ namespace HiSql
             result.Delete(tabname, objdata);
             return result;
         }
+
         public IDelete Delete(string tabname, List<object> objlst)
         {
             IDelete result = Instance.GetDelete(this.Context.CurrentConnectionConfig);
             result.Context = this.Context;
             result.Delete(tabname, objlst);
             return result;
-
         }
 
         public IDelete Delete<T>(T objdata)
@@ -1065,6 +1180,7 @@ namespace HiSql
             result.Delete<T>(objdata);
             return result;
         }
+
         public IDelete Delete<T>(string tabname, List<T> objlst)
         {
             IDelete result = Instance.GetDelete(this.Context.CurrentConnectionConfig);
@@ -1072,6 +1188,7 @@ namespace HiSql
             result.Delete<T>(tabname, objlst);
             return result;
         }
+
         public IDelete Delete<T>(List<T> objlst)
         {
             IDelete result = Instance.GetDelete(this.Context.CurrentConnectionConfig);
@@ -1156,10 +1273,6 @@ namespace HiSql
         {
             this.Context.BeginTran(iso);
         }
-
-
-
-
 
 
 

@@ -4,7 +4,7 @@
 	  <!--net461;-->
 	  <TargetFrameworks>net5.0;netcoreapp3.1;net6.0</TargetFrameworks>
     <Authors>tansar</Authors>
-    <Version>1.0.7.8</Version>
+    <Version>1.0.8.2</Version>
     <Company>dotnetlowcode</Company>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
    
@@ -25,7 +25,7 @@
     <ProjectReference Include="..\HiSql\HiSql.csproj" />
   </ItemGroup>
 
-	<ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
+	<!--<ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
 		<Reference Include="Sap.Data.Hana.Core.v2.1">
 			<HintPath>..\HanaDLL\Sap.Data.Hana.Core.v2.1.dll</HintPath>
 		</Reference>
@@ -39,7 +39,7 @@
 		<Reference Include="Sap.Data.Hana.Core.v2.1">
 			<HintPath>..\HanaDLL\Sap.Data.Hana.Core.v2.1.dll</HintPath>
 		</Reference>
-	</ItemGroup>
+	</ItemGroup>-->
 
 	<!--<ItemGroup Condition="'$(TargetFramework)' == 'net461'">
 		<HintPath>..\HanaDLL\Sap.Data.Hana.Core.v2.1.dll</HintPath>
@@ -72,6 +72,8 @@
 
   <ItemGroup>
     <Reference Include="Sap.Data.Hana.Core.v2.1">
+		<!--如果要编译windows版请改为 ..\HanaDLL\windows\Sap.Data.Hana.Core.v2.1.dll-->
+		<!--如果要编译linux版请改为 ..\HanaDLL\linuxDll\Sap.Data.Hana.Core.v2.1.dll-->
       <HintPath>..\HanaDLL\linuxDll\Sap.Data.Hana.Core.v2.1.dll</HintPath>
     </Reference>
   </ItemGroup>

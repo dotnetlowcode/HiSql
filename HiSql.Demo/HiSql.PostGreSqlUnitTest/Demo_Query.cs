@@ -25,9 +25,9 @@ namespace HiSql.PostGreSqlUnitTest
             //Query_Demo13(sqlClient);
             //Query_Demo15(sqlClient);
             //Query_Demo16(sqlClient);
-            //Query_Demo18(sqlClient);
+            Query_Demo18(sqlClient);
             //Query_Demo19(sqlClient);
-            Query_Demo20(sqlClient);
+            //Query_Demo20(sqlClient);
         }
         static void Query_Demo21(HiSqlClient sqlClient)
         {
@@ -185,6 +185,7 @@ namespace HiSql.PostGreSqlUnitTest
         {
             string sql = sqlClient.HiSql("select FieldName, count(FieldName) as NAME_count,max(FieldType) as FieldType_max from Hi_FieldModel  group by FieldName").ToSql();
 
+            string _sql2 = sqlClient.HiSql("select  b.SkuCode , count(b.SkuCode ) as skucount from ThStock as a  inner join ThGoodsInfoSku as b on a.BarCode=b.BarCode and a.MaterialCode = b.MaterialCode   where b.StyleCode = 'HG00458'  and a.StockInventory>0 and b.Size=19  and b.Jinz < 5 group by b.SkuCode having count(*)  > 3").ToSql();
 
             string sql_having = sqlClient.HiSql("select FieldName, count(FieldName) as NAME_count,max(FieldType) as FieldType_max from Hi_FieldModel  group by FieldName having count(FieldName) > 1").ToSql();
             List<HiColumn> lst = sqlClient.HiSql("select FieldName, count(FieldName) as NAME_count,max(FieldType) as FieldType_max from Hi_FieldModel  group by FieldName").ToColumns();

@@ -4,6 +4,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using HiSql.Common.Entities.TabLog;
+
+
 
 namespace HiSql
 {
@@ -24,14 +27,18 @@ namespace HiSql
 
         IDbConfig dbconfig = null;
         HiSqlProvider _context = null;
-        public HiSqlProvider Context { get=>_context; 
-            set { _context = value;
+        public HiSqlProvider Context
+        {
+            get => _context;
+            set
+            {
+                _context = value;
                 if (dbconfig == null)
                 {
                     dbconfig = (IDbConfig)Instance.CreateInstance<IDbConfig>($"{Constants.NameSpace}.{_context.CurrentConnectionConfig.DbType.ToString()}{DbInterFace.Config.ToString()}");
                     dbconfig.Init();
                 }
-            } 
+            }
         }
         public TableDefinition Table
         {
@@ -71,10 +78,10 @@ namespace HiSql
         /// </summary>
         public bool IsNoDbLog { get => _isnodblog; }
 
-        
+
         public DeleteProvider()
         {
-            
+
         }
 
         public virtual string ToSql()
@@ -231,7 +238,8 @@ namespace HiSql
                 _queue.Add("drop");
                 _isdrop = true;
 
-            }else
+            }
+            else
                 throw new Exception($"已经指定了Delete或TrunCate 不允许再指定Drop");
             return this;
         }
@@ -332,7 +340,7 @@ namespace HiSql
 
                         throw new Exception($"字段[{hiColumn.FieldName}] 为主键或业务主键,传入的删除对象中未发现此字段");
 
-                        
+
 
                     }
                     else
@@ -355,7 +363,7 @@ namespace HiSql
                             {
                                 throw new Exception($"字段[{objprop.Name}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
                             }
-                            if(hiColumn.IsPrimary && string.IsNullOrEmpty(_value))
+                            if (hiColumn.IsPrimary && string.IsNullOrEmpty(_value))
                                 _values.Add(hiColumn.FieldName, $"'{dbconfig.Key_Char_Default}'");
                             else
                                 _values.Add(hiColumn.FieldName, $"'{_value.ToSqlInject()}'");
@@ -389,7 +397,7 @@ namespace HiSql
                         }
                         else if (hiColumn.FieldType == HiType.BOOL)
                         {
-                            
+
                             if (this.Context.CurrentConnectionConfig.DbType.IsIn(DBType.SqlServer, DBType.Oracle, DBType.DaMeng))
                             {
                                 if (_value.ToLower().Equals("true") || _value.ToLower().Equals("1"))
@@ -458,7 +466,7 @@ namespace HiSql
                         {
                             if (hiColumn.FieldType.IsIn<HiType>(HiType.NVARCHAR, HiType.NCHAR, HiType.GUID))
                             {
-                                if (_value.Length > hiColumn.FieldLen && hiColumn.FieldLen>0)
+                                if (_value.Length > hiColumn.FieldLen && hiColumn.FieldLen > 0)
                                 {
                                     throw new Exception($"字段[{hiColumn.FieldName}]的值[{_value}]超过了限制长度[{hiColumn.FieldLen}] 无法数据提交");
                                 }
@@ -567,16 +575,47 @@ namespace HiSql
             return _values;
         }
 
-        int IDelete.ExecCommand()
+        public int ExecCommand()
         {
-            var sql = this.ToSql();
-            return this.Context.DBO.ExecCommand(sql);
+            return this.ExecCommandAsync().ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
-        public Task<int> ExecCommandAsync()
+
+        /// <summary>
+        /// 将当前操作向数据库执行
+        /// </summary>
+        /// <param name="credentialCallback">操作凭证</param>
+        /// <returns></returns>
+        public int ExecCommand(Action<HiSql.Interface.TabLog.Credential> credentialCallback)
+        {
+            return this.ExecCommandAsync(credentialCallback).ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+
+        public async Task<int> ExecCommandAsync()
         {
             var sql = this.ToSql();
-            return this.Context.DBO.ExecCommandAsync(sql);
+
+            int deleteCount = 0;
+            await this.RecordLog(async () =>
+                  {
+                      deleteCount = await this.Context.DBO.ExecCommandAsync(sql);
+                      return deleteCount > 0;
+                  });
+            return deleteCount;
+        }
+
+
+        public async Task<int> ExecCommandAsync(Action<HiSql.Interface.TabLog.Credential> credentialCallback)
+        {
+            var sql = this.ToSql();
+            int deleteCount = 0;
+            var credentialObj = await this.RecordLog(async () =>
+             {
+                 deleteCount = await this.Context.DBO.ExecCommandAsync(sql);
+                 return deleteCount > 0;
+             });
+            credentialCallback(credentialObj);
+            return deleteCount;
         }
     }
 }

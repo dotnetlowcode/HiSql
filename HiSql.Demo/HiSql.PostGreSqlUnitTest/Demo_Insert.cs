@@ -34,8 +34,20 @@ namespace HiSql.PostGreSqlUnitTest
             //Demo1_Modi(sqlClient);
             //Demo1_Modi2(sqlClient);
             //Demo4_Insert1(sqlClient);
-            Demo5_Insert(sqlClient);
+            //Demo5_Insert(sqlClient);
+            Demo6_Insert(sqlClient);
             string s = Console.ReadLine();
+        }
+
+        static void Demo6_Insert(HiSqlClient sqlClient) {
+            List<WmsTest> lst_test = new List<WmsTest>();
+            HiSql.Global.SnroOn = true;
+            HiSql.SnroNumber.SqlClient=sqlClient.Context.CloneClient();
+            for (int i = 0; i < 10; i++)
+            {
+                lst_test.Add(new WmsTest { Tdesc = $"Tdesc-{i}", Remark = $"Remark-{i}" });
+            }
+            sqlClient.Modi(typeof(WmsTest).Name, lst_test).ExecCommand();
         }
         static void Demo5_Insert(HiSqlClient sqlClient) {
             bool isexits=sqlClient.DbFirst.CheckTabExists(typeof(HTest02).Name);

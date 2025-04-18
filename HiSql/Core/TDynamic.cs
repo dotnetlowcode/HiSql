@@ -74,6 +74,11 @@ namespace HiSql
             return (dynamic)_exObject;
         }
 
+        public ExpandoObject ToExpandoObject()
+        {
+            return _exObject;
+        }
+
         public object this[string keyname]
         {
             get
@@ -92,10 +97,6 @@ namespace HiSql
             }
         }
 
-        private ExpandoObject ToExpandoObject()
-        {
-            return _exObject;
-        }
         private IDictionary<string, object> ToDictionary()
         {
             
