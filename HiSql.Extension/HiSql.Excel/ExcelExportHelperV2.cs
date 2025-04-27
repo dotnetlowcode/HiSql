@@ -281,23 +281,30 @@ namespace HiSql.Extension
                 rowHandlerFun();
                 var excelRow = sheet.CreateRow(sheet.LastRowNum + 1);
                 int colIdx = 0;
-                for (int j = 0; j < dt.Columns.Count; j++)
+                foreach (var header in headerMap)
                 {
-                    var columnObj = dt.Columns[j];
-                    if (!headerMap.ContainsKey(columnObj.ColumnName))
-                    {
-                        continue;
-                    }
 
+                    DataColumn columnObj = null;
+                    var _value = "";
+                    if (dt.Columns.Contains(header.Key) == false)
+                    {
+
+                    }
+                    else
+                    {
+                        _value = dt.Rows[i][header.Key].ToString().Trim();
+                        columnObj = dt.Columns[header.Key];
+                    }
                     ICell _dCell = excelRow.CreateCell(colIdx);
                     _dCell.CellStyle = textStyle;
-                    var _value = dt.Rows[i][j].ToString().Trim();
-                   
-                    if (
+
+                    if (columnObj != null &&
+                        (
                         columnObj.DataType == typeDec
                         || columnObj.DataType == typeInt
                         || columnObj.DataType == typeInt64
                         || columnObj.DataType == typeFloat
+                        )
                     )
                     {
                         if (_value.Length <= 10)
@@ -316,7 +323,7 @@ namespace HiSql.Extension
                         else
                             _dCell.SetCellValue(_value);
                     }
-                    else if (columnObj.DataType == typeDatetime)
+                    else if (columnObj !=null &&columnObj.DataType == typeDatetime)
                     {
                         if (!string.IsNullOrEmpty(_value))
                         {
@@ -326,7 +333,7 @@ namespace HiSql.Extension
                     }
                     else
                         _dCell.SetCellValue(_value);
-                    if (headerMap.ContainsKey(columnObj.ColumnName))
+                    if (columnObj !=null && headerMap.ContainsKey(columnObj.ColumnName))
                     {
                         var headInfo = headerMap[columnObj.ColumnName];
                         await cellHandlerFun(sheet, excelRow, _dCell, headInfo);
@@ -334,6 +341,60 @@ namespace HiSql.Extension
 
                     colIdx++;
                 }
+
+                //for (int j = 0; j < dt.Columns.Count; j++)
+                //{
+                //    var columnObj = dt.Columns[j];
+                //    if (!headerMap.ContainsKey(columnObj.ColumnName))
+                //    {
+                //        continue;
+                //    }
+
+                //    ICell _dCell = excelRow.CreateCell(colIdx);
+                //    _dCell.CellStyle = textStyle;
+                //    var _value = dt.Rows[i][j].ToString().Trim();
+                   
+                //    if (
+                //        columnObj.DataType == typeDec
+                //        || columnObj.DataType == typeInt
+                //        || columnObj.DataType == typeInt64
+                //        || columnObj.DataType == typeFloat
+                //    )
+                //    {
+                //        if (_value.Length <= 10)
+                //        {
+                //            _dCell.SetCellType(CellType.Numeric);
+                //            _dCell.CellStyle = numberStyle;
+                //            if (_value == "")
+                //            {
+                //                _dCell.SetCellValue(_value);
+                //            }
+                //            else if (_value.IndexOf(".") > 0)
+                //                _dCell.SetCellValue(Convert.ToDouble(_value));
+                //            else
+                //                _dCell.SetCellValue(Convert.ToInt64(_value));
+                //        }
+                //        else
+                //            _dCell.SetCellValue(_value);
+                //    }
+                //    else if (columnObj.DataType == typeDatetime)
+                //    {
+                //        if (!string.IsNullOrEmpty(_value))
+                //        {
+                //            _dCell.SetCellValue(Convert.ToDateTime(_value));
+                //            _dCell.CellStyle = dateStyle;
+                //        }
+                //    }
+                //    else
+                //        _dCell.SetCellValue(_value);
+                //    if (headerMap.ContainsKey(columnObj.ColumnName))
+                //    {
+                //        var headInfo = headerMap[columnObj.ColumnName];
+                //        await cellHandlerFun(sheet, excelRow, _dCell, headInfo);
+                //    }
+
+                //    colIdx++;
+                //}
             }
         }
 
