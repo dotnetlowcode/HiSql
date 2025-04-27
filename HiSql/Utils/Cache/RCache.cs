@@ -1714,6 +1714,7 @@ namespace HiSql
 
         public string ExecLuaScript(string script, object obj = null)
         {
+            CheckRedisServer();
             var scriptObj = LuaScript.Prepare(script);
             var redisResult = _cache.ScriptEvaluate(scriptObj, obj);
             return redisResult.ToString();
@@ -1751,6 +1752,7 @@ namespace HiSql
         {
             if (this.dic_sha.ContainsKey(shaid))
             {
+                CheckRedisServer();
                 RedisKey[] rediskeys=new RedisKey[] { };
                 RedisValue[] redisvalues=new RedisValue[] { };
 
@@ -1827,7 +1829,7 @@ namespace HiSql
                 //        redisvalues[i] = (RedisValue)values[i];
                 //    }
                 //}
-
+                CheckRedisServer();
                 var result = _cache.ScriptEvaluate(this.dic_sha[shaid], rediskeys, redisvalues);
                 if (((bool)result))
                     return true;
