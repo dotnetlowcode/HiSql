@@ -1121,6 +1121,7 @@ namespace HiSql
         }
         public override Tuple<bool, string> LockOn(string[] keys, LckInfo lckinfo, int expirySeconds = 30, int timeoutSeconds = 5)
         {
+            CheckRedis();
             var isBlockingMode = timeoutSeconds > 0; //是否
             Tuple<bool, string> tuple = new Tuple<bool, string>(false, "获取锁超时");
 
