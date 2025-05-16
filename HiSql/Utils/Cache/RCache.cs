@@ -874,6 +874,7 @@ namespace HiSql
         /// <returns></returns>
         public override List<LckInfo> GetCurrLockInfo()
         {
+            CheckRedis();
             List<LckInfo> lckInfos = new List<LckInfo>();
             var hashkey = GetRegionKey(_lockhashname);
             var valu = _cache.HashGetAll(hashkey);
@@ -909,6 +910,7 @@ namespace HiSql
         /// <returns></returns>
         public override List<LckInfo> GetHisLockInfo()
         {
+            CheckRedis();
             List<LckInfo> lckInfos = new List<LckInfo>();
             var key = GetRegionKey(_lockhishashname);
             var valu = _cache.HashGetAll(key);
