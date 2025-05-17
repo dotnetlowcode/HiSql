@@ -311,7 +311,7 @@ namespace HiSql.AST
 
                         bool _has_subselect = Tool.RegexMatch(Constants.REG_SELECT_SUB, sql);
 
-                        if (_has_subselect ) //sql.LastIndexOf(')') > _pos_idx
+                        if (_has_subselect  && sql.LastIndexOf(')') > _pos_idx) //sql.LastIndexOf(')') > _pos_idx
                         {
                             //说明都是子语语句
                             var rtndic = Tool.RegexGrp(Constants.REG_SELECT_WHERE2, sql);
