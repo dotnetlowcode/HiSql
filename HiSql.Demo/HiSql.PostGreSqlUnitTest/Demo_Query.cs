@@ -183,6 +183,9 @@ namespace HiSql.PostGreSqlUnitTest
         }
         static void Query_Demo18(HiSqlClient sqlClient)
         {
+           var t = sqlClient.DbFirst.GetTabStruct("ThOrderDetail");
+
+            var t3 = sqlClient.DbFirst.GetTabStruct("ThOrderDetail_2025");
             string sql = sqlClient.HiSql("select FieldName, count(FieldName) as NAME_count,max(FieldType) as FieldType_max from Hi_FieldModel  group by FieldName").ToSql();
 
             string _sql2 = sqlClient.HiSql("select  b.SkuCode , count(b.SkuCode ) as skucount from ThStock as a  inner join ThGoodsInfoSku as b on a.BarCode=b.BarCode and a.MaterialCode = b.MaterialCode   where b.StyleCode = 'HG00458'  and a.StockInventory>0 and b.Size=19  and b.Jinz < 5 group by b.SkuCode having count(*)  > 3").ToSql();
