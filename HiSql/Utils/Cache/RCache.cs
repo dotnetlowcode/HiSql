@@ -808,7 +808,7 @@ namespace HiSql
         public override bool UnLock(params string[] keys)
         {
             if (keys.Length == 0) return true;
-            CheckRedis();
+            CheckRedisServer();
 
             Stopwatch stopwatch = Stopwatch.StartNew();
 
@@ -1412,7 +1412,7 @@ namespace HiSql
 
             var isBlockingMode = timeoutSeconds > 0; //是否
 
-            CheckRedis();
+            CheckRedisServer();// CheckRedis();
             if (!key.Contains(_lockkeyPrefix))
                 key = _lockkeyPrefix + key;
 
@@ -1577,7 +1577,7 @@ namespace HiSql
             {
                 return LockOnExecute(keys[0], action, lckinfo, expirySeconds, timeoutSeconds);
             }
-            CheckRedis();
+            CheckRedisServer(); //CheckRedis();
             int _max_second = int.MaxValue;//最长定锁有效期
             int _max_timeout = int.MaxValue;//最长加锁等待时间
             int _times = 5;//续锁最多次数
