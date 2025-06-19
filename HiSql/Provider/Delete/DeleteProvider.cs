@@ -94,6 +94,12 @@ namespace HiSql
             {
                 throw new Exception($"已经指定了TrunCate 不允许再指定Delete");
             }
+
+            if (objdata == null)
+            {
+                throw new Exception($"指定的objdata为空");
+            }
+
             if (!_queue.HasQueue("table"))
             {
                 _table = new TableDefinition(tabname);
@@ -115,7 +121,10 @@ namespace HiSql
                 throw new Exception($"已经指定了TrunCate 不允许再指定Delete");
             }
 
-
+            if (objlst == null || objlst.Count == 0)
+            {
+                throw new Exception($"指定的objlst为空或是空集合");
+            }
             if (!_queue.HasQueue("table"))
             {
                 _table = new TableDefinition(tabname);
@@ -152,6 +161,11 @@ namespace HiSql
             {
                 throw new Exception($"已经指定了TrunCate 不允许再指定Delete");
             }
+
+            if (objlst == null || objlst.Count == 0)
+            {
+                throw new Exception($"指定的objlst为空或是空集合");
+            }
             if (!_queue.HasQueue("table"))
             {
                 _table = new TableDefinition(tabname);
@@ -171,6 +185,12 @@ namespace HiSql
             if (_queue.HasQueue("truncate"))
             {
                 throw new Exception($"已经指定了TrunCate 不允许再指定Delete");
+            }
+
+
+            if (objlst == null || objlst.Count == 0)
+            {
+                throw new Exception($"指定的objlst为空或是空集合");
             }
 
             if (!_queue.HasQueue("table"))
