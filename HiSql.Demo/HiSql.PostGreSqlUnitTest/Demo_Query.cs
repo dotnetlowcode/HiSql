@@ -1,4 +1,5 @@
 ﻿using HiSql.PostGreSqlUnitTest.Table;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -183,7 +184,19 @@ namespace HiSql.PostGreSqlUnitTest
         }
         static void Query_Demo18(HiSqlClient sqlClient)
         {
-           var t = sqlClient.DbFirst.GetTabStruct("ThOrderDetail");
+
+            TabInfo stockTabInfo = sqlClient.DbFirst.GetTabStruct("ThStock");
+            TabInfo tabInfo = GetTempTabInfo(stockTabInfo);
+            //
+            sqlClient.DbFirst.CreateTable(tabInfo);
+
+            var data = sqlClient.HiSql($"select * from {tabInfo.TabModel.TabName}").ToTable();
+            var tmp_struct = sqlClient.DbFirst.GetTabStruct(tabInfo.TabModel.TabName);
+
+
+
+
+            var t = sqlClient.DbFirst.GetTabStruct("ThOrderDetail");
 
             var t3 = sqlClient.DbFirst.GetTabStruct("ThOrderDetail_2025");
             string sql = sqlClient.HiSql("select FieldName, count(FieldName) as NAME_count,max(FieldType) as FieldType_max from Hi_FieldModel  group by FieldName").ToSql();
@@ -396,5 +409,36 @@ namespace HiSql.PostGreSqlUnitTest
 
 
         }
+        public static TabInfo GetTempTabInfo(TabInfo tabinfo)
+        {
+            var primaryJsonList = JArray.FromObject(
+                tabinfo.GetColumns.Where(col => col.IsPrimary).ToList()
+            );
+            List<HiColumn> lstcolumn = tabinfo.GetColumns.Where(col => col.IsPrimary).ToList();
+            var primaryList = new List<HiColumn>();
+            var randm = new Random().Next(100000, 999999);
+            //var tempTableName = "#" + tableName + "_" + randm;
+            string tempName = $"#{tabinfo.TabModel.TabName}_{randm}";
+
+            foreach (var primary in primaryJsonList)
+            {
+                var column = primary.ToObject<HiColumn>();
+                if (column != null)
+                {
+                    column.TabName = tempName;
+                    column.IsPrimary = false;
+                    column.IsIdentity = false;
+                    primaryList.Add(column);
+                }
+            }
+
+            TabInfo _tabinfo = new TabInfo
+            {
+                TabModel = new HiTable { TabName = tempName },
+                Columns = primaryList
+            };
+            return _tabinfo;
+        }
     }
+  
 }

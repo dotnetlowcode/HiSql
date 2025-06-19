@@ -303,6 +303,12 @@ namespace HiSql
             HiSqlClient _client = null;
             string _keyname = HiSqlCommProvider.GetTabCacheKey(tabname, Context.CurrentConnectionConfig);
             TabInfo newtabinfo = this.Context.MCache.GetCache<TabInfo>(_keyname);
+
+            //add by pengxy date:2025.6.19
+            HiTable curTable = new HiTable { TabName = tabname };
+            if (newtabinfo == null && curTable.TableType.IsIn<TableType>(TableType.Global, TableType.Local, TableType.Var))
+                newtabinfo = this.Context.MCache.GetCache<TabInfo>(tabname);
+
             if (newtabinfo == null)
             {
                 newtabinfo = HiSqlCommProvider.InitTabMaping(_keyname, () =>
