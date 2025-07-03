@@ -2,7 +2,7 @@ using HiSql;
 using HiSql.TabLog.Module;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
+using StackExchange.Redis;
 using System.Diagnostics;
 using System.Net;
 using WebApplication1.Helper;
@@ -184,7 +184,8 @@ namespace WebApplication1.Controller
                     { "Desc", "ModifyStringValue" }
                 }
             };
-            var modiResult = await hiSqlClient.Modi("test", modiData).ExecCommandAsync((cert) => { 
+            var modiResult = await hiSqlClient.Modi("test", modiData).ExecCommandAsync((cert) =>
+            {
                 Console.WriteLine(cert.CredentialId);
             });
 
@@ -211,9 +212,32 @@ namespace WebApplication1.Controller
             var detailTableName = "Th_DetailLog202503";
             return await HiSqlCredentialModule.GetTableDetailLogs(hiSqlClient, tableName, detailTableName, (query, settingObj) =>
                {
-                   query = query.Sort(["CreateTime asc"]).Skip(1).Take(1);
+                   query = query.Sort(new string[] { "CreateTime asc" }).Skip(1).Take(1);
                    return query;
                });
+        }
+
+        [HttpGet]
+        public Task<object> TestViewTable()
+        {
+            var parm = new
+            {
+                TableName = "VW_SYSDS_CERTQUERY",
+                OrderBy = "CertNo Asc,ItemId Asc",
+                PageNum = 1,
+                PageSize = 10,
+                TableFields = new string[] { "*" }
+            };
+            var iQuery = hiSqlClient.Query(parm.TableName);
+            iQuery = iQuery.WithLock(LockMode.NOLOCK).Field(parm.TableFields.ToArray());
+
+            if (parm.OrderBy != null && parm.OrderBy.Count() > 0)
+            {
+                iQuery.Sort(parm.OrderBy.Split(",").ToArray());
+            }
+            var currSql = iQuery.Skip(parm.PageNum).Take(parm.PageSize).ToSql();
+            //var resp = hiSqlClient.Query("VW_SYSDS_CERTQUERY").WithLock(LockMode.NOLOCK).Field("*").Skip(1).Take(10).ToSql();
+            return Task.FromResult<object>(currSql);
         }
 
     }

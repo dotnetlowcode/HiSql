@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using HiSql.Common.Entities.TabLog;
 using HiSql.Interface.TabLog;
+using HiSql.Utils;
 
 namespace HiSql
 {
@@ -1128,13 +1129,12 @@ namespace HiSql
                     });
                 }
                 var credentialModule = sqlProvider.GetCredentialModule();
-                //记录精确操作时间
-                //var watch = Stopwatch.StartNew();
-                var operateDataList = HiSql.Utils.ListObjectConverter.ConvertToListOfDictionary(insertProvider.Data);
-                credentialObj = await credentialModule.RecordLog(sqlProvider, tableName, operateDataList, new List<Dictionary<string, string>>(0), func, operateTypes);
-                //watch.Stop();
-                //Console.WriteLine($"记录RecordLog日志耗时：{watch.ElapsedMilliseconds}ms");
-                return credentialObj;
+                return await TaskHelper.ExcuteTimerAsync("Modi", async () =>
+                {
+                    var operateDataList = HiSql.Utils.ListObjectConverter.ConvertToListOfDictionary(insertProvider.Data);
+                    credentialObj = await credentialModule.RecordLog(sqlProvider, tableName, operateDataList, new List<Dictionary<string, string>>(0), func, operateTypes);
+                    return credentialObj;
+                });
             }
             await func();
             return credentialObj;
