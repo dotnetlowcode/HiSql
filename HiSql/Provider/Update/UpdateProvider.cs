@@ -596,7 +596,7 @@ namespace HiSql
                                     lst_primary.Add(_primary);
                                 }
                                 else
-                                    throw new Exception($"行[{_rowidx}] 数据无字段可更新 ");
+                                    throw new Exception($"表[{tabinfo.TabModel.TabName}]行[{_rowidx}] 数据无字段可更新(Dictionary<string, object>)对象 ");
 
                             }
                             #endregion
@@ -702,7 +702,7 @@ namespace HiSql
                                     lst_primary.Add(_primary);
                                 }
                                 else
-                                    throw new Exception($"行[{_rowidx}] 数据无字段可更新 ");
+                                    throw new Exception($"表[{tabinfo.TabModel.TabName}]行[{_rowidx}] 数据无字段可更新(Dictionary<string, string>对象) ");
                             }
 
                             #endregion
@@ -904,7 +904,7 @@ namespace HiSql
                                 lst_primary.Add(_primary);
                             }
                             else
-                                throw new Exception($"行[{_rowidx}] 数据无字段可更新 ");
+                                throw new Exception($"表[{tabinfo.TabModel.TabName}]行[{_rowidx}] 数据无字段可更新(object对象)");
                         }
                     }
 
@@ -995,7 +995,7 @@ namespace HiSql
 
                 }
                 else
-                    throw new Exception($"无可更新数据");
+                    throw new Exception($"[{table.TabName}]无可更新数据");
                 rtn = new Tuple<List<Dictionary<string, string>>, List<Dictionary<string, string>>>(lst_value, lst_primary);
                 return rtn;
             }

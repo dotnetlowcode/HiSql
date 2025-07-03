@@ -276,6 +276,26 @@ namespace HiSql
         {
             if (_sqlClient != null)
             {
+                if (tabInfo != null && tabInfo.Columns != null)
+                {
+                    foreach (var col in tabInfo.Columns)
+                    {
+                        if (col.FieldType == HiType.INT && col.FieldLen > 38)
+                        {
+                            throw new Exception($"表 [{tabInfo.TabModel.TabName}],字段[{col.FieldName}] 的长度不能超过35，类型[{col.FieldType.ToString()}]");
+                        }
+                        if (col.FieldType == HiType.DECIMAL && col.FieldLen > 38) //将表列长度太大了 要检查
+                        {
+                            throw new Exception($"表 [{tabInfo.TabModel.TabName}],字段[{col.FieldName}]的长度不能超过35，类型[{col.FieldType.ToString()}]");
+                        }
+                        if (col.FieldType == HiType.NVARCHAR && col.FieldLen > 4000)
+                        {
+                            throw new Exception($"表 [{tabInfo.TabModel.TabName}],字段[{col.FieldName}] 的长度不能超过4000，类型[{col.FieldType.ToString()}]");
+                        }
+                    }
+                }
+
+
                 if (!CheckTabExists(tabInfo.TabModel.TabName))
                 {
                     string _key = Constants.LockTablePre.Replace("[$TabName$]", tabInfo.TabModel.TabName).Replace("[$DbType$]",_sqlClient.CurrentConnectionConfig.DbType.ToString()).Replace("[$DbServer$]",_sqlClient.CurrentConnectionConfig.DbServer);
