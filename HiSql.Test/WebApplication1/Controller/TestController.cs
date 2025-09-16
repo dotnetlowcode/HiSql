@@ -1,9 +1,9 @@
+using System.Diagnostics;
 using HiSql;
 using HiSql.TabLog.Module;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
-using System.Diagnostics;
 
 namespace WebApplication1.Controller
 {
@@ -17,7 +17,6 @@ namespace WebApplication1.Controller
         {
             this.hiSqlClient = _hiSqlClient;
         }
-
 
         /// <summary>
         /// 插入测试
@@ -33,12 +32,14 @@ namespace WebApplication1.Controller
                 var dataList = new List<object>();
                 for (int i = 0; i < 1000; i++)
                 {
-                    dataList.Add(new
-                    {
-                        Id = "R" + new Random().Next().ToString() + i,
-                        Name = "1111",
-                        Desc = "Desc"
-                    });
+                    dataList.Add(
+                        new
+                        {
+                            Id = "R" + new Random().Next().ToString() + i,
+                            Name = "1111",
+                            Desc = "Desc"
+                        }
+                    );
                 }
                 var insertValue = await hiSqlClient.Insert("test", dataList).ExecCommandAsync();
                 watch.Stop();
@@ -48,7 +49,6 @@ namespace WebApplication1.Controller
             return "OK";
         }
 
-
         /// <summary>
         /// 更新测试
         /// </summary>
@@ -57,21 +57,67 @@ namespace WebApplication1.Controller
         public async Task<object> UpdateTest()
         {
             object creObj = null;
+            // var updateResult = hiSqlClient
+            //     .Update("test", new { Desc = "UpdateOnly22" })
+            //     .Where(
+            //         new Filter()
+            //         {
+            //             { "Id", OperType.EQ, "R1779617504" },
+            //             { "Name", OperType.EQ, "1111" }
+            //         }
+            //     )
+            //     .ExecCommand(
+            //         (tempCreObj) =>
+            //         {
+            //             creObj = tempCreObj;
+            //         }
+            //     );
+
+            // {"UpdateSet":{"MTypeName":"SKU库存合并1","SHKZG":"S","StockFlag":1,"Ctype":"WA","IsHasSource":0,"IsHasOut":1,"SourceFlag":-4,"OutFlag":1,"IsTriggerExtSys":0,"IsWaitExtSys":1,"AutoCreate":0,"IsReversal":1,"PreMType":"","NextMType":"","CancelMType":"H212","IsUpdateStock":1,"IsCostUpdate":0,"IsCrossWorks":0,"IsCrossLocation":0,"IsVirLocation":0,"Pvid":"H211240905","SortNumber":12,"Remark":"SKU库存合并AA","Status":1,"CreateTime":"2024-11-13T11:18:15.186649","CreateName":"ThirdApi","ModiTime":"2025-03-27T16:08:42.353","ModiName":"HiSql"},"WhereJson":{"MTypeCode":"H211"},"HiSqlWhere":"","HiSqlWhereParam":{}}
             var updateResult = hiSqlClient
-                .Update("test", new
-                {
-                    Desc = "UpdateOnly22"
-                })
-                .Where(
-                    new Filter() { { "Id", OperType.EQ, "R1779617504" }, { "Name", OperType.EQ, "1111" } }
+                .Update(
+                    "ThCertMType",
+                    new
+                    {
+                        MTypeName = "SKU库存合并1",
+                        SHKZG = "S",
+                        StockFlag = 1,
+                        Ctype = "WA",
+                        IsHasSource = 0,
+                        IsHasOut = 1,
+                        SourceFlag = -4,
+                        OutFlag = 1,
+                        IsTriggerExtSys = 0,
+                        IsWaitExtSys = 1,
+                        AutoCreate = 0,
+                        IsReversal = 1,
+                        PreMType = "",
+                        NextMType = "",
+                        CancelMType = "H212",
+                        IsUpdateStock = 1,
+                        IsCostUpdate = 0,
+                        IsCrossWorks = 0,
+                        IsCrossLocation = 0,
+                        IsVirLocation = 0,
+                        Pvid = "H211240905",
+                        SortNumber = 12,
+                        Remark = "SKU库存合并AA",
+                        Status = 1,
+                        // CreateTime = "2024-11-13T11:18:15.186649",
+                        // CreateName = "ThirdApi",
+                        // ModiTime = "2025-03-27T16:08:42.353",
+                        // ModiName = "HiSql"
+                    }
                 )
-                .ExecCommand((tempCreObj) =>
-                {
-                    creObj = tempCreObj;
-                });
+                .Where(new Filter() { { "MTypeCode", OperType.EQ, "H211" } })
+                .ExecCommand(
+                    (tempCreObj) =>
+                    {
+                        creObj = tempCreObj;
+                    }
+                );
             return creObj;
         }
-
 
         /// <summary>
         /// 删除测试
@@ -141,7 +187,7 @@ namespace WebApplication1.Controller
 
             var modiData = new List<object>()
             {
-               new Dictionary<string, object>
+                new Dictionary<string, object>
                 {
                     { "Id", "R6261325320" },
                     { "Name", "1111" },
@@ -179,16 +225,20 @@ namespace WebApplication1.Controller
         }
 
         [HttpGet]
-        public async Task<object> GetTableLog()//[FromQuery] string detailTableName, [FromQuery] string tableName
+        public async Task<object> GetTableLog() //[FromQuery] string detailTableName, [FromQuery] string tableName
         {
             var tableName = "test";
             var detailTableName = "Th_DetailLog202503";
-            return await HiSqlCredentialModule.GetTableDetailLogs(hiSqlClient, tableName, detailTableName, (query, settingObj) =>
-               {
-                   query = query.Sort(["CreateTime asc"]);
-                   return query;
-               });
+            return await HiSqlCredentialModule.GetTableDetailLogs(
+                hiSqlClient,
+                tableName,
+                detailTableName,
+                (query, settingObj) =>
+                {
+                    query = query.Sort(["CreateTime asc"]);
+                    return query;
+                }
+            );
         }
-
     }
 }
