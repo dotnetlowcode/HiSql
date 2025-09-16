@@ -1,4 +1,5 @@
 ﻿using HiSql.PostGreSqlUnitTest.Table;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -25,11 +26,11 @@ namespace HiSql.PostGreSqlUnitTest
             //Query_Demo13(sqlClient);
             //Query_Demo15(sqlClient);
             //Query_Demo16(sqlClient);
-            //Query_Demo18(sqlClient);
+            Query_Demo18(sqlClient);
             //Query_Demo19(sqlClient);
-            Query_Demo20(sqlClient);
+            //Query_Demo20(sqlClient);
         }
-        static void Query_Demo20(HiSqlClient sqlClient)
+        static void Query_Demo21(HiSqlClient sqlClient)
         {
             var filters = new Filter();
 
@@ -43,15 +44,21 @@ namespace HiSql.PostGreSqlUnitTest
             filters.Add(LogiType.OR);
 
             filters.Add("(");
-            filters.Add(LogiType.OR);
             filters.Add("SID", OperType.EQ, 0);
+            filters.Add(LogiType.OR);
             filters.Add("UName", OperType.EQ, "asdf");
-            filters.Add(")"); 
             filters.Add(")");
+            filters.Add(")");
+            filters.Add(LogiType.AND);
+            filters.Add("SID", OperType.EQ, 0);
             var query = sqlClient.Query("HTest02").Field(@"SID")
-               .Where(filters ).ToSql();
+               .Where(filters).ToSql();
             Console.WriteLine(query);
             return;
+        }
+            static void Query_Demo20(HiSqlClient sqlClient)
+        {
+            
             var task = Task.Run( async() =>
             {
                 bool isexits = sqlClient.DbFirst.CheckTabExists(typeof(HTest02).Name);
@@ -71,11 +78,36 @@ namespace HiSql.PostGreSqlUnitTest
                 cnt87 = sqlClient.Insert("#test02", new HTest02 { SID = 1, UName = "tansar" }).ExecCommand();
                 for (int i = 0; i < 10; i++)
                 {
-
-
                     cnt87 = sqlClient.Insert("#test02", new HTest02 { SID = 1 + new Random().Next(1000, 2000), UName = "tansar" }).ExecCommand();
 
                 }
+
+                var query = sqlClient
+                           .Query("#test02")
+                           .As("t1")
+                           .Field("t2.*")
+                           .Join("HTest02", JoinType.Left)
+                           .As("t2");
+                var obj = new JoinOn();
+                obj.Add("t1.SID", "t2.SID");
+
+                query = query.On(obj);
+                var filters = new Filter();
+
+                filters.Add("SID", OperType.EQ, 0);
+                foreach (var fieldEle in filters.Elements.Where(t => t.FilterType == FilterType.CONDITION))
+                {
+                    fieldEle.Field.TabName = "HTest02";
+                    fieldEle.Field.AsTabName = "t2";
+                }
+
+                query.Where(filters);
+                var currSql = query.Skip(1).Take(30).ToSql();
+                
+                var tt = query.Skip(1).Take(30).ToTable();
+                Console.WriteLine(currSql);
+                return;
+
 
                 var sqldbHTest02 = sqlClient.HiSql("select * from HTest02 ").ToTable();
 
@@ -152,8 +184,27 @@ namespace HiSql.PostGreSqlUnitTest
         }
         static void Query_Demo18(HiSqlClient sqlClient)
         {
+
+            TabInfo stockTabInfo = sqlClient.DbFirst.GetTabStruct("ThStock");
+            TabInfo tabInfo = GetTempTabInfo(stockTabInfo);
+            //
+            sqlClient.DbFirst.CreateTable(tabInfo);
+
+            var data = sqlClient.HiSql($"select * from {tabInfo.TabModel.TabName}").ToTable();
+            var tmp_struct = sqlClient.DbFirst.GetTabStruct(tabInfo.TabModel.TabName);
+
+
+
+
+            var t = sqlClient.DbFirst.GetTabStruct("ThOrderDetail");
+
+            var t3 = sqlClient.DbFirst.GetTabStruct("ThOrderDetail_2025");
             string sql = sqlClient.HiSql("select FieldName, count(FieldName) as NAME_count,max(FieldType) as FieldType_max from Hi_FieldModel  group by FieldName").ToSql();
 
+            string _sql2 = sqlClient.HiSql("select  b.SkuCode , count(b.SkuCode ) as skucount from ThStock as a  inner join ThGoodsInfoSku as b on a.BarCode=b.BarCode and a.MaterialCode = b.MaterialCode   where b.StyleCode = 'HG00458'  and a.StockInventory>0 and b.Size=19  and b.Jinz < 5 group by b.SkuCode having count(*)  > 3").ToSql();
+
+            string _sql3 = "select  * from ThOrderStatus as thorderstatus  where thorderstatus.ThirdName = 'Tmall'   and thorderstatus.TradeNumber not in (select  thtaskordertsformed.TradeNumber from ThTaskOrderTsformed as thtaskordertsformed\r\n  where thtaskordertsformed.CreateTime >= '2025-04-7 00:00:00' and thtaskordertsformed.TfStatus = 0  ) and thorderstatus.Flag = 0 and  (thorderstatus.TradeStatus >= 10 or thorderstatus.TradeStatus < 0)  order by thorderstatus.OCreateTime asc";
+            string _sql3_str=sqlClient.HiSql(_sql3).ToSql();
 
             string sql_having = sqlClient.HiSql("select FieldName, count(FieldName) as NAME_count,max(FieldType) as FieldType_max from Hi_FieldModel  group by FieldName having count(FieldName) > 1").ToSql();
             List<HiColumn> lst = sqlClient.HiSql("select FieldName, count(FieldName) as NAME_count,max(FieldType) as FieldType_max from Hi_FieldModel  group by FieldName").ToColumns();
@@ -358,5 +409,36 @@ namespace HiSql.PostGreSqlUnitTest
 
 
         }
+        public static TabInfo GetTempTabInfo(TabInfo tabinfo)
+        {
+            var primaryJsonList = JArray.FromObject(
+                tabinfo.GetColumns.Where(col => col.IsPrimary).ToList()
+            );
+            List<HiColumn> lstcolumn = tabinfo.GetColumns.Where(col => col.IsPrimary).ToList();
+            var primaryList = new List<HiColumn>();
+            var randm = new Random().Next(100000, 999999);
+            //var tempTableName = "#" + tableName + "_" + randm;
+            string tempName = $"#{tabinfo.TabModel.TabName}_{randm}";
+
+            foreach (var primary in primaryJsonList)
+            {
+                var column = primary.ToObject<HiColumn>();
+                if (column != null)
+                {
+                    column.TabName = tempName;
+                    column.IsPrimary = false;
+                    column.IsIdentity = false;
+                    primaryList.Add(column);
+                }
+            }
+
+            TabInfo _tabinfo = new TabInfo
+            {
+                TabModel = new HiTable { TabName = tempName },
+                Columns = primaryList
+            };
+            return _tabinfo;
+        }
     }
+  
 }

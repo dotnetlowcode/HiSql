@@ -388,9 +388,15 @@ namespace HiSql
             List<HiColumn> _lstmodi = new List<HiColumn>();
             List<object> _lstdel = new List<object>();
             HiSqlClient _client = null;
-            
+
             string _keyname = HiSqlCommProvider.GetTabCacheKey(tabname, Context.CurrentConnectionConfig);
             TabInfo newtabinfo = this.Context.MCache.GetCache<TabInfo>(_keyname);
+
+            //add by pengxy date:2025.6.19
+            HiTable curTable = new HiTable { TabName = tabname };
+            if (newtabinfo == null && curTable.TableType.IsIn<TableType>(TableType.Global, TableType.Local, TableType.Var))
+                newtabinfo = this.Context.MCache.GetCache<TabInfo>(tabname);
+
             if (newtabinfo == null)
             {
                 newtabinfo = HiSqlCommProvider.InitTabMaping(_keyname, () =>
@@ -793,7 +799,7 @@ namespace HiSql
             {
                 if (_i != _values.Count - 1)
                 {
-                    _sb_field.Append($"{n},");
+                    _sb_field.Append($"[{n}],");
                     if( _values[n] is null)
                         _sb_value.Append($"null,");
                     else
@@ -801,7 +807,7 @@ namespace HiSql
                 }
                 else
                 {
-                    _sb_field.Append($"{n}");
+                    _sb_field.Append($"[{n}]");
                     if (_values[n] is null)
                         _sb_value.Append($"null");
                     else

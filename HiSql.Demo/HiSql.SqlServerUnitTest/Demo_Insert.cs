@@ -62,8 +62,12 @@ namespace HiSql
                 get; set;
             }
         }
-        class H_Test : StandField
+
+        [System.Serializable]
+        [HiTable(IsEdit = true, TabName = "H_Test")]
+        public class H_Test : StandField
         {
+            [HiColumn(FieldDesc = "编号", IsPrimary = true, IsBllKey = true, FieldType = HiType.INT, SortNum = 1, IsSys = false, DBDefault = HiTypeDBDefault.EMPTY)]
             public int Hid
             {
                 get; set;
@@ -329,21 +333,85 @@ namespace HiSql
             var s = Console.ReadLine();
 
         }
+        public static TabInfo GetTempTabInfo(TabInfo tabinfo)
+        {
+            var primaryJsonList = JArray.FromObject(
+                tabinfo.GetColumns.Where(col => col.IsPrimary).ToList()
+            );
+            List<HiColumn> lstcolumn = tabinfo.GetColumns.Where(col => col.IsPrimary).ToList();
+            var primaryList = new List<HiColumn>();
+            var randm = new Random().Next(100000, 999999);
+            //var tempTableName = "#" + tableName + "_" + randm;
+            string tempName = $"#{tabinfo.TabModel.TabName}_{randm}";
 
+            foreach (var primary in primaryJsonList)
+            {
+                var column = primary.ToObject<HiColumn>();
+                if (column != null)
+                {
+                    column.TabName = tempName;
+                    column.IsPrimary = false;
+                    column.IsIdentity = false;
+                    primaryList.Add(column);
+                }
+            }
+
+            TabInfo _tabinfo = new TabInfo
+            {
+                TabModel = new HiTable { TabName = tempName },
+                Columns = primaryList
+            };
+            return _tabinfo;
+        }
         //测试 表校验检测
         static async Task Demo1_Insert7(HiSqlClient sqlClient)
         {
-            ///
-            //sqlClient.Modi("H_UType", new List<object> {
-            //    new { UTYP = "U1", UTypeName = "普通用户" },
-            //    new { UTYP = "U2", UTypeName = "中级用户" },
-            //    new { UTYP = "U3", UTypeName = "高级用户" }
-            //}).ExecCommand();
+            try
+            {
+
+                TabInfo stockTabInfo = sqlClient.DbFirst.GetTabStruct("ThStock");
+                TabInfo tabInfo = GetTempTabInfo(stockTabInfo);
+                //
+                sqlClient.DbFirst.CreateTable(tabInfo);
+
+                var data = sqlClient.HiSql($"select * from {tabInfo.TabModel.TabName}").ToTable();
+                var tmp_struct = sqlClient.DbFirst.GetTabStruct(tabInfo.TabModel.TabName);
+
+
+
+                ///
+                var ttt = sqlClient.Modi("H02_ShopInfo", new List<object> {
+                    new { ShopCode="A0001", AreaCode = "AreaCode", WhseName = "WhseName" },
+
+                    new { ShopCode="A0002", AreaCode = "AreaCode", WhseName = "WhseName" }
+                }).ToSql();
+
+                var ttt2 = sqlClient.Insert("H02_ShopInfo", new List<object> {
+                    new { ShopCode="A00021", AreaCode = "AreaCode", WhseName = "WhseName" },
+
+                    new { ShopCode="A00022", AreaCode = "AreaCode", WhseName = "WhseName" }
+                }).ToSql();
+
+
+                var ttt233 = sqlClient.Update("H02_ShopInfo", new List<object> {
+                    new { ShopCode="A00021", AreaCode = "AreaCode", WhseName = "WhseName" },
+
+                    new { ShopCode="A00022", AreaCode = "AreaCode", WhseName = "WhseName" }
+                }).ToSql();
+
+                sqlClient.DbFirst.CreateTable(new TabInfo() { });
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+            
 
             //sqlClient.Update("Hi_FieldModel", new { TabName = "HTest01", FieldName = "UTYP", Regex = @"" ,IsRefTab=true,RefTab= "H_UType",RefField="UTYP", RefFields = "UTYP,UTypeName",RefFieldDesc= "类型编码,类型名称",RefWhere="UTYP<>''" }).ExecCommand();
             //sqlClient.Update("Hi_FieldModel", new { TabName = "HTest01", FieldName = "UName", Regex = @"^[\w]+[^']$" ,IsRefTab=false,RefTab= "",RefField="", RefFields = "",RefFieldDesc= "",RefWhere="" }).ExecCommand();
             //sqlClient.BeginTran(IsolationLevel.ReadUncommitted);
-           // sqlClient.DbFirst.DropTable(typeof(HTest01).Name);
+            // sqlClient.DbFirst.DropTable(typeof(HTest01).Name);
 
             bool isok = sqlClient.DbFirst.CheckTabExists(typeof(HTest01).Name);
             if (isok == false)

@@ -808,7 +808,7 @@ namespace HiSql
         public override bool UnLock(params string[] keys)
         {
             if (keys.Length == 0) return true;
-            CheckRedis();
+            CheckRedisServer();
 
             Stopwatch stopwatch = Stopwatch.StartNew();
 
@@ -874,6 +874,7 @@ namespace HiSql
         /// <returns></returns>
         public override List<LckInfo> GetCurrLockInfo()
         {
+            CheckRedis();
             List<LckInfo> lckInfos = new List<LckInfo>();
             var hashkey = GetRegionKey(_lockhashname);
             var valu = _cache.HashGetAll(hashkey);
@@ -909,6 +910,7 @@ namespace HiSql
         /// <returns></returns>
         public override List<LckInfo> GetHisLockInfo()
         {
+            CheckRedis();
             List<LckInfo> lckInfos = new List<LckInfo>();
             var key = GetRegionKey(_lockhishashname);
             var valu = _cache.HashGetAll(key);
@@ -1121,6 +1123,7 @@ namespace HiSql
         }
         public override Tuple<bool, string> LockOn(string[] keys, LckInfo lckinfo, int expirySeconds = 30, int timeoutSeconds = 5)
         {
+            CheckRedis();
             var isBlockingMode = timeoutSeconds > 0; //是否
             Tuple<bool, string> tuple = new Tuple<bool, string>(false, "获取锁超时");
 
@@ -1409,7 +1412,7 @@ namespace HiSql
 
             var isBlockingMode = timeoutSeconds > 0; //是否
 
-            CheckRedis();
+            CheckRedisServer();// CheckRedis();
             if (!key.Contains(_lockkeyPrefix))
                 key = _lockkeyPrefix + key;
 
@@ -1574,7 +1577,7 @@ namespace HiSql
             {
                 return LockOnExecute(keys[0], action, lckinfo, expirySeconds, timeoutSeconds);
             }
-            CheckRedis();
+            CheckRedisServer(); //CheckRedis();
             int _max_second = int.MaxValue;//最长定锁有效期
             int _max_timeout = int.MaxValue;//最长加锁等待时间
             int _times = 5;//续锁最多次数
@@ -1714,6 +1717,7 @@ namespace HiSql
 
         public string ExecLuaScript(string script, object obj = null)
         {
+            CheckRedisServer();
             var scriptObj = LuaScript.Prepare(script);
             var redisResult = _cache.ScriptEvaluate(scriptObj, obj);
             return redisResult.ToString();
@@ -1751,6 +1755,7 @@ namespace HiSql
         {
             if (this.dic_sha.ContainsKey(shaid))
             {
+                CheckRedisServer();
                 RedisKey[] rediskeys=new RedisKey[] { };
                 RedisValue[] redisvalues=new RedisValue[] { };
 
@@ -1827,7 +1832,7 @@ namespace HiSql
                 //        redisvalues[i] = (RedisValue)values[i];
                 //    }
                 //}
-
+                CheckRedisServer();
                 var result = _cache.ScriptEvaluate(this.dic_sha[shaid], rediskeys, redisvalues);
                 if (((bool)result))
                     return true;

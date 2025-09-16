@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using HiSql.Common.Entities.TabLog;
 using HiSql.Interface.TabLog;
+using HiSql.Utils;
 
 namespace HiSql
 {
@@ -1098,7 +1099,7 @@ namespace HiSql
             Func<Task<bool>> func
         )
         {
-           Credential credentialObj = null;
+            Credential credentialObj = null;
             var tableName = insertProvider.Table.TabName;
             if (IgnoreLogTable(tableName))
             {
@@ -1117,7 +1118,7 @@ namespace HiSql
                     //判断主键是否为自增，就报异常，自增不能记日志因为缺少主键id值
                     tabinfo.Columns.ForEach(fieldObj =>
                     {
-                        if(fieldObj.IsIdentity)
+                        if (fieldObj.IsIdentity)
                         {
                             throw new Exception("自增主键不能记录日志，因为缺少主键id值！");
                         }
@@ -1125,16 +1126,15 @@ namespace HiSql
                         {
                             throw new Exception("自增编号SNO主键不能记录日志，因为缺少主键id值！");
                         }
-                    }) ;
+                    });
                 }
                 var credentialModule = sqlProvider.GetCredentialModule();
-                //记录精确操作时间
-                //var watch = Stopwatch.StartNew();
-                var operateDataList = HiSql.Utils.ListObjectConverter.ConvertToListOfDictionary(insertProvider.Data);
-                credentialObj = await credentialModule.RecordLog(sqlProvider, tableName, operateDataList, new List<Dictionary<string, string>>(0), func, operateTypes);
-                //watch.Stop();
-                //Console.WriteLine($"记录RecordLog日志耗时：{watch.ElapsedMilliseconds}ms");
-                return credentialObj;
+                return await TaskHelper.ExcuteTimerAsync("Modi", async () =>
+                {
+                    var operateDataList = HiSql.Utils.ListObjectConverter.ConvertToListOfDictionary(insertProvider.Data);
+                    credentialObj = await credentialModule.RecordLog(sqlProvider, tableName, operateDataList, new List<Dictionary<string, string>>(0), func, operateTypes);
+                    return credentialObj;
+                });
             }
             await func();
             return credentialObj;
@@ -1169,7 +1169,7 @@ namespace HiSql
                 Filter where = null;
                 if (updateProvider.Wheres != null && updateProvider.Wheres.Count > 0)
                     where = new Filter(updateProvider.Wheres);
-                else if (updateProvider.Filters != null && updateProvider.Filters.Elements.Count > 0)
+                else if (updateProvider.Filters != null && (updateProvider.Filters.Elements.Count > 0 || updateProvider.Filters.IsHiSqlWhere))
                     where = updateProvider.Filters;
                 if (where != null)
                 {
@@ -1177,13 +1177,26 @@ namespace HiSql
                     var queryFieldList = new string[] { "*" };
                     var list = await sqlClient.Query(tableName).Field(queryFieldList).Where(where).ToEObjectAsync();
                     operateDataList = HiSql.Utils.ListObjectConverter.ConvertToListOfDictionary(list);
+                    var updateSetValue = HiSql.Utils.ListObjectConverter.ConvertToListOfDictionary(updateProvider.Data);
+                    if (updateProvider.Filters.IsHiSqlWhere)
+                    {
+                        foreach (var item in operateDataList)
+                            updateSetValue.ForEach(row =>
+                            {
+                                var keys = row.Keys;
+                                foreach (var key in keys)
+                                {
+                                    item[key] = row[key];
+                                }
+                            });
+                    }
                 }
                 else
                     operateDataList = HiSql.Utils.ListObjectConverter.ConvertToListOfDictionary(updateProvider.Data);
                 var credentialModule = sqlProvider.GetCredentialModule();
                 //记录精确操作时间
                 //var watch = Stopwatch.StartNew();
-                credentialObj= await credentialModule.RecordLog(sqlProvider, tableName, operateDataList, new List<Dictionary<string, string>>(0), func, new List<OperationType> {
+                credentialObj = await credentialModule.RecordLog(sqlProvider, tableName, operateDataList, new List<Dictionary<string, string>>(0), func, new List<OperationType> {
                         OperationType.Update
                 });
                 //watch.Stop();
@@ -1220,7 +1233,7 @@ namespace HiSql
                 using var sqlClient = sqlProvider.CloneClient();
                 if (deleteProvider.Wheres != null && deleteProvider.Wheres.Count > 0)
                     where = new Filter(deleteProvider.Wheres);
-                else if (deleteProvider.Filters != null && deleteProvider.Filters.Elements.Count > 0)
+                else if (deleteProvider.Filters != null && (deleteProvider.Filters.Elements.Count > 0 || deleteProvider.Filters.IsHiSqlWhere))
                     where = deleteProvider.Filters;
                 if (where != null)
                 {
@@ -1237,7 +1250,7 @@ namespace HiSql
                 var credentialModule = sqlProvider.GetCredentialModule();
                 //记录精确操作时间
                 //var watch = Stopwatch.StartNew();
-                credentialObj= await credentialModule.RecordLog(sqlProvider, tableName, new List<Dictionary<string, object>>(0), deleteList, func, new List<OperationType> { OperationType.Delete });
+                credentialObj = await credentialModule.RecordLog(sqlProvider, tableName, new List<Dictionary<string, object>>(0), deleteList, func, new List<OperationType> { OperationType.Delete });
                 //watch.Stop();
                 //Console.WriteLine($"记录RecordLog日志耗时：{watch.ElapsedMilliseconds}ms");
                 return credentialObj;

@@ -361,7 +361,7 @@ namespace HiSql.TabLog.Module
                         "t2.DCount",
                         "t2.RefLogId"
                     )
-                    .Join(tabManagerObj.MainTabLog, JoinType.Right)
+                    .Join(tabManagerObj.MainTabLog, JoinType.Left)
                     .As("t2");
                 query = query.On(
                     new JoinOn { { "t1.LogId", "t2.LogId" }, { "t1.TabName", "t2.TabName" } }
