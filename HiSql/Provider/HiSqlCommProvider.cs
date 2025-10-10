@@ -29,6 +29,12 @@ namespace HiSql
         /// <returns></returns>
         public static TabInfo InitTabMaping(string keyname, Func<TabInfo> GetInfo)
         {
+            /*
+             * 将表结构的的缓存获取进行调整 ，但锁定逻辑不变
+             * CacheContext.MCache.GetCache 改为 CacheContext.TabStructCache.GetCache
+             * add by tgm date:2025.10.8
+             */
+
             string _keyname = keyname;
             int _waitseconds = 20; //等待时间单位秒
             //string _keyname = Constants.KEY_TABLE_CACHE_NAME.Replace("[$TABLE$]", keyname.ToLower());
@@ -37,7 +43,7 @@ namespace HiSql
             var lckinfo = new LckInfo() { UName = "hisql", EventName = "InitTabMaping" };
             try
             {
-                tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
+                tableInfo = CacheContext.TabStructCache.GetCache<TabInfo>(_keyname);
 
                 if (tableInfo == null)
                 {
@@ -47,7 +53,7 @@ namespace HiSql
                         () =>
                         {
                             tableInfo = GetInfo();
-                            CacheContext.MCache.SetCache(_keyname, tableInfo);
+                            CacheContext.TabStructCache.SetCache(_keyname, tableInfo);
                         },
                         lckinfo,
                         30,
@@ -62,7 +68,7 @@ namespace HiSql
                         {
                             _currtimes = _currtimes + (1 * 1000);
                             Thread.Sleep(1 * 1000); //隔1000毫秒取一次缓存
-                            tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
+                            tableInfo = CacheContext.TabStructCache.GetCache<TabInfo>(_keyname);
                             if (tableInfo != null)
                             {
                                 _getinfo = true;
@@ -100,7 +106,7 @@ namespace HiSql
             }
             catch (Exception ex)
             {
-                tableInfo = CacheContext.MCache.GetCache<TabInfo>(_keyname);
+                tableInfo = CacheContext.TabStructCache.GetCache<TabInfo>(_keyname);
             }
             finally
             {
@@ -182,9 +188,15 @@ namespace HiSql
         /// <param name="tabname"></param>
         public static void RemoveTabInfoCache(string tabname, ConnectionConfig config)
         {
+            /*
+             * 将表结构的的缓存获取进行调整 ，但锁定逻辑不变
+             * CacheContext.MCache.GetCache 改为 CacheContext.TabStructCache.GetCache
+             * add by tgm date:2025.10.8
+             */
+
             string _keyname = GetTabCacheKey(tabname, config);
-            if (CacheContext.MCache.Exists(_keyname))
-                CacheContext.MCache.RemoveCache(_keyname);
+            if (CacheContext.TabStructCache.Exists(_keyname))
+                CacheContext.TabStructCache.RemoveCache(_keyname);
         }
 
         /// <summary>
@@ -1005,8 +1017,14 @@ namespace HiSql
 
         public static void InitMapping(Type type)
         {
+            /*
+             * 将表结构的的缓存获取进行调整 ，但锁定逻辑不变
+             * CacheContext.MCache.GetCache 改为 CacheContext.TabStructCache.GetCache
+             * add by tgm date:2025.10.8
+             */
+            
             string _keyname = Constants.KEY_ENTITY_NAME.Replace("[$NAME$]", type.FullName);
-            CacheContext.MCache.GetOrCreate<TabInfo>(
+            CacheContext.TabStructCache.GetOrCreate<TabInfo>(
                 _keyname,
                 () =>
                 {

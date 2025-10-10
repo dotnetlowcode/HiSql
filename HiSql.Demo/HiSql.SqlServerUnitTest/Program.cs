@@ -100,9 +100,9 @@ namespace HiSql.UnitTest
             // Console.WriteLine($"数据库连接id"+sqlcient.Context.ConnectedId);
             //Demo_Snro.Init(sqlcient);
             //Demo_Update.Init(sqlcient);
-            // Demo_Query.Init(sqlcient);
+             Demo_Query.Init(sqlcient);
            // DemoCodeFirst.Init(sqlcient);
-            Demo_Delete.Init(sqlcient);
+            //Demo_Delete.Init(sqlcient);
 
             //
             //Demo_Insert.Init(sqlcient);

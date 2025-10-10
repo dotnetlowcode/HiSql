@@ -383,6 +383,11 @@ namespace HiSql
         /// <returns></returns>
         public TabInfo GetTabStruct(string tabname)
         {
+            /*
+             * 将表结构的的缓存获取进行调整 ，但锁定逻辑不变
+             * CacheContext.MCache.GetCache 改为 CacheContext.TabStructCache.GetCache
+             * add by tgm date:2025.10.8
+             */
             string _schema = string.IsNullOrEmpty(Context.CurrentConnectionConfig.Schema) ? "dbo" : Context.CurrentConnectionConfig.Schema;
 
             List<HiColumn> _lstmodi = new List<HiColumn>();

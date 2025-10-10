@@ -52,8 +52,34 @@ namespace HiSql
             }
         }
 
+        /// <summary>
+        /// 表结构缓存
+        /// </summary>
+        internal static ICache TabStructCache
+        {
+            get
+            {
 
+                if (_cache == null)
+                {
+                    lock (_obj_mcache)
+                    {
+                        if (_cache == null)
+                        {
+                            /*
+                             * 当未开启redis缓存，或者开启了redis缓存但是表结构缓存强制使用内存缓存 
+                             */
+                            if (!Global.RedisOn || Global.TabStructOptions.TabStructCacheForceMCache)
+                                _cache = new MCache(HiSql.Constants.NameSpace);
+                            else
+                                _cache = new RCache(Global.RedisOptions);
+                        }
+                    }
+                }
 
+                return _cache;
+            }
+        }
 
 
         internal static ICache MCache

@@ -48,7 +48,7 @@ namespace HiSql.UnitTest
             //Query_Demo2(sqlClient);
             //Query_Demo4(sqlClient);
             //Query_Demo5(sqlClient);
-            Query_Demo6(sqlClient);
+            //Query_Demo6(sqlClient);
             //Query_Demo7(sqlClient);
             //Query_Demo8(sqlClient);
             //Query_Demo9(sqlClient);
@@ -69,13 +69,23 @@ namespace HiSql.UnitTest
 
             //Query_Null(sqlClient);
             //Query_Null2(sqlClient);
-           // Query_MyFlowDto(sqlClient);
+            // Query_MyFlowDto(sqlClient);
 
-           // Query_MyMultiJoinOn(sqlClient);
+            // Query_MyMultiJoinOn(sqlClient);
             //Query_Demo23(sqlClient);
+            Query_Demo24(sqlClient);
             var s = Console.ReadLine();
         }
 
+
+        static void Query_Demo24(HiSqlClient sqlClient)
+        {
+            HiSql.Global.RedisOn = true;
+            HiSql.Global.RedisOptions = new HiSql.RedisOptions { Host = "192.168.10.141", Port= 4010, Database=4,CacheRegion= "Third",IsZip=true };
+            HiSql.Global.TabStructOptions= new HiSql.TabStructOptions { TabStructCacheForceMCache = true };
+            string _sql = sqlClient.HiSql("select * from Hi_FieldModel order by TabName asc fieldname asc").Take(10).Skip(2).ToSql();
+
+        }
 
         static void Query_Demo23(HiSqlClient sqlClient)
         {
