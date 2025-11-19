@@ -453,6 +453,8 @@ namespace HiSql.TabLog.Module
         {
             var mangerObj = GetTableLogSetting(tableName, sqlClient);
             List<Hi_DetailLog> operateList;
+            if (InstallTableLog.GetSqlClientByName == null)
+                throw new Exception("未初始化函数(AddTabLogServer),表又开启了日志功能");
             //回滚操作
             using (var logClient = InstallTableLog.GetSqlClientByName(mangerObj.DbServer))
             {
