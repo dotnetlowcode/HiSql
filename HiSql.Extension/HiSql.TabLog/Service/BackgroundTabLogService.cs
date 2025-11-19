@@ -9,7 +9,6 @@ using HiSql.Interface.TabLog;
 using HiSql.TabLog.Ext;
 using HiSql.TabLog.Interface;
 using HiSql.TabLog.Model;
-using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
