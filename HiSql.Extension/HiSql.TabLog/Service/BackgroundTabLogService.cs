@@ -144,6 +144,8 @@ namespace HiSql.TabLog.Service
                 HiSqlClient hiSqlClient = null;
                 if (!dbClient.ContainsKey(group.Key))
                 {
+                    if (InstallTableLog.GetSqlClientByName == null)
+                        throw new Exception("未初始化函数(AddTabLogServer),表又开启了日志功能");
                     hiSqlClient = InstallTableLog.GetSqlClientByName(group.Key);
                     dbClient.Add(group.Key, hiSqlClient);
                 }

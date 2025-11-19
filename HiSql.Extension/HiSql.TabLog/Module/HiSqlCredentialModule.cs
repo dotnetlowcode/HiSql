@@ -292,7 +292,10 @@ namespace HiSql.TabLog.Module
             QueryWhereBuilder queryWhereBuilder
         )
         {
+
             var tabManagerObj = GetTableLogSetting(tableName, hiSqlClient);
+            if (InstallTableLog.GetSqlClientByName == null)
+                throw new Exception("未初始化函数(AddTabLogServer),表又开启了日志功能");
             using (var queryClient = InstallTableLog.GetSqlClientByName(tabManagerObj.DbServer))
             {
                 var mainLog = hiSqlClient
@@ -322,6 +325,8 @@ namespace HiSql.TabLog.Module
         )
         {
             var state = GetTableLogSetting(tableName, hiSqlClient);
+            if (InstallTableLog.GetSqlClientByName == null)
+                throw new Exception("未初始化函数(AddTabLogServer),表又开启了日志功能");
             using (var queryClient = InstallTableLog.GetSqlClientByName(state.DbServer))
             {
                 IQuery query = queryClient
@@ -348,6 +353,8 @@ namespace HiSql.TabLog.Module
         )
         {
             var tabManagerObj = GetTableLogSetting(tableName, hiSqlClient);
+            if (InstallTableLog.GetSqlClientByName == null)
+                throw new Exception("未初始化函数(AddTabLogServer),表又开启了日志功能");
             using (var queryClient = InstallTableLog.GetSqlClientByName(tabManagerObj.DbServer))
             {
                 IQuery query = queryClient
