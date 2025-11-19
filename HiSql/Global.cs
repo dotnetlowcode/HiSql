@@ -21,6 +21,7 @@ namespace HiSql
         static bool _redison = false;
 
 
+        static TabStructOptions tabStructOptions = new TabStructOptions();
         /// <summary>
         /// 是否开启编号
         /// </summary>
@@ -55,6 +56,16 @@ namespace HiSql
                 if (_redison && redisOptions != null)
                     CacheContext.Reset();
             }
+        }
+
+
+        /// <summary>
+        /// 表结构配置
+        /// </summary>
+        public static TabStructOptions TabStructOptions
+        {
+            get { return tabStructOptions; }
+            set { tabStructOptions = value; }
         }
 
         /// <summary>

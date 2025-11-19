@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <TargetFrameworks>net461;net5.0;netcoreapp3.1;net6.0;net7.0;net8.0</TargetFrameworks>
-    <Version>1.0.8.8</Version>
+	  <TargetFrameworks>net461;net5.0;netcoreapp3.1;net6.0;net7.0;net8.0;net9.0;net10.0</TargetFrameworks>
+    <Version>1.0.8.9</Version>
     <Authors>tansar</Authors>
     <Company>dotnetlowcode</Company>
     <Description>该包支持PostGreSql数据库 依赖于HiSql.dll包运行</Description>

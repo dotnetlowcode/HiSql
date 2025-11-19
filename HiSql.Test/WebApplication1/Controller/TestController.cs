@@ -51,7 +51,10 @@ namespace WebApplication1.Controller
                 }
                 var insertValue = await hiSqlClient.Insert("test", dataList).ExecCommandAsync();
                 watch.Stop();
-                Console.WriteLine($"执行插入{k} {watch.ElapsedMilliseconds}ms");
+                //Console.WriteLine($"执行插入{k} {watch.ElapsedMilliseconds}ms");
+            }catch(Exception ex)
+            {
+                Console.WriteLine("异常:" + ex.Message);
             }
 
             return "OK";

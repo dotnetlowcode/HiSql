@@ -43,6 +43,17 @@
 
 # 项目更新日志
 
+## 2025年6月6日 发布更新
+### 1. 增加对.NET10.0的支持
+    Oracle的暂时不支持
+### 2. 增加在启用redis时可单独开启表结构缓存使用内存缓存
+```csharp
+    HiSql.Global.RedisOn = true;
+    HiSql.Global.RedisOptions = new HiSql.RedisOptions { Host = "192.168.10.141", Port= 4010, Database=4,CacheRegion= "Third",IsZip=true };
+    /*TabStructCacheForceMCache=true 表示在开启用了redis的情况下表结构缓存强制使用内存缓存 */
+    HiSql.Global.TabStructOptions= new HiSql.TabStructOptions { TabStructCacheForceMCache = true };
+```
+
 ## 2025年3月28日 发布更新
 
 本次更新新增了强大的日志记录模块，允许您记录表的所有更改，并通过生成的凭证 ID 进行数据反向恢复。
