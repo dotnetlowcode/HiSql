@@ -267,3 +267,5 @@ __pycache__/
 /EmitDemo.rar
 /HiSql-dameng.zip
 /HiSql.zip
+**/.DS_Store
+HiSql.Extension/.DS_Store
