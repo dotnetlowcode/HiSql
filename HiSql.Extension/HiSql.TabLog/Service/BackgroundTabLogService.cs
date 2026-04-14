@@ -164,8 +164,16 @@ namespace HiSql.TabLog.Service
                         );
                         tableExists.Add(tableGroup.Key, true);
                     }
-                    await hiSqlClient.Insert(tableGroup.Key, tableGroup.Value).ExecCommandAsync();
+                    List<Hi_MainLog> mainLogs = tableGroup.Value;
+                    var userRecords = mainLogs.GroupBy(r => r.CreateName);
+                    foreach (var userRecord in userRecords)
+                    {
+                        List<Hi_MainLog> values = userRecord.Value;
+                        hiSqlClient.CurrentConnectionConfig.User = userRecord.Key;
+                        await hiSqlClient.Insert(tableGroup.Key, values).ExecCommandAsync();
+                    }
                 }
+
                 foreach (var tableGroup in detailLogs)
                 {
                     //看表是否存在，不存在就创建
@@ -177,7 +185,15 @@ namespace HiSql.TabLog.Service
                         );
                         tableExists.Add(tableGroup.Key, true);
                     }
-                    await hiSqlClient.Insert(tableGroup.Key, tableGroup.Value).ExecCommandAsync();
+                    List<Hi_DetailLog> ddRecord = tableGroup.Value;
+                    var createUserGroup = ddRecord.GroupBy(r => r.CreateName);
+                    foreach (var userGroup in createUserGroup)
+                    {
+                        List<Hi_DetailLog> userRecord = userGroup.Value;
+                        //记录创建人
+                        hiSqlClient.CurrentConnectionConfig.User = userGroup.Key;
+                        await hiSqlClient.Insert(tableGroup.Key, userRecord).ExecCommandAsync();
+                    }
                 }
                 //hiSqlClient.CommitTran();
                 //watch.Stop();

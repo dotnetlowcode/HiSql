@@ -63,6 +63,7 @@ namespace HiSql.TabLog.Module
                 OldValue = new List<IDictionary<string, object>>(),
                 OperationType = OperationType.Delete,
                 TableName = tableName,
+                CreateName = mainClient.CurrentConnectionConfig.User
             };
             var addLog = new OperationLog
             {
@@ -77,6 +78,7 @@ namespace HiSql.TabLog.Module
                 OldValue = new List<IDictionary<string, object>>(),
                 OperationType = OperationType.Update,
                 TableName = tableName,
+
             };
             // 如果operationTypes里包含删除和更新操作则需要创建临时表
             if (
