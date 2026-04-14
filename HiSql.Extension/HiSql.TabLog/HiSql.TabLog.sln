@@ -4,6 +4,8 @@ VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HiSql.TabLog", "HiSql.TabLog.csproj", "{7C9B0334-781B-19DA-73E9-63018A7D1855}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HiSql", "..\..\HiSql\HiSql.csproj", "{B826C0D4-D2AB-0FC1-C189-16B122E76BDB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -14,6 +16,10 @@ Global
 		{7C9B0334-781B-19DA-73E9-63018A7D1855}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C9B0334-781B-19DA-73E9-63018A7D1855}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C9B0334-781B-19DA-73E9-63018A7D1855}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B826C0D4-D2AB-0FC1-C189-16B122E76BDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B826C0D4-D2AB-0FC1-C189-16B122E76BDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B826C0D4-D2AB-0FC1-C189-16B122E76BDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B826C0D4-D2AB-0FC1-C189-16B122E76BDB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

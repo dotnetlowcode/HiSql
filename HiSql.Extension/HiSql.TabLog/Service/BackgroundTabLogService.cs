@@ -9,6 +9,7 @@ using HiSql.Interface.TabLog;
 using HiSql.TabLog.Ext;
 using HiSql.TabLog.Interface;
 using HiSql.TabLog.Model;
+using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -164,9 +165,9 @@ namespace HiSql.TabLog.Service
                         );
                         tableExists.Add(tableGroup.Key, true);
                     }
-                    List<Hi_MainLog> mainLogs = tableGroup.Value;
-                    var userRecords = mainLogs.GroupBy(r => r.CreateName);
-                    foreach (var userRecord in userRecords)
+                    List<Hi_MainLog> gropuMainLogs = tableGroup.Value;
+                    var userMainRecords = gropuMainLogs.GroupBy(r => r.CreateName).ToDictionary(r=>r.Key,r=>r.ToList());
+                    foreach (var userRecord in userMainRecords)
                     {
                         List<Hi_MainLog> values = userRecord.Value;
                         hiSqlClient.CurrentConnectionConfig.User = userRecord.Key;
@@ -186,7 +187,7 @@ namespace HiSql.TabLog.Service
                         tableExists.Add(tableGroup.Key, true);
                     }
                     List<Hi_DetailLog> ddRecord = tableGroup.Value;
-                    var createUserGroup = ddRecord.GroupBy(r => r.CreateName);
+                    var createUserGroup = ddRecord.GroupBy(r => r.CreateName).ToDictionary(r => r.Key, r => r.ToList());
                     foreach (var userGroup in createUserGroup)
                     {
                         List<Hi_DetailLog> userRecord = userGroup.Value;

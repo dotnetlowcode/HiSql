@@ -62,8 +62,7 @@ namespace HiSql.TabLog.Module
                 NewValue = new List<IDictionary<string, object>>(0),
                 OldValue = new List<IDictionary<string, object>>(),
                 OperationType = OperationType.Delete,
-                TableName = tableName,
-                CreateName = mainClient.CurrentConnectionConfig.User
+                TableName = tableName
             };
             var addLog = new OperationLog
             {
