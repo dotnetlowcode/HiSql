@@ -353,7 +353,7 @@ namespace HiSql.Extension
                 //    ICell _dCell = excelRow.CreateCell(colIdx);
                 //    _dCell.CellStyle = textStyle;
                 //    var _value = dt.Rows[i][j].ToString().Trim();
-                   
+
                 //    if (
                 //        columnObj.DataType == typeDec
                 //        || columnObj.DataType == typeInt
@@ -424,6 +424,8 @@ namespace HiSql.Extension
                     file.Close();
                     file.Dispose();
                 }
+                // 📢 极其重要：写完文件后，立刻调用 Dispose 释放临时文件
+                ((SXSSFWorkbook)workbook).Dispose();
                 Console.WriteLine("Excel保存结束");
             }
         }
