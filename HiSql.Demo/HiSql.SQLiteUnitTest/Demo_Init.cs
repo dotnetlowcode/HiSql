@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
+using Microsoft.Data.Sqlite;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -18,7 +18,7 @@ namespace HiSql.UnitTest
             //string DriverPath = "/Users/tansar/work/project/ThirdApi/ThirdApi/ThirdApi/bin/Debug/net6.0/Data/Db/";
             string DriverPath = "D:\\Project\\ThirdApi\\ThirdApi\\ThirdApi\\bin\\Debug\\net6.0\\Data\\Db";
             string dbName = Path.Combine(DriverPath, $"LocalServer_{DateTime.Now.ToString("yyyyMM")}_Third.db");
-            string connStr = new SQLiteConnectionStringBuilder()
+            string connStr = new SqliteConnectionStringBuilder()
             {
                 DataSource = dbName
                 ,
@@ -79,7 +79,7 @@ namespace HiSql.UnitTest
             // Global.RedisOptions = new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "", CacheRegion = "", Database = 3, EnableMultiCache = false, KeyspaceNotificationsEnabled = false };
 
             string dbName = Path.Combine(Environment.CurrentDirectory, "SampleDB3.db");
-            string connStr = new SQLiteConnectionStringBuilder()
+            string connStr = new SqliteConnectionStringBuilder()
             {
                 DataSource = dbName
                 ,
@@ -135,6 +135,6 @@ namespace HiSql.UnitTest
             Console.WriteLine($" 版本号：{sqlclient.Context.DMTab.DBVersion().Version}  版本描述：{sqlclient.Context.DMTab.DBVersion().VersionDesc}");
             return sqlclient;
         }
-        
+
     }
 }

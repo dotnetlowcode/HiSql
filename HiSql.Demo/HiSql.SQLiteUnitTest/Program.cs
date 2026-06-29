@@ -69,11 +69,11 @@ namespace HiSql.UnitTest
             HiSqlClient _sqlcient = Demo_Init.GetSqliteClient();
              //Demo_Insert.Init(_sqlcient);//ok
             //Demo_Update.Init(sqlcient);//ok
-            //Demo_Query.Init(sqlcient);//ok
+            Demo_Query.Init(sqlcient);//ok
 
             //Demo_Delete.Init(sqlcient);//ok
             //
-            DemoCodeFirst.Init(sqlcient);//ok
+            //DemoCodeFirst.Init(sqlcient);//ok
             //Demo_Snro.Init(sqlcient);
              //Demo_DbCode.Init(sqlcient);
 

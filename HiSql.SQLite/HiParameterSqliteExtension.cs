@@ -1,12 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
-using System.Data.SQLite;
+using Microsoft.Data.Sqlite;
 
 namespace HiSql
 {
@@ -16,15 +15,15 @@ namespace HiSql
 
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="hiParameter"></param>
         /// <returns></returns>
-        public static SQLiteParameter ConvertToSqlParameter(this HiParameter hiParameter)
+        public static SqliteParameter ConvertToSqlParameter(this HiParameter hiParameter)
         {
             if (hiParameter != null)
             {
-                SQLiteParameter sqlParameter = new SQLiteParameter();
+                SqliteParameter sqlParameter = new SqliteParameter();
                 sqlParameter.ParameterName = hiParameter.ParameterName;
                 sqlParameter.Size = hiParameter.Size;
                 sqlParameter.Value = hiParameter.Value;

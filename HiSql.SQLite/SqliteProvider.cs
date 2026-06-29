@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Data.SQLite;
+using Microsoft.Data.Sqlite;
 using System.Threading.Tasks;
 
 namespace HiSql
@@ -29,7 +29,7 @@ namespace HiSql
                             _connstring = base.Context.CurrentConnectionConfig.AppEvents.OnDbDecryptEvent(_connstring);
                         }
                     }
-                    base._DbConnection = new SQLiteConnection(base.Context.CurrentConnectionConfig.ConnectionString);
+                    base._DbConnection = new SqliteConnection(base.Context.CurrentConnectionConfig.ConnectionString);
                 }
 
                 return base._DbConnection;
@@ -54,19 +54,19 @@ namespace HiSql
 
         public override DbDataAdapter GetAdapter()
         {
-            return new SQLiteDataAdapter();
+            return new SqliteDataAdapter();
         }
 
         public override DbCommand GetCommand(string sql, HiParameter[] param)
         {
             TryOpen(); 
-            SQLiteCommand sqlCommand = new SQLiteCommand(sql, (SQLiteConnection)this.Connection);
+            SqliteCommand sqlCommand = new SqliteCommand(sql, (SqliteConnection)this.Connection);
             
             sqlCommand.CommandType = this.CmdTyp;
             sqlCommand.CommandTimeout = this.CommandTimeOut;
             if (this.Transaction != null)
             {
-                sqlCommand.Transaction = (SQLiteTransaction)this.Transaction;
+                sqlCommand.Transaction = (SqliteTransaction)this.Transaction;
                 
             }
             else
@@ -83,13 +83,13 @@ namespace HiSql
             return sqlCommand;
         }
 
-        public SQLiteParameter[] GetSqlParameters(params HiParameter[] parameters)
+        public SqliteParameter[] GetSqlParameters(params HiParameter[] parameters)
         {
-            List<SQLiteParameter> sqlList = new List<SQLiteParameter>();
+            List<SqliteParameter> sqlList = new List<SqliteParameter>();
 
             foreach (var parameter in parameters)
             {
-                SQLiteParameter _sqlparam = parameter.ConvertToSqlParameter();
+                SqliteParameter _sqlparam = parameter.ConvertToSqlParameter();
                 if (_sqlparam != null)
                 {
 
@@ -109,7 +109,7 @@ namespace HiSql
         public override void SetCommandToAdapter(IDataAdapter dataAdapter, DbCommand command)
         {
 
-            ((SQLiteDataAdapter)dataAdapter).SelectCommand = (SQLiteCommand)command;
+            ((SqliteDataAdapter)dataAdapter).SelectCommand = (SqliteCommand)command;
         }
 
     }

@@ -54,6 +54,9 @@
     HiSql.Global.TabStructOptions= new HiSql.TabStructOptions { TabStructCacheForceMCache = true };
 ```
 
+## 2026年6月29 发布更新
+修改sqlite 跨平台问题
+
 ## 2025年3月28日 发布更新
 
 本次更新新增了强大的日志记录模块，允许您记录表的所有更改，并通过生成的凭证 ID 进行数据反向恢复。

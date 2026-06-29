@@ -1,7 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
+using Microsoft.Data.Sqlite;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -88,7 +88,7 @@ namespace HiSql.Unit.Test
             // Global.RedisOptions = new RedisOptions { Host = "127.0.0.1", Port = 6379, PassWord = "", CacheRegion = "", Database = 3, EnableMultiCache = false, KeyspaceNotificationsEnabled = false };
 
             string dbName = Path.Combine(Environment.CurrentDirectory, "SampleDB3.db");
-            string connStr = new SQLiteConnectionStringBuilder()
+            string connStr = new SqliteConnectionStringBuilder()
             {
                 DataSource = dbName
                 ,

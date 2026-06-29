@@ -25,7 +25,7 @@ namespace HiSql.UnitTest
 
         public static void Init(HiSqlClient sqlClient)
         {
-            // Query_Demo(sqlClient);//ok
+             Query_Demo(sqlClient);//ok
             //QuerySlave(sqlClient); //忽略从库查询
             //Query_Demo3(sqlClient); //ok
             //Query_Case(sqlClient);//有问题
